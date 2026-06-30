@@ -7,7 +7,7 @@ export const revalidate = 600
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://arwignplanners.com'
 
-export const NOTEBOOK_FAQS = [
+const NOTEBOOK_FAQS = [
   { q: 'How do I receive my notebook after purchase?', a: 'Instantly. A secure download link is emailed to you the moment payment clears, and it stays in your account so you can re-download any time.' },
   { q: 'Which apps and devices work with the notebooks?', a: 'Every notebook is hyperlinked and works in GoodNotes 5 & 6, Notability, Xodo and any PDF app on iPad, Android tablets and desktop. You can also print them at home.' },
   { q: 'What sizes are included?', a: 'Each notebook ships with A4, US Letter and A5 sizes so it fits your device or printer perfectly — no resizing required.' },
