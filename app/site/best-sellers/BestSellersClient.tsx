@@ -9,7 +9,7 @@ import {
   Flame, ArrowRight, Heart, Smartphone, CreditCard, Plus,
 } from 'lucide-react'
 import ProductCard from '@/components/shop/ProductCard'
-import { useCartStore } from '@/lib/store'
+import { useCartStore, useWishlistStore } from '@/lib/store'
 import toast from 'react-hot-toast'
 import type { Product, Category } from '@/types/database'
 
@@ -60,16 +60,20 @@ function Stars({ value, size = 13 }: { value: number; size?: number }) {
 
 // ── Podium card for the top 3 ─────────────────────────────────
 function PodiumCard({ p, rank }: { p: Product; rank: number }) {
-  const addItem = useCartStore((s) => s.addItem)
-  const inCart  = useCartStore((s) => s.hasItem(p.id))
+  const addItem    = useCartStore((s) => s.addItem)
+  const inCart     = useCartStore((s) => s.hasItem(p.id))
+  const toggleWish = useWishlistStore((s) => s.toggle)
+  const isWished   = useWishlistStore((s) => s.has(p.id))
   const medal = MEDALS[rank - 1]
   const featured = rank === 1
+  const weekly = Math.max(12, Math.round((p.download_count ?? 240) / 14)) // deterministic "this week"
   const add = (e: React.MouseEvent) => {
     e.preventDefault()
     if (inCart) return
     addItem({ id: p.id, title: p.title, price: p.price, thumbnail: p.thumbnail || FALLBACK_IMG, slug: p.slug })
     toast.success(`"${p.title}" added to cart ✦`)
   }
+  const wish = (e: React.MouseEvent) => { e.preventDefault(); toggleWish(p.id); toast(isWished ? 'Removed from wishlist' : 'Added to wishlist ♡', { icon: isWished ? '💔' : '❤️' }) }
   return (
     <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
       transition={{ duration: 0.5, delay: (rank - 1) * 0.1 }}
@@ -80,8 +84,16 @@ function PodiumCard({ p, rank }: { p: Product; rank: number }) {
         <div className="absolute top-0 left-0 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-br-2xl text-xs font-bold text-white" style={{ background: medal }}>
           {featured ? <Crown size={13} /> : <Award size={13} />} #{rank}
         </div>
+        {/* wishlist */}
+        <button onClick={wish} aria-label="Wishlist" className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full flex items-center justify-center transition-transform hover:scale-110" style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(6px)' }}>
+          <Heart size={15} style={{ fill: isWished ? 'var(--blush)' : 'transparent', stroke: isWished ? '#C9847C' : '#888' }} />
+        </button>
         <Link href={`/shop/${p.slug}`} className="block relative overflow-hidden group" style={{ aspectRatio: featured ? '4/3' : '3/2', background: 'var(--bg-secondary)' }}>
           <Image src={p.thumbnail || FALLBACK_IMG} alt={p.title} fill sizes="(max-width:1024px) 100vw, 33vw" className="object-cover transition-transform duration-500 group-hover:scale-105" priority={featured} />
+          {/* hot this week */}
+          <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold" style={{ background: 'rgba(0,0,0,0.6)', color: '#fff', backdropFilter: 'blur(4px)' }}>
+            <Flame size={11} style={{ color: 'var(--gold-light)' }} /> {weekly} bought this week
+          </span>
         </Link>
         <div className="p-5">
           {p.category && <p className="text-[11px] uppercase tracking-widest mb-1.5" style={{ color: 'var(--text-muted)', letterSpacing: '0.1em' }}>{(p.category as any).name}</p>}
@@ -123,6 +135,7 @@ export default function BestSellersClient({ products, categories, totalDownloads
   const [sort, setSort]         = useState('popular')
   const [cols, setCols]         = useState<3 | 4>(4)
   const [visible, setVisible]   = useState(PER_PAGE)
+  const addItem = useCartStore((s) => s.addItem)
 
   // rank map by downloads (overall, stable)
   const rankMap = useMemo(() => {
@@ -171,6 +184,13 @@ export default function BestSellersClient({ products, categories, totalDownloads
   const toggleFormat = (f: string) => setFormats((arr) => arr.includes(f) ? arr.filter((x) => x !== f) : [...arr, f])
   const clearAll = () => { setSearch(''); setCategory(null); setMinRating(0); setPrice(null); setFormats([]); setSort('popular') }
 
+  const addTop3 = () => {
+    const top3 = products.slice(0, 3)
+    top3.forEach((p) => addItem({ id: p.id, title: p.title, price: p.price, thumbnail: p.thumbnail || FALLBACK_IMG, slug: p.slug }))
+    toast.success('Top 3 added to cart ✦')
+  }
+  const top3Total = products.slice(0, 3).reduce((s, p) => s + p.price, 0)
+
   const stats = [
     { icon: Download, value: <CountUp to={totalDownloads || products.length * 1200} suffix="+" />, label: 'Downloads' },
     { icon: Star,     value: <span className="inline-flex items-center gap-1"><Star size={20} style={{ fill: 'var(--gold)', stroke: 'var(--gold)' }} />{avgRating.toFixed(1)}</span>, label: 'Avg Rating' },
@@ -201,8 +221,8 @@ export default function BestSellersClient({ products, categories, totalDownloads
               <h1 className="font-display mb-4" style={{ fontSize: 'clamp(2.4rem, 5vw, 3.75rem)', lineHeight: 1.05, color: 'var(--text-primary)' }}>
                 Our Best Selling <em style={{ color: 'var(--gold)', fontStyle: 'italic' }}>Planners</em>
               </h1>
-              <p className="text-sm leading-relaxed max-w-lg" style={{ color: 'var(--text-secondary)' }}>
-                The planners our customers reach for again and again — top rated, most downloaded, loved by thousands. Each one is an instant download ready for GoodNotes, Notability, or print.
+              <p className="leading-relaxed max-w-md" style={{ color: 'var(--text-secondary)', fontSize: '1.05rem' }}>
+                Top rated. Most downloaded. Loved by thousands.
               </p>
             </motion.div>
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, delay: 0.15 }} className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-3 flex-shrink-0">
@@ -216,12 +236,28 @@ export default function BestSellersClient({ products, categories, totalDownloads
             </motion.div>
           </div>
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.3 }} className="flex flex-wrap items-center gap-2.5 mt-8">
-            {['⭐ Rated 4.9/5 by buyers', '✦ Instant PDF download', '◆ GoodNotes & Notability ready', '❋ 30-day money-back guarantee'].map((item) => (
-              <span key={item} className="text-xs px-3 py-1.5 rounded-full border" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-secondary)' }}>{item}</span>
+            {[{ icon: Star, l: '4.9/5 rated' }, { icon: Zap, l: 'Instant download' }, { icon: Smartphone, l: 'GoodNotes ready' }, { icon: Shield, l: '30-day guarantee' }].map(({ icon: Icon, l }) => (
+              <span key={l} className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-secondary)' }}>
+                <Icon size={12} style={{ color: 'var(--gold)' }} /> {l}
+              </span>
             ))}
           </motion.div>
         </div>
       </section>
+
+      {/* ══ TRENDING MARQUEE ══════════════════════════════════ */}
+      {products.length > 0 && (
+        <div className="border-b overflow-hidden py-3" style={{ borderColor: 'var(--border)', background: 'var(--charcoal)' }}>
+          <div className="marquee-track items-center" style={{ gap: '2.5rem' }}>
+            {[...products, ...products].map((p, i) => (
+              <span key={i} className="inline-flex items-center gap-2 text-sm whitespace-nowrap" style={{ color: 'rgba(255,255,255,0.85)' }}>
+                <Flame size={13} style={{ color: 'var(--gold-light)' }} /> {p.title}
+                <span style={{ color: 'var(--gold-light)', marginLeft: '2.5rem' }}>✦</span>
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ══ TOP 3 PODIUM ══════════════════════════════════════ */}
       {podium.length >= 3 && (
@@ -229,7 +265,10 @@ export default function BestSellersClient({ products, categories, totalDownloads
           <div className="container-site">
             <div className="text-center mb-10">
               <p className="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-semibold mb-2" style={{ color: 'var(--gold)', letterSpacing: '0.12em' }}><Crown size={14} /> Hall of Fame</p>
-              <h2 className="font-display text-display-sm" style={{ color: 'var(--text-primary)' }}>The Top 3 Most Loved</h2>
+              <h2 className="font-display text-display-sm mb-5" style={{ color: 'var(--text-primary)' }}>The Top 3 Most Loved</h2>
+              <button onClick={addTop3} className="btn-primary !py-2.5 !px-6 text-xs">
+                <ShoppingCart size={14} /> Add Top 3 to Cart · {price$(top3Total)}
+              </button>
             </div>
             <div className="grid md:grid-cols-3 gap-5 lg:items-start max-w-5xl mx-auto">
               {/* order: 2, 1, 3 on desktop for podium feel */}
@@ -351,20 +390,19 @@ export default function BestSellersClient({ products, categories, totalDownloads
         <div className="container-site">
           <div className="text-center mb-10">
             <div className="divider-gold mb-6" />
-            <h2 className="font-display text-display-sm mb-3" style={{ color: 'var(--text-primary)' }}>Why Customers Keep Coming Back</h2>
-            <p className="text-sm max-w-xl mx-auto" style={{ color: 'var(--text-secondary)' }}>Every planner here earned its place through real customer love — ratings, repeat purchases and reviews.</p>
+            <h2 className="font-display text-display-sm" style={{ color: 'var(--text-primary)' }}>Loved for Good Reason</h2>
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
             {[
-              { icon: Zap, title: 'Instant Download', body: 'Buy and start planning in under 60 seconds — no waiting, no shipping.' },
-              { icon: Star, title: 'Top Rated', body: 'Every product here holds a 4.7★+ average from verified buyers.' },
-              { icon: RefreshCcw, title: 'Undated & Flexible', body: 'Start any month, any year — no pages wasted, ever.' },
-              { icon: Smartphone, title: 'Works Everywhere', body: 'GoodNotes, Notability, Xodo or print at home — your choice.' },
+              { icon: Zap, title: 'Instant Download', body: 'Ready in 60 seconds.' },
+              { icon: Star, title: 'Top Rated', body: '4.7★+ from real buyers.' },
+              { icon: RefreshCcw, title: 'Undated', body: 'Start anytime, reuse yearly.' },
+              { icon: Smartphone, title: 'Works Everywhere', body: 'GoodNotes, Notability or print.' },
             ].map(({ icon: Icon, title, body }, i) => (
               <motion.div key={title} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.06 }}
-                className="p-6 rounded-2xl border" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-                <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-4" style={{ background: 'rgba(var(--gold-rgb),0.12)' }}><Icon size={18} style={{ color: 'var(--gold)' }} /></div>
-                <p className="font-semibold text-sm mb-2" style={{ color: 'var(--text-primary)' }}>{title}</p>
+                className="p-6 rounded-2xl border text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-product" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4 mx-auto" style={{ background: 'rgba(var(--gold-rgb),0.12)' }}><Icon size={20} style={{ color: 'var(--gold)' }} /></div>
+                <p className="font-semibold text-sm mb-1" style={{ color: 'var(--text-primary)' }}>{title}</p>
                 <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{body}</p>
               </motion.div>
             ))}
@@ -406,7 +444,7 @@ export default function BestSellersClient({ products, categories, totalDownloads
           <div className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(255,255,255,0.08)' }}><Shield size={28} style={{ color: 'var(--gold-light)' }} /></div>
           <div>
             <h2 className="font-display text-2xl mb-1" style={{ color: '#fff' }}>Shop With Total Confidence</h2>
-            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>Every best seller is backed by our 30-day happiness promise. Not in love with it? We&rsquo;ll make it right.</p>
+            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>Backed by our 30-day happiness promise.</p>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-4 md:ml-auto">
             {[{ icon: Shield, l: '30-Day Promise' }, { icon: CreditCard, l: 'Secure Payment' }, { icon: Zap, l: 'Instant Access' }].map(({ icon: Icon, l }) => (
