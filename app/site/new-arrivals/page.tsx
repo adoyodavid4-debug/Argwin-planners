@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { createServiceRoleClient } from '@/lib/supabase/server'
-import NewArrivalsClient from './NewArrivalsClient'
+import NewArrivalsClient, { type RelItem } from './NewArrivalsClient'
+
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'New Arrivals — Fresh Digital & Printable Planners | Arwign',
@@ -12,62 +14,45 @@ export const metadata: Metadata = {
   },
 }
 
-export default async function NewArrivalsPage({
-  searchParams,
-}: {
-  searchParams: { sort?: string; category?: string; page?: string }
-}) {
+export default async function NewArrivalsPage() {
   const supabase = createServiceRoleClient()
 
-  // ── Fetch categories for filter pills ────────────────────
-  const { data: categories } = await supabase
-    .from('categories')
-    .select('*')
-    .order('sort_order')
-    .then((r) => ({ data: r.error ? [] : r.data }))
+  const [{ data: categories }, { data: products }, { data: related }] = await Promise.all([
+    supabase.from('categories').select('*').order('sort_order').then((r) => ({ data: r.error ? [] : r.data })),
+    supabase
+      .from('products')
+      .select('*, category:categories(name, slug)')
+      .eq('status', 'active')
+      .eq('is_new', true)
+      .order('created_at', { ascending: false })
+      .limit(100)
+      .then((r) => ({ data: r.error ? [] : r.data })),
+    supabase
+      .from('products')
+      .select('id, title, slug, price, currency, thumbnail')
+      .eq('status', 'active')
+      .eq('is_bestseller', true)
+      .order('download_count', { ascending: false })
+      .limit(8)
+      .then((r) => ({ data: r.error ? [] : r.data })),
+  ])
 
-  // ── Build new arrivals query ──────────────────────────────
-  let query = supabase
-    .from('products')
-    .select('*, category:categories(name, slug)', { count: 'exact' })
-    .eq('status', 'active')
-    .eq('is_new', true)
+  const items = (products ?? []) as any[]
+  const newIds = new Set(items.map((p) => p.id))
+  const relatedItems: RelItem[] = (related ?? [])
+    .filter((p: any) => !newIds.has(p.id))
+    .map((p: any) => ({ id: p.id, title: p.title, slug: p.slug, price: p.price, currency: p.currency, thumbnail: p.thumbnail }))
 
-  // Optional category filter
-  if (searchParams.category) {
-    const cat = categories?.find((c) => c.slug === searchParams.category)
-    if (cat) query = query.eq('category_id', cat.id)
-  }
-
-  // Sort — default newest first
-  switch (searchParams.sort) {
-    case 'popular':     query = query.order('download_count', { ascending: false }); break
-    case 'rating':      query = query.order('rating_avg',     { ascending: false }); break
-    case 'price-asc':   query = query.order('price',          { ascending: true  }); break
-    case 'price-desc':  query = query.order('price',          { ascending: false }); break
-    default:            query = query.order('created_at',     { ascending: false })
-  }
-
-  const page    = Math.max(1, parseInt(searchParams.page ?? '1'))
-  const perPage = 24
-  query = query.range((page - 1) * perPage, page * perPage - 1)
-
-  const { data: products, count } = await query.then((r) => ({
-    data:  r.error ? [] : r.data,
-    count: r.error ? 0  : r.count,
-  }))
-
-  // ── Most recently added (for "just dropped" badge) ───────
-  const latestDate = products?.[0]?.created_at ?? null
+  // categories that actually have a new arrival
+  const presentSlugs = new Set(items.map((p) => p.category?.slug).filter(Boolean))
+  const usedCategories = (categories ?? []).filter((c) => presentSlugs.has(c.slug))
 
   return (
     <NewArrivalsClient
-      initialProducts={products ?? []}
-      totalCount={count ?? 0}
-      categories={categories ?? []}
-      currentPage={page}
-      searchParams={searchParams}
-      latestDate={latestDate}
+      products={items}
+      categories={usedCategories}
+      related={relatedItems}
+      latestDate={items[0]?.created_at ?? null}
     />
   )
 }
