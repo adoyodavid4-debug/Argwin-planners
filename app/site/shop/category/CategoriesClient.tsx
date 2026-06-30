@@ -1,7 +1,7 @@
 'use client'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef } from 'react'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
 import {
   Tablet, Printer, Wallet, BookOpen, HeartPulse, Briefcase, CheckCircle,
   Utensils, Brain, Target, PiggyBank, LayoutTemplate, Package, Notebook,
@@ -34,6 +34,57 @@ const hexToRgba = (hex: string, a: number) => {
   return `rgba(${r},${g},${b},${a})`
 }
 
+// ── Interactive 3D tilt wrapper (follows the cursor) ──────────
+function Tilt3D({ children, className, intensity = 12, glare = true }: { children: React.ReactNode; className?: string; intensity?: number; glare?: boolean }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const mx = useMotionValue(0.5)
+  const my = useMotionValue(0.5)
+  const rx = useSpring(useTransform(my, [0, 1], [intensity, -intensity]), { stiffness: 250, damping: 22 })
+  const ry = useSpring(useTransform(mx, [0, 1], [-intensity, intensity]), { stiffness: 250, damping: 22 })
+  const gx = useTransform(mx, [0, 1], ['0%', '100%'])
+  const gy = useTransform(my, [0, 1], ['0%', '100%'])
+  const glareBg = useTransform([gx, gy], ([x, y]) => `radial-gradient(420px circle at ${x} ${y}, rgba(255,255,255,0.35), transparent 45%)`)
+
+  const onMove = (e: React.MouseEvent) => {
+    const r = ref.current?.getBoundingClientRect()
+    if (!r) return
+    mx.set((e.clientX - r.left) / r.width)
+    my.set((e.clientY - r.top) / r.height)
+  }
+  const reset = () => { mx.set(0.5); my.set(0.5) }
+
+  return (
+    <motion.div ref={ref} onMouseMove={onMove} onMouseLeave={reset}
+      className={className}
+      style={{ rotateX: rx, rotateY: ry, transformStyle: 'preserve-3d' }}>
+      {children}
+      {glare && (
+        <motion.div aria-hidden className="pointer-events-none absolute inset-0 rounded-[inherit] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          style={{ background: glareBg, mixBlendMode: 'overlay', transform: 'translateZ(60px)' }} />
+      )}
+    </motion.div>
+  )
+}
+
+// ── Stylized 3D planner mockup (decorative) ───────────────────
+function PlannerMock({ accent, icon: Icon }: { accent: string; icon: React.ElementType }) {
+  return (
+    <div className="rounded-2xl overflow-hidden shadow-2xl" style={{ width: 160, aspectRatio: '3/4', background: 'var(--bg-card)', border: '1px solid var(--border)', transformStyle: 'preserve-3d' }}>
+      <div className="h-2/5 flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${hexToRgba(accent, 0.9)}, ${hexToRgba(accent, 0.55)})` }}>
+        <Icon size={34} color="white" style={{ opacity: 0.95 }} />
+      </div>
+      <div className="p-4 flex flex-col gap-2">
+        <div className="h-2 rounded-full" style={{ width: '70%', background: 'var(--border)' }} />
+        <div className="h-2 rounded-full" style={{ width: '90%', background: 'var(--border)' }} />
+        <div className="h-2 rounded-full" style={{ width: '55%', background: 'var(--border)' }} />
+        <div className="grid grid-cols-3 gap-1.5 mt-2">
+          {Array.from({ length: 6 }).map((_, i) => <div key={i} className="rounded" style={{ aspectRatio: '1', background: 'var(--bg-secondary)' }} />)}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 interface Props {
   categories:    Category[]
   counts:        Record<string, number>
@@ -61,6 +112,22 @@ export default function CategoriesClient({ categories, counts, totalProducts }: 
         <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute rounded-full blur-3xl opacity-30 animate-float" style={{ width: 320, height: 320, top: -100, right: '6%', background: 'var(--lavender)' }} />
           <div className="absolute rounded-full blur-3xl opacity-25 animate-float-delayed" style={{ width: 240, height: 240, bottom: -80, left: '2%', background: 'var(--gold)' }} />
+
+          {/* 3D floating planner mockups */}
+          <div className="hidden lg:block absolute inset-0" style={{ perspective: 1200 }}>
+            <motion.div className="absolute" style={{ top: 70, left: '7%', rotateX: 12, rotateY: 22, transformStyle: 'preserve-3d', opacity: 0.9 }}
+              animate={{ y: [0, -18, 0] }} transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}>
+              <PlannerMock accent="#7B6FAE" icon={Tablet} />
+            </motion.div>
+            <motion.div className="absolute" style={{ top: 50, right: '7%', rotateX: 12, rotateY: -22, transformStyle: 'preserve-3d', opacity: 0.9 }}
+              animate={{ y: [0, -22, 0] }} transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 0.6 }}>
+              <PlannerMock accent="#C9A84C" icon={Wallet} />
+            </motion.div>
+            <motion.div className="absolute" style={{ bottom: 24, right: '20%', rotateX: -10, rotateY: -16, transformStyle: 'preserve-3d', opacity: 0.7, scale: 0.8 }}
+              animate={{ y: [0, 16, 0] }} transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut', delay: 1 }}>
+              <PlannerMock accent="#E8A0A0" icon={HeartPulse} />
+            </motion.div>
+          </div>
         </div>
 
         <div className="container-site relative text-center">
@@ -128,31 +195,33 @@ export default function CategoriesClient({ categories, counts, totalProducts }: 
             {featured.map((cat, i) => {
               const m = meta(cat.slug); const Icon = m.icon; const n = counts[cat.id] ?? 0
               return (
-                <motion.div key={cat.id} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45, delay: i * 0.08 }}>
-                  <Link href={`/shop/category/${cat.slug}`}
-                    className="group relative block rounded-3xl overflow-hidden border h-full transition-all duration-300 hover:-translate-y-1.5 hover:shadow-product-hover"
-                    style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}>
-                    {/* Cover */}
-                    <div className="relative h-44 flex items-center justify-center overflow-hidden"
-                      style={{ background: `linear-gradient(135deg, ${hexToRgba(m.accent, 0.22)}, ${hexToRgba(m.accent, 0.06)})` }}>
-                      <div aria-hidden className="absolute rounded-full blur-2xl opacity-50 transition-transform duration-500 group-hover:scale-125" style={{ width: 130, height: 130, background: hexToRgba(m.accent, 0.5) }} />
-                      <div className="relative w-20 h-20 rounded-3xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3"
-                        style={{ background: 'var(--bg-card)', boxShadow: `0 8px 28px ${hexToRgba(m.accent, 0.3)}` }}>
-                        <Icon size={34} style={{ color: m.accent }} />
+                <motion.div key={cat.id} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45, delay: i * 0.08 }} style={{ perspective: 1100 }}>
+                  <Tilt3D className="group relative h-full rounded-3xl" intensity={11}>
+                    <Link href={`/shop/category/${cat.slug}`}
+                      className="relative flex flex-col rounded-3xl overflow-hidden border h-full transition-shadow duration-300 hover:shadow-product-hover"
+                      style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', transformStyle: 'preserve-3d' }}>
+                      {/* Cover */}
+                      <div className="relative h-44 flex items-center justify-center overflow-hidden"
+                        style={{ background: `linear-gradient(135deg, ${hexToRgba(m.accent, 0.22)}, ${hexToRgba(m.accent, 0.06)})`, transformStyle: 'preserve-3d' }}>
+                        <div aria-hidden className="absolute rounded-full blur-2xl opacity-50 transition-transform duration-500 group-hover:scale-125" style={{ width: 130, height: 130, background: hexToRgba(m.accent, 0.5) }} />
+                        <div className="relative w-20 h-20 rounded-3xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
+                          style={{ background: 'var(--bg-card)', boxShadow: `0 14px 34px ${hexToRgba(m.accent, 0.4)}`, transform: 'translateZ(55px)' }}>
+                          <Icon size={34} style={{ color: m.accent }} />
+                        </div>
+                        <span className="absolute top-4 right-4 text-[11px] font-semibold px-2.5 py-1 rounded-full" style={{ background: 'var(--bg-card)', color: 'var(--text-secondary)', transform: 'translateZ(35px)' }}>
+                          {n > 0 ? `${n} ${n === 1 ? 'design' : 'designs'}` : 'New'}
+                        </span>
                       </div>
-                      <span className="absolute top-4 right-4 text-[11px] font-semibold px-2.5 py-1 rounded-full" style={{ background: 'var(--bg-card)', color: 'var(--text-secondary)' }}>
-                        {n > 0 ? `${n} ${n === 1 ? 'design' : 'designs'}` : 'New'}
-                      </span>
-                    </div>
-                    {/* Body */}
-                    <div className="p-6">
-                      <h3 className="font-display text-2xl mb-2 transition-colors group-hover:text-gold" style={{ color: 'var(--text-primary)' }}>{cat.name}</h3>
-                      <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--text-secondary)' }}>{cat.description || m.blurb}</p>
-                      <span className="inline-flex items-center gap-1.5 text-sm font-semibold" style={{ color: m.accent }}>
-                        Explore collection <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
-                      </span>
-                    </div>
-                  </Link>
+                      {/* Body */}
+                      <div className="p-6" style={{ transform: 'translateZ(28px)' }}>
+                        <h3 className="font-display text-2xl mb-2 transition-colors group-hover:text-gold" style={{ color: 'var(--text-primary)' }}>{cat.name}</h3>
+                        <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--text-secondary)' }}>{cat.description || m.blurb}</p>
+                        <span className="inline-flex items-center gap-1.5 text-sm font-semibold" style={{ color: m.accent }}>
+                          Explore collection <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
+                        </span>
+                      </div>
+                    </Link>
+                  </Tilt3D>
                 </motion.div>
               )
             })}
@@ -184,28 +253,30 @@ export default function CategoriesClient({ categories, counts, totalProducts }: 
             {(query ? filtered : rest).map((cat, i) => {
               const m = meta(cat.slug); const Icon = m.icon; const n = counts[cat.id] ?? 0
               return (
-                <motion.div key={cat.id} initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-30px' }} transition={{ duration: 0.4, delay: Math.min(i * 0.04, 0.4) }}>
-                  <Link href={`/shop/category/${cat.slug}`}
-                    className="group relative flex flex-col h-full p-5 rounded-2xl border overflow-hidden transition-all duration-300 hover:-translate-y-1"
-                    style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}
-                    aria-label={`Shop ${cat.name}`}>
-                    {/* hover glow */}
-                    <div aria-hidden className="absolute -top-10 -right-10 w-28 h-28 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ background: hexToRgba(m.accent, 0.35) }} />
-                    <div className="relative flex items-start justify-between mb-4">
-                      <div className="w-14 h-14 rounded-2xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3"
-                        style={{ background: hexToRgba(m.accent, 0.12), border: `1.5px solid ${hexToRgba(m.accent, 0.25)}` }}>
-                        <Icon size={24} style={{ color: m.accent }} />
+                <motion.div key={cat.id} initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-30px' }} transition={{ duration: 0.4, delay: Math.min(i * 0.04, 0.4) }} style={{ perspective: 900 }}>
+                  <Tilt3D className="group relative h-full rounded-2xl" intensity={9}>
+                    <Link href={`/shop/category/${cat.slug}`}
+                      className="relative flex flex-col h-full p-5 rounded-2xl border overflow-hidden transition-shadow duration-300 hover:shadow-product"
+                      style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', transformStyle: 'preserve-3d' }}
+                      aria-label={`Shop ${cat.name}`}>
+                      {/* hover glow */}
+                      <div aria-hidden className="absolute -top-10 -right-10 w-28 h-28 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ background: hexToRgba(m.accent, 0.35) }} />
+                      <div className="relative flex items-start justify-between mb-4" style={{ transform: 'translateZ(30px)' }}>
+                        <div className="w-14 h-14 rounded-2xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
+                          style={{ background: hexToRgba(m.accent, 0.12), border: `1.5px solid ${hexToRgba(m.accent, 0.25)}` }}>
+                          <Icon size={24} style={{ color: m.accent }} />
+                        </div>
+                        <span className="text-[11px] font-semibold px-2 py-1 rounded-full" style={{ background: 'var(--bg-secondary)', color: 'var(--text-muted)' }}>
+                          {n > 0 ? n : 'New'}
+                        </span>
                       </div>
-                      <span className="text-[11px] font-semibold px-2 py-1 rounded-full" style={{ background: 'var(--bg-secondary)', color: 'var(--text-muted)' }}>
-                        {n > 0 ? n : 'New'}
+                      <h3 className="relative font-semibold text-base mb-1.5 transition-colors group-hover:text-gold" style={{ color: 'var(--text-primary)', transform: 'translateZ(22px)' }}>{cat.name}</h3>
+                      <p className="relative text-xs leading-relaxed mb-4 flex-1" style={{ color: 'var(--text-secondary)' }}>{cat.description || m.blurb}</p>
+                      <span className="relative inline-flex items-center gap-1 text-xs font-semibold mt-auto" style={{ color: m.accent }}>
+                        Explore <ChevronRight size={13} className="transition-transform group-hover:translate-x-1" />
                       </span>
-                    </div>
-                    <h3 className="relative font-semibold text-base mb-1.5 transition-colors group-hover:text-gold" style={{ color: 'var(--text-primary)' }}>{cat.name}</h3>
-                    <p className="relative text-xs leading-relaxed mb-4 flex-1" style={{ color: 'var(--text-secondary)' }}>{cat.description || m.blurb}</p>
-                    <span className="relative inline-flex items-center gap-1 text-xs font-semibold mt-auto" style={{ color: m.accent }}>
-                      Explore <ChevronRight size={13} className="transition-transform group-hover:translate-x-1" />
-                    </span>
-                  </Link>
+                    </Link>
+                  </Tilt3D>
                 </motion.div>
               )
             })}
