@@ -11,14 +11,6 @@ import {
 } from 'lucide-react'
 import { OptInForm } from '@/components/funnel/OptInForm'
 
-export const NOTEBOOK_FAQS = [
-  { q: 'How do I receive my notebook after purchase?', a: 'Instantly. A secure download link is emailed to you the moment payment clears, and it stays in your account so you can re-download any time.' },
-  { q: 'Which apps and devices work with the notebooks?', a: 'Every notebook is hyperlinked and works in GoodNotes 5 & 6, Notability, Xodo and any PDF app on iPad, Android tablets and desktop. You can also print them at home.' },
-  { q: 'What sizes are included?', a: 'Each notebook ships with A4, US Letter and A5 sizes so it fits your device or printer perfectly — no resizing required.' },
-  { q: 'Can I get a notebook designed just for me?', a: 'Yes! Our personalized notebook service lets you describe the layout, theme or niche you need and our design team builds it around you.' },
-  { q: 'Do the notebooks expire or need a subscription?', a: 'Never. Buy once and it is yours forever, with free access to any future updates of that notebook — no subscriptions, ever.' },
-]
-
 const COVERS = [
   { name: 'Lavender', hex: '#A98FE3' },
   { name: 'Blush',    hex: '#F0B0A8', dark: true },
@@ -150,7 +142,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 }
 
 // ════════════════════════════════════════════════════════════
-export default function NotebooksClient({ notebooks }: { notebooks: NotebookItem[] }) {
+export default function NotebooksClient({ notebooks, faqs }: { notebooks: NotebookItem[]; faqs: { q: string; a: string }[] }) {
   const [cover, setCover] = useState(0)
   const c = COVERS[cover]
 
@@ -413,7 +405,7 @@ export default function NotebooksClient({ notebooks }: { notebooks: NotebookItem
             <p className="text-xs uppercase tracking-widest font-semibold mb-2" style={{ color: 'var(--gold)', letterSpacing: '0.12em' }}>Good to Know</p>
             <h2 className="font-display text-display-sm" style={{ color: 'var(--text-primary)' }}>Frequently Asked</h2>
           </div>
-          <div className="flex flex-col gap-3">{NOTEBOOK_FAQS.map((f, i) => <FaqItem key={i} {...f} />)}</div>
+          <div className="flex flex-col gap-3">{faqs.map((f, i) => <FaqItem key={i} {...f} />)}</div>
         </div>
       </section>
 
