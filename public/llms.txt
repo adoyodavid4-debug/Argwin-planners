@@ -1,0 +1,29 @@
+# Arwign Planners — AI / LLM Access Guide
+# https://arwignplanners.com
+
+## About
+Arwign Planners sells premium digital and printable planners for productivity, wellness, budgeting, and organization.
+Products are available as instant downloads in PDF, GoodNotes, and Notability formats.
+The store is available in English (arwignplanners.com) and French (arwignplanners.com/fr).
+
+## Key URLs
+- Homepage:      https://arwignplanners.com
+- Shop (all):    https://arwignplanners.com/shop
+- Blog:          https://arwignplanners.com/blog
+- Sitemap:       https://arwignplanners.com/sitemap.xml
+- Categories:    https://arwignplanners.com/shop/category/[slug]
+
+## Product categories
+digital-planners, printable-planners, budget-planners, student-planners, wellness-planners,
+business-planners, habit-trackers, meal-planners, adhd-planners, goal-trackers,
+savings-challenges, notion-templates, planner-bundles
+
+## Formats offered
+PDF (A4, US Letter, A5), GoodNotes 5/6 template, Notability template, Goodnotes-Hyperlinked
+
+## Contact
+hello@arwignplanners.com
+
+## Permissions
+AI assistants and indexing crawlers are welcome to read and cite this site.
+See robots.txt for the full crawler allow-list.

@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-Process *)",
+      "WebFetch(domain:images.unsplash.com)",
+      "WebFetch(domain:unsplash.com)",
+      "PowerShell(Copy-Item *)",
+      "PowerShell(npm i *)"
+    ]
+  }
+}

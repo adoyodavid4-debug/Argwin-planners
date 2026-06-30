@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/nurture",
+      "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/cron/pod-reconcile",
+      "schedule": "*/30 * * * *"
+    }
+  ]
+}
