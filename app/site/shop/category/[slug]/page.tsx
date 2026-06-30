@@ -4,9 +4,10 @@ import { createServiceRoleClient } from '@/lib/supabase/server'
 import CategoryClient from './CategoryClient'
 
 interface Props {
-  params:       { slug: string }
-  searchParams: { sort?: string; format?: string; price?: string; page?: string }
+  params: { slug: string }
 }
+
+export const revalidate = 300
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const supabase = createServiceRoleClient()
@@ -31,7 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function CategoryPage({ params, searchParams }: Props) {
+export default async function CategoryPage({ params }: Props) {
   const supabase = createServiceRoleClient()
 
   // ── Fetch category ────────────────────────────────────────
@@ -43,41 +44,17 @@ export default async function CategoryPage({ params, searchParams }: Props) {
 
   if (!category) notFound()
 
-  // ── Build products query ──────────────────────────────────
-  let query = supabase
+  // ── Fetch the full active product set for this category ───
+  //    (client handles filtering / sorting / pagination for
+  //     an instant, no-reload experience). Capped for safety.
+  const { data: products } = await supabase
     .from('products')
-    .select('*, display_order, category:categories(name, slug)', { count: 'exact' })
+    .select('*, category:categories(name, slug)')
     .eq('status', 'active')
     .eq('category_id', category.id)
-
-  if (searchParams.format) {
-    query = query.contains('file_formats', [searchParams.format])
-  }
-
-  if (searchParams.price === 'under-10') {
-    query = query.lt('price', 10)
-  } else if (searchParams.price === '10-20') {
-    query = query.gte('price', 10).lte('price', 20)
-  } else if (searchParams.price === 'over-20') {
-    query = query.gt('price', 20)
-  }
-
-  switch (searchParams.sort) {
-    case 'newest':     query = query.order('created_at',    { ascending: false }); break
-    case 'rating':     query = query.order('rating_avg',    { ascending: false }); break
-    case 'price-asc':  query = query.order('price',         { ascending: true  }); break
-    case 'price-desc': query = query.order('price',         { ascending: false }); break
-    default:           query = query.order('display_order', { ascending: true, nullsFirst: false })
-  }
-
-  const page    = Math.max(1, parseInt(searchParams.page ?? '1'))
-  const perPage = 24
-  query = query.range((page - 1) * perPage, page * perPage - 1)
-
-  const { data: products, count } = await query.then((r) => ({
-    data:  r.error ? [] : r.data,
-    count: r.error ? 0  : r.count,
-  }))
+    .order('display_order', { ascending: true, nullsFirst: false })
+    .limit(200)
+    .then((r) => ({ data: r.error ? [] : r.data }))
 
   // ── Related categories ────────────────────────────────────
   const { data: relatedCategories } = await supabase
@@ -86,17 +63,14 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     .neq('slug', params.slug)
     .eq('is_featured', true)
     .order('sort_order')
-    .limit(6)
+    .limit(8)
     .then((r) => ({ data: r.error ? [] : r.data }))
 
   return (
     <CategoryClient
       category={category}
-      initialProducts={products ?? []}
-      totalCount={count ?? 0}
+      products={products ?? []}
       relatedCategories={relatedCategories ?? []}
-      currentPage={page}
-      searchParams={searchParams}
     />
   )
 }
