@@ -36,7 +36,7 @@ function Callout({ children, icon }: { children: React.ReactNode; icon?: React.R
   return (
     <div
       className="flex gap-4 p-5 rounded-2xl border my-6"
-      style={{ background: 'rgba(201,168,76,0.07)', borderColor: 'rgba(201,168,76,0.30)' }}
+      style={{ background: 'rgba(224,168,44,0.07)', borderColor: 'rgba(224,168,44,0.30)' }}
     >
       {icon && <div className="flex-shrink-0 mt-0.5" style={{ color: 'var(--gold)' }}>{icon}</div>}
       <div className="text-sm leading-relaxed" style={{ color: 'var(--text-primary)' }}>{children}</div>
@@ -292,7 +292,7 @@ function HabitLoopArticle() {
             >
               <div
                 className="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5"
-                style={{ background: 'rgba(201,168,76,0.18)', color: 'var(--gold)', fontFamily: 'var(--font-jost)' }}
+                style={{ background: 'rgba(224,168,44,0.18)', color: 'var(--gold)', fontFamily: 'var(--font-jost)' }}
               >
                 {i + 1}
               </div>
@@ -365,7 +365,7 @@ function CompareRow({
   nb:      string
   winner?: 'gn' | 'nb' | 'tie'
 }) {
-  const winnerBg = 'rgba(201,168,76,0.10)'
+  const winnerBg = 'rgba(224,168,44,0.10)'
   return (
     <div
       className="grid grid-cols-[1fr_1fr_1fr] border-b text-sm last:border-b-0"
@@ -831,7 +831,7 @@ export default function BlogPostClient({ post, related }: Props) {
                 >
                   <div
                     className="p-5"
-                    style={{ background: 'linear-gradient(135deg, rgba(201,168,76,0.14) 0%, rgba(184,169,212,0.08) 100%)' }}
+                    style={{ background: 'linear-gradient(135deg, rgba(224,168,44,0.14) 0%, rgba(184,169,212,0.08) 100%)' }}
                   >
                     <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--gold)', letterSpacing: '0.1em' }}>
                       Related Product
@@ -933,7 +933,7 @@ export default function BlogPostClient({ post, related }: Props) {
         className="border-t py-14"
         style={{
           borderColor: 'var(--border)',
-          background: 'linear-gradient(135deg, rgba(201,168,76,0.09) 0%, rgba(184,169,212,0.06) 60%, rgba(201,168,76,0.03) 100%)',
+          background: 'linear-gradient(135deg, rgba(224,168,44,0.09) 0%, rgba(184,169,212,0.06) 60%, rgba(224,168,44,0.03) 100%)',
         }}
       >
         <div className="container-site max-w-xl mx-auto text-center">

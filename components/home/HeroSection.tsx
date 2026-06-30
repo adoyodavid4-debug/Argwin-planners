@@ -39,7 +39,7 @@ export default function HeroSection() {
             background: `
               radial-gradient(ellipse 80% 60% at 20% 0%, rgba(184,169,212,0.18) 0%, transparent 60%),
               radial-gradient(ellipse 70% 50% at 80% 100%, rgba(232,197,192,0.15) 0%, transparent 60%),
-              radial-gradient(ellipse 60% 70% at 50% 50%, rgba(201,168,76,0.06) 0%, transparent 70%),
+              radial-gradient(ellipse 60% 70% at 50% 50%, rgba(224,168,44,0.06) 0%, transparent 70%),
               var(--bg-primary)
             `,
           }}
@@ -90,9 +90,9 @@ export default function HeroSection() {
             <span
               className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest"
               style={{
-                background: 'rgba(201,168,76,0.12)',
+                background: 'rgba(224,168,44,0.12)',
                 color: 'var(--gold-dark)',
-                border: '1px solid rgba(201,168,76,0.25)',
+                border: '1px solid rgba(224,168,44,0.25)',
                 letterSpacing: '0.12em',
               }}
             >
@@ -216,7 +216,7 @@ export default function HeroSection() {
                 <div className="absolute bottom-4 left-4 right-4">
                   <span
                     className="inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full mb-1"
-                    style={{ background: 'rgba(201,168,76,0.85)', color: '#fff' }}
+                    style={{ background: 'rgba(224,168,44,0.85)', color: '#fff' }}
                   >
                     {img.tag}
                   </span>

@@ -33,7 +33,7 @@ export default async function AdminProductsPage() {
             </Link>
             <span style={{ color: 'var(--border)' }}>|</span>
             <h1 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>Products</h1>
-            <span className="text-sm px-2 py-0.5 rounded-full" style={{ background: 'rgba(201,168,76,0.12)', color: 'var(--gold)' }}>
+            <span className="text-sm px-2 py-0.5 rounded-full" style={{ background: 'rgba(224,168,44,0.12)', color: 'var(--gold)' }}>
               {products?.length ?? 0}
             </span>
           </div>

@@ -100,7 +100,7 @@ export default function ProductsTable({ initialProducts, categories }: Props) {
           <button key={tab.val}
             onClick={() => setStatusFilter(tab.val)}
             className={`rounded-lg px-3 py-1.5 text-xs font-medium border transition-all ${statusFilter === tab.val
-              ? 'border-[#C9A84C] bg-[rgba(201,168,76,0.1)] text-[#C9A84C]'
+              ? 'border-[#C9A84C] bg-[rgba(224,168,44,0.1)] text-[#C9A84C]'
               : 'border-[var(--border)] text-[var(--text-muted)] hover:border-[#C9A84C]'}`}
           >
             {tab.label}
@@ -220,7 +220,7 @@ export default function ProductsTable({ initialProducts, categories }: Props) {
                   {/* Type */}
                   <td className="px-4 py-3">
                     <span className="text-xs rounded-full px-2 py-0.5 capitalize"
-                      style={{ background: product.product_type === 'notebook' ? 'rgba(124,104,183,0.12)' : 'rgba(201,168,76,0.1)', color: product.product_type === 'notebook' ? '#7C68B7' : '#C9A84C' }}>
+                      style={{ background: product.product_type === 'notebook' ? 'rgba(124,104,183,0.12)' : 'rgba(224,168,44,0.1)', color: product.product_type === 'notebook' ? '#7C68B7' : '#C9A84C' }}>
                       {product.product_type ?? 'planner'}
                     </span>
                   </td>

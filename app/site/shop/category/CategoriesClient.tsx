@@ -294,7 +294,7 @@ export default function CategoriesClient({ categories, counts, totalProducts }: 
             { icon: Shield, title: 'Secure & Trusted',  body: 'Encrypted checkout with global payment options.' },
           ].map(({ icon: Icon, title, body }) => (
             <div key={title} className="flex flex-col gap-2">
-              <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: 'rgba(201,168,76,0.10)' }}><Icon size={18} style={{ color: 'var(--gold)' }} /></div>
+              <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: 'rgba(224,168,44,0.10)' }}><Icon size={18} style={{ color: 'var(--gold)' }} /></div>
               <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{title}</p>
               <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{body}</p>
             </div>

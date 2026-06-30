@@ -60,13 +60,13 @@ function statusBadge(status: string) {
 }
 
 function visibilityBadge(v: string) {
-  if (v === 'public')  return { bg: 'rgba(201,168,76,0.15)', color: '#C9A84C',  label: 'Public',  Icon: Globe }
+  if (v === 'public')  return { bg: 'rgba(224,168,44,0.15)', color: '#C9A84C',  label: 'Public',  Icon: Globe }
   if (v === 'shared')  return { bg: 'rgba(96,165,250,0.15)', color: '#3b82f6',  label: 'Shared',  Icon: Share2 }
   return                      { bg: 'rgba(148,163,184,0.15)', color: '#64748b', label: 'Private', Icon: Lock }
 }
 
 function typeBadge(t: string) {
-  if (t === 'custom') return { bg: 'rgba(201,168,76,0.12)', color: '#C9A84C', label: 'Custom' }
+  if (t === 'custom') return { bg: 'rgba(224,168,44,0.12)', color: '#C9A84C', label: 'Custom' }
   return                    { bg: 'rgba(148,163,184,0.12)', color: '#94a3b8', label: 'General' }
 }
 

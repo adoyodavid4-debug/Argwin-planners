@@ -30,8 +30,8 @@ const VALUES = [
     icon:  Palette,
     title: 'Design First',
     body:  'Every layout, colour palette, and typeface is chosen deliberately. We start with beauty — then make it functional.',
-    accent: 'rgba(201,168,76,0.12)',
-    border: 'rgba(201,168,76,0.30)',
+    accent: 'rgba(224,168,44,0.12)',
+    border: 'rgba(224,168,44,0.30)',
   },
   {
     icon:  Heart,
@@ -75,7 +75,7 @@ export default function AboutClient() {
       <section
         className="relative w-full pt-16 pb-20 border-b overflow-hidden"
         style={{
-          background: 'linear-gradient(135deg, rgba(201,168,76,0.13) 0%, rgba(184,169,212,0.09) 55%, rgba(201,168,76,0.05) 100%)',
+          background: 'linear-gradient(135deg, rgba(224,168,44,0.13) 0%, rgba(184,169,212,0.09) 55%, rgba(224,168,44,0.05) 100%)',
           borderColor: 'var(--border)',
         }}
       >
@@ -97,7 +97,7 @@ export default function AboutClient() {
             <motion.div
               initial="hidden" animate="show" variants={stagger(0)}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full border mb-6"
-              style={{ background: 'rgba(201,168,76,0.10)', borderColor: 'rgba(201,168,76,0.30)' }}
+              style={{ background: 'rgba(224,168,44,0.10)', borderColor: 'rgba(224,168,44,0.30)' }}
             >
               <Heart size={13} style={{ color: 'var(--gold)' }} />
               <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--gold-dark)', letterSpacing: '0.1em' }}>
@@ -205,7 +205,7 @@ export default function AboutClient() {
 
               <div className="mt-8 flex flex-wrap gap-3">
                 <div className="px-4 py-2 rounded-full border text-xs font-medium"
-                  style={{ background: 'rgba(201,168,76,0.09)', borderColor: 'rgba(201,168,76,0.25)', color: 'var(--gold-dark)' }}>
+                  style={{ background: 'rgba(224,168,44,0.09)', borderColor: 'rgba(224,168,44,0.25)', color: 'var(--gold-dark)' }}>
                   ✦ Est. 2022
                 </div>
                 <div className="px-4 py-2 rounded-full border text-xs font-medium"
@@ -249,7 +249,7 @@ export default function AboutClient() {
               >
                 <div
                   className="w-11 h-11 rounded-xl flex items-center justify-center mb-5"
-                  style={{ background: 'rgba(201,168,76,0.15)' }}
+                  style={{ background: 'rgba(224,168,44,0.15)' }}
                 >
                   <Icon size={20} style={{ color: 'var(--gold)' }} />
                 </div>
@@ -303,7 +303,7 @@ export default function AboutClient() {
                   <div key={title} className="flex gap-4">
                     <div
                       className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
-                      style={{ background: 'rgba(201,168,76,0.10)', border: '1px solid rgba(201,168,76,0.20)' }}
+                      style={{ background: 'rgba(224,168,44,0.10)', border: '1px solid rgba(224,168,44,0.20)' }}
                     >
                       <Icon size={16} style={{ color: 'var(--gold)' }} />
                     </div>
@@ -459,7 +459,7 @@ export default function AboutClient() {
                 style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
               >
                 <div className="relative w-24 h-24 rounded-full overflow-hidden mb-5"
-                  style={{ boxShadow: '0 0 0 4px rgba(201,168,76,0.3)' }}>
+                  style={{ boxShadow: '0 0 0 4px rgba(224,168,44,0.3)' }}>
                   <Image src={img} alt={name} fill sizes="96px" className="object-cover" />
                 </div>
                 <p className="font-display text-xl mb-0.5" style={{ color: 'var(--text-primary)' }}>{name}</p>
@@ -475,7 +475,7 @@ export default function AboutClient() {
       <section
         className="py-20"
         style={{
-          background: 'linear-gradient(135deg, rgba(201,168,76,0.10) 0%, rgba(184,169,212,0.08) 60%, rgba(201,168,76,0.04) 100%)',
+          background: 'linear-gradient(135deg, rgba(224,168,44,0.10) 0%, rgba(184,169,212,0.08) 60%, rgba(224,168,44,0.04) 100%)',
         }}
       >
         <div className="container-site text-center">

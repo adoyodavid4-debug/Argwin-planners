@@ -31,7 +31,7 @@ const CATEGORY_META: Record<string, {
     subheadline: 'Hyperlinked & GoodNotes Ready',
     description: 'Fully interactive digital planners built for iPad, GoodNotes, Notability, and any PDF app. Tap to navigate, type to fill — no paper needed.',
     accentColor: 'var(--lavender)',
-    bgGradient: 'linear-gradient(135deg, rgba(184,169,212,0.18) 0%, rgba(201,168,76,0.08) 100%)',
+    bgGradient: 'linear-gradient(135deg, rgba(184,169,212,0.18) 0%, rgba(224,168,44,0.08) 100%)',
     features: [
       { icon: Zap,         label: 'Instant Download' },
       { icon: Smartphone,  label: 'GoodNotes & Notability' },
@@ -61,7 +61,7 @@ const CATEGORY_META: Record<string, {
     subheadline: 'Take Control of Your Money',
     description: 'Beautifully designed budget trackers and financial planners to help you save more, spend smarter, and hit your money goals.',
     accentColor: 'var(--sage)',
-    bgGradient: 'linear-gradient(135deg, rgba(168,181,160,0.18) 0%, rgba(201,168,76,0.10) 100%)',
+    bgGradient: 'linear-gradient(135deg, rgba(168,181,160,0.18) 0%, rgba(224,168,44,0.10) 100%)',
     features: [
       { icon: Zap,         label: 'Monthly & Weekly Tracking' },
       { icon: Download,    label: 'Debt Payoff Sheets' },
@@ -106,7 +106,7 @@ const CATEGORY_META: Record<string, {
     subheadline: 'Build the Life You Want, One Day at a Time',
     description: 'Research-backed habit trackers to help you build routines, break bad patterns, and make positive change stick for good.',
     accentColor: 'var(--gold)',
-    bgGradient: 'linear-gradient(135deg, rgba(201,168,76,0.14) 0%, rgba(247,242,232,0.60) 100%)',
+    bgGradient: 'linear-gradient(135deg, rgba(224,168,44,0.14) 0%, rgba(247,242,232,0.60) 100%)',
     features: [
       { icon: Zap,         label: '21-Day & 66-Day Formats' },
       { icon: Download,    label: 'Up to 20 Habits at Once' },
@@ -121,7 +121,7 @@ const CATEGORY_META: Record<string, {
     subheadline: 'More Planning, More Savings',
     description: 'Get our most popular planners bundled together at massive savings. The perfect way to set up your entire planning system at once.',
     accentColor: 'var(--gold)',
-    bgGradient: 'linear-gradient(135deg, rgba(201,168,76,0.18) 0%, rgba(184,169,212,0.12) 100%)',
+    bgGradient: 'linear-gradient(135deg, rgba(224,168,44,0.18) 0%, rgba(184,169,212,0.12) 100%)',
     features: [
       { icon: Zap,         label: 'Up to 65% Off Individual Price' },
       { icon: Download,    label: 'Multiple Planners in One' },
@@ -138,7 +138,7 @@ const defaultMeta = {
   subheadline: 'Premium Collection',
   description: 'Browse our collection of premium planners — instant download, PDF & GoodNotes ready.',
   accentColor: 'var(--gold)',
-  bgGradient: 'linear-gradient(135deg, rgba(201,168,76,0.12) 0%, rgba(184,169,212,0.10) 100%)',
+  bgGradient: 'linear-gradient(135deg, rgba(224,168,44,0.12) 0%, rgba(184,169,212,0.10) 100%)',
   features: [
     { icon: Zap,        label: 'Instant Download' },
     { icon: Smartphone, label: 'Multi-Device Ready' },
@@ -653,7 +653,7 @@ export default function CategoryClient({ category, products, relatedCategories }
             { icon: Shield,     title: 'Secure & Trusted',   body: 'Encrypted checkout with global payment options.' },
           ].map(({ icon: Icon, title, body }) => (
             <div key={title} className="flex flex-col gap-2">
-              <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: 'rgba(201,168,76,0.10)' }}>
+              <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: 'rgba(224,168,44,0.10)' }}>
                 <Icon size={18} style={{ color: 'var(--gold)' }} />
               </div>
               <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{title}</p>
@@ -705,7 +705,7 @@ export default function CategoryClient({ category, products, relatedCategories }
                   <Link href={`/shop/category/${cat.slug}`}
                     className="group relative flex flex-col gap-3 p-5 rounded-2xl border text-left transition-all duration-300 hover:border-gold hover:shadow-gold overflow-hidden"
                     style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}>
-                    <div className="w-11 h-11 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110" style={{ background: 'rgba(201,168,76,0.10)' }}>
+                    <div className="w-11 h-11 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110" style={{ background: 'rgba(224,168,44,0.10)' }}>
                       <Sparkles size={18} style={{ color: 'var(--gold)' }} />
                     </div>
                     <div>
@@ -813,7 +813,7 @@ function Chip({ label, onClear }: { label: string; onClear: () => void }) {
   return (
     <button onClick={onClear}
       className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border transition-all hover:opacity-80"
-      style={{ background: 'rgba(201,168,76,0.12)', borderColor: 'rgba(201,168,76,0.35)', color: 'var(--gold-dark)' }}>
+      style={{ background: 'rgba(224,168,44,0.12)', borderColor: 'rgba(224,168,44,0.35)', color: 'var(--gold-dark)' }}>
       {label} <X size={10} />
     </button>
   )
@@ -909,7 +909,7 @@ function FilterPanel(p: FilterPanelProps) {
               return (
                 <button key={t} onClick={() => p.toggle(p.tags, p.setTags, t)}
                   className="px-2.5 py-1 rounded-full text-xs font-medium border transition-all flex items-center gap-1"
-                  style={{ background: on ? 'rgba(201,168,76,0.14)' : 'transparent', borderColor: on ? 'rgba(201,168,76,0.4)' : 'var(--border)', color: on ? 'var(--gold-dark)' : 'var(--text-secondary)' }}>
+                  style={{ background: on ? 'rgba(224,168,44,0.14)' : 'transparent', borderColor: on ? 'rgba(224,168,44,0.4)' : 'var(--border)', color: on ? 'var(--gold-dark)' : 'var(--text-secondary)' }}>
                   <TagIcon size={9} />{t}
                 </button>
               )
@@ -1060,7 +1060,7 @@ function ProductRow({ product, index, inCompare, onCompare, onQuickView }: CardP
           <div className="flex-1" />
           <button onClick={(e) => { e.preventDefault(); onCompare() }} aria-label="Compare"
             className="w-9 h-9 rounded-full border flex items-center justify-center transition-colors"
-            style={{ borderColor: inCompare ? 'var(--gold)' : 'var(--border)', background: inCompare ? 'rgba(201,168,76,0.12)' : 'transparent' }}>
+            style={{ borderColor: inCompare ? 'var(--gold)' : 'var(--border)', background: inCompare ? 'rgba(224,168,44,0.12)' : 'transparent' }}>
             <Scale size={14} style={{ color: inCompare ? 'var(--gold-dark)' : 'var(--text-muted)' }} />
           </button>
           <button onClick={onQuickView} className="btn-ghost !py-2 !px-3 text-xs hidden sm:inline-flex" style={{ border: '1px solid var(--border)' }}><Eye size={13} /> Quick View</button>
@@ -1194,7 +1194,7 @@ function Spotlight({ category, products, meta, accent }: { category: Category; p
         {/* Copy */}
         <motion.div initial={{ opacity: 0, x: -24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
           <p className="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-semibold mb-4 px-3 py-1.5 rounded-full"
-            style={{ color: 'var(--gold-dark)', background: 'rgba(201,168,76,0.12)', letterSpacing: '0.12em' }}>
+            style={{ color: 'var(--gold-dark)', background: 'rgba(224,168,44,0.12)', letterSpacing: '0.12em' }}>
             <Sparkles size={12} /> The Collection
           </p>
           <h2 className="font-display mb-4" style={{ fontSize: 'clamp(1.9rem,3.5vw,2.8rem)', lineHeight: 1.1, color: 'var(--text-primary)' }}>
@@ -1240,7 +1240,7 @@ function Spotlight({ category, products, meta, accent }: { category: Category; p
           {/* Floating rating badge */}
           <motion.div initial={{ opacity: 0, scale: 0.6 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.5 }}
             className="absolute bottom-4 right-2 sm:right-8 z-10 flex items-center gap-2.5 px-4 py-3 rounded-2xl shadow-xl" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-            <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(201,168,76,0.14)' }}><Star size={16} style={{ fill: 'var(--gold)', stroke: 'var(--gold)' }} /></div>
+            <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(224,168,44,0.14)' }}><Star size={16} style={{ fill: 'var(--gold)', stroke: 'var(--gold)' }} /></div>
             <div><p className="text-sm font-bold leading-none" style={{ color: 'var(--text-primary)' }}>4.9 / 5</p><p className="text-[10px] mt-1" style={{ color: 'var(--text-muted)' }}>Loved by planners</p></div>
           </motion.div>
         </motion.div>
@@ -1271,7 +1271,7 @@ function WhatsInside({ accent, bgGradient }: { accent: string; bgGradient: strin
           {items.map(({ icon: Icon, title, body }, i) => (
             <motion.div key={title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.06 }}
               className="p-6 rounded-2xl border transition-all duration-300 hover:-translate-y-1 hover:shadow-product" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4" style={{ background: 'rgba(201,168,76,0.12)' }}>
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4" style={{ background: 'rgba(224,168,44,0.12)' }}>
                 <Icon size={20} style={{ color: 'var(--gold)' }} />
               </div>
               <h3 className="font-semibold text-base mb-2" style={{ color: 'var(--text-primary)' }}>{title}</h3>
@@ -1420,7 +1420,7 @@ function WhyArwign() {
         <div className="rounded-3xl border overflow-hidden" style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}>
           <div className="grid grid-cols-[1fr_auto_auto]">
             <div className="p-4 border-b" style={{ borderColor: 'var(--border)' }} />
-            <div className="p-4 border-b text-center min-w-[110px]" style={{ borderColor: 'var(--border)', background: 'rgba(201,168,76,0.08)' }}>
+            <div className="p-4 border-b text-center min-w-[110px]" style={{ borderColor: 'var(--border)', background: 'rgba(224,168,44,0.08)' }}>
               <span className="font-display text-base font-semibold" style={{ color: 'var(--gold-dark)' }}>Arwign</span>
             </div>
             <div className="p-4 border-b text-center min-w-[110px]" style={{ borderColor: 'var(--border)' }}>
@@ -1429,7 +1429,7 @@ function WhyArwign() {
             {rows.map((row, i) => (
               <div key={row} className="contents">
                 <div className="p-4 text-sm flex items-center" style={{ color: 'var(--text-secondary)', borderTop: i === 0 ? 'none' : '1px solid var(--border)' }}>{row}</div>
-                <div className="p-4 flex items-center justify-center" style={{ background: 'rgba(201,168,76,0.08)', borderTop: i === 0 ? 'none' : '1px solid var(--border)' }}>
+                <div className="p-4 flex items-center justify-center" style={{ background: 'rgba(224,168,44,0.08)', borderTop: i === 0 ? 'none' : '1px solid var(--border)' }}>
                   <span className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: 'var(--gold)' }}><Check size={13} color="white" strokeWidth={3} /></span>
                 </div>
                 <div className="p-4 flex items-center justify-center" style={{ borderTop: i === 0 ? 'none' : '1px solid var(--border)' }}>

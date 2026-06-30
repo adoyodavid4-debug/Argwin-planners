@@ -91,7 +91,7 @@ function PostCard({ post, featured = false }: { post: BlogPost; featured?: boole
           <div className="absolute top-3 left-3">
             <span
               className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide"
-              style={{ background: 'rgba(201,168,76,0.92)', color: 'white', letterSpacing: '0.07em' }}
+              style={{ background: 'rgba(224,168,44,0.92)', color: 'white', letterSpacing: '0.07em' }}
             >
               {post.category}
             </span>
@@ -178,7 +178,7 @@ export default function BlogClient({ posts, searchParams }: Props) {
       <section
         className="w-full pt-12 pb-14 border-b"
         style={{
-          background: 'linear-gradient(135deg, rgba(201,168,76,0.12) 0%, rgba(184,169,212,0.08) 60%, rgba(201,168,76,0.04) 100%)',
+          background: 'linear-gradient(135deg, rgba(224,168,44,0.12) 0%, rgba(184,169,212,0.08) 60%, rgba(224,168,44,0.04) 100%)',
           borderColor: 'var(--border)',
         }}
       >
@@ -198,7 +198,7 @@ export default function BlogClient({ posts, searchParams }: Props) {
             >
               <div
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full border mb-5"
-                style={{ background: 'rgba(201,168,76,0.10)', borderColor: 'rgba(201,168,76,0.30)' }}
+                style={{ background: 'rgba(224,168,44,0.10)', borderColor: 'rgba(224,168,44,0.30)' }}
               >
                 <BookOpen size={13} style={{ color: 'var(--gold)' }} />
                 <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--gold-dark)', letterSpacing: '0.1em' }}>
@@ -341,7 +341,7 @@ export default function BlogClient({ posts, searchParams }: Props) {
         className="border-t py-16"
         style={{
           borderColor: 'var(--border)',
-          background: 'linear-gradient(135deg, rgba(201,168,76,0.10) 0%, rgba(184,169,212,0.07) 60%, rgba(201,168,76,0.04) 100%)',
+          background: 'linear-gradient(135deg, rgba(224,168,44,0.10) 0%, rgba(184,169,212,0.07) 60%, rgba(224,168,44,0.04) 100%)',
         }}
       >
         <div className="container-site max-w-2xl mx-auto text-center">

@@ -29,7 +29,7 @@ export function BenefitsStrip() {
             >
               <div
                 className="w-10 h-10 rounded-xl flex items-center justify-center mb-1"
-                style={{ background: 'rgba(201,168,76,0.1)' }}
+                style={{ background: 'rgba(224,168,44,0.1)' }}
               >
                 <b.icon size={18} style={{ color: 'var(--gold)' }} />
               </div>
@@ -58,7 +58,7 @@ export function MarqueeBar() {
   return (
     <div
       className="w-full overflow-hidden py-3 border-y"
-      style={{ borderColor: 'var(--border-gold)', background: 'rgba(201,168,76,0.04)' }}
+      style={{ borderColor: 'var(--border-gold)', background: 'rgba(224,168,44,0.04)' }}
       aria-hidden="true"
     >
       <div className="marquee-track">
@@ -179,7 +179,7 @@ export function TrustSection() {
               className="flex items-start gap-4 p-5 rounded-2xl border"
               style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}
             >
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(201,168,76,0.1)' }}>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(224,168,44,0.1)' }}>
                 <item.icon size={18} style={{ color: 'var(--gold)' }} />
               </div>
               <div>

@@ -41,7 +41,7 @@ const chartData = [
 
 export default function AdminDashboardClient({ stats }: { stats: Stats }) {
   const kpis = [
-    { label: 'Monthly Revenue',   value: `$${stats.monthRevenue.toFixed(0)}`,  icon: DollarSign, color: 'rgba(201,168,76,0.12)',  accent: 'var(--gold)' },
+    { label: 'Monthly Revenue',   value: `$${stats.monthRevenue.toFixed(0)}`,  icon: DollarSign, color: 'rgba(224,168,44,0.12)',  accent: 'var(--gold)' },
     { label: 'Orders This Month', value: stats.thisMonthOrders.toLocaleString(), icon: ShoppingBag, color: 'rgba(184,169,212,0.15)', accent: '#7B6FAE' },
     { label: 'Active Products',   value: stats.totalProducts.toLocaleString(),  icon: Package,     color: 'rgba(168,181,160,0.15)', accent: '#6E7E66' },
     { label: 'Newsletter Subs',   value: stats.totalSubscribers.toLocaleString(), icon: Users,     color: 'rgba(232,197,192,0.15)', accent: '#C9847C' },
@@ -135,7 +135,7 @@ export default function AdminDashboardClient({ stats }: { stats: Stats }) {
                   <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
                   <Tooltip
                     contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, fontSize: 12 }}
-                    cursor={{ fill: 'rgba(201,168,76,0.05)' }}
+                    cursor={{ fill: 'rgba(224,168,44,0.05)' }}
                   />
                   <Bar dataKey="sales" fill="var(--gold)" radius={[6,6,0,0]} />
                 </BarChart>

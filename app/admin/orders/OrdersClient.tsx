@@ -118,7 +118,7 @@ export default function OrdersClient({ initialOrders }: Props) {
             key={tab.val}
             onClick={() => setStatus(tab.val)}
             className={`rounded-lg px-3 py-1.5 text-xs font-medium border transition-all ${statusFilter === tab.val
-              ? 'border-[#C9A84C] bg-[rgba(201,168,76,0.1)] text-[#C9A84C]'
+              ? 'border-[#C9A84C] bg-[rgba(224,168,44,0.1)] text-[#C9A84C]'
               : 'border-[var(--border)] text-[var(--text-muted)] hover:border-[#C9A84C]'}`}
           >
             {tab.label}
@@ -189,7 +189,7 @@ export default function OrdersClient({ initialOrders }: Props) {
                   <td className="px-4 py-3">
                     <span className="text-xs" style={{ color: 'var(--text-primary)' }}>{order.email}</span>
                     {order.coupon_code && (
-                      <span className="ml-2 text-xs rounded-full px-1.5 py-0.5 font-mono" style={{ background: 'rgba(201,168,76,0.12)', color: 'var(--gold)' }}>
+                      <span className="ml-2 text-xs rounded-full px-1.5 py-0.5 font-mono" style={{ background: 'rgba(224,168,44,0.12)', color: 'var(--gold)' }}>
                         {order.coupon_code}
                       </span>
                     )}

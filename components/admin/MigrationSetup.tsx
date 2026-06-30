@@ -29,7 +29,7 @@ export default function MigrationSetup({ migrationFile, sql, supabaseUrl }: Prop
       <div className="rounded-2xl border p-6" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
         <div className="flex items-start gap-4">
           <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{ background: 'rgba(201,168,76,0.12)' }}>
+            style={{ background: 'rgba(224,168,44,0.12)' }}>
             <span style={{ color: 'var(--gold)', fontSize: 18 }}>⚙</span>
           </div>
           <div>
@@ -58,7 +58,7 @@ export default function MigrationSetup({ migrationFile, sql, supabaseUrl }: Prop
           ].map((step, i) => (
             <li key={i} className="flex items-start gap-3">
               <span className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5"
-                style={{ background: 'rgba(201,168,76,0.15)', color: 'var(--gold)' }}>
+                style={{ background: 'rgba(224,168,44,0.15)', color: 'var(--gold)' }}>
                 {i + 1}
               </span>
               <span>{step}</span>

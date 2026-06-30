@@ -27,7 +27,7 @@ export default async function AdminNotebookRequestsPage() {
             </Link>
             <span style={{ color: 'var(--border)' }}>|</span>
             <h1 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>Notebook Requests</h1>
-            <span className="text-sm px-2 py-0.5 rounded-full" style={{ background: 'rgba(201,168,76,0.12)', color: 'var(--gold)' }}>
+            <span className="text-sm px-2 py-0.5 rounded-full" style={{ background: 'rgba(224,168,44,0.12)', color: 'var(--gold)' }}>
               {count ?? 0}
             </span>
           </div>

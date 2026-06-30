@@ -55,7 +55,7 @@ export default function BestSellersClient({
       <section
         className="w-full pt-10 pb-14 border-b"
         style={{
-          background: 'linear-gradient(135deg, rgba(201,168,76,0.14) 0%, rgba(184,169,212,0.10) 60%, rgba(201,168,76,0.06) 100%)',
+          background: 'linear-gradient(135deg, rgba(224,168,44,0.14) 0%, rgba(184,169,212,0.10) 60%, rgba(224,168,44,0.06) 100%)',
           borderColor: 'var(--border)',
         }}
       >
@@ -76,7 +76,7 @@ export default function BestSellersClient({
             >
               {/* Badge */}
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border mb-5"
-                style={{ background: 'rgba(201,168,76,0.12)', borderColor: 'rgba(201,168,76,0.35)' }}>
+                style={{ background: 'rgba(224,168,44,0.12)', borderColor: 'rgba(224,168,44,0.35)' }}>
                 <TrendingUp size={14} style={{ color: 'var(--gold)' }} />
                 <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--gold-dark)', letterSpacing: '0.1em' }}>
                   Customer Favourites
@@ -185,7 +185,7 @@ export default function BestSellersClient({
               <button
                 onClick={() => updateParam('category', null)}
                 className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border"
-                style={{ background: 'rgba(201,168,76,0.12)', borderColor: 'rgba(201,168,76,0.35)', color: 'var(--gold-dark)' }}
+                style={{ background: 'rgba(224,168,44,0.12)', borderColor: 'rgba(224,168,44,0.35)', color: 'var(--gold-dark)' }}
               >
                 {categories.find((c) => c.slug === searchParams.category)?.name}
                 <X size={10} />

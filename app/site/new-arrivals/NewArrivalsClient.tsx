@@ -51,7 +51,7 @@ export default function NewArrivalsClient({
       <section
         className="w-full pt-10 pb-14 border-b"
         style={{
-          background: 'linear-gradient(135deg, rgba(184,169,212,0.16) 0%, rgba(201,168,76,0.10) 60%, rgba(184,169,212,0.06) 100%)',
+          background: 'linear-gradient(135deg, rgba(184,169,212,0.16) 0%, rgba(224,168,44,0.10) 60%, rgba(184,169,212,0.06) 100%)',
           borderColor: 'var(--border)',
         }}
       >
