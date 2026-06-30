@@ -4,34 +4,24 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  TrendingUp, Star, Download, Award, Crown, ChevronRight, ChevronDown, Search, X,
-  Grid3X3, Grid2X2, ShoppingCart, Check, Shield, Zap, RefreshCcw, Quote, BadgeCheck,
-  Flame, ArrowRight, Heart, Smartphone, CreditCard, Plus,
+  TrendingUp, Star, Download, Award, Crown, ChevronRight, ShoppingCart, Check,
+  Shield, Zap, RefreshCcw, Quote, BadgeCheck, Flame, ArrowRight, Heart, Smartphone,
+  CreditCard, Plus,
 } from 'lucide-react'
 import ProductCard from '@/components/shop/ProductCard'
 import { useCartStore, useWishlistStore } from '@/lib/store'
 import toast from 'react-hot-toast'
-import type { Product, Category } from '@/types/database'
+import type { Product } from '@/types/database'
 
 const FALLBACK_IMG = 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=600&q=80'
 const PER_PAGE = 12
 const price$ = (n: number) => `$${n.toFixed(2)}`
 const compact = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}k` : `${n}`)
 
-const SORT_OPTIONS = [
-  { value: 'popular',    label: 'Most Downloaded' },
-  { value: 'rating',     label: 'Highest Rated' },
-  { value: 'newest',     label: 'Newest First' },
-  { value: 'price-asc',  label: 'Price: Low → High' },
-  { value: 'price-desc', label: 'Price: High → Low' },
-]
-const RATING_OPTS = [{ v: 0, l: 'Any' }, { v: 4, l: '4★+' }, { v: 4.5, l: '4.5★+' }]
-const PRICE_OPTS = [{ v: 'under-10', l: 'Under $10' }, { v: '10-20', l: '$10–$20' }, { v: 'over-20', l: 'Over $20' }]
 const MEDALS = ['#E0A82C', '#AEB6BF', '#CD7F4E'] // gold / silver / bronze
 
 interface Props {
   products:       Product[]
-  categories:     Category[]
   totalDownloads: number
   totalReviews:   number
   avgRating:      number
@@ -117,24 +107,8 @@ function PodiumCard({ p, rank }: { p: Product; rank: number }) {
   )
 }
 
-function Chip({ label, onClear }: { label: string; onClear: () => void }) {
-  return (
-    <button onClick={onClear} className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border transition-all hover:opacity-80"
-      style={{ background: 'rgba(var(--gold-rgb),0.12)', borderColor: 'rgba(var(--gold-rgb),0.35)', color: 'var(--gold-dark)' }}>
-      {label} <X size={10} />
-    </button>
-  )
-}
-
-export default function BestSellersClient({ products, categories, totalDownloads, totalReviews, avgRating }: Props) {
-  const [search, setSearch]     = useState('')
-  const [category, setCategory] = useState<string | null>(null)
-  const [minRating, setMinRating] = useState(0)
-  const [price, setPrice]       = useState<string | null>(null)
-  const [formats, setFormats]   = useState<string[]>([])
-  const [sort, setSort]         = useState('popular')
-  const [cols, setCols]         = useState<3 | 4>(4)
-  const [visible, setVisible]   = useState(PER_PAGE)
+export default function BestSellersClient({ products, totalDownloads, totalReviews, avgRating }: Props) {
+  const [visible, setVisible] = useState(PER_PAGE)
   const addItem = useCartStore((s) => s.addItem)
 
   // rank map by downloads (overall, stable)
@@ -144,45 +118,9 @@ export default function BestSellersClient({ products, categories, totalDownloads
     return m
   }, [products])
 
-  const allFormats = useMemo(() => {
-    const s = new Set<string>(); products.forEach((p) => (p.file_formats ?? []).forEach((f) => s.add(f))); return Array.from(s).sort()
-  }, [products])
-
-  const hasFilters = !!(search || category || minRating || price || formats.length || sort !== 'popular')
-
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase()
-    let list = products.filter((p) => {
-      if (q && !`${p.title} ${p.description ?? ''} ${(p.tags ?? []).join(' ')}`.toLowerCase().includes(q)) return false
-      if (category && (p.category as any)?.slug !== category) return false
-      if (minRating && p.rating_avg < minRating) return false
-      if (price === 'under-10' && !(p.price < 10)) return false
-      if (price === '10-20' && !(p.price >= 10 && p.price <= 20)) return false
-      if (price === 'over-20' && !(p.price > 20)) return false
-      if (formats.length && !formats.some((f) => (p.file_formats ?? []).includes(f))) return false
-      return true
-    })
-    list = [...list].sort((a, b) => {
-      switch (sort) {
-        case 'rating':     return b.rating_avg - a.rating_avg
-        case 'newest':     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        case 'price-asc':  return a.price - b.price
-        case 'price-desc': return b.price - a.price
-        default:           return (b.download_count ?? 0) - (a.download_count ?? 0)
-      }
-    })
-    return list
-  }, [products, search, category, minRating, price, formats, sort])
-
-  useEffect(() => { setVisible(PER_PAGE) }, [search, category, minRating, price, formats, sort])
-
-  const podium = !hasFilters ? products.slice(0, 3) : []
-  const podiumIds = new Set(podium.map((p) => p.id))
-  const gridList = hasFilters ? filtered : filtered.filter((p) => !podiumIds.has(p.id))
+  const podium = products.slice(0, 3)
+  const gridList = products.slice(3)
   const visibleList = gridList.slice(0, visible)
-
-  const toggleFormat = (f: string) => setFormats((arr) => arr.includes(f) ? arr.filter((x) => x !== f) : [...arr, f])
-  const clearAll = () => { setSearch(''); setCategory(null); setMinRating(0); setPrice(null); setFormats([]); setSort('popular') }
 
   const addTop3 = () => {
     const top3 = products.slice(0, 3)
@@ -280,86 +218,18 @@ export default function BestSellersClient({ products, categories, totalDownloads
         </section>
       )}
 
-      {/* ══ STICKY TOOLBAR ════════════════════════════════════ */}
-      <div className="sticky top-[var(--nav-height,88px)] z-30 border-b py-3 backdrop-blur" style={{ background: 'color-mix(in srgb, var(--bg-primary) 88%, transparent)', borderColor: 'var(--border)' }}>
-        <div className="container-site flex items-center gap-3 flex-wrap">
-          <div className="relative flex-1 min-w-[180px] max-w-md">
-            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
-            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search best sellers…" className="input-field !py-2 !pl-10 !pr-9 text-sm" aria-label="Search" />
-            {search && <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2" aria-label="Clear"><X size={14} style={{ color: 'var(--text-muted)' }} /></button>}
-          </div>
-          <div className="flex-1 hidden lg:block" />
-          <div className="relative">
-            <select value={sort} onChange={(e) => setSort(e.target.value)} className="input-field !py-2 !pr-9 cursor-pointer text-sm appearance-none" style={{ width: 'auto', minWidth: 168 }} aria-label="Sort">
-              {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-            </select>
-            <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--text-muted)' }} />
-          </div>
-          <div className="hidden md:flex items-center gap-1 p-1 rounded-xl border" style={{ borderColor: 'var(--border)' }}>
-            <button onClick={() => setCols(3)} className="p-2 rounded-lg transition-all" style={{ background: cols === 3 ? 'var(--gold)' : 'transparent', color: cols === 3 ? '#fff' : 'var(--text-muted)' }} aria-label="3 columns"><Grid2X2 size={15} /></button>
-            <button onClick={() => setCols(4)} className="p-2 rounded-lg transition-all" style={{ background: cols === 4 ? 'var(--gold)' : 'transparent', color: cols === 4 ? '#fff' : 'var(--text-muted)' }} aria-label="4 columns"><Grid3X3 size={15} /></button>
-          </div>
-        </div>
-
-        {/* filter row */}
-        <div className="container-site flex items-center gap-2 mt-3 flex-wrap">
-          {categories.length > 0 && (
-            <>
-              <button className={`category-pill ${!category ? 'active' : ''}`} onClick={() => setCategory(null)}>All</button>
-              {categories.map((c) => (
-                <button key={c.slug} className={`category-pill ${category === c.slug ? 'active' : ''}`} onClick={() => setCategory(category === c.slug ? null : c.slug)}>{c.name}</button>
-              ))}
-              <span className="w-px h-5 mx-1" style={{ background: 'var(--border)' }} />
-            </>
-          )}
-          {RATING_OPTS.map((r) => (
-            <button key={r.v} className={`category-pill ${minRating === r.v ? 'active' : ''}`} onClick={() => setMinRating(r.v)}>{r.l}</button>
-          ))}
-          <span className="w-px h-5 mx-1" style={{ background: 'var(--border)' }} />
-          {PRICE_OPTS.map((o) => (
-            <button key={o.v} className={`category-pill ${price === o.v ? 'active' : ''}`} onClick={() => setPrice(price === o.v ? null : o.v)}>{o.l}</button>
-          ))}
-          {allFormats.length > 0 && <span className="w-px h-5 mx-1" style={{ background: 'var(--border)' }} />}
-          {allFormats.map((f) => (
-            <button key={f} className={`category-pill ${formats.includes(f) ? 'active' : ''}`} onClick={() => toggleFormat(f)}>{f}</button>
-          ))}
-        </div>
-
-        {hasFilters && (
-          <div className="container-site flex items-center gap-2 mt-2 flex-wrap">
-            <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Active:</span>
-            {search && <Chip label={`“${search}”`} onClear={() => setSearch('')} />}
-            {category && <Chip label={categories.find((c) => c.slug === category)?.name ?? category} onClear={() => setCategory(null)} />}
-            {minRating > 0 && <Chip label={`${minRating}★ & up`} onClear={() => setMinRating(0)} />}
-            {price && <Chip label={PRICE_OPTS.find((o) => o.v === price)?.l ?? price} onClear={() => setPrice(null)} />}
-            {formats.map((f) => <Chip key={f} label={f} onClear={() => toggleFormat(f)} />)}
-            {sort !== 'popular' && <Chip label={SORT_OPTIONS.find((o) => o.value === sort)?.label ?? sort} onClear={() => setSort('popular')} />}
-            <button onClick={clearAll} className="text-xs underline" style={{ color: 'var(--text-muted)' }}>Clear all</button>
-          </div>
-        )}
-      </div>
-
       {/* ══ GRID ══════════════════════════════════════════════ */}
+      {gridList.length > 0 && (
       <div className="container-site py-10">
         <div className="flex items-center gap-2 mb-6">
-          {!hasFilters && <Flame size={15} style={{ color: 'var(--gold)' }} />}
+          <Flame size={15} style={{ color: 'var(--gold)' }} />
           <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-            {hasFilters
-              ? <>Showing <b style={{ color: 'var(--text-primary)' }}>{Math.min(visible, gridList.length)}</b> of <b style={{ color: 'var(--text-primary)' }}>{gridList.length}</b> matching</>
-              : <>The rest of the chart — <b style={{ color: 'var(--text-primary)' }}>{gridList.length}</b> more best {gridList.length === 1 ? 'seller' : 'sellers'}</>}
+            The rest of the chart — <b style={{ color: 'var(--text-primary)' }}>{gridList.length}</b> more best {gridList.length === 1 ? 'seller' : 'sellers'}
           </p>
         </div>
 
-        {gridList.length === 0 ? (
-          <div className="text-center py-24 rounded-3xl border" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
-            <Search size={28} className="mx-auto mb-4" style={{ color: 'var(--text-muted)' }} />
-            <p className="font-display text-2xl mb-2" style={{ color: 'var(--text-primary)' }}>Nothing matches those filters</p>
-            <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>Try clearing a filter to see more favourites.</p>
-            <button className="btn-outline" onClick={clearAll}>Clear Filters</button>
-          </div>
-        ) : (
-          <AnimatePresence mode="popLayout">
-            <motion.div layout className={`grid gap-5 ${cols === 4 ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4' : 'grid-cols-2 md:grid-cols-3'}`}>
+        <AnimatePresence mode="popLayout">
+            <motion.div layout className="grid gap-5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               {visibleList.map((p, i) => (
                 <motion.div layout key={p.id} className="relative">
                   {rankMap[p.id] <= 10 && (
@@ -373,7 +243,6 @@ export default function BestSellersClient({ products, categories, totalDownloads
               ))}
             </motion.div>
           </AnimatePresence>
-        )}
 
         {visible < gridList.length && (
           <div className="flex flex-col items-center gap-3 mt-12">
@@ -384,6 +253,7 @@ export default function BestSellersClient({ products, categories, totalDownloads
           </div>
         )}
       </div>
+      )}
 
       {/* ══ WHY BEST SELLERS ══════════════════════════════════ */}
       <section className="border-t py-14" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>

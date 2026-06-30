@@ -17,17 +17,14 @@ export const metadata: Metadata = {
 export default async function BestSellersPage() {
   const supabase = createServiceRoleClient()
 
-  const [{ data: categories }, { data: products }] = await Promise.all([
-    supabase.from('categories').select('*').order('sort_order').then((r) => ({ data: r.error ? [] : r.data })),
-    supabase
-      .from('products')
-      .select('*, category:categories(name, slug)')
-      .eq('status', 'active')
-      .eq('is_bestseller', true)
-      .order('download_count', { ascending: false })
-      .limit(100)
-      .then((r) => ({ data: r.error ? [] : r.data })),
-  ])
+  const { data: products } = await supabase
+    .from('products')
+    .select('*, category:categories(name, slug)')
+    .eq('status', 'active')
+    .eq('is_bestseller', true)
+    .order('download_count', { ascending: false })
+    .limit(100)
+    .then((r) => ({ data: r.error ? [] : r.data }))
 
   const items = (products ?? []) as any[]
   const totalDownloads = items.reduce((s, p) => s + (p.download_count ?? 0), 0)
@@ -35,14 +32,9 @@ export default async function BestSellersPage() {
   const rated = items.filter((p) => p.rating_avg > 0)
   const avgRating = rated.length ? (rated.reduce((s, p) => s + p.rating_avg, 0) / rated.length) : 4.9
 
-  // only categories that actually have a bestseller
-  const presentSlugs = new Set(items.map((p) => p.category?.slug).filter(Boolean))
-  const usedCategories = (categories ?? []).filter((c) => presentSlugs.has(c.slug))
-
   return (
     <BestSellersClient
       products={items}
-      categories={usedCategories}
       totalDownloads={totalDownloads}
       totalReviews={totalReviews}
       avgRating={avgRating}
