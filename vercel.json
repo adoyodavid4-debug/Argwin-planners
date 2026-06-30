@@ -2,11 +2,11 @@
   "crons": [
     {
       "path": "/api/cron/nurture",
-      "schedule": "*/10 * * * *"
+      "schedule": "0 8 * * *"
     },
     {
       "path": "/api/cron/pod-reconcile",
-      "schedule": "*/30 * * * *"
+      "schedule": "0 9 * * *"
     }
   ]
 }
