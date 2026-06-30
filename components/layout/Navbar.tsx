@@ -30,8 +30,9 @@ const navLinks = [
     label: 'Digital Notebooks',
     href: '/notebooks',
     children: [
-      { label: 'Personalized Notebooks', href: '/notebooks/personalized' },
-      { label: 'General Notebooks',      href: '/notebooks/general' },
+      { label: 'Ready-Made vs Personalised', href: '/site#digital-notebooks' },
+      { label: 'Personalized Notebooks',     href: '/notebooks/personalized' },
+      { label: 'General Notebooks',          href: '/notebooks/general' },
     ],
   },
   { label: 'Best Sellers', href: '/best-sellers' },

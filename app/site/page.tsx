@@ -1,6 +1,8 @@
 // app/site/page.tsx — homepage
 import type { Metadata } from 'next'
+import { Suspense }        from 'react'
 import HeroSection          from '@/components/home/HeroSection'
+import NewArrivals, { NewArrivalsSkeleton } from '@/components/home/NewArrivals'
 import CategoryGrid         from '@/components/home/CategoryGrid'
 import FeaturedProducts     from '@/components/home/FeaturedProducts'
 import BenefitsStrip        from '@/components/home/BenefitsStrip'
@@ -8,6 +10,7 @@ import TestimonialsSection  from '@/components/home/TestimonialsSection'
 import BlogPreview          from '@/components/home/BlogPreview'
 import TrustSection         from '@/components/home/TrustSection'
 import MarqueeBar           from '@/components/home/MarqueeBar'
+import DigitalNotebookSection from '@/components/home/digital-notebook/DigitalNotebookSection'
 import { LifestyleBanner }  from '@/components/home/HomeComponents'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
@@ -53,8 +56,12 @@ export default async function HomePage() {
       <MarqueeBar />
       <BenefitsStrip />
       <CategoryGrid />
+      <Suspense fallback={<NewArrivalsSkeleton />}>
+        <NewArrivals />
+      </Suspense>
       <LifestyleBanner />
       <FeaturedProducts products={featured} title="Featured Planners" />
+      <DigitalNotebookSection />
       <TrustSection />
       <FeaturedProducts products={bestsellers} title="Best Sellers" showAll="/best-sellers" />
       <TestimonialsSection />
