@@ -247,12 +247,12 @@ export default function BestSellersClient({ products, categories, totalDownloads
 
       {/* ══ TRENDING MARQUEE ══════════════════════════════════ */}
       {products.length > 0 && (
-        <div className="border-b overflow-hidden py-3" style={{ borderColor: 'var(--border)', background: 'var(--charcoal)' }}>
+        <div className="border-b overflow-hidden py-3" style={{ borderColor: 'var(--border)', background: 'linear-gradient(90deg, rgba(var(--gold-rgb),0.10) 0%, rgba(184,169,212,0.12) 50%, rgba(var(--gold-rgb),0.10) 100%)' }}>
           <div className="marquee-track items-center" style={{ gap: '2.5rem' }}>
             {[...products, ...products].map((p, i) => (
-              <span key={i} className="inline-flex items-center gap-2 text-sm whitespace-nowrap" style={{ color: 'rgba(255,255,255,0.85)' }}>
-                <Flame size={13} style={{ color: 'var(--gold-light)' }} /> {p.title}
-                <span style={{ color: 'var(--gold-light)', marginLeft: '2.5rem' }}>✦</span>
+              <span key={i} className="inline-flex items-center gap-2 text-sm font-medium whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
+                <Flame size={13} style={{ color: 'var(--gold)' }} /> {p.title}
+                <span style={{ color: 'var(--gold)', marginLeft: '2.5rem' }}>✦</span>
               </span>
             ))}
           </div>
@@ -296,8 +296,8 @@ export default function BestSellersClient({ products, categories, totalDownloads
             <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--text-muted)' }} />
           </div>
           <div className="hidden md:flex items-center gap-1 p-1 rounded-xl border" style={{ borderColor: 'var(--border)' }}>
-            <button onClick={() => setCols(3)} className="p-2 rounded-lg transition-all" style={{ background: cols === 3 ? 'var(--charcoal)' : 'transparent', color: cols === 3 ? '#fff' : 'var(--text-muted)' }} aria-label="3 columns"><Grid2X2 size={15} /></button>
-            <button onClick={() => setCols(4)} className="p-2 rounded-lg transition-all" style={{ background: cols === 4 ? 'var(--charcoal)' : 'transparent', color: cols === 4 ? '#fff' : 'var(--text-muted)' }} aria-label="4 columns"><Grid3X3 size={15} /></button>
+            <button onClick={() => setCols(3)} className="p-2 rounded-lg transition-all" style={{ background: cols === 3 ? 'var(--gold)' : 'transparent', color: cols === 3 ? '#fff' : 'var(--text-muted)' }} aria-label="3 columns"><Grid2X2 size={15} /></button>
+            <button onClick={() => setCols(4)} className="p-2 rounded-lg transition-all" style={{ background: cols === 4 ? 'var(--gold)' : 'transparent', color: cols === 4 ? '#fff' : 'var(--text-muted)' }} aria-label="4 columns"><Grid3X3 size={15} /></button>
           </div>
         </div>
 
@@ -439,16 +439,16 @@ export default function BestSellersClient({ products, categories, totalDownloads
       </section>
 
       {/* ══ GUARANTEE BAND ════════════════════════════════════ */}
-      <section className="border-t py-12" style={{ borderColor: 'var(--border)', background: 'var(--charcoal)' }}>
+      <section className="border-t py-12 newsletter-gradient" style={{ borderColor: 'var(--border)' }}>
         <div className="container-site flex flex-col md:flex-row items-center justify-center gap-8 text-center md:text-left">
-          <div className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(255,255,255,0.08)' }}><Shield size={28} style={{ color: 'var(--gold-light)' }} /></div>
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(var(--gold-rgb),0.14)' }}><Shield size={28} style={{ color: 'var(--gold)' }} /></div>
           <div>
-            <h2 className="font-display text-2xl mb-1" style={{ color: '#fff' }}>Shop With Total Confidence</h2>
-            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>Backed by our 30-day happiness promise.</p>
+            <h2 className="font-display text-2xl mb-1" style={{ color: 'var(--text-primary)' }}>Shop With Total Confidence</h2>
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Backed by our 30-day happiness promise.</p>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-4 md:ml-auto">
             {[{ icon: Shield, l: '30-Day Promise' }, { icon: CreditCard, l: 'Secure Payment' }, { icon: Zap, l: 'Instant Access' }].map(({ icon: Icon, l }) => (
-              <span key={l} className="inline-flex items-center gap-2 text-xs font-medium" style={{ color: 'rgba(255,255,255,0.85)' }}><Icon size={15} style={{ color: 'var(--gold-light)' }} /> {l}</span>
+              <span key={l} className="inline-flex items-center gap-2 text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}><Icon size={15} style={{ color: 'var(--gold)' }} /> {l}</span>
             ))}
           </div>
         </div>
