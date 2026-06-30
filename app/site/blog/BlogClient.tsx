@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  BookOpen, Clock, Eye, Search, X, ChevronRight, ArrowRight, Tag,
+  BookOpen, Clock, Search, X, ChevronRight, ArrowRight,
 } from 'lucide-react'
 import { type BlogPost, STATIC_POSTS } from './blog-data'
 
@@ -17,51 +17,35 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
+// Cover image with its own shimmer skeleton (no layout shift)
+function CoverImage({ src, alt, sizes, priority, className }: { src: string; alt: string; sizes: string; priority?: boolean; className?: string }) {
+  const [loaded, setLoaded] = useState(false)
+  return (
+    <>
+      {!loaded && <div className="absolute inset-0 skeleton" />}
+      <Image src={src} alt={alt} fill sizes={sizes} priority={priority} onLoad={() => setLoaded(true)}
+        className={`object-cover transition-all duration-500 ${loaded ? 'opacity-100' : 'opacity-0'} ${className ?? ''}`} />
+    </>
+  )
+}
+
 function PostCard({ post, featured = false }: { post: BlogPost; featured?: boolean }) {
   if (featured) {
     return (
       <Link href={`/blog/${post.slug}`} className="group block">
-        <motion.article
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="relative rounded-3xl overflow-hidden border"
-          style={{ borderColor: 'var(--border)' }}
-        >
-          <div className="relative h-[420px] w-full overflow-hidden">
-            <Image
-              src={post.cover || 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&q=80'}
-              alt={post.title}
-              fill
-              sizes="100vw"
-              className="object-cover transition-transform duration-700 group-hover:scale-105"
-              priority
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+        <motion.article initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
+          className="relative rounded-3xl overflow-hidden border" style={{ borderColor: 'var(--border)' }}>
+          <div className="relative h-[360px] md:h-[440px] w-full overflow-hidden" style={{ background: 'var(--bg-secondary)' }}>
+            <CoverImage src={post.cover || 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=1000&q=80'} alt={post.title} sizes="100vw" priority className="group-hover:scale-105 duration-700" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
           </div>
-
-          <div className="absolute bottom-0 left-0 right-0 p-8">
+          <div className="absolute bottom-0 left-0 right-0 p-7 md:p-9">
             <div className="flex items-center gap-3 mb-3">
-              <span
-                className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest"
-                style={{ background: 'var(--gold)', color: 'white', letterSpacing: '0.08em' }}
-              >
-                {post.category}
-              </span>
-              <span className="text-xs text-white/70">Featured</span>
+              <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest" style={{ background: 'var(--gold)', color: 'white', letterSpacing: '0.08em' }}>{post.category}</span>
+              <span className="text-xs text-white/70 inline-flex items-center gap-1"><Clock size={11} /> {post.readMins} min read</span>
             </div>
-            <h2
-              className="font-display text-3xl md:text-4xl text-white mb-3 group-hover:text-gold-light transition-colors leading-tight"
-              style={{ textShadow: '0 2px 12px rgba(0,0,0,0.4)' }}
-            >
-              {post.title}
-            </h2>
-            <p className="text-sm text-white/80 line-clamp-2 mb-4 max-w-2xl">{post.excerpt}</p>
-            <div className="flex items-center gap-4 text-xs text-white/60">
-              <span className="flex items-center gap-1"><Clock size={11} /> {post.readMins} min read</span>
-              <span className="flex items-center gap-1"><Eye size={11} /> {post.viewCount.toLocaleString()} views</span>
-              <span>{formatDate(post.publishedAt)}</span>
-            </div>
+            <h2 className="font-display text-3xl md:text-4xl text-white mb-2.5 group-hover:text-gold-light transition-colors leading-tight max-w-3xl" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.4)' }}>{post.title}</h2>
+            <p className="text-sm text-white/80 line-clamp-1 max-w-xl">{post.excerpt}</p>
           </div>
         </motion.article>
       </Link>
@@ -70,71 +54,19 @@ function PostCard({ post, featured = false }: { post: BlogPost; featured?: boole
 
   return (
     <Link href={`/blog/${post.slug}`} className="group block h-full">
-      <motion.article
-        layout
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.96 }}
-        transition={{ duration: 0.35 }}
-        className="flex flex-col h-full rounded-2xl overflow-hidden border transition-all duration-300 group-hover:-translate-y-1"
-        style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', boxShadow: '0 2px 8px rgba(44,42,53,0.04)' }}
-      >
-        {/* Cover */}
-        <div className="relative h-48 overflow-hidden flex-shrink-0">
-          <Image
-            src={post.cover || 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=600&q=75'}
-            alt={post.title}
-            fill
-            sizes="(max-width: 768px) 100vw, 33vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-          <div className="absolute top-3 left-3">
-            <span
-              className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide"
-              style={{ background: 'rgba(224,168,44,0.92)', color: 'white', letterSpacing: '0.07em' }}
-            >
-              {post.category}
-            </span>
-          </div>
+      <motion.article layout initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96 }} transition={{ duration: 0.35 }}
+        className="flex flex-col h-full rounded-2xl overflow-hidden border transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-product"
+        style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+        <div className="relative overflow-hidden flex-shrink-0" style={{ aspectRatio: '16/10', background: 'var(--bg-secondary)' }}>
+          <CoverImage src={post.cover || 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=600&q=75'} alt={post.title} sizes="(max-width: 768px) 100vw, 33vw" className="group-hover:scale-105" />
+          <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide" style={{ background: 'rgba(224,168,44,0.92)', color: 'white', letterSpacing: '0.07em' }}>{post.category}</span>
         </div>
-
-        {/* Body */}
         <div className="flex flex-col flex-1 p-5">
-          <h3
-            className="font-display text-xl leading-snug mb-2 group-hover:text-gold transition-colors"
-            style={{ color: 'var(--text-primary)' }}
-          >
-            {post.title}
-          </h3>
-          <p className="text-sm leading-relaxed line-clamp-3 mb-4 flex-1" style={{ color: 'var(--text-secondary)' }}>
-            {post.excerpt}
-          </p>
-
-          {/* Tags */}
-          {post.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mb-4">
-              {post.tags.slice(0, 3).map((tag) => (
-                <span
-                  key={tag}
-                  className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full"
-                  style={{ background: 'var(--bg-secondary)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}
-                >
-                  <Tag size={8} />
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {/* Footer */}
+          <h3 className="font-display text-xl leading-snug mb-2 group-hover:text-gold transition-colors line-clamp-2" style={{ color: 'var(--text-primary)' }}>{post.title}</h3>
+          <p className="text-sm leading-relaxed line-clamp-1 mb-4 flex-1" style={{ color: 'var(--text-secondary)' }}>{post.excerpt}</p>
           <div className="flex items-center justify-between pt-3 border-t" style={{ borderColor: 'var(--border)' }}>
-            <div className="flex items-center gap-3 text-xs" style={{ color: 'var(--text-muted)' }}>
-              <span className="flex items-center gap-1"><Clock size={10} /> {post.readMins} min</span>
-              <span className="flex items-center gap-1"><Eye size={10} /> {post.viewCount.toLocaleString()}</span>
-            </div>
-            <span className="text-xs font-medium flex items-center gap-1 transition-colors" style={{ color: 'var(--gold)' }}>
-              Read <ArrowRight size={11} />
-            </span>
+            <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-muted)' }}><Clock size={10} /> {post.readMins} min read</span>
+            <span className="text-xs font-medium flex items-center gap-1" style={{ color: 'var(--gold)' }}>Read <ArrowRight size={11} /></span>
           </div>
         </div>
       </motion.article>

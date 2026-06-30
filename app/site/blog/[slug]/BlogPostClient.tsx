@@ -1,18 +1,22 @@
 'use client'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { motion } from 'framer-motion'
+import { motion, useScroll, useSpring, useReducedMotion } from 'framer-motion'
 import {
   Clock, Eye, Tag, ChevronRight, ArrowRight,
-  ArrowLeft, BookOpen, Share2, Lightbulb,
-  Check, Minus, Trophy,
+  ArrowLeft, BookOpen, Lightbulb, Check, Trophy,
+  List, ArrowUpRight, Twitter, Facebook, Linkedin, Link as LinkIcon,
 } from 'lucide-react'
+import toast from 'react-hot-toast'
 import type { BlogPost } from '../blog-data'
+
+const slugifyHeading = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 
 // ── Prose helpers ─────────────────────────────────────────────
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="mb-10">
+    <section className="mb-12" id={slugifyHeading(title)} style={{ scrollMarginTop: 96 }}>
       <h2
         className="font-display text-2xl md:text-3xl mb-4"
         style={{ color: 'var(--text-primary)', lineHeight: 1.15 }}
@@ -685,6 +689,94 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
+// ── Reading aids & conversion helpers ─────────────────────────
+function Toc({ items, onJump, reduce }: { items: { id: string; text: string }[]; onJump: (id: string) => void; reduce: boolean }) {
+  const [open, setOpen] = useState(true)
+  return (
+    <nav className="rounded-2xl border mb-10" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }} aria-label="Table of contents">
+      <button onClick={() => setOpen((v) => !v)} aria-expanded={open}
+        className="w-full flex items-center justify-between gap-3 px-5 py-3.5 text-left">
+        <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-primary)', letterSpacing: '0.1em' }}>
+          <List size={14} style={{ color: 'var(--gold)' }} /> On this page
+        </span>
+        <ChevronRight size={15} style={{ color: 'var(--text-muted)', transform: open ? 'rotate(90deg)' : 'none', transition: reduce ? 'none' : 'transform 0.2s' }} />
+      </button>
+      {open && (
+        <ol className="px-5 pb-4 pt-1 flex flex-col gap-1.5">
+          {items.map((it, i) => (
+            <li key={it.id}>
+              <button onClick={() => onJump(it.id)} className="text-left text-sm leading-snug transition-colors hover:text-gold w-full" style={{ color: 'var(--text-secondary)' }}>
+                <span style={{ color: 'var(--gold)', fontWeight: 600 }}>{String(i + 1).padStart(2, '0')}</span>&nbsp;&nbsp;{it.text}
+              </button>
+            </li>
+          ))}
+        </ol>
+      )}
+    </nav>
+  )
+}
+
+function InlineProduct({ sp, compact }: { sp: { name: string; blurb: string; price: string; href: string }; compact?: boolean }) {
+  if (compact) {
+    return (
+      <Link href={sp.href} className="group flex items-center gap-4 my-8 p-4 rounded-2xl border transition-all duration-300 hover:-translate-y-0.5 hover:shadow-product"
+        style={{ borderColor: 'var(--border)', background: 'linear-gradient(135deg, rgba(224,168,44,0.10) 0%, rgba(184,169,212,0.06) 100%)' }}>
+        <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(224,168,44,0.16)' }}><BookOpen size={18} style={{ color: 'var(--gold)' }} /></div>
+        <div className="flex-1 min-w-0">
+          <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--gold)', letterSpacing: '0.1em' }}>Featured in this article</p>
+          <p className="font-semibold text-sm truncate" style={{ color: 'var(--text-primary)' }}>{sp.name}</p>
+        </div>
+        <span className="inline-flex items-center gap-1 text-xs font-semibold flex-shrink-0" style={{ color: 'var(--gold)' }}>{sp.price} <ArrowUpRight size={13} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" /></span>
+      </Link>
+    )
+  }
+  return (
+    <div className="my-10 rounded-3xl border overflow-hidden" style={{ borderColor: 'var(--border)' }}>
+      <div className="p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center gap-6" style={{ background: 'linear-gradient(135deg, rgba(224,168,44,0.14) 0%, rgba(184,169,212,0.08) 100%)' }}>
+        <div className="flex-1">
+          <p className="text-[11px] font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--gold)', letterSpacing: '0.1em' }}>The planner behind this article</p>
+          <h3 className="font-display text-2xl mb-2" style={{ color: 'var(--text-primary)' }}>{sp.name}</h3>
+          <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{sp.blurb}</p>
+        </div>
+        <div className="flex-shrink-0 text-left sm:text-center">
+          <p className="font-display text-3xl mb-3" style={{ color: 'var(--text-primary)' }}>{sp.price}</p>
+          <Link href={sp.href} className="btn-primary whitespace-nowrap">View planner <ArrowRight size={14} /></Link>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ShareRow({ title }: { title: string }) {
+  const [url, setUrl] = useState('')
+  useEffect(() => { setUrl(window.location.href) }, [])
+  const enc = encodeURIComponent
+  const links = [
+    { icon: Twitter,  label: 'Share on X',        href: `https://twitter.com/intent/tweet?url=${enc(url)}&text=${enc(title)}` },
+    { icon: Facebook, label: 'Share on Facebook', href: `https://www.facebook.com/sharer/sharer.php?u=${enc(url)}` },
+    { icon: Linkedin, label: 'Share on LinkedIn', href: `https://www.linkedin.com/sharing/share-offsite/?url=${enc(url)}` },
+  ]
+  return (
+    <div className="flex items-center gap-3 mt-10 pt-6 border-t" style={{ borderColor: 'var(--border)' }}>
+      <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Share</span>
+      <div className="flex items-center gap-2">
+        {links.map(({ icon: Icon, label, href }) => (
+          <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
+            className="w-9 h-9 rounded-full flex items-center justify-center border transition-all hover:-translate-y-0.5"
+            style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)', background: 'var(--bg-card)' }}>
+            <Icon size={15} />
+          </a>
+        ))}
+        <button onClick={() => { navigator.clipboard?.writeText(url); toast.success('Link copied ✦') }} aria-label="Copy link"
+          className="w-9 h-9 rounded-full flex items-center justify-center border transition-all hover:-translate-y-0.5"
+          style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)', background: 'var(--bg-card)' }}>
+          <LinkIcon size={15} />
+        </button>
+      </div>
+    </div>
+  )
+}
+
 // ── Main component ────────────────────────────────────────────
 interface Props {
   post:    BlogPost
@@ -693,262 +785,140 @@ interface Props {
 
 export default function BlogPostClient({ post, related }: Props) {
   const ArticleBody = CONTENT[post.slug] ?? ComingSoonBody
+  const sp = SIDEBAR_PRODUCTS[post.slug] ?? DEFAULT_PRODUCT
+  const reduce = !!useReducedMotion()
+  const articleRef = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({ target: articleRef, offset: ['start start', 'end end'] })
+  const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.2 })
+  const [toc, setToc] = useState<{ id: string; text: string }[]>([])
+
+  useEffect(() => {
+    if (!articleRef.current) return
+    const hs = Array.from(articleRef.current.querySelectorAll<HTMLElement>('h2[id]'))
+    setToc(hs.map((h) => ({ id: h.id, text: h.textContent ?? '' })))
+  }, [post.slug])
+
+  const jump = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })
 
   return (
     <div className="w-full" style={{ background: 'var(--bg-primary)' }}>
 
-      {/* ── Hero image ───────────────────────────────────── */}
-      <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden">
-        <Image
-          src={post.cover || 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=1200&q=80'}
-          alt={post.title}
-          fill
-          sizes="100vw"
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/25 to-transparent" />
+      {/* Reading progress */}
+      <motion.div className="fixed top-0 left-0 right-0 h-1 z-50 origin-left" style={{ scaleX, background: 'linear-gradient(90deg, var(--gold), var(--gold-light))' }} aria-hidden />
 
-        {/* Breadcrumb overlay */}
+      {/* ── Immersive hero ───────────────────────────────── */}
+      <div className="relative w-full h-[400px] md:h-[520px] overflow-hidden">
+        <Image src={post.cover || 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=1200&q=80'} alt={post.title} fill sizes="100vw" className="object-cover" priority />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent" />
         <div className="absolute top-6 left-0 right-0">
           <div className="container-site">
-            <nav className="flex items-center gap-1.5 text-xs text-white/70">
-              <Link href="/" className="hover:text-white transition-colors">Home</Link>
-              <ChevronRight size={12} />
-              <Link href="/blog" className="hover:text-white transition-colors">Blog</Link>
-              <ChevronRight size={12} />
+            <nav className="flex items-center gap-1.5 text-xs text-white/70" aria-label="Breadcrumb">
+              <Link href="/" className="hover:text-white transition-colors">Home</Link><ChevronRight size={12} />
+              <Link href="/blog" className="hover:text-white transition-colors">Blog</Link><ChevronRight size={12} />
               <span className="text-white/50 line-clamp-1">{post.title}</span>
             </nav>
           </div>
         </div>
-
-        {/* Title overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-8">
-          <div className="container-site max-w-4xl">
-            <span
-              className="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide mb-4"
-              style={{ background: 'var(--gold)', color: 'white', letterSpacing: '0.08em' }}
-            >
-              {post.category}
-            </span>
-            <motion.h1
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="font-display text-white mb-4"
-              style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)', lineHeight: 1.1, textShadow: '0 2px 16px rgba(0,0,0,0.4)' }}
-            >
+          <div className="container-site max-w-3xl">
+            <span className="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide mb-4" style={{ background: 'var(--gold)', color: 'white', letterSpacing: '0.08em' }}>{post.category}</span>
+            <motion.h1 initial={reduce ? false : { opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
+              className="font-display text-white mb-3" style={{ fontSize: 'clamp(1.9rem, 4vw, 3.1rem)', lineHeight: 1.08, textShadow: '0 2px 16px rgba(0,0,0,0.4)' }}>
               {post.title}
             </motion.h1>
-            <div className="flex flex-wrap items-center gap-5 text-sm text-white/70">
+            <div className="flex flex-wrap items-center gap-5 text-sm text-white/75">
               <span className="flex items-center gap-1.5"><Clock size={13} /> {post.readMins} min read</span>
-              <span className="flex items-center gap-1.5"><Eye   size={13} /> {post.viewCount.toLocaleString()} views</span>
+              <span className="flex items-center gap-1.5"><Eye size={13} /> {post.viewCount.toLocaleString()} views</span>
               <span>{formatDate(post.publishedAt)}</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* ── Body ─────────────────────────────────────────── */}
+      {/* ── Article (comfortable measure) ────────────────── */}
       <div className="container-site py-12">
-        <div className="flex flex-col lg:flex-row gap-12 max-w-6xl mx-auto">
+        <article className="mx-auto" style={{ maxWidth: 720 }}>
+          <Link href="/blog" className="inline-flex items-center gap-1.5 text-xs mb-8 transition-colors hover:text-gold" style={{ color: 'var(--text-muted)' }}>
+            <ArrowLeft size={13} /> All articles
+          </Link>
 
-          {/* ── Main article column ─────────────────────── */}
-          <motion.article
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="flex-1 min-w-0"
-          >
-            {/* Back link */}
-            <Link
-              href="/blog"
-              className="inline-flex items-center gap-1.5 text-xs mb-8 transition-colors"
-              style={{ color: 'var(--text-muted)' }}
-            >
-              <ArrowLeft size={13} />
-              All articles
-            </Link>
+          {/* Lead */}
+          <p className="leading-relaxed mb-8 border-l-4 pl-5 italic" style={{ color: 'var(--text-secondary)', borderColor: 'var(--gold)', fontSize: '1.2rem' }}>
+            {post.excerpt.slice(0, 200)}{post.excerpt.length > 200 ? '…' : ''}
+          </p>
 
-            {/* Excerpt lead */}
-            <p
-              className="text-lg leading-relaxed mb-8 font-light border-l-4 pl-5 italic"
-              style={{ color: 'var(--text-secondary)', borderColor: 'var(--gold)' }}
-            >
-              {post.excerpt.slice(0, 220)}{post.excerpt.length > 220 ? '…' : ''}
-            </p>
+          {/* TOC (longer posts) */}
+          {toc.length >= 3 && <Toc items={toc} onJump={jump} reduce={reduce} />}
 
-            {/* Full article content */}
+          {/* Inline product (within) */}
+          <InlineProduct sp={sp} compact />
+
+          {/* Article body */}
+          <motion.div ref={articleRef} initial={reduce ? false : { opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-80px' }} transition={{ duration: 0.5 }}>
             <ArticleBody post={post} />
+          </motion.div>
 
-            {/* Tags */}
-            {post.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 pt-8 border-t mt-8" style={{ borderColor: 'var(--border)' }}>
-                <Tag size={13} style={{ color: 'var(--text-muted)' }} className="mt-0.5" />
-                {post.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="text-xs px-3 py-1 rounded-full border"
-                    style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)', color: 'var(--text-muted)' }}
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {/* Share strip */}
-            <div
-              className="flex items-center justify-between mt-8 p-4 rounded-2xl border"
-              style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
-            >
-              <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-jost)' }}>
-                Found this useful? Share it.
-              </p>
-              <button
-                onClick={() => navigator.share?.({ title: post.title, url: window.location.href })}
-                className="btn-outline py-2 px-4 text-xs"
-              >
-                <Share2 size={13} />
-                Share
-              </button>
+          {/* Tags */}
+          {post.tags.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 pt-8 border-t mt-8" style={{ borderColor: 'var(--border)' }}>
+              <Tag size={13} style={{ color: 'var(--text-muted)' }} />
+              {post.tags.map((tag) => (
+                <span key={tag} className="text-xs px-3 py-1 rounded-full border" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)', color: 'var(--text-muted)' }}>{tag}</span>
+              ))}
             </div>
-          </motion.article>
+          )}
 
-          {/* ── Sidebar ─────────────────────────────────── */}
-          <aside className="w-full lg:w-72 flex-shrink-0 space-y-6">
+          {/* Inline product (after) */}
+          <InlineProduct sp={sp} />
 
-            {/* Related planner CTA — driven by SIDEBAR_PRODUCTS map */}
-            {(() => {
-              const sp = SIDEBAR_PRODUCTS[post.slug] ?? DEFAULT_PRODUCT
-              return (
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: 0.2 }}
-                  className="rounded-2xl border overflow-hidden"
-                  style={{ borderColor: 'var(--border)' }}
-                >
-                  <div
-                    className="p-5"
-                    style={{ background: 'linear-gradient(135deg, rgba(224,168,44,0.14) 0%, rgba(184,169,212,0.08) 100%)' }}
-                  >
-                    <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--gold)', letterSpacing: '0.1em' }}>
-                      Related Product
-                    </p>
-                    <p className="font-display text-lg mb-2" style={{ color: 'var(--text-primary)' }}>
-                      {sp.name}
-                    </p>
-                    <p className="text-xs mb-4" style={{ color: 'var(--text-secondary)' }}>
-                      {sp.blurb}
-                    </p>
-                    <p className="font-bold text-lg mb-4" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-jost)' }}>
-                      {sp.price}
-                    </p>
-                    <Link
-                      href={sp.href}
-                      className="btn-primary w-full justify-center text-xs"
-                    >
-                      View Product <ArrowRight size={12} />
-                    </Link>
-                  </div>
-                </motion.div>
-              )
-            })()}
-
-            {/* Article quick-facts */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="rounded-2xl border p-5"
-              style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
-            >
-              <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
-                Key Research Facts
-              </p>
-              <div className="space-y-3">
-                {[
-                  { label: 'Study authors', value: 'Lally et al., UCL' },
-                  { label: 'Published',     value: 'European Journal of Social Psychology, 2010' },
-                  { label: 'Participants',  value: '96 adults over 12 weeks' },
-                  { label: 'Average',       value: '66 days to automaticity' },
-                  { label: 'Range',         value: '18 to 254 days' },
-                  { label: 'Key finding',   value: 'Missing days had no significant impact' },
-                ].map(({ label, value }) => (
-                  <div key={label} className="flex flex-col gap-0.5">
-                    <span className="text-[10px] uppercase tracking-wide" style={{ color: 'var(--text-muted)', letterSpacing: '0.07em' }}>{label}</span>
-                    <span className="text-xs font-medium" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-jost)' }}>{value}</span>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* More articles */}
-            {related.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-                className="rounded-2xl border p-5"
-                style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
-              >
-                <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
-                  More Articles
-                </p>
-                <div className="space-y-4">
-                  {related.map((r) => (
-                    <Link key={r.slug} href={`/blog/${r.slug}`} className="flex gap-3 group">
-                      <div className="relative w-16 h-14 rounded-xl overflow-hidden flex-shrink-0">
-                        <Image
-                          src={r.cover}
-                          alt={r.title}
-                          fill
-                          sizes="64px"
-                          className="object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p
-                          className="text-xs font-semibold leading-snug line-clamp-2 group-hover:text-gold transition-colors"
-                          style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-jost)' }}
-                        >
-                          {r.title}
-                        </p>
-                        <p className="text-[10px] mt-1 flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
-                          <Clock size={9} /> {r.readMins} min
-                        </p>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </aside>
-        </div>
+          {/* Share */}
+          <ShareRow title={post.title} />
+        </article>
       </div>
 
-      {/* ── Newsletter CTA ────────────────────────────────── */}
-      <section
-        className="border-t py-14"
-        style={{
-          borderColor: 'var(--border)',
-          background: 'linear-gradient(135deg, rgba(224,168,44,0.09) 0%, rgba(184,169,212,0.06) 60%, rgba(224,168,44,0.03) 100%)',
-        }}
-      >
+      {/* ── End-of-post CTA ──────────────────────────────── */}
+      <section className="border-t py-16" style={{ borderColor: 'var(--border)', background: 'linear-gradient(135deg, rgba(224,168,44,0.12) 0%, rgba(184,169,212,0.07) 60%, rgba(224,168,44,0.04) 100%)' }}>
         <div className="container-site max-w-xl mx-auto text-center">
-          <div className="divider-gold mb-5" />
-          <h2 className="font-display text-3xl mb-2" style={{ color: 'var(--text-primary)' }}>
-            More tips like this, free.
-          </h2>
-          <p className="text-sm mb-7" style={{ color: 'var(--text-secondary)' }}>
-            Planning guides and productivity science delivered straight to your inbox — never spammy.
-          </p>
-          <form
-            onSubmit={(e) => e.preventDefault()}
-            className="flex flex-col sm:flex-row gap-3 max-w-sm mx-auto"
-          >
-            <input type="email" required placeholder="your@email.com" className="input-field flex-1 text-sm" />
+          <div className="divider-gold mb-6" />
+          <h2 className="font-display text-3xl mb-3" style={{ color: 'var(--text-primary)' }}>Put it into practice</h2>
+          <p className="text-sm mb-7" style={{ color: 'var(--text-secondary)' }}>Beautiful, ready-to-use planners and notebooks — instant download.</p>
+          <div className="flex items-center justify-center gap-3 flex-wrap">
+            <Link href="/shop" className="btn-primary">Shop the collection <ArrowRight size={14} /></Link>
+            <Link href="/best-sellers" className="btn-outline">Best sellers</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Related posts ────────────────────────────────── */}
+      {related.length > 0 && (
+        <section className="border-t py-16" style={{ borderColor: 'var(--border)' }}>
+          <div className="container-site">
+            <h2 className="font-display text-2xl mb-8" style={{ color: 'var(--text-primary)' }}>Keep reading</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {related.slice(0, 3).map((r) => (
+                <Link key={r.slug} href={`/blog/${r.slug}`} className="group block rounded-2xl overflow-hidden border transition-all duration-300 hover:-translate-y-1 hover:shadow-product" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+                  <div className="relative h-44 overflow-hidden">
+                    <Image src={r.cover} alt={r.title} fill loading="lazy" sizes="(max-width:768px) 100vw, 33vw" className="object-cover transition-transform duration-500 group-hover:scale-105" />
+                    <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide" style={{ background: 'rgba(224,168,44,0.92)', color: 'white', letterSpacing: '0.07em' }}>{r.category}</span>
+                  </div>
+                  <div className="p-5">
+                    <h3 className="font-display text-lg leading-snug mb-2 transition-colors group-hover:text-gold line-clamp-2" style={{ color: 'var(--text-primary)' }}>{r.title}</h3>
+                    <p className="text-xs flex items-center gap-1" style={{ color: 'var(--text-muted)' }}><Clock size={10} /> {r.readMins} min read</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── Newsletter ───────────────────────────────────── */}
+      <section className="border-t py-14" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
+        <div className="container-site max-w-xl mx-auto text-center">
+          <h2 className="font-display text-2xl mb-2" style={{ color: 'var(--text-primary)' }}>More tips like this, free.</h2>
+          <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>Planning guides and productivity science — never spammy.</p>
+          <form onSubmit={(e) => e.preventDefault()} className="flex flex-col sm:flex-row gap-3 max-w-sm mx-auto">
+            <input type="email" required placeholder="your@email.com" className="input-field flex-1 text-sm" aria-label="Email address" />
             <button type="submit" className="btn-primary text-sm whitespace-nowrap">Subscribe</button>
           </form>
         </div>
