@@ -7,7 +7,8 @@ import {
   ChevronRight, ChevronDown, Search, SlidersHorizontal, Grid3X3, Grid2X2,
   List as ListIcon, X, Download, Star, Zap, Smartphone, RefreshCcw,
   ShoppingCart, Heart, Eye, Check, Shield, CreditCard, Clock, ArrowUp,
-  Scale, Sparkles, Layers, Tag as TagIcon, Plus,
+  Scale, Sparkles, Layers, Tag as TagIcon, Plus, ArrowRight, Quote,
+  BadgeCheck, Calendar, Link2, Palette, Tablet, Printer,
 } from 'lucide-react'
 import { useCartStore, useWishlistStore } from '@/lib/store'
 import toast from 'react-hot-toast'
@@ -265,7 +266,7 @@ export default function CategoryClient({ category, products, relatedCategories }
   const [onlyBest, setOnlyBest]       = useState(false)
   const [sort, setSort]               = useState('popular')
   const [view, setView]               = useState<'grid' | 'list'>('grid')
-  const [cols, setCols]               = useState<2 | 3 | 4>(4)
+  const [cols, setCols]               = useState<2 | 3 | 4>(3)
   const [visible, setVisible]         = useState(PER_PAGE)
   const [drawerOpen, setDrawerOpen]   = useState(false)
   const [compare, setCompare]         = useState<string[]>([])
@@ -471,6 +472,9 @@ export default function CategoryClient({ category, products, relatedCategories }
         </div>
       </section>
 
+      {/* ══ COLLECTION SPOTLIGHT ══════════════════════════════ */}
+      <Spotlight category={category} products={products} meta={meta} accent={accent} />
+
       {/* ══ STICKY TOOLBAR ════════════════════════════════════ */}
       <div className="sticky top-[var(--nav-height,88px)] z-30 border-b py-3 backdrop-blur"
         style={{ background: 'color-mix(in srgb, var(--bg-primary) 88%, transparent)', borderColor: 'var(--border)' }}>
@@ -542,7 +546,7 @@ export default function CategoryClient({ category, products, relatedCategories }
       </div>
 
       {/* ══ BODY: sidebar + grid ══════════════════════════════ */}
-      <div className="container-site py-10 flex gap-8 items-start">
+      <div id="shop-grid" className="container-site py-10 flex gap-8 items-start" style={{ scrollMarginTop: 160 }}>
         {/* Desktop sidebar */}
         <aside className="hidden lg:block w-64 flex-shrink-0 sticky top-[160px]">
           <FilterPanel
@@ -604,6 +608,18 @@ export default function CategoryClient({ category, products, relatedCategories }
         </div>
       </div>
 
+      {/* ══ WHAT'S INSIDE ═════════════════════════════════════ */}
+      <WhatsInside accent={accent} bgGradient={meta.bgGradient} />
+
+      {/* ══ HOW IT WORKS ══════════════════════════════════════ */}
+      <HowItWorks />
+
+      {/* ══ DEVICE / FORMAT SHOWCASE ══════════════════════════ */}
+      <DeviceShowcase categoryName={category.name} />
+
+      {/* ══ TESTIMONIALS ══════════════════════════════════════ */}
+      <Testimonials categoryName={category.name} rating={stats.avg} />
+
       {/* ══ RECENTLY VIEWED ═══════════════════════════════════ */}
       {mounted && recentlyViewed.length > 0 && (
         <section className="border-t py-12" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
@@ -646,6 +662,9 @@ export default function CategoryClient({ category, products, relatedCategories }
           ))}
         </div>
       </section>
+
+      {/* ══ WHY ARWIGN — COMPARISON ═══════════════════════════ */}
+      <WhyArwign />
 
       {/* ══ SEO CONTENT ═══════════════════════════════════════ */}
       <section className="border-t py-14" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
@@ -1160,5 +1179,267 @@ function CompareModal({ products, onClose }: { products: Product[]; onClose: () 
         </div>
       </div>
     </div>
+  )
+}
+
+// ── Collection spotlight banner ───────────────────────────────
+function Spotlight({ category, products, meta, accent }: { category: Category; products: Product[]; meta: any; accent: string }) {
+  const covers = products.slice(0, 3)
+  const top = [...products].sort((a, b) => Number(b.is_bestseller) - Number(a.is_bestseller) || (b.download_count ?? 0) - (a.download_count ?? 0))[0]
+  const scrollToGrid = () => document.getElementById('shop-grid')?.scrollIntoView({ behavior: 'smooth' })
+
+  return (
+    <section className="relative border-b overflow-hidden" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+      <div className="container-site py-12 lg:py-16 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+        {/* Copy */}
+        <motion.div initial={{ opacity: 0, x: -24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
+          <p className="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-semibold mb-4 px-3 py-1.5 rounded-full"
+            style={{ color: 'var(--gold-dark)', background: 'rgba(201,168,76,0.12)', letterSpacing: '0.12em' }}>
+            <Sparkles size={12} /> The Collection
+          </p>
+          <h2 className="font-display mb-4" style={{ fontSize: 'clamp(1.9rem,3.5vw,2.8rem)', lineHeight: 1.1, color: 'var(--text-primary)' }}>
+            Planning, beautifully reimagined
+          </h2>
+          <p className="text-sm leading-relaxed mb-6 max-w-md" style={{ color: 'var(--text-secondary)' }}>
+            {meta.description} Every design is crafted in-house, tested by real planners, and delivered the second you check out.
+          </p>
+          <div className="flex flex-wrap gap-2 mb-8">
+            {['Hand-crafted layouts', 'Instant delivery', 'Lifetime access', 'Loved worldwide'].map((c) => (
+              <span key={c} className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border"
+                style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)', background: 'var(--bg-primary)' }}>
+                <Check size={11} style={{ color: 'var(--gold)' }} /> {c}
+              </span>
+            ))}
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <button onClick={scrollToGrid} className="btn-primary">Browse the Collection <ArrowRight size={15} /></button>
+            {top && <Link href={`/shop/${top.slug}`} className="btn-outline">View the Bestseller</Link>}
+          </div>
+        </motion.div>
+
+        {/* Cover collage */}
+        <motion.div initial={{ opacity: 0, scale: 0.94 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.55, delay: 0.1 }}
+          className="relative h-[320px] sm:h-[400px] flex items-center justify-center">
+          <div aria-hidden className="absolute rounded-full blur-3xl opacity-50" style={{ width: 360, height: 360, background: accent }} />
+          {covers.length > 0 ? covers.map((p, i) => {
+            const pos = [
+              { rotate: '-8deg', x: '-32%', z: 1, scale: 0.86 },
+              { rotate: '0deg',  x: '0%',   z: 3, scale: 1 },
+              { rotate: '8deg',  x: '32%',  z: 1, scale: 0.86 },
+            ][i] ?? { rotate: '0deg', x: '0%', z: 1, scale: 1 }
+            return (
+              <motion.div key={p.id} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.15 + i * 0.1 }}
+                className="absolute rounded-2xl overflow-hidden shadow-2xl"
+                style={{ width: 200, aspectRatio: '3/4', transform: `translateX(${pos.x}) rotate(${pos.rotate}) scale(${pos.scale})`, zIndex: pos.z, border: '3px solid var(--bg-card)' }}>
+                <Image src={p.thumbnail || FALLBACK_IMG} alt={p.title} fill sizes="200px" className="object-cover" />
+              </motion.div>
+            )
+          }) : (
+            <div className="relative rounded-2xl shadow-2xl" style={{ width: 220, aspectRatio: '3/4', background: meta.bgGradient }} />
+          )}
+          {/* Floating rating badge */}
+          <motion.div initial={{ opacity: 0, scale: 0.6 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.5 }}
+            className="absolute bottom-4 right-2 sm:right-8 z-10 flex items-center gap-2.5 px-4 py-3 rounded-2xl shadow-xl" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
+            <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(201,168,76,0.14)' }}><Star size={16} style={{ fill: 'var(--gold)', stroke: 'var(--gold)' }} /></div>
+            <div><p className="text-sm font-bold leading-none" style={{ color: 'var(--text-primary)' }}>4.9 / 5</p><p className="text-[10px] mt-1" style={{ color: 'var(--text-muted)' }}>Loved by planners</p></div>
+          </motion.div>
+        </motion.div>
+      </div>
+    </section>
+  )
+}
+
+// ── What's inside ─────────────────────────────────────────────
+function WhatsInside({ accent, bgGradient }: { accent: string; bgGradient: string }) {
+  const items = [
+    { icon: Link2,    title: 'Hyperlinked Navigation',  body: 'Tap any tab to jump between yearly, monthly, weekly and daily views — instantly.' },
+    { icon: Calendar, title: '12 Months · 52 Weeks',     body: 'Complete monthly spreads, weekly layouts and daily pages for a full year of planning.' },
+    { icon: Palette,  title: 'Beautiful Themes',          body: 'Curated colour palettes and elegant typography designed to make you want to plan.' },
+    { icon: RefreshCcw, title: 'Undated & Reusable',      body: 'Start any day, any month. Never waste a page and reuse it year after year.' },
+    { icon: Layers,   title: 'Every File Format',         body: 'PDF, GoodNotes, Notability and print-ready A4 & A5 sizes included in every purchase.' },
+    { icon: BadgeCheck, title: 'Free Lifetime Updates',   body: 'Buy once and re-download improved versions from your account, forever.' },
+  ]
+  return (
+    <section className="border-t py-16" style={{ borderColor: 'var(--border)', background: bgGradient }}>
+      <div className="container-site">
+        <div className="text-center mb-12 max-w-xl mx-auto">
+          <p className="text-xs uppercase tracking-widest font-semibold mb-2" style={{ color: 'var(--gold)', letterSpacing: '0.12em' }}>Thoughtful by Design</p>
+          <h2 className="font-display text-display-sm mb-3" style={{ color: 'var(--text-primary)' }}>What&rsquo;s Inside Every Planner</h2>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Each planner is packed with the details that make planning effortless and a joy to return to.</p>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {items.map(({ icon: Icon, title, body }, i) => (
+            <motion.div key={title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.06 }}
+              className="p-6 rounded-2xl border transition-all duration-300 hover:-translate-y-1 hover:shadow-product" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4" style={{ background: 'rgba(201,168,76,0.12)' }}>
+                <Icon size={20} style={{ color: 'var(--gold)' }} />
+              </div>
+              <h3 className="font-semibold text-base mb-2" style={{ color: 'var(--text-primary)' }}>{title}</h3>
+              <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{body}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ── How it works ──────────────────────────────────────────────
+function HowItWorks() {
+  const steps = [
+    { icon: ShoppingCart, title: 'Choose Your Planner', body: 'Pick a design you love and check out securely with card, PayPal or M-Pesa.' },
+    { icon: Download,     title: 'Download Instantly',  body: 'Your files arrive by email and in your account the moment payment clears.' },
+    { icon: Sparkles,     title: 'Start Planning',       body: 'Import to GoodNotes or print at home and begin building the life you want.' },
+  ]
+  return (
+    <section className="border-t py-16" style={{ borderColor: 'var(--border)' }}>
+      <div className="container-site">
+        <div className="text-center mb-12">
+          <p className="text-xs uppercase tracking-widest font-semibold mb-2" style={{ color: 'var(--gold)', letterSpacing: '0.12em' }}>Simple as 1·2·3</p>
+          <h2 className="font-display text-display-sm" style={{ color: 'var(--text-primary)' }}>How It Works</h2>
+        </div>
+        <div className="grid md:grid-cols-3 gap-8 relative max-w-4xl mx-auto">
+          {steps.map(({ icon: Icon, title, body }, i) => (
+            <motion.div key={title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45, delay: i * 0.12 }}
+              className="relative text-center flex flex-col items-center">
+              <div className="relative w-16 h-16 rounded-full flex items-center justify-center mb-5" style={{ background: 'var(--bg-card)', border: '2px solid var(--gold)' }}>
+                <Icon size={24} style={{ color: 'var(--gold)' }} />
+                <span className="absolute -top-2 -right-1 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: 'var(--gold)' }}>{i + 1}</span>
+              </div>
+              <h3 className="font-semibold text-lg mb-2" style={{ color: 'var(--text-primary)' }}>{title}</h3>
+              <p className="text-sm leading-relaxed max-w-xs" style={{ color: 'var(--text-secondary)' }}>{body}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ── Device / format showcase ──────────────────────────────────
+function DeviceShowcase({ categoryName }: { categoryName: string }) {
+  const apps = [
+    { icon: Tablet,     label: 'iPad & GoodNotes' },
+    { icon: Smartphone, label: 'Notability' },
+    { icon: Eye,        label: 'Xodo & PDF' },
+    { icon: Printer,    label: 'Print at Home' },
+  ]
+  return (
+    <section className="border-t py-16" style={{ borderColor: 'var(--border)', background: 'var(--charcoal)' }}>
+      <div className="container-site grid lg:grid-cols-2 gap-10 items-center">
+        <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
+          <p className="text-xs uppercase tracking-widest font-semibold mb-3" style={{ color: 'var(--gold-light)', letterSpacing: '0.12em' }}>Use It Anywhere</p>
+          <h2 className="font-display text-display-sm mb-4" style={{ color: '#fff' }}>Works Beautifully on Every Device</h2>
+          <p className="text-sm leading-relaxed mb-7" style={{ color: 'rgba(255,255,255,0.7)' }}>
+            Annotate on your iPad, type on your laptop, or print and bind at home. Your {categoryName.toLowerCase()} go wherever your ideas do — no subscriptions, no lock-in.
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            {apps.map(({ icon: Icon, label }) => (
+              <div key={label} className="flex items-center gap-3 px-4 py-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                <Icon size={18} style={{ color: 'var(--gold-light)' }} />
+                <span className="text-sm font-medium" style={{ color: '#fff' }}>{label}</span>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.1 }}
+          className="grid grid-cols-2 gap-4">
+          {[
+            { n: '50k+', l: 'Downloads' },
+            { n: '4.9★', l: 'Avg Rating' },
+            { n: '100%', l: 'Instant Access' },
+            { n: '30-Day', l: 'Happiness Promise' },
+          ].map((s) => (
+            <div key={s.l} className="text-center py-7 rounded-2xl" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <p className="font-display text-3xl font-semibold mb-1" style={{ color: 'var(--gold-light)' }}>{s.n}</p>
+              <p className="text-xs uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.55)', letterSpacing: '0.08em' }}>{s.l}</p>
+            </div>
+          ))}
+        </motion.div>
+      </div>
+    </section>
+  )
+}
+
+// ── Testimonials ──────────────────────────────────────────────
+function Testimonials({ categoryName, rating }: { categoryName: string; rating: number }) {
+  const reviews = [
+    { name: 'Amara N.',    grad: 'linear-gradient(135deg,#B8A9D4,#7B6FAE)', text: `Genuinely the most beautiful planner I've ever used. The hyperlinks make it so fast to navigate — I've finally stuck to a routine.` },
+    { name: 'Daniel K.',   grad: 'linear-gradient(135deg,#C9A84C,#E2C97E)', text: `Downloaded it in seconds and had it in GoodNotes before my coffee was ready. Worth every cent and then some.` },
+    { name: 'Priya S.',    grad: 'linear-gradient(135deg,#E8C5C0,#C9847C)', text: `I've bought planners before that I never opened. This one I actually look forward to. The design just makes you want to plan.` },
+  ]
+  return (
+    <section className="border-t py-16" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
+      <div className="container-site">
+        <div className="text-center mb-12">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <Stars value={rating || 5} size={18} />
+            <span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{(rating || 4.9).toFixed(1)} out of 5</span>
+          </div>
+          <h2 className="font-display text-display-sm" style={{ color: 'var(--text-primary)' }}>Loved by Thousands of Planners</h2>
+        </div>
+        <div className="grid md:grid-cols-3 gap-5">
+          {reviews.map((r, i) => (
+            <motion.div key={r.name} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45, delay: i * 0.1 }}
+              className="p-6 rounded-2xl border flex flex-col" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+              <Quote size={26} style={{ color: 'var(--gold)', opacity: 0.4 }} className="mb-3" />
+              <Stars value={5} size={13} />
+              <p className="text-sm leading-relaxed my-4 flex-1" style={{ color: 'var(--text-secondary)' }}>&ldquo;{r.text}&rdquo;</p>
+              <div className="flex items-center gap-3 pt-3 border-t" style={{ borderColor: 'var(--border)' }}>
+                <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: r.grad }}>{r.name.charAt(0)}</div>
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{r.name}</p>
+                  <p className="text-[11px] inline-flex items-center gap-1" style={{ color: 'var(--sage)' }}><BadgeCheck size={11} /> Verified Purchase</p>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ── Why Arwign comparison ─────────────────────────────────────
+function WhyArwign() {
+  const rows = [
+    'Instant digital delivery',
+    'Hyperlinked, tap-to-navigate pages',
+    'Works on iPad, tablet & print',
+    'Undated — start anytime, reuse yearly',
+    'Free lifetime updates',
+    'Designed by real productivity nerds',
+  ]
+  return (
+    <section className="border-t py-16" style={{ borderColor: 'var(--border)' }}>
+      <div className="container-site max-w-3xl mx-auto">
+        <div className="text-center mb-10">
+          <p className="text-xs uppercase tracking-widest font-semibold mb-2" style={{ color: 'var(--gold)', letterSpacing: '0.12em' }}>The Difference</p>
+          <h2 className="font-display text-display-sm" style={{ color: 'var(--text-primary)' }}>Why Choose Arwign</h2>
+        </div>
+        <div className="rounded-3xl border overflow-hidden" style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}>
+          <div className="grid grid-cols-[1fr_auto_auto]">
+            <div className="p-4 border-b" style={{ borderColor: 'var(--border)' }} />
+            <div className="p-4 border-b text-center min-w-[110px]" style={{ borderColor: 'var(--border)', background: 'rgba(201,168,76,0.08)' }}>
+              <span className="font-display text-base font-semibold" style={{ color: 'var(--gold-dark)' }}>Arwign</span>
+            </div>
+            <div className="p-4 border-b text-center min-w-[110px]" style={{ borderColor: 'var(--border)' }}>
+              <span className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>Ordinary</span>
+            </div>
+            {rows.map((row, i) => (
+              <div key={row} className="contents">
+                <div className="p-4 text-sm flex items-center" style={{ color: 'var(--text-secondary)', borderTop: i === 0 ? 'none' : '1px solid var(--border)' }}>{row}</div>
+                <div className="p-4 flex items-center justify-center" style={{ background: 'rgba(201,168,76,0.08)', borderTop: i === 0 ? 'none' : '1px solid var(--border)' }}>
+                  <span className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: 'var(--gold)' }}><Check size={13} color="white" strokeWidth={3} /></span>
+                </div>
+                <div className="p-4 flex items-center justify-center" style={{ borderTop: i === 0 ? 'none' : '1px solid var(--border)' }}>
+                  <X size={16} style={{ color: 'var(--text-muted)', opacity: 0.5 }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
   )
 }
