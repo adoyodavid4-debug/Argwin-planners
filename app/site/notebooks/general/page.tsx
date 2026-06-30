@@ -1,22 +1,20 @@
 import type { Metadata } from 'next'
 import { createServiceRoleClient } from '@/lib/supabase/server'
-import Link from 'next/link'
-import Image from 'next/image'
-import { ItemListSchema } from '@/components/seo/JsonLd'
-import { OptInForm } from '@/components/funnel/OptInForm'
+import { ItemListSchema, FaqSchema } from '@/components/seo/JsonLd'
+import GeneralClient, { type NbProduct, type RelItem } from './GeneralClient'
+import { FAQS } from './data'
 
 export const revalidate = 600
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://arwignplanners.com'
 
 export const metadata: Metadata = {
-  title: 'General Notebooks — Arwign Planners',
-  description: 'Versatile digital notebooks for everyday use — bullet journaling, project planning, and creative writing. Download instantly.',
-  // Same catalog as /notebooks — canonical points there to avoid duplicate content.
+  title: 'General Notebooks — Ready-Made, Instant Download | Arwign Planners',
+  description: 'Versatile ready-made digital notebooks for journaling, planning and notes. Choose your colourway and size, download instantly. GoodNotes & Notability ready.',
   alternates: { canonical: `${BASE_URL}/notebooks` },
   openGraph: {
     title: 'General Notebooks — Arwign Planners',
-    description: 'Versatile digital notebooks for everyday use. Download instantly.',
+    description: 'Ready-made digital notebooks — choose your colourway and size, download instantly.',
     url: `${BASE_URL}/notebooks/general`,
     type: 'website',
   },
@@ -27,102 +25,28 @@ export default async function GeneralNotebooksPage() {
 
   const { data: notebooks } = await supabase
     .from('products')
-    .select('id, title, slug, description, price, currency, images, status, product_type, fulfillment_options, categories(name, slug)')
+    .select('id, title, slug, description, price, currency, images, status, product_type')
     .eq('product_type', 'notebook')
     .eq('status', 'active')
     .order('created_at', { ascending: false })
+    .then((r) => ({ data: r.error ? [] : r.data }))
 
-  const items = (notebooks ?? [])
+  const items = (notebooks ?? []) as any[]
+  const first = items[0]
+  const product: NbProduct | null = first && first.price != null
+    ? { id: first.id, title: first.title, slug: first.slug, price: first.price, currency: first.currency, thumbnail: (first.images as string[] | null)?.[0] ?? null }
+    : null
+
+  const related: RelItem[] = items
+    .filter((p) => !product || p.id !== product.id)
+    .map((p) => ({ id: p.id, title: p.title, slug: p.slug, price: p.price, currency: p.currency, image: (p.images as string[] | null)?.[0] ?? null }))
 
   return (
     <>
-      <ItemListSchema
-        name="General Notebooks"
-        url={`${BASE_URL}/notebooks/general`}
-        items={items.map((p, i) => ({
-          position: i + 1,
-          name: p.title,
-          url: `${BASE_URL}/shop/${p.slug}`,
-        }))}
-      />
-
-      <main className="max-w-6xl mx-auto px-4 py-12">
-        {/* Hero */}
-        <div className="text-center mb-12">
-          <span className="inline-block text-xs font-semibold uppercase tracking-widest text-[#C9A84C] mb-3">General Notebooks</span>
-          <h1 className="text-3xl sm:text-4xl font-bold mb-4">Versatile notebooks for everyday use.</h1>
-          <p className="text-[var(--text-muted)] max-w-xl mx-auto text-lg">
-            Ready-made layouts for bullet journaling, project planning, and creative writing — downloadable instantly, printable or use digitally on any device.
-          </p>
-        </div>
-
-        {/* GEO direct-answer block */}
-        <section className="mb-10 rounded-xl bg-[var(--bg-muted)] border border-[var(--border)] p-6">
-          <h2 className="text-lg font-semibold mb-3">What's included in each notebook?</h2>
-          <ul className="space-y-2 text-sm text-[var(--text-muted)]">
-            <li><span className="font-medium text-[var(--text-primary)]">High-resolution PDF</span> — print at home or at any copy shop</li>
-            <li><span className="font-medium text-[var(--text-primary)]">GoodNotes / Notability ready</span> — import directly into your favourite app</li>
-            <li><span className="font-medium text-[var(--text-primary)]">Multiple size options</span> — A4, US Letter, A5</li>
-            <li><span className="font-medium text-[var(--text-primary)]">Lifetime access</span> — download again any time from your order history</li>
-          </ul>
-        </section>
-
-        {/* Product grid */}
-        {items.length === 0 ? (
-          <p className="text-center text-[var(--text-muted)] py-20">Notebooks coming soon — sign up below to be first to know.</p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-            {items.map((p) => {
-              const img = (p.images as string[] | null)?.[0]
-              const price = p.price != null
-                ? new Intl.NumberFormat('en-US', { style: 'currency', currency: p.currency ?? 'USD' }).format(p.price)
-                : null
-              return (
-                <Link key={p.id} href={`/shop/${p.slug}`}
-                  className="group rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] overflow-hidden hover:shadow-md transition-shadow">
-                  <div className="aspect-[3/4] bg-[var(--bg-muted)] relative overflow-hidden">
-                    {img ? (
-                      <Image src={img} alt={p.title} fill className="object-cover group-hover:scale-102 transition-transform duration-300" sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw" />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center text-[var(--text-muted)] text-sm">No preview</div>
-                    )}
-                    {p.fulfillment_options === 'both' && (
-                      <span className="absolute top-3 right-3 rounded-full bg-[#C9A84C] px-2 py-0.5 text-[10px] font-semibold text-white uppercase tracking-wide shadow">
-                        Also in print
-                      </span>
-                    )}
-                  </div>
-                  <div className="p-5">
-                    <h3 className="font-semibold text-base mb-1 line-clamp-2">{p.title}</h3>
-                    <p className="text-sm text-[var(--text-muted)] mb-3 line-clamp-2">{p.description}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-lg">{price ?? 'Free'}</span>
-                      <span className="text-sm text-[#C9A84C] font-medium group-hover:underline">View →</span>
-                    </div>
-                  </div>
-                </Link>
-              )
-            })}
-          </div>
-        )}
-
-        {/* Cross-link to personalized notebooks */}
-        <div className="mb-16 rounded-xl border border-[var(--border)] bg-[var(--bg-muted)] p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div>
-            <h2 className="font-semibold text-base mb-1">Not finding what you need?</h2>
-            <p className="text-sm text-[var(--text-muted)]">Tell us your idea and we'll design a notebook just for you.</p>
-          </div>
-          <Link href="/notebooks/personalized"
-            className="rounded-lg bg-[#C9A84C] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#b8963e] transition-colors whitespace-nowrap">
-            Request a personalized notebook →
-          </Link>
-        </div>
-
-        {/* Lead magnet CTA */}
-        <div className="mt-16 border-t border-[var(--border)] pt-12">
-          <OptInForm variant="footer" locale="en" />
-        </div>
-      </main>
+      <ItemListSchema name="General Notebooks" url={`${BASE_URL}/notebooks/general`}
+        items={items.map((p, i) => ({ position: i + 1, name: p.title, url: `${BASE_URL}/shop/${p.slug}` }))} />
+      <FaqSchema items={FAQS.map((f) => ({ question: f.q, answer: f.a }))} />
+      <GeneralClient product={product} related={related} />
     </>
   )
 }
