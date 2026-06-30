@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion, useScroll, useSpring, useReducedMotion } from 'framer-motion'
 import {
-  Clock, Eye, Tag, ChevronRight, ArrowRight,
+  Clock, Tag, ChevronRight, ArrowRight,
   ArrowLeft, BookOpen, Lightbulb, Check, Trophy,
   List, ArrowUpRight, Twitter, Facebook, Linkedin, Link as LinkIcon,
 } from 'lucide-react'
@@ -777,6 +777,66 @@ function ShareRow({ title }: { title: string }) {
   )
 }
 
+// Default editorial author (no per-post author field exists in the data source).
+const AUTHOR = {
+  name: 'The Arwign Team',
+  role: 'Planner designers & writers',
+  bio: 'We craft premium digital and printable planners — and write about the systems, science and small habits behind a calmer, more intentional life.',
+}
+
+function Avatar({ size = 36 }: { size?: number }) {
+  return (
+    <span className="rounded-full flex items-center justify-center font-bold text-white flex-shrink-0"
+      style={{ width: size, height: size, background: 'linear-gradient(135deg, var(--gold), var(--gold-light))', fontSize: size * 0.42, fontFamily: 'var(--font-cormorant)' }} aria-hidden>A</span>
+  )
+}
+
+function NewsletterForm({ source }: { source: string }) {
+  const [email, setEmail] = useState('')
+  const [status, setStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!email || status === 'loading') return
+    setStatus('loading')
+    try {
+      const r = await fetch('/api/newsletter', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, source }) })
+      setStatus(r.ok ? 'done' : 'error')
+    } catch { setStatus('error') }
+  }
+  if (status === 'done') return <p className="inline-flex items-center gap-2 text-sm font-semibold" style={{ color: 'var(--gold-dark)' }}><Check size={16} /> You&rsquo;re in — check your inbox ✦</p>
+  return (
+    <form onSubmit={submit} className="flex flex-col sm:flex-row gap-3 max-w-sm mx-auto">
+      <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your@email.com" className="input-field flex-1 text-sm" aria-label="Email address" />
+      <button type="submit" disabled={status === 'loading'} className="btn-primary text-sm whitespace-nowrap disabled:opacity-60">{status === 'loading' ? 'Joining…' : 'Subscribe'}</button>
+      {status === 'error' && <span className="sr-only">Something went wrong</span>}
+    </form>
+  )
+}
+
+function ShareRail({ title }: { title: string }) {
+  const [url, setUrl] = useState('')
+  useEffect(() => { setUrl(window.location.href) }, [])
+  const enc = encodeURIComponent
+  const links = [
+    { icon: Twitter,  label: 'Share on X',        href: `https://twitter.com/intent/tweet?url=${enc(url)}&text=${enc(title)}` },
+    { icon: Facebook, label: 'Share on Facebook', href: `https://www.facebook.com/sharer/sharer.php?u=${enc(url)}` },
+    { icon: Linkedin, label: 'Share on LinkedIn', href: `https://www.linkedin.com/sharing/share-offsite/?url=${enc(url)}` },
+  ]
+  return (
+    <div className="sticky top-28 flex flex-col items-center gap-2.5">
+      <span className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: 'var(--text-muted)', letterSpacing: '0.12em' }}>Share</span>
+      {links.map(({ icon: Icon, label, href }) => (
+        <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
+          className="w-10 h-10 rounded-full flex items-center justify-center border transition-all hover:-translate-y-0.5 hover:border-gold"
+          style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)', background: 'var(--bg-card)' }}><Icon size={15} /></a>
+      ))}
+      <button onClick={() => { navigator.clipboard?.writeText(url); toast.success('Link copied ✦') }} aria-label="Copy link"
+        className="w-10 h-10 rounded-full flex items-center justify-center border transition-all hover:-translate-y-0.5 hover:border-gold"
+        style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)', background: 'var(--bg-card)' }}><LinkIcon size={15} /></button>
+    </div>
+  )
+}
+
 // ── Main component ────────────────────────────────────────────
 interface Props {
   post:    BlogPost
@@ -799,6 +859,7 @@ export default function BlogPostClient({ post, related }: Props) {
   }, [post.slug])
 
   const jump = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })
+  const lead = post.excerpt.length > 200 ? `${post.excerpt.slice(0, 200)}…` : post.excerpt
 
   return (
     <div className="w-full" style={{ background: 'var(--bg-primary)' }}>
@@ -826,54 +887,78 @@ export default function BlogPostClient({ post, related }: Props) {
               className="font-display text-white mb-3" style={{ fontSize: 'clamp(1.9rem, 4vw, 3.1rem)', lineHeight: 1.08, textShadow: '0 2px 16px rgba(0,0,0,0.4)' }}>
               {post.title}
             </motion.h1>
-            <div className="flex flex-wrap items-center gap-5 text-sm text-white/75">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/75">
+              <span className="flex items-center gap-2"><Avatar size={28} /> <span className="text-white/90 font-medium">{AUTHOR.name}</span></span>
               <span className="flex items-center gap-1.5"><Clock size={13} /> {post.readMins} min read</span>
-              <span className="flex items-center gap-1.5"><Eye size={13} /> {post.viewCount.toLocaleString()} views</span>
               <span>{formatDate(post.publishedAt)}</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* ── Article (comfortable measure) ────────────────── */}
+      {/* ── Article (magazine 3-column scaffold) ─────────── */}
       <div className="container-site py-12">
-        <article className="mx-auto" style={{ maxWidth: 720 }}>
-          <Link href="/blog" className="inline-flex items-center gap-1.5 text-xs mb-8 transition-colors hover:text-gold" style={{ color: 'var(--text-muted)' }}>
-            <ArrowLeft size={13} /> All articles
-          </Link>
+        <div className="lg:grid lg:gap-10 lg:justify-center" style={{ gridTemplateColumns: 'minmax(0,230px) minmax(0,720px) minmax(0,84px)' }}>
 
-          {/* Lead */}
-          <p className="leading-relaxed mb-8 border-l-4 pl-5 italic" style={{ color: 'var(--text-secondary)', borderColor: 'var(--gold)', fontSize: '1.2rem' }}>
-            {post.excerpt.slice(0, 200)}{post.excerpt.length > 200 ? '…' : ''}
-          </p>
+          {/* Left rail — sticky TOC (desktop, longer posts) */}
+          <aside className="hidden lg:block">
+            {toc.length >= 3 && <div className="sticky top-28"><Toc items={toc} onJump={jump} reduce={reduce} /></div>}
+          </aside>
 
-          {/* TOC (longer posts) */}
-          {toc.length >= 3 && <Toc items={toc} onJump={jump} reduce={reduce} />}
+          {/* Centre — article */}
+          <article className="mx-auto w-full" style={{ maxWidth: 720 }}>
+            <Link href="/blog" className="inline-flex items-center gap-1.5 text-xs mb-8 transition-colors hover:text-gold" style={{ color: 'var(--text-muted)' }}>
+              <ArrowLeft size={13} /> All articles
+            </Link>
 
-          {/* Inline product (within) */}
-          <InlineProduct sp={sp} compact />
+            {/* Lead with drop cap */}
+            <p className="mb-9 leading-relaxed" style={{ color: 'var(--text-secondary)', fontSize: '1.22rem' }}>
+              <span aria-hidden style={{ float: 'left', fontFamily: 'var(--font-cormorant)', fontWeight: 600, fontSize: '3.6rem', lineHeight: 0.82, marginRight: '0.55rem', marginTop: '0.35rem', color: 'var(--gold)' }}>{lead.charAt(0)}</span>
+              {lead.slice(1)}
+            </p>
 
-          {/* Article body */}
-          <motion.div ref={articleRef} initial={reduce ? false : { opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-80px' }} transition={{ duration: 0.5 }}>
-            <ArticleBody post={post} />
-          </motion.div>
+            {/* Mobile TOC */}
+            {toc.length >= 3 && <div className="lg:hidden"><Toc items={toc} onJump={jump} reduce={reduce} /></div>}
 
-          {/* Tags */}
-          {post.tags.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2 pt-8 border-t mt-8" style={{ borderColor: 'var(--border)' }}>
-              <Tag size={13} style={{ color: 'var(--text-muted)' }} />
-              {post.tags.map((tag) => (
-                <span key={tag} className="text-xs px-3 py-1 rounded-full border" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)', color: 'var(--text-muted)' }}>{tag}</span>
-              ))}
+            {/* Inline product (within) */}
+            <InlineProduct sp={sp} compact />
+
+            {/* Article body */}
+            <motion.div ref={articleRef} initial={reduce ? false : { opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-80px' }} transition={{ duration: 0.5 }}>
+              <ArticleBody post={post} />
+            </motion.div>
+
+            {/* Tags */}
+            {post.tags.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2 pt-8 border-t mt-8" style={{ borderColor: 'var(--border)' }}>
+                <Tag size={13} style={{ color: 'var(--text-muted)' }} />
+                {post.tags.map((tag) => (
+                  <span key={tag} className="text-xs px-3 py-1 rounded-full border" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)', color: 'var(--text-muted)' }}>{tag}</span>
+                ))}
+              </div>
+            )}
+
+            {/* Inline product (after) */}
+            <InlineProduct sp={sp} />
+
+            {/* Author bio */}
+            <div className="mt-12 flex items-start gap-4 p-6 rounded-2xl border" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
+              <Avatar size={52} />
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: 'var(--gold)', letterSpacing: '0.1em' }}>Written by</p>
+                <p className="font-display text-lg" style={{ color: 'var(--text-primary)' }}>{AUTHOR.name}</p>
+                <p className="text-sm leading-relaxed mt-1" style={{ color: 'var(--text-secondary)' }}>{AUTHOR.bio}</p>
+                <Link href="/shop" className="inline-flex items-center gap-1 text-xs font-semibold mt-2.5 hover:gap-2 transition-all" style={{ color: 'var(--gold)' }}>Explore our planners <ArrowRight size={12} /></Link>
+              </div>
             </div>
-          )}
 
-          {/* Inline product (after) */}
-          <InlineProduct sp={sp} />
+            {/* Share row (mobile only) */}
+            <div className="lg:hidden"><ShareRow title={post.title} /></div>
+          </article>
 
-          {/* Share */}
-          <ShareRow title={post.title} />
-        </article>
+          {/* Right rail — sticky share (desktop) */}
+          <aside className="hidden lg:block"><ShareRail title={post.title} /></aside>
+        </div>
       </div>
 
       {/* ── End-of-post CTA ──────────────────────────────── */}
@@ -917,10 +1002,7 @@ export default function BlogPostClient({ post, related }: Props) {
         <div className="container-site max-w-xl mx-auto text-center">
           <h2 className="font-display text-2xl mb-2" style={{ color: 'var(--text-primary)' }}>More tips like this, free.</h2>
           <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>Planning guides and productivity science — never spammy.</p>
-          <form onSubmit={(e) => e.preventDefault()} className="flex flex-col sm:flex-row gap-3 max-w-sm mx-auto">
-            <input type="email" required placeholder="your@email.com" className="input-field flex-1 text-sm" aria-label="Email address" />
-            <button type="submit" className="btn-primary text-sm whitespace-nowrap">Subscribe</button>
-          </form>
+          <NewsletterForm source={`blog-post:${post.slug}`} />
         </div>
       </section>
 

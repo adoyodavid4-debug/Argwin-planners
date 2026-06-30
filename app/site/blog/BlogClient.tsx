@@ -1,10 +1,11 @@
 'use client'
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useScroll, useTransform, useReducedMotion } from 'framer-motion'
 import {
-  BookOpen, Clock, Search, X, ChevronRight, ArrowRight,
+  BookOpen, Clock, Search, X, ChevronRight, ArrowRight, Check, Plus,
+  TrendingUp, Heart, Wallet, Tablet, Sparkles,
 } from 'lucide-react'
 import { type BlogPost, STATIC_POSTS } from './blog-data'
 
@@ -29,29 +30,73 @@ function CoverImage({ src, alt, sizes, priority, className }: { src: string; alt
   )
 }
 
-function PostCard({ post, featured = false }: { post: BlogPost; featured?: boolean }) {
-  if (featured) {
-    return (
-      <Link href={`/blog/${post.slug}`} className="group block">
-        <motion.article initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-          className="relative rounded-3xl overflow-hidden border" style={{ borderColor: 'var(--border)' }}>
-          <div className="relative h-[360px] md:h-[440px] w-full overflow-hidden" style={{ background: 'var(--bg-secondary)' }}>
-            <CoverImage src={post.cover || 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=1000&q=80'} alt={post.title} sizes="100vw" priority className="group-hover:scale-105 duration-700" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 p-7 md:p-9">
-            <div className="flex items-center gap-3 mb-3">
-              <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest" style={{ background: 'var(--gold)', color: 'white', letterSpacing: '0.08em' }}>{post.category}</span>
-              <span className="text-xs text-white/70 inline-flex items-center gap-1"><Clock size={11} /> {post.readMins} min read</span>
-            </div>
-            <h2 className="font-display text-3xl md:text-4xl text-white mb-2.5 group-hover:text-gold-light transition-colors leading-tight max-w-3xl" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.4)' }}>{post.title}</h2>
-            <p className="text-sm text-white/80 line-clamp-1 max-w-xl">{post.excerpt}</p>
-          </div>
-        </motion.article>
-      </Link>
-    )
-  }
+const AUTHOR_NAME = 'The Arwign Team'
 
+function Avatar({ size = 24 }: { size?: number }) {
+  return (
+    <span className="rounded-full flex items-center justify-center font-bold text-white flex-shrink-0"
+      style={{ width: size, height: size, background: 'linear-gradient(135deg, var(--gold), var(--gold-light))', fontSize: size * 0.45, fontFamily: 'var(--font-cormorant)' }} aria-hidden>A</span>
+  )
+}
+
+const TOPICS = [
+  { label: 'Productivity', cat: 'Productivity',  icon: TrendingUp },
+  { label: 'Wellness',     cat: 'Wellness',      icon: Heart },
+  { label: 'Finance',      cat: 'Finance',       icon: Wallet },
+  { label: 'Digital Tools', cat: 'Digital Tools', icon: Tablet },
+]
+
+function NewsletterForm() {
+  const [email, setEmail] = useState('')
+  const [status, setStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!email || status === 'loading') return
+    setStatus('loading')
+    try {
+      const r = await fetch('/api/newsletter', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, source: 'blog-index' }) })
+      setStatus(r.ok ? 'done' : 'error')
+    } catch { setStatus('error') }
+  }
+  if (status === 'done') return <p className="inline-flex items-center gap-2 text-sm font-semibold" style={{ color: 'var(--gold-dark)' }}><Check size={16} /> You&rsquo;re in — check your inbox ✦</p>
+  return (
+    <form onSubmit={submit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+      <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your@email.com" className="input-field flex-1 text-sm" aria-label="Email address" />
+      <button type="submit" disabled={status === 'loading'} className="btn-primary text-sm whitespace-nowrap disabled:opacity-60">{status === 'loading' ? 'Joining…' : 'Subscribe Free'}</button>
+    </form>
+  )
+}
+
+// Cinematic featured banner with gentle scale-on-scroll
+function FeaturedCard({ post }: { post: BlogPost }) {
+  const reduce = useReducedMotion()
+  const ref = useRef<HTMLElement>(null)
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] })
+  const scale = useTransform(scrollYProgress, [0, 1], [1.14, 1])
+  return (
+    <Link href={`/blog/${post.slug}`} className="group block">
+      <article ref={ref} className="relative rounded-3xl overflow-hidden border" style={{ borderColor: 'var(--border)' }}>
+        <div className="relative h-[380px] md:h-[480px] w-full overflow-hidden" style={{ background: 'var(--bg-secondary)' }}>
+          <motion.div className="absolute inset-0" style={reduce ? undefined : { scale }}>
+            <CoverImage src={post.cover || 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=1200&q=80'} alt={post.title} sizes="100vw" priority className="group-hover:scale-105 duration-700" />
+          </motion.div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 p-7 md:p-10">
+          <div className="flex items-center gap-3 mb-3">
+            <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest" style={{ background: 'var(--gold)', color: 'white', letterSpacing: '0.08em' }}>{post.category}</span>
+            <span className="text-xs text-white/70 inline-flex items-center gap-1"><Clock size={11} /> {post.readMins} min read</span>
+          </div>
+          <h2 className="font-display text-3xl md:text-5xl text-white mb-2.5 group-hover:text-gold-light transition-colors leading-[1.06] max-w-3xl" style={{ textShadow: '0 2px 14px rgba(0,0,0,0.45)' }}>{post.title}</h2>
+          <p className="text-sm text-white/80 line-clamp-1 max-w-xl mb-4">{post.excerpt}</p>
+          <div className="flex items-center gap-2.5 text-xs text-white/75"><Avatar size={26} /> <span className="text-white/90 font-medium">{AUTHOR_NAME}</span><span className="text-white/40">·</span><span>{formatDate(post.publishedAt)}</span></div>
+        </div>
+      </article>
+    </Link>
+  )
+}
+
+function PostCard({ post }: { post: BlogPost }) {
   return (
     <Link href={`/blog/${post.slug}`} className="group block h-full">
       <motion.article layout initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96 }} transition={{ duration: 0.35 }}
@@ -65,7 +110,7 @@ function PostCard({ post, featured = false }: { post: BlogPost; featured?: boole
           <h3 className="font-display text-xl leading-snug mb-2 group-hover:text-gold transition-colors line-clamp-2" style={{ color: 'var(--text-primary)' }}>{post.title}</h3>
           <p className="text-sm leading-relaxed line-clamp-1 mb-4 flex-1" style={{ color: 'var(--text-secondary)' }}>{post.excerpt}</p>
           <div className="flex items-center justify-between pt-3 border-t" style={{ borderColor: 'var(--border)' }}>
-            <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-muted)' }}><Clock size={10} /> {post.readMins} min read</span>
+            <span className="flex items-center gap-2 text-xs" style={{ color: 'var(--text-muted)' }}><Avatar size={22} /> <span className="flex items-center gap-1"><Clock size={10} /> {post.readMins} min</span></span>
             <span className="text-xs font-medium flex items-center gap-1" style={{ color: 'var(--gold)' }}>Read <ArrowRight size={11} /></span>
           </div>
         </div>
@@ -82,6 +127,7 @@ interface Props {
 export default function BlogClient({ posts, searchParams }: Props) {
   const [search,   setSearch]   = useState(searchParams.q ?? '')
   const [category, setCategory] = useState(searchParams.category ?? 'All')
+  const [visible,  setVisible]  = useState(6)
 
   const filtered = useMemo(() => {
     let list = [...posts]
@@ -98,8 +144,11 @@ export default function BlogClient({ posts, searchParams }: Props) {
     return list
   }, [posts, category, search])
 
+  useEffect(() => { setVisible(6) }, [category, search])
+
   const featured  = filtered[0]
-  const rest      = filtered.slice(1)
+  const picks     = filtered.slice(1, 3)
+  const gridPosts = filtered.slice(3)
 
   const clearSearch = useCallback(() => setSearch(''), [])
 
@@ -238,30 +287,61 @@ export default function BlogClient({ posts, searchParams }: Props) {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
-              {/* Featured post */}
-              {featured && (
-                <div className="mb-10">
-                  <PostCard post={featured} featured />
-                </div>
+              {/* Cinematic featured banner */}
+              {featured && <div className="mb-12"><FeaturedCard post={featured} /></div>}
+
+              {/* Editor's picks — 2-up */}
+              {picks.length > 0 && (
+                <section className="mb-14">
+                  <div className="flex items-center gap-2 mb-5">
+                    <Sparkles size={15} style={{ color: 'var(--gold)' }} />
+                    <h2 className="font-display text-2xl" style={{ color: 'var(--text-primary)' }}>Editor&rsquo;s Picks</h2>
+                  </div>
+                  <div className="grid sm:grid-cols-2 gap-6">
+                    {picks.map((post) => <PostCard key={post.id} post={post} />)}
+                  </div>
+                </section>
               )}
 
-              {/* Grid */}
-              {rest.length > 0 && (
-                <>
+              {/* Browse by topic — only on the unfiltered view */}
+              {category === 'All' && !search && (
+                <section className="mb-14">
+                  <h2 className="font-display text-2xl mb-5" style={{ color: 'var(--text-primary)' }}>Browse by topic</h2>
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    {TOPICS.map(({ label, cat, icon: Icon }) => (
+                      <button key={cat} onClick={() => setCategory(cat)}
+                        className="group flex items-center gap-3 p-5 rounded-2xl border text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-product"
+                        style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+                        <span className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110" style={{ background: 'rgba(var(--gold-rgb),0.12)' }}><Icon size={19} style={{ color: 'var(--gold)' }} /></span>
+                        <span className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {/* All articles grid */}
+              {gridPosts.length > 0 && (
+                <section>
                   <div className="flex items-center justify-between mb-6">
+                    <h2 className="font-display text-2xl" style={{ color: 'var(--text-primary)' }}>
+                      {category !== 'All' ? category : search ? 'Results' : 'Latest articles'}
+                    </h2>
                     <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
                       {filtered.length} article{filtered.length !== 1 ? 's' : ''}
-                      {category !== 'All' && ` in ${category}`}
-                      {search && ` matching "${search}"`}
                     </p>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {rest.map((post) => (
-                      <PostCard key={post.id} post={post} />
-                    ))}
+                    {gridPosts.slice(0, visible).map((post) => <PostCard key={post.id} post={post} />)}
                   </div>
-                </>
+
+                  {visible < gridPosts.length && (
+                    <div className="flex justify-center mt-10">
+                      <button onClick={() => setVisible((v) => v + 6)} className="btn-outline px-8">Load more <Plus size={14} /></button>
+                    </div>
+                  )}
+                </section>
               )}
             </motion.div>
           </AnimatePresence>
@@ -284,20 +364,7 @@ export default function BlogClient({ posts, searchParams }: Props) {
           <p className="text-sm mb-8" style={{ color: 'var(--text-secondary)' }}>
             Planning tips, productivity guides, and new planner announcements — delivered free, never spammy.
           </p>
-          <form
-            onSubmit={(e) => e.preventDefault()}
-            className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
-          >
-            <input
-              type="email"
-              required
-              placeholder="your@email.com"
-              className="input-field flex-1 text-sm"
-            />
-            <button type="submit" className="btn-primary text-sm whitespace-nowrap">
-              Subscribe Free
-            </button>
-          </form>
+          <NewsletterForm />
           <p className="text-xs mt-3" style={{ color: 'var(--text-muted)' }}>
             No spam. Unsubscribe any time.
           </p>
