@@ -1,319 +1,139 @@
 'use client'
+import { useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion, useScroll, useTransform, useSpring } from 'framer-motion'
 import {
-  Heart, Zap, Star, Download, Users, Globe, Award,
-  ArrowRight, BookOpen, Palette, Sparkles, ChevronRight,
+  Heart, Star, Download, Users, Globe, ArrowRight, ChevronRight, Sparkles,
+  Palette, PenTool, Tablet, Ruler, Link2, Type, Check, Quote, BadgeCheck, Leaf, Award,
 } from 'lucide-react'
 
-// ── Shared fade-up variant ────────────────────────────────────
-const fadeUp = {
-  hidden: { opacity: 0, y: 28 },
-  show:   { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.25, 0.46, 0.45, 0.94] } },
-}
-const stagger = (delay = 0) => ({
-  hidden: { opacity: 0, y: 20 },
-  show:   { opacity: 1, y: 0, transition: { duration: 0.5, delay, ease: [0.25, 0.46, 0.45, 0.94] } },
-})
+const BRAND_GREEN = '#2E4A38' // forest-green brand mark
 
-// ── Static data ───────────────────────────────────────────────
+// ── Data ──────────────────────────────────────────────────────
 const STATS = [
-  { icon: Download, value: '15k+',  label: 'Planners downloaded' },
-  { icon: Star,     value: '4.9★',  label: 'Average rating' },
-  { icon: Users,    value: '12k+',  label: 'Happy customers' },
-  { icon: Globe,    value: '30+',   label: 'Countries served' },
+  { icon: Download, value: '15k+', label: 'Planners downloaded' },
+  { icon: Star,     value: '4.9★', label: 'Average rating' },
+  { icon: Users,    value: '12k+', label: 'Happy customers' },
+  { icon: Globe,    value: '30+',  label: 'Countries served' },
 ]
 
 const VALUES = [
-  {
-    icon:  Palette,
-    title: 'Design First',
-    body:  'Every layout, colour palette, and typeface is chosen deliberately. We start with beauty — then make it functional.',
-    accent: 'rgba(224,168,44,0.12)',
-    border: 'rgba(224,168,44,0.30)',
-  },
-  {
-    icon:  Heart,
-    title: 'Practical Beauty',
-    body:  'Beautiful things that actually get used. Our planners are made for the desk, the iPad screen, and the real moments of your day.',
-    accent: 'rgba(184,169,212,0.12)',
-    border: 'rgba(184,169,212,0.30)',
-  },
-  {
-    icon:  Zap,
-    title: 'Instant Access',
-    body:  'No waiting, no shipping. You buy, you download, you plan — in under 60 seconds. Every product is ready immediately.',
-    accent: 'rgba(168,181,160,0.12)',
-    border: 'rgba(168,181,160,0.30)',
-  },
+  { icon: Heart,   title: 'Warm & inclusive design', body: 'Calm, non-clinical layouts made for real, busy, wonderfully imperfect lives.' },
+  { icon: PenTool, title: 'Thoughtful craftsmanship', body: 'Every margin, tab and typeface is hand-considered and tested before release.' },
+  { icon: Tablet,  title: 'Works in your apps',        body: 'GoodNotes, Notability, Xodo or print — your planner goes wherever you do.' },
+  { icon: Check,   title: 'Made to actually be used',  body: 'Beautiful, yes — but built for the desk, the iPad, and the everyday moment.' },
 ]
 
-const PHILOSOPHY = [
-  {
-    icon:  BookOpen,
-    title: 'Undated by Design',
-    body:  'Start any day of any year. No wasted pages, no guilt about missing a week. Our planners meet you where you are.',
-  },
-  {
-    icon:  Sparkles,
-    title: 'Multi-Format Ready',
-    body:  'PDF, GoodNotes, Notability, Xodo — every planner ships in the formats your setup actually uses.',
-  },
-  {
-    icon:  Award,
-    title: 'Quality You Can Feel',
-    body:  'From hyperlinked tabs to perfectly balanced margins, every detail is tested before a product reaches the shop.',
-  },
+const CRAFT = [
+  { icon: Link2,  title: 'Hyperlinked navigation', body: 'Tap any tab to jump between views instantly.' },
+  { icon: Ruler,  title: 'Three sizes',            body: 'A4, US Letter and A5 in every download.' },
+  { icon: Palette,title: 'A warm, calm palette',    body: 'Cream, peach, sage, golden and terracotta.' },
+  { icon: Type,   title: 'Lora + Poppins',          body: 'Editorial serif headings, clean modern body.' },
+  { icon: Tablet, title: 'App compatible',          body: 'GoodNotes, Notability, Xodo and any PDF app.' },
+  { icon: Leaf,   title: 'Undated & reusable',      body: 'Start any day; reuse year after year.' },
 ]
+
+const TESTIMONIALS = [
+  { quote: 'I have tried every planner app out there. Arwign is the first that actually stayed on my iPad for more than a week.', name: 'Amara N.', role: 'Teacher, Nairobi', grad: 'linear-gradient(135deg,#A98FE3,#7B6FAE)' },
+  { quote: 'The budget planner genuinely changed my savings habits. Six months in and I have hit every target I set.', name: 'James K.', role: 'Accountant, London', grad: 'linear-gradient(135deg,#E0A82C,#F6D265)' },
+  { quote: 'I ordered the complete bundle and have not touched another planner since. The quality is unreal.', name: 'Sofia R.', role: 'Designer, Melbourne', grad: 'linear-gradient(135deg,#F0B0A8,#C9847C)' },
+]
+
+const JOURNEY = [
+  { year: '2022', title: 'A blank notebook', body: 'Frustrated with every planner on the market, we designed our own.' },
+  { year: '2023', title: 'Word got around', body: 'Friends, then strangers, wanted a copy — and Arwign was born.' },
+  { year: 'Today', title: 'A growing collection', body: '50+ products across 9 categories, loved in 30+ countries.' },
+]
+
+function Stars({ value = 5, size = 13 }: { value?: number; size?: number }) {
+  return <span className="inline-flex gap-0.5" aria-label={`${value} out of 5`}>{[1, 2, 3, 4, 5].map((i) => <Star key={i} size={size} style={{ fill: i <= value ? 'var(--gold)' : 'transparent', stroke: i <= value ? 'var(--gold)' : 'var(--border)' }} />)}</span>
+}
 
 export default function AboutClient() {
+  const reduce = useReducedMotion()
+  const heroRef = useRef<HTMLElement>(null)
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
+  const yRaw = useTransform(scrollYProgress, [0, 1], [0, -60])
+  const parallax = useSpring(yRaw, { stiffness: 60, damping: 20 })
+
+  const reveal = (d = 0) => reduce ? {} : { initial: { opacity: 0, y: 24 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, margin: '-60px' }, transition: { duration: 0.55, delay: d } }
+  const heroIn = (d = 0) => reduce ? {} : { initial: { opacity: 0, y: 24 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.6, delay: d } }
+
   return (
     <div className="w-full" style={{ background: 'var(--bg-primary)' }}>
 
-      {/* ══ 1. Hero ════════════════════════════════════════════ */}
-      <section
-        className="relative w-full pt-16 pb-20 border-b overflow-hidden"
-        style={{
-          background: 'linear-gradient(135deg, rgba(224,168,44,0.13) 0%, rgba(184,169,212,0.09) 55%, rgba(224,168,44,0.05) 100%)',
-          borderColor: 'var(--border)',
-        }}
-      >
-        {/* Decorative orbs */}
-        <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full opacity-20 pointer-events-none"
-          style={{ background: 'radial-gradient(circle, var(--gold-light) 0%, transparent 70%)' }} />
-        <div className="absolute -bottom-16 -left-16 w-72 h-72 rounded-full opacity-15 pointer-events-none"
-          style={{ background: 'radial-gradient(circle, var(--lavender) 0%, transparent 70%)' }} />
-
+      {/* ══ 1. HERO ════════════════════════════════════════════ */}
+      <section ref={heroRef} className="relative w-full pt-12 pb-16 lg:pb-20 border-b overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, rgba(224,168,44,0.13) 0%, rgba(184,169,212,0.09) 55%, rgba(224,168,44,0.05) 100%)', borderColor: 'var(--border)' }}>
+        <div aria-hidden className="absolute -top-24 -right-24 w-96 h-96 rounded-full opacity-20 pointer-events-none blur-3xl" style={{ background: 'var(--gold-light)' }} />
         <div className="container-site relative">
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-1.5 mb-8 text-xs" style={{ color: 'var(--text-muted)' }}>
+          <nav className="flex items-center gap-1.5 mb-8 text-xs" aria-label="Breadcrumb" style={{ color: 'var(--text-muted)' }}>
             <Link href="/" className="hover:text-gold transition-colors" style={{ color: 'var(--text-muted)' }}>Home</Link>
-            <ChevronRight size={12} />
-            <span style={{ color: 'var(--text-primary)' }}>About</span>
+            <ChevronRight size={12} /><span style={{ color: 'var(--text-primary)' }}>About</span>
           </nav>
 
-          <div className="max-w-3xl">
-            <motion.div
-              initial="hidden" animate="show" variants={stagger(0)}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full border mb-6"
-              style={{ background: 'rgba(224,168,44,0.10)', borderColor: 'rgba(224,168,44,0.30)' }}
-            >
-              <Heart size={13} style={{ color: 'var(--gold)' }} />
-              <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--gold-dark)', letterSpacing: '0.1em' }}>
-                Our Story
-              </span>
-            </motion.div>
-
-            <motion.h1
-              initial="hidden" animate="show" variants={stagger(0.1)}
-              className="font-display mb-5"
-              style={{ fontSize: 'clamp(2.6rem, 5.5vw, 4rem)', lineHeight: 1.05, color: 'var(--text-primary)' }}
-            >
-              Planners designed{' '}
-              <em style={{ color: 'var(--gold)', fontStyle: 'italic' }}>with intention.</em>
-            </motion.h1>
-
-            <motion.p
-              initial="hidden" animate="show" variants={stagger(0.2)}
-              className="text-base leading-relaxed max-w-2xl mb-10"
-              style={{ color: 'var(--text-secondary)' }}
-            >
-              At Arwign Planners, we believe a well-designed planner changes everything — the way you think,
-              the way you plan, and the way you show up every single day. We build tools that are as beautiful
-              as they are useful, and as calming as they are effective.
-            </motion.p>
-
-            {/* Stats bar */}
-            <motion.div
-              initial="hidden" animate="show" variants={stagger(0.3)}
-              className="grid grid-cols-2 sm:grid-cols-4 gap-6"
-            >
-              {STATS.map(({ icon: Icon, value, label }) => (
-                <div key={label} className="text-center">
-                  <div className="flex justify-center mb-1.5" style={{ color: 'var(--gold)' }}>
-                    <Icon size={16} />
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            <div>
+              <motion.div {...heroIn(0)} className="inline-flex items-center gap-2 px-4 py-2 rounded-full border mb-6" style={{ background: 'rgba(var(--gold-rgb),0.12)', borderColor: 'rgba(var(--gold-rgb),0.30)' }}>
+                <Heart size={13} style={{ color: 'var(--gold)' }} />
+                <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--gold-dark)', letterSpacing: '0.1em' }}>Our Story</span>
+              </motion.div>
+              <motion.h1 {...heroIn(0.08)} className="font-display mb-5" style={{ fontSize: 'clamp(2.5rem,5.5vw,4rem)', lineHeight: 1.04, color: 'var(--text-primary)' }}>
+                Beautiful tools for a<br /><em style={{ color: 'var(--gold)', fontStyle: 'italic' }}>calmer, kinder</em> way to plan.
+              </motion.h1>
+              <motion.p {...heroIn(0.16)} className="text-base leading-relaxed max-w-md mb-9" style={{ color: 'var(--text-secondary)' }}>
+                Arwign makes warm, inclusive planners and notebooks that feel good to use — so organising your life feels less like a chore and more like a small daily kindness.
+              </motion.p>
+              <motion.div {...heroIn(0.24)} className="grid grid-cols-2 sm:grid-cols-4 gap-5 max-w-lg">
+                {STATS.map(({ icon: Icon, value, label }) => (
+                  <div key={label}>
+                    <div className="flex mb-1.5" style={{ color: 'var(--gold)' }}><Icon size={15} /></div>
+                    <p className="font-display text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>{value}</p>
+                    <p className="text-[11px] mt-0.5 uppercase tracking-wide" style={{ color: 'var(--text-muted)', letterSpacing: '0.06em' }}>{label}</p>
                   </div>
-                  <p className="font-display text-3xl font-semibold" style={{ color: 'var(--text-primary)' }}>{value}</p>
-                  <p className="text-xs mt-0.5 uppercase tracking-wide" style={{ color: 'var(--text-muted)', letterSpacing: '0.07em' }}>{label}</p>
+                ))}
+              </motion.div>
+            </div>
+
+            {/* Supporting visual (parallax) */}
+            <motion.div {...heroIn(0.15)} className="relative hidden lg:block">
+              <motion.div style={reduce ? undefined : { y: parallax }} className="relative rounded-3xl overflow-hidden shadow-2xl" >
+                <div className="relative" style={{ aspectRatio: '4/5' }}>
+                  <Image src="https://images.unsplash.com/photo-1517842645767-c639042777db?w=900&q=85" alt="A calm planning workspace with an open Arwign planner" fill priority sizes="45vw" className="object-cover" />
                 </div>
-              ))}
+                <div className="absolute bottom-5 left-5 right-5 p-4 rounded-2xl backdrop-blur-md" style={{ background: 'rgba(255,255,255,0.82)', border: '1px solid rgba(255,255,255,0.6)' }}>
+                  <p className="font-display text-lg font-semibold mb-0.5" style={{ color: 'var(--text-primary)' }}>Designed to be used</p>
+                  <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>Every planner begins with a real planning problem we wanted to solve.</p>
+                </div>
+              </motion.div>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* ══ 2. Our Story ═══════════════════════════════════════ */}
+      {/* ══ 2. OUR STORY ═══════════════════════════════════════ */}
       <section className="py-20 border-b" style={{ borderColor: 'var(--border)' }}>
         <div className="container-site">
           <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
-
-            {/* Image */}
-            <motion.div
-              initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp}
-              className="w-full lg:w-[45%] flex-shrink-0"
-            >
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[4/5]">
-                <Image
-                  src="https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&q=85"
-                  alt="Arwign Planners — our workspace"
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 45vw"
-                  className="object-cover"
-                />
-                {/* Overlay tag */}
-                <div
-                  className="absolute bottom-6 left-6 right-6 p-4 rounded-2xl backdrop-blur-md"
-                  style={{ background: 'rgba(255,255,255,0.80)', border: '1px solid rgba(255,255,255,0.6)' }}
-                >
-                  <p className="font-display text-lg font-semibold mb-0.5" style={{ color: 'var(--text-primary)' }}>
-                    Founded with a purpose
-                  </p>
-                  <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                    Every planner begins with a real planning problem we wanted to solve.
-                  </p>
-                </div>
+            <motion.div {...reveal()} className="w-full lg:w-[45%] flex-shrink-0">
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl" style={{ aspectRatio: '4/5' }}>
+                <Image src="https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&q=85" alt="An open planner beside a warm cup of coffee" fill loading="lazy" sizes="(max-width:1024px) 100vw, 45vw" className="object-cover" />
               </div>
             </motion.div>
-
-            {/* Text */}
-            <motion.div
-              initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp}
-              className="flex-1"
-            >
+            <motion.div {...reveal(0.05)} className="flex-1">
               <div className="divider-gold mb-6" />
               <h2 className="font-display text-4xl mb-6" style={{ color: 'var(--text-primary)', lineHeight: 1.1 }}>
-                It started with a blank notebook<br />
-                <em style={{ color: 'var(--gold)' }}>and a lot of frustration.</em>
+                It started with a blank notebook<br /><em style={{ color: 'var(--gold)' }}>and a lot of frustration.</em>
               </h2>
-              <div className="space-y-4 text-sm leading-7" style={{ color: 'var(--text-secondary)' }}>
-                <p>
-                  We tried every planner on the market. Some were too rigid — pages tied to specific months,
-                  wasted within weeks. Others were so minimal they offered no guidance at all. And most
-                  of the beautiful ones? Completely impractical to actually use.
-                </p>
-                <p>
-                  So we built our own. What started as a personal system quietly became something our
-                  friends wanted, then strangers — and Arwign Planners was born.
-                </p>
-                <p>
-                  Today we design every product the same way we designed that first one: obsessively,
-                  with a real person in front of us, asking <em>"would they actually use this?"</em>
-                  every step of the way.
-                </p>
+              <div className="flex flex-col gap-4 text-[0.98rem] leading-7" style={{ color: 'var(--text-secondary)' }}>
+                <p>We tried every planner on the market. Some were too rigid — pages tied to specific months, wasted within weeks. Others were so minimal they offered no guidance at all. And most of the beautiful ones? Completely impractical to actually use.</p>
+                <p>So we built our own. What started as a personal system quietly became something our friends wanted, then strangers — and Arwign was born.</p>
+                <p>Today we design every product the same way we designed that first one: obsessively, with a real person in front of us, asking <em>&ldquo;would they actually use this?&rdquo;</em> every step of the way.</p>
               </div>
-
               <div className="mt-8 flex flex-wrap gap-3">
-                <div className="px-4 py-2 rounded-full border text-xs font-medium"
-                  style={{ background: 'rgba(224,168,44,0.09)', borderColor: 'rgba(224,168,44,0.25)', color: 'var(--gold-dark)' }}>
-                  ✦ Est. 2022
-                </div>
-                <div className="px-4 py-2 rounded-full border text-xs font-medium"
-                  style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)', color: 'var(--text-secondary)' }}>
-                  ◆ 50+ products designed
-                </div>
-                <div className="px-4 py-2 rounded-full border text-xs font-medium"
-                  style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)', color: 'var(--text-secondary)' }}>
-                  ❋ Made for real planners
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* ══ 3. Values ══════════════════════════════════════════ */}
-      <section className="py-20 border-b" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
-        <div className="container-site">
-          <motion.div
-            initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp}
-            className="text-center mb-14"
-          >
-            <div className="divider-gold mb-6" />
-            <h2 className="font-display text-4xl mb-4" style={{ color: 'var(--text-primary)' }}>
-              What we stand for
-            </h2>
-            <p className="text-sm max-w-xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
-              Three principles guide every product decision we make — from the first sketch to the final download.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {VALUES.map(({ icon: Icon, title, body, accent, border }, i) => (
-              <motion.div
-                key={title}
-                initial="hidden" whileInView="show" viewport={{ once: true }}
-                variants={stagger(i * 0.12)}
-                className="p-7 rounded-3xl border"
-                style={{ background: accent, borderColor: border }}
-              >
-                <div
-                  className="w-11 h-11 rounded-xl flex items-center justify-center mb-5"
-                  style={{ background: 'rgba(224,168,44,0.15)' }}
-                >
-                  <Icon size={20} style={{ color: 'var(--gold)' }} />
-                </div>
-                <h3 className="font-display text-xl mb-3" style={{ color: 'var(--text-primary)' }}>{title}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{body}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══ 4. Product Philosophy ══════════════════════════════ */}
-      <section className="py-20 border-b" style={{ borderColor: 'var(--border)' }}>
-        <div className="container-site">
-          <div className="flex flex-col lg:flex-row-reverse items-center gap-12 lg:gap-20">
-
-            {/* Image */}
-            <motion.div
-              initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp}
-              className="w-full lg:w-[44%] flex-shrink-0"
-            >
-              <div className="relative rounded-3xl overflow-hidden shadow-xl aspect-[4/3]">
-                <Image
-                  src="https://images.unsplash.com/photo-1531346878377-a5be20888e57?w=800&q=85"
-                  alt="Planning with Arwign digital planner on iPad"
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 44vw"
-                  className="object-cover"
-                />
-              </div>
-            </motion.div>
-
-            {/* Text */}
-            <motion.div
-              initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp}
-              className="flex-1"
-            >
-              <div className="divider-gold mb-6" />
-              <h2 className="font-display text-4xl mb-4" style={{ color: 'var(--text-primary)', lineHeight: 1.1 }}>
-                Built for how you{' '}
-                <em style={{ color: 'var(--gold)' }}>actually plan.</em>
-              </h2>
-              <p className="text-sm leading-relaxed mb-8" style={{ color: 'var(--text-secondary)' }}>
-                We design for the real moments — the Sunday night planning sessions, the Thursday reset,
-                the random Tuesday when you decide to finally get organised. Not for a hypothetical perfectly
-                disciplined person who never misses a day.
-              </p>
-
-              <div className="space-y-5">
-                {PHILOSOPHY.map(({ icon: Icon, title, body }) => (
-                  <div key={title} className="flex gap-4">
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
-                      style={{ background: 'rgba(224,168,44,0.10)', border: '1px solid rgba(224,168,44,0.20)' }}
-                    >
-                      <Icon size={16} style={{ color: 'var(--gold)' }} />
-                    </div>
-                    <div>
-                      <p className="font-semibold text-sm mb-1" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-jost)' }}>
-                        {title}
-                      </p>
-                      <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{body}</p>
-                    </div>
-                  </div>
+                {['✦ Est. 2022', '◆ 50+ products designed', '❋ Made for real planners'].map((t, i) => (
+                  <span key={t} className="px-4 py-2 rounded-full border text-xs font-medium" style={{ background: i === 0 ? 'rgba(var(--gold-rgb),0.09)' : 'var(--bg-secondary)', borderColor: i === 0 ? 'rgba(var(--gold-rgb),0.25)' : 'var(--border)', color: i === 0 ? 'var(--gold-dark)' : 'var(--text-secondary)' }}>{t}</span>
                 ))}
               </div>
             </motion.div>
@@ -321,150 +141,114 @@ export default function AboutClient() {
         </div>
       </section>
 
-      {/* ══ 5. The Numbers ═════════════════════════════════════ */}
-      <section
-        className="py-20 border-b"
-        style={{
-          background: 'linear-gradient(135deg, rgba(44,42,53,0.97) 0%, rgba(30,28,40,1) 100%)',
-          borderColor: 'transparent',
-        }}
-      >
-        <div className="container-site text-center">
-          <motion.div
-            initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp}
-          >
-            <p className="text-xs uppercase tracking-widest mb-4 font-semibold" style={{ color: 'var(--gold)', letterSpacing: '0.15em' }}>
-              By the numbers
-            </p>
-            <h2 className="font-display text-4xl mb-14" style={{ color: '#F0EDF8', lineHeight: 1.1 }}>
-              The impact so far
-            </h2>
-          </motion.div>
-
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { value: '15,000+', label: 'Planners downloaded',  sub: 'and counting' },
-              { value: '4.9 / 5', label: 'Average rating',       sub: 'from verified buyers' },
-              { value: '50+',     label: 'Unique products',      sub: 'across 9 categories' },
-              { value: '30+',     label: 'Countries reached',    sub: 'from one small idea' },
-            ].map(({ value, label, sub }, i) => (
-              <motion.div
-                key={label}
-                initial="hidden" whileInView="show" viewport={{ once: true }}
-                variants={stagger(i * 0.1)}
-                className="text-center"
-              >
-                <p className="font-display font-bold" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: 'var(--gold)' }}>
-                  {value}
-                </p>
-                <p className="font-semibold text-sm mt-1" style={{ color: '#F0EDF8', fontFamily: 'var(--font-jost)' }}>{label}</p>
-                <p className="text-xs mt-0.5" style={{ color: '#7A7590' }}>{sub}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══ 6. Customer Love ═══════════════════════════════════ */}
+      {/* ══ 3. VALUES ══════════════════════════════════════════ */}
       <section className="py-20 border-b" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
         <div className="container-site">
-          <motion.div
-            initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp}
-            className="text-center mb-12"
-          >
+          <motion.div {...reveal()} className="text-center mb-14 max-w-xl mx-auto">
             <div className="divider-gold mb-6" />
-            <h2 className="font-display text-4xl mb-3" style={{ color: 'var(--text-primary)' }}>
-              What our customers say
-            </h2>
+            <h2 className="font-display text-4xl mb-4" style={{ color: 'var(--text-primary)' }}>What we stand for</h2>
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>A few beliefs guide every product decision we make — from the first sketch to the final download.</p>
           </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {[
-              {
-                quote: `"I've tried every planner app out there. Arwign is the first one that actually stayed on my iPad screen for more than a week."`,
-                name:  'Amara N.',
-                role:  'Teacher, Nairobi',
-                stars: 5,
-              },
-              {
-                quote: `"The budget planner literally changed my savings habits. Six months in and I've hit every target I set."`,
-                name:  'James K.',
-                role:  'Accountant, London',
-                stars: 5,
-              },
-              {
-                quote: `"I ordered the complete bundle and haven't touched another planner since. Worth every penny — the quality is unreal."`,
-                name:  'Sofia R.',
-                role:  'Designer, Melbourne',
-                stars: 5,
-              },
-            ].map(({ quote, name, role, stars }, i) => (
-              <motion.div
-                key={name}
-                initial="hidden" whileInView="show" viewport={{ once: true }}
-                variants={stagger(i * 0.12)}
-                className="p-6 rounded-2xl border"
-                style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
-              >
-                <div className="flex gap-0.5 mb-4">
-                  {Array.from({ length: stars }).map((_, j) => (
-                    <Star key={j} size={13} fill="var(--gold)" style={{ color: 'var(--gold)' }} />
-                  ))}
-                </div>
-                <p className="text-sm leading-relaxed mb-4 italic" style={{ color: 'var(--text-secondary)' }}>{quote}</p>
-                <p className="font-semibold text-xs" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-jost)' }}>{name}</p>
-                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{role}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {VALUES.map(({ icon: Icon, title, body }, i) => (
+              <motion.div key={title} {...reveal(i * 0.08)} className="p-6 rounded-3xl border transition-all duration-300 hover:-translate-y-1 hover:shadow-product" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style={{ background: 'rgba(var(--gold-rgb),0.14)' }}><Icon size={20} style={{ color: 'var(--gold)' }} /></div>
+                <h3 className="font-semibold text-base mb-2" style={{ color: 'var(--text-primary)' }}>{title}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{body}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ══ 7. Meet the Team ═══════════════════════════════════ */}
+      {/* ══ 4. THE CRAFT ═══════════════════════════════════════ */}
+      <section className="py-20 border-b" style={{ borderColor: 'var(--border)' }}>
+        <div className="container-site grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <motion.div {...reveal()} className="order-last lg:order-first">
+            <div className="relative rounded-3xl overflow-hidden shadow-xl" style={{ aspectRatio: '4/3' }}>
+              <Image src="https://images.unsplash.com/photo-1531346878377-a5be20888e57?w=900&q=85" alt="Close-up of an Arwign planner interior spread" fill loading="lazy" sizes="(max-width:1024px) 100vw, 45vw" className="object-cover" />
+            </div>
+          </motion.div>
+          <motion.div {...reveal(0.05)}>
+            <div className="divider-gold mb-6" />
+            <h2 className="font-display text-4xl mb-4" style={{ color: 'var(--text-primary)', lineHeight: 1.1 }}>The care in every <em style={{ color: 'var(--gold)' }}>page.</em></h2>
+            <p className="text-sm leading-relaxed mb-8 max-w-md" style={{ color: 'var(--text-secondary)' }}>Nothing here is a template dropped into a shop. Every layout is hand-considered and tested across devices and print before it reaches you.</p>
+            <div className="grid sm:grid-cols-2 gap-x-6 gap-y-5">
+              {CRAFT.map(({ icon: Icon, title, body }) => (
+                <div key={title} className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(var(--gold-rgb),0.12)' }}><Icon size={17} style={{ color: 'var(--gold)' }} /></div>
+                  <div><p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{title}</p><p className="text-xs leading-relaxed mt-0.5" style={{ color: 'var(--text-secondary)' }}>{body}</p></div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ══ 5. THE MAKER ═══════════════════════════════════════ */}
+      <section className="py-20 border-b" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
+        <div className="container-site max-w-4xl mx-auto">
+          <motion.div {...reveal()} className="rounded-3xl border overflow-hidden grid md:grid-cols-[auto_1fr]" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+            {/* Brand mark (forest green) — TODO: replace with a real founder portrait */}
+            <div className="flex items-center justify-center p-10 md:p-12" style={{ background: BRAND_GREEN }}>
+              <div className="w-28 h-28 rounded-full flex items-center justify-center" style={{ border: '2px solid rgba(255,255,255,0.35)' }}>
+                <span style={{ fontFamily: 'var(--font-cormorant)', fontSize: 52, fontWeight: 600, color: '#fff' }}>A</span>
+              </div>
+            </div>
+            <div className="p-8 md:p-10">
+              <p className="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-semibold mb-3" style={{ color: 'var(--gold)', letterSpacing: '0.1em' }}><Award size={13} /> The maker</p>
+              <h2 className="font-display text-3xl mb-4" style={{ color: 'var(--text-primary)' }}>The person behind Arwign</h2>
+              <p className="text-sm leading-relaxed mb-3" style={{ color: 'var(--text-secondary)' }}>
+                Arwign is a small, independent studio led by a designer who spent years frustrated by planners that were either beautiful or useful, but never both. Combining a background in graphic design with a genuine obsession for calm, intentional productivity, every product is drawn, tested and refined by hand.
+              </p>
+              <p className="text-xs italic" style={{ color: 'var(--text-muted)' }}>
+                {/* TODO(bio): replace with the real founder name, photo and personal bio when available. */}
+                Founder bio &amp; portrait — placeholder, to be replaced with real details.
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ══ 6. SOCIAL PROOF ════════════════════════════════════ */}
       <section className="py-20 border-b" style={{ borderColor: 'var(--border)' }}>
         <div className="container-site">
-          <motion.div
-            initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp}
-            className="text-center mb-12"
-          >
-            <div className="divider-gold mb-6" />
-            <h2 className="font-display text-4xl mb-3" style={{ color: 'var(--text-primary)' }}>
-              The people behind the planners
-            </h2>
-            <p className="text-sm max-w-lg mx-auto" style={{ color: 'var(--text-secondary)' }}>
-              A small, passionate team obsessed with design, productivity, and making your days feel a little more intentional.
-            </p>
+          <motion.div {...reveal()} className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 mb-14 text-center">
+            <span className="inline-flex items-center gap-2"><Stars size={16} /><span className="font-display text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>4.9</span><span className="text-sm" style={{ color: 'var(--text-muted)' }}>average</span></span>
+            <span className="w-px h-5 hidden sm:block" style={{ background: 'var(--border)' }} />
+            <span className="text-sm" style={{ color: 'var(--text-secondary)' }}><b style={{ color: 'var(--text-primary)' }}>12,000+</b> happy customers</span>
+            <span className="w-px h-5 hidden sm:block" style={{ background: 'var(--border)' }} />
+            <span className="inline-flex items-center gap-1.5 text-sm" style={{ color: 'var(--text-secondary)' }}><Sparkles size={13} style={{ color: 'var(--gold)' }} /> Loved on Etsy &amp; Gumroad</span>
           </motion.div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {TESTIMONIALS.map((t, i) => (
+              <motion.figure key={t.name} {...reveal(i * 0.08)} className="p-6 rounded-2xl border flex flex-col" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+                <Quote size={22} style={{ color: 'var(--gold)', opacity: 0.4 }} className="mb-3" />
+                <Stars size={13} />
+                <p className="text-sm leading-relaxed my-4 flex-1" style={{ color: 'var(--text-secondary)' }}>&ldquo;{t.quote}&rdquo;</p>
+                <figcaption className="flex items-center gap-3 pt-3 border-t" style={{ borderColor: 'var(--border)' }}>
+                  <span className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: t.grad }}>{t.name.charAt(0)}</span>
+                  <div><p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{t.name}</p><p className="text-[11px] inline-flex items-center gap-1" style={{ color: 'var(--sage)' }}><BadgeCheck size={11} /> {t.role}</p></div>
+                </figcaption>
+              </motion.figure>
+            ))}
+          </div>
+        </div>
+      </section>
 
-          <div className="flex flex-wrap justify-center gap-8">
-            {[
-              {
-                name:  'Arwign Studio',
-                role:  'Founder & Lead Designer',
-                bio:   'Combining a background in graphic design with a deep obsession with productivity, our founder spends every waking hour thinking about how a planner could be just a little bit better.',
-                img:   'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&q=80',
-              },
-              {
-                name:  'The Design Team',
-                role:  'Layout & UX Designers',
-                bio:   'Our small remote team tests every planner template across GoodNotes, Notability, Xodo, and print before it ever reaches the shop. No template ships without 100+ hours of real-world testing.',
-                img:   'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400&q=80',
-              },
-            ].map(({ name, role, bio, img }, i) => (
-              <motion.div
-                key={name}
-                initial="hidden" whileInView="show" viewport={{ once: true }}
-                variants={stagger(i * 0.15)}
-                className="flex flex-col items-center text-center max-w-xs p-6 rounded-3xl border"
-                style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
-              >
-                <div className="relative w-24 h-24 rounded-full overflow-hidden mb-5"
-                  style={{ boxShadow: '0 0 0 4px rgba(224,168,44,0.3)' }}>
-                  <Image src={img} alt={name} fill sizes="96px" className="object-cover" />
-                </div>
-                <p className="font-display text-xl mb-0.5" style={{ color: 'var(--text-primary)' }}>{name}</p>
-                <p className="text-xs uppercase tracking-wide mb-3 font-semibold" style={{ color: 'var(--gold)', letterSpacing: '0.08em' }}>{role}</p>
-                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{bio}</p>
+      {/* ══ 7. JOURNEY ═════════════════════════════════════════ */}
+      <section className="py-20 border-b" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
+        <div className="container-site max-w-4xl mx-auto">
+          <motion.div {...reveal()} className="text-center mb-14">
+            <div className="divider-gold mb-6" />
+            <h2 className="font-display text-4xl" style={{ color: 'var(--text-primary)' }}>The journey so far</h2>
+          </motion.div>
+          <div className="grid md:grid-cols-3 gap-6 relative">
+            {JOURNEY.map((m, i) => (
+              <motion.div key={m.year} {...reveal(i * 0.1)} className="text-center flex flex-col items-center">
+                <div className="w-14 h-14 rounded-full flex items-center justify-center mb-4 font-display text-sm font-bold" style={{ background: 'var(--bg-card)', border: '2px solid var(--gold)', color: 'var(--gold-dark)' }}>{m.year}</div>
+                <h3 className="font-semibold text-base mb-1.5" style={{ color: 'var(--text-primary)' }}>{m.title}</h3>
+                <p className="text-sm leading-relaxed max-w-[220px]" style={{ color: 'var(--text-secondary)' }}>{m.body}</p>
               </motion.div>
             ))}
           </div>
@@ -472,45 +256,24 @@ export default function AboutClient() {
       </section>
 
       {/* ══ 8. CTA ═════════════════════════════════════════════ */}
-      <section
-        className="py-20"
-        style={{
-          background: 'linear-gradient(135deg, rgba(224,168,44,0.10) 0%, rgba(184,169,212,0.08) 60%, rgba(224,168,44,0.04) 100%)',
-        }}
-      >
+      <section className="py-20 newsletter-gradient">
         <div className="container-site text-center">
-          <motion.div
-            initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp}
-          >
+          <motion.div {...reveal()}>
             <div className="divider-gold mb-6" />
-            <h2 className="font-display text-4xl mb-4" style={{ color: 'var(--text-primary)' }}>
-              Ready to plan{' '}
-              <em style={{ color: 'var(--gold)' }}>better?</em>
-            </h2>
-            <p className="text-sm max-w-md mx-auto mb-10" style={{ color: 'var(--text-secondary)' }}>
-              Browse our full collection of digital and printable planners. Find your perfect system — then download and start today.
-            </p>
-
+            <h2 className="font-display text-4xl mb-4" style={{ color: 'var(--text-primary)' }}>Ready to plan <em style={{ color: 'var(--gold)' }}>better?</em></h2>
+            <p className="text-sm max-w-md mx-auto mb-9" style={{ color: 'var(--text-secondary)' }}>Browse our full collection of digital and printable planners. Find your perfect system — then download and start today.</p>
             <div className="flex flex-wrap items-center justify-center gap-4">
-              <Link href="/shop" className="btn-primary">
-                Shop All Planners
-                <ArrowRight size={15} />
-              </Link>
-              <Link href="/best-sellers" className="btn-outline">
-                See Best Sellers
-              </Link>
+              <Link href="/shop" className="btn-primary">Explore our planners <ArrowRight size={15} /></Link>
+              <Link href="/best-sellers" className="btn-outline">See best sellers</Link>
             </div>
-
-            {/* Trust badges */}
-            <div className="flex flex-wrap items-center justify-center gap-5 mt-12 text-xs" style={{ color: 'var(--text-muted)' }}>
-              {['⚡ Instant download', '⭐ 4.9 star average', '🔄 Start any month', '🔒 Secure checkout'].map((b) => (
-                <span key={b}>{b}</span>
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-12 text-xs" style={{ color: 'var(--text-muted)' }}>
+              {[{ icon: Download, l: 'Instant download' }, { icon: Star, l: '4.9 average' }, { icon: Leaf, l: 'Undated & reusable' }, { icon: Heart, l: 'Loved worldwide' }].map(({ icon: Icon, l }) => (
+                <span key={l} className="inline-flex items-center gap-1.5"><Icon size={12} style={{ color: 'var(--gold)' }} /> {l}</span>
               ))}
             </div>
           </motion.div>
         </div>
       </section>
-
     </div>
   )
 }
