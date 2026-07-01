@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { Instagram, Youtube } from 'lucide-react'
+import { Instagram, Youtube, Gift, FileText, Lightbulb, Percent, Rocket, Sparkles } from 'lucide-react'
 import NewsletterForm from '@/components/home/NewsletterForm'
 
 const footerLinks = {
@@ -60,20 +60,70 @@ export default function Footer() {
 
   return (
     <footer aria-label="Site footer" style={{ background: 'var(--bg-secondary)', borderTop: '1px solid var(--border)' }}>
-      {/* Newsletter Banner */}
-      <div className="newsletter-gradient border-b" style={{ borderColor: 'var(--border)' }}>
-        <div className="container-site py-16">
-          <div className="max-w-xl mx-auto text-center">
-            <p className="text-xs uppercase tracking-widest mb-3 font-semibold" style={{ color: 'var(--gold)', letterSpacing: '0.12em' }}>
-              Join 50,000+ Organized People
-            </p>
-            <h2 className="font-display text-3xl md:text-4xl mb-4" style={{ color: 'var(--text-primary)' }}>
-              Get Free Planning Resources
-            </h2>
-            <p className="text-sm mb-8" style={{ color: 'var(--text-secondary)' }}>
-              Subscribe for free planner printables, productivity tips, exclusive discounts, and first access to new launches.
-            </p>
-            <NewsletterForm source="footer" />
+      {/* Newsletter — a contained, anchored "moment" that sits on the footer's own
+          surface, so its seam is always the footer's top border — identical on every page. */}
+      <div style={{ background: 'var(--bg-secondary)' }}>
+        <div className="container-site pt-16 pb-4">
+          <div className="relative overflow-hidden rounded-3xl border animate-fade-up"
+            style={{
+              background: 'linear-gradient(135deg, rgba(var(--gold-rgb),0.12) 0%, rgba(184,169,212,0.08) 55%, var(--bg-card) 100%)',
+              borderColor: 'var(--border-gold)',
+              boxShadow: '0 10px 40px rgba(44,42,53,0.08)',
+            }}>
+            <div aria-hidden className="pointer-events-none absolute -top-20 -right-12 w-72 h-72 rounded-full blur-3xl" style={{ background: 'rgba(var(--gold-rgb),0.18)' }} />
+
+            <div className="relative grid lg:grid-cols-[1.35fr_1fr] gap-8 lg:gap-12 p-8 sm:p-10 lg:p-12 items-center">
+              {/* Content + form */}
+              <div>
+                <p className="inline-flex items-center gap-2 text-xs uppercase tracking-widest mb-4 font-semibold px-3 py-1.5 rounded-full"
+                  style={{ color: 'var(--gold-dark)', background: 'rgba(var(--gold-rgb),0.14)', letterSpacing: '0.12em' }}>
+                  <Gift size={12} /> Join 50,000+ organised people
+                </p>
+                <h2 className="font-display text-3xl md:text-4xl mb-3" style={{ color: 'var(--text-primary)', lineHeight: 1.1 }}>
+                  Get free planning resources
+                </h2>
+                <p className="text-sm leading-relaxed mb-6 max-w-md" style={{ color: 'var(--text-secondary)' }}>
+                  Free printables, productivity tips, exclusive discounts and first access to new launches — straight to your inbox.
+                </p>
+
+                {/* Value row */}
+                <ul className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-7">
+                  {[
+                    { icon: FileText,  l: 'Free printables' },
+                    { icon: Lightbulb, l: 'Productivity tips' },
+                    { icon: Percent,   l: 'Exclusive discounts' },
+                    { icon: Rocket,    l: 'First access' },
+                  ].map(({ icon: Icon, l }) => (
+                    <li key={l} className="flex items-center gap-2">
+                      <span className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(var(--gold-rgb),0.12)' }}>
+                        <Icon size={15} style={{ color: 'var(--gold)' }} />
+                      </span>
+                      <span className="text-xs font-medium leading-tight" style={{ color: 'var(--text-secondary)' }}>{l}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <NewsletterForm source="footer" className="max-w-md" />
+                <p className="text-[11px] mt-3" style={{ color: 'var(--text-muted)' }}>No spam, ever. Unsubscribe any time.</p>
+              </div>
+
+              {/* Supporting visual (desktop) — a tasteful "free printable" mock */}
+              <div className="hidden lg:flex justify-center" aria-hidden>
+                <div className="relative" style={{ width: 210, height: 250 }}>
+                  <div className="absolute rounded-2xl" style={{ inset: '14px 34px 22px 0', background: 'var(--bg-card)', border: '1px solid var(--border)', transform: 'rotate(-6deg)', boxShadow: '0 14px 30px rgba(44,42,53,0.12)' }} />
+                  <div className="absolute rounded-2xl overflow-hidden" style={{ inset: '0 0 12px 30px', background: '#fff', border: '1px solid var(--border)', transform: 'rotate(5deg)', boxShadow: '0 18px 42px rgba(44,42,53,0.16)' }}>
+                    <div style={{ height: '34%', background: 'linear-gradient(135deg, var(--gold), var(--gold-light))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Sparkles size={26} color="#fff" />
+                    </div>
+                    <div className="p-4 flex flex-col gap-2">
+                      {[72, 92, 56, 82].map((w, i) => <div key={i} style={{ height: 5, width: `${w}%`, borderRadius: 3, background: 'var(--border)' }} />)}
+                      <div className="grid grid-cols-3 gap-1.5 mt-1">{Array.from({ length: 6 }).map((_, i) => <div key={i} style={{ aspectRatio: '1', borderRadius: 4, background: 'var(--bg-secondary)' }} />)}</div>
+                    </div>
+                  </div>
+                  <div className="absolute" style={{ top: 10, left: 6, background: 'var(--gold)', color: '#fff', fontWeight: 800, fontSize: 10, letterSpacing: '0.1em', padding: '4px 11px', borderRadius: 100, transform: 'rotate(5deg)', boxShadow: '0 4px 12px rgba(224,168,44,0.4)' }}>FREE</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
