@@ -1,8 +1,8 @@
 'use client'
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import {
   Search, X, SlidersHorizontal, Grid3X3, Grid2X2, List as ListIcon, ChevronDown, ChevronRight,
   ShoppingCart, Heart, Eye, Check, Star, Plus, Clock, Layers, Crown, Sparkles, BookOpen,
@@ -60,11 +60,53 @@ export default function ShopClient({ products, categories, featured }: Props) {
   const [recentIds, setRecentIds] = useState<string[]>([])
   const [mounted, setMounted]   = useState(false)
 
+  const hydrated = useRef(false)
+
   useEffect(() => { const t = setTimeout(() => setSearch(searchInput), 200); return () => clearTimeout(t) }, [searchInput])
   useEffect(() => {
     setMounted(true)
     try { const raw = localStorage.getItem('arwign-recently-viewed'); if (raw) setRecentIds(JSON.parse(raw)) } catch {}
   }, [])
+
+  // ── Shareable state: read filters/sort/search/view from the URL ──
+  useEffect(() => {
+    const apply = () => {
+      const sp = new URLSearchParams(window.location.search)
+      setCategory(sp.get('category'))
+      setFormats(sp.get('format')?.split(',').filter(Boolean) ?? [])
+      setSizes(sp.get('size')?.split(',').filter(Boolean) ?? [])
+      setPrice(sp.get('price'))
+      setMinRating(Number(sp.get('rating') ?? 0) || 0)
+      setOnlyNew(sp.get('new') === '1')
+      setOnlyBest(sp.get('best') === '1')
+      setSort(sp.get('sort') ?? 'featured')
+      setView(sp.get('view') === 'list' ? 'list' : 'grid')
+      const q = sp.get('q') ?? ''
+      setSearchInput(q); setSearch(q)
+      hydrated.current = true
+    }
+    apply()
+    window.addEventListener('popstate', apply)
+    return () => window.removeEventListener('popstate', apply)
+  }, [])
+
+  // ── …and reflect current state back into the URL (no reload) ──
+  useEffect(() => {
+    if (!hydrated.current) return
+    const sp = new URLSearchParams()
+    if (search) sp.set('q', search)
+    if (category) sp.set('category', category)
+    if (formats.length) sp.set('format', formats.join(','))
+    if (sizes.length) sp.set('size', sizes.join(','))
+    if (price) sp.set('price', price)
+    if (minRating) sp.set('rating', String(minRating))
+    if (onlyNew) sp.set('new', '1')
+    if (onlyBest) sp.set('best', '1')
+    if (sort !== 'featured') sp.set('sort', sort)
+    if (view === 'list') sp.set('view', 'list')
+    const qs = sp.toString()
+    window.history.replaceState(null, '', qs ? `?${qs}` : window.location.pathname)
+  }, [search, category, formats, sizes, price, minRating, onlyNew, onlyBest, sort, view])
 
   const allFormats = useMemo(() => { const s = new Set<string>(); products.forEach((p) => (p.file_formats ?? []).forEach((f) => s.add(f))); return FORMAT_OPTIONS.filter((f) => s.has(f)) }, [products])
   const allSizes   = useMemo(() => { const s = new Set<string>(); products.forEach((p) => sizesOf(p).forEach((l) => s.add(l))); return SIZE_KEYS.map(({ l }) => l).filter((l) => s.has(l)) }, [products])
@@ -422,10 +464,11 @@ function Tags({ p }: { p: Product }) {
 
 function ShopCard({ p, index, onQuickView }: { p: Product; index: number; onQuickView: () => void }) {
   const [loaded, setLoaded] = useState(false)
+  const reduce = useReducedMotion()
   const { add, wish, inCart, isWished } = useCard(p)
   const sale = p.compare_price && p.compare_price > p.price
   return (
-    <motion.div layout initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: Math.min(index * 0.03, 0.25) }} className="group">
+    <motion.div layout initial={reduce ? false : { opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reduce ? 0 : 0.4, delay: reduce ? 0 : Math.min(index * 0.03, 0.25) }} className="group">
       <div className="rounded-xl overflow-hidden tile-hover h-full flex flex-col" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
         <div className="relative overflow-hidden" style={{ aspectRatio: '3/4' }}>
           {!loaded && <div className="absolute inset-0 skeleton" />}
@@ -450,10 +493,11 @@ function ShopCard({ p, index, onQuickView }: { p: Product; index: number; onQuic
 }
 
 function ShopRow({ p, index, onQuickView }: { p: Product; index: number; onQuickView: () => void }) {
+  const reduce = useReducedMotion()
   const { add, wish, inCart, isWished } = useCard(p)
   const sale = p.compare_price && p.compare_price > p.price
   return (
-    <motion.div layout initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, delay: Math.min(index * 0.03, 0.2) }} className="flex gap-4 p-3 rounded-2xl border tile-hover" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+    <motion.div layout initial={reduce ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reduce ? 0 : 0.35, delay: reduce ? 0 : Math.min(index * 0.03, 0.2) }} className="flex gap-4 p-3 rounded-2xl border tile-hover" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
       <Link href={`/shop/${p.slug}`} className="relative flex-shrink-0 rounded-xl overflow-hidden" style={{ width: 128, aspectRatio: '3/4', background: 'var(--bg-secondary)' }}>
         <Badges p={p} />
         <Image src={p.thumbnail || FALLBACK_IMG} alt={p.title} fill loading="lazy" sizes="128px" className="object-cover" />
