@@ -256,16 +256,6 @@ export default function NewArrivalsClient({ products, categories, related, lates
         </section>
       )}
 
-      {/* ══ NEWSLETTER ════════════════════════════════════════ */}
-      <section className="border-t py-16 newsletter-gradient" style={{ borderColor: 'var(--border)' }}>
-        <div className="container-site max-w-xl mx-auto text-center">
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5" style={{ background: 'rgba(var(--gold-rgb),0.14)' }}><Sparkles size={26} style={{ color: 'var(--gold)' }} /></div>
-          <h2 className="font-display text-display-sm mb-3" style={{ color: 'var(--text-primary)' }}>Be first to know about new drops</h2>
-          <p className="text-sm mb-7" style={{ color: 'var(--text-secondary)' }}>Get fresh designs and early access — free, never spammy.</p>
-          <NewsletterForm />
-        </div>
-      </section>
-
       {/* ══ CTA ═══════════════════════════════════════════════ */}
       <section className="border-t py-12" style={{ borderColor: 'var(--border)' }}>
         <div className="container-site text-center">
@@ -357,24 +347,3 @@ function NewCard({ product, index, onQuickView, fmt }: { product: Product; index
   )
 }
 
-function NewsletterForm() {
-  const [email, setEmail] = useState('')
-  const [status, setStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!email || status === 'loading') return
-    setStatus('loading')
-    try {
-      const r = await fetch('/api/newsletter', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, source: 'new-arrivals' }) })
-      setStatus(r.ok ? 'done' : 'error')
-    } catch { setStatus('error') }
-  }
-  if (status === 'done') return <p className="inline-flex items-center gap-2 text-sm font-semibold" style={{ color: 'var(--gold-dark)' }}><Check size={16} /> You&rsquo;re in — we&rsquo;ll email you the next drop ✦</p>
-  return (
-    <form onSubmit={submit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-      <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your@email.com" className="input-field flex-1 text-sm" aria-label="Email address" />
-      <button type="submit" disabled={status === 'loading'} className="btn-primary text-sm whitespace-nowrap disabled:opacity-60">{status === 'loading' ? 'Joining…' : 'Notify me'}</button>
-      {status === 'error' && <span className="sr-only">Something went wrong</span>}
-    </form>
-  )
-}

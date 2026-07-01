@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion, AnimatePresence, useScroll, useTransform, useReducedMotion } from 'framer-motion'
 import {
-  BookOpen, Clock, Search, X, ChevronRight, ArrowRight, Check, Plus,
+  BookOpen, Clock, Search, X, ChevronRight, ArrowRight, Plus,
   TrendingUp, Heart, Wallet, Tablet, Sparkles,
 } from 'lucide-react'
 import { type BlogPost, STATIC_POSTS } from './blog-data'
@@ -45,27 +45,6 @@ const TOPICS = [
   { label: 'Finance',      cat: 'Finance',       icon: Wallet },
   { label: 'Digital Tools', cat: 'Digital Tools', icon: Tablet },
 ]
-
-function NewsletterForm() {
-  const [email, setEmail] = useState('')
-  const [status, setStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!email || status === 'loading') return
-    setStatus('loading')
-    try {
-      const r = await fetch('/api/newsletter', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, source: 'blog-index' }) })
-      setStatus(r.ok ? 'done' : 'error')
-    } catch { setStatus('error') }
-  }
-  if (status === 'done') return <p className="inline-flex items-center gap-2 text-sm font-semibold" style={{ color: 'var(--gold-dark)' }}><Check size={16} /> You&rsquo;re in — check your inbox ✦</p>
-  return (
-    <form onSubmit={submit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-      <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your@email.com" className="input-field flex-1 text-sm" aria-label="Email address" />
-      <button type="submit" disabled={status === 'loading'} className="btn-primary text-sm whitespace-nowrap disabled:opacity-60">{status === 'loading' ? 'Joining…' : 'Subscribe Free'}</button>
-    </form>
-  )
-}
 
 // Cinematic featured banner with gentle scale-on-scroll
 function FeaturedCard({ post }: { post: BlogPost }) {
@@ -347,29 +326,6 @@ export default function BlogClient({ posts, searchParams }: Props) {
           </AnimatePresence>
         )}
       </div>
-
-      {/* ── Newsletter CTA ────────────────────────────────── */}
-      <section
-        className="border-t py-16"
-        style={{
-          borderColor: 'var(--border)',
-          background: 'linear-gradient(135deg, rgba(224,168,44,0.10) 0%, rgba(184,169,212,0.07) 60%, rgba(224,168,44,0.04) 100%)',
-        }}
-      >
-        <div className="container-site max-w-2xl mx-auto text-center">
-          <div className="divider-gold mb-6" />
-          <h2 className="font-display text-3xl mb-3" style={{ color: 'var(--text-primary)' }}>
-            Get new articles in your inbox
-          </h2>
-          <p className="text-sm mb-8" style={{ color: 'var(--text-secondary)' }}>
-            Planning tips, productivity guides, and new planner announcements — delivered free, never spammy.
-          </p>
-          <NewsletterForm />
-          <p className="text-xs mt-3" style={{ color: 'var(--text-muted)' }}>
-            No spam. Unsubscribe any time.
-          </p>
-        </div>
-      </section>
 
       {/* ── Browse Shop CTA ───────────────────────────────── */}
       <section className="border-t py-12" style={{ borderColor: 'var(--border)' }}>

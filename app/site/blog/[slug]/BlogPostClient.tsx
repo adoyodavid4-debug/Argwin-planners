@@ -791,28 +791,6 @@ function Avatar({ size = 36 }: { size?: number }) {
   )
 }
 
-function NewsletterForm({ source }: { source: string }) {
-  const [email, setEmail] = useState('')
-  const [status, setStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!email || status === 'loading') return
-    setStatus('loading')
-    try {
-      const r = await fetch('/api/newsletter', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, source }) })
-      setStatus(r.ok ? 'done' : 'error')
-    } catch { setStatus('error') }
-  }
-  if (status === 'done') return <p className="inline-flex items-center gap-2 text-sm font-semibold" style={{ color: 'var(--gold-dark)' }}><Check size={16} /> You&rsquo;re in — check your inbox ✦</p>
-  return (
-    <form onSubmit={submit} className="flex flex-col sm:flex-row gap-3 max-w-sm mx-auto">
-      <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your@email.com" className="input-field flex-1 text-sm" aria-label="Email address" />
-      <button type="submit" disabled={status === 'loading'} className="btn-primary text-sm whitespace-nowrap disabled:opacity-60">{status === 'loading' ? 'Joining…' : 'Subscribe'}</button>
-      {status === 'error' && <span className="sr-only">Something went wrong</span>}
-    </form>
-  )
-}
-
 function ShareRail({ title }: { title: string }) {
   const [url, setUrl] = useState('')
   useEffect(() => { setUrl(window.location.href) }, [])
@@ -996,15 +974,6 @@ export default function BlogPostClient({ post, related }: Props) {
           </div>
         </section>
       )}
-
-      {/* ── Newsletter ───────────────────────────────────── */}
-      <section className="border-t py-14" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
-        <div className="container-site max-w-xl mx-auto text-center">
-          <h2 className="font-display text-2xl mb-2" style={{ color: 'var(--text-primary)' }}>More tips like this, free.</h2>
-          <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>Planning guides and productivity science — never spammy.</p>
-          <NewsletterForm source={`blog-post:${post.slug}`} />
-        </div>
-      </section>
 
     </div>
   )

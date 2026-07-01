@@ -15,7 +15,6 @@ import HomeHero            from './_home/HomeHero'
 import SocialProof         from './_home/SocialProof'
 import BestSellerShowcase  from './_home/BestSellerShowcase'
 import InteriorPreview     from './_home/InteriorPreview'
-import HomeNewsletter      from './_home/HomeNewsletter'
 import StickyShopCTA       from './_home/StickyShopCTA'
 import { WhyArwign, HowItWorks, FinalCTA } from './_home/EditorialSections'
 
@@ -55,7 +54,6 @@ export default async function HomePage() {
       <HowItWorks />
       <BlogPreview />
       <TestimonialsSection />
-      <HomeNewsletter />
       <FinalCTA />
       <StickyShopCTA />
     </>

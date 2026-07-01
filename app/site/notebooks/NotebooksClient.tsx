@@ -420,10 +420,6 @@ export default function NotebooksClient({ notebooks, faqs }: { notebooks: Notebo
         </div>
       </section>
 
-      {/* ══ NEWSLETTER ════════════════════════════════════════ */}
-      <section className="border-t py-14" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
-        <div className="container-site"><OptInForm variant="footer" locale="en" /></div>
-      </section>
     </div>
   )
 }
