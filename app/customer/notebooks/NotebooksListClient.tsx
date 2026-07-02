@@ -353,7 +353,7 @@ export default function NotebooksListClient({
             </h2>
             <span
               className="text-xs px-2 py-0.5 rounded-full"
-              style={{ background: 'rgba(224,168,44,0.12)', color: 'var(--gold)' }}
+              style={{ background: 'rgba(201,168,76,0.12)', color: 'var(--gold)' }}
             >
               {ownedList.length}
             </span>

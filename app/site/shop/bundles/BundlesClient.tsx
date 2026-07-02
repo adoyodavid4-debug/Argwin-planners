@@ -101,7 +101,7 @@ export default function BundlesClient({ featured, sections }: Props) {
       {/* ── Hero ─────────────────────────────────────────────── */}
       <section
         className="w-full pt-10 pb-12 border-b"
-        style={{ background: 'linear-gradient(135deg, rgba(224,168,44,0.18) 0%, rgba(184,169,212,0.12) 100%)', borderColor: 'var(--border)' }}
+        style={{ background: 'linear-gradient(135deg, rgba(201,168,76,0.18) 0%, rgba(184,169,212,0.12) 100%)', borderColor: 'var(--border)' }}
       >
         <div className="container-site">
           <nav className="flex items-center gap-1.5 mb-6 text-xs" aria-label="Breadcrumb" style={{ color: 'var(--text-muted)' }}>
@@ -161,7 +161,7 @@ export default function BundlesClient({ featured, sections }: Props) {
               <div className="p-8 md:p-10 flex flex-col justify-center">
                 <span
                   className="inline-flex items-center gap-1.5 self-start px-3 py-1 rounded-full text-[11px] font-semibold mb-4"
-                  style={{ background: 'rgba(224,168,44,0.14)', color: 'var(--gold-dark)' }}
+                  style={{ background: 'rgba(201,168,76,0.14)', color: 'var(--gold-dark)' }}
                 >
                   <Sparkles size={12} /> Best Value
                 </span>

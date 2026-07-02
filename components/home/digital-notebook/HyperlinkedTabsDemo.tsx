@@ -46,7 +46,7 @@ export default function HyperlinkedTabsDemo() {
             className="px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-300"
             style={
               i === active
-                ? { background: 'var(--gold)', color: '#fff', boxShadow: '0 2px 10px rgba(224,168,44,0.35)' }
+                ? { background: 'var(--gold)', color: '#fff', boxShadow: '0 2px 10px rgba(201,168,76,0.35)' }
                 : { background: 'var(--bg-secondary)', color: 'var(--text-secondary)' }
             }
           >

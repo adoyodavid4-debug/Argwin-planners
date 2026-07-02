@@ -120,7 +120,7 @@ export default function Footer() {
                       <div className="grid grid-cols-3 gap-1.5 mt-1">{Array.from({ length: 6 }).map((_, i) => <div key={i} style={{ aspectRatio: '1', borderRadius: 4, background: 'var(--bg-secondary)' }} />)}</div>
                     </div>
                   </div>
-                  <div className="absolute" style={{ top: 10, left: 6, background: 'var(--gold)', color: '#fff', fontWeight: 800, fontSize: 10, letterSpacing: '0.1em', padding: '4px 11px', borderRadius: 100, transform: 'rotate(5deg)', boxShadow: '0 4px 12px rgba(224,168,44,0.4)' }}>FREE</div>
+                  <div className="absolute" style={{ top: 10, left: 6, background: 'var(--gold)', color: '#fff', fontWeight: 800, fontSize: 10, letterSpacing: '0.1em', padding: '4px 11px', borderRadius: 100, transform: 'rotate(5deg)', boxShadow: '0 4px 12px rgba(201,168,76,0.4)' }}>FREE</div>
                 </div>
               </div>
             </div>

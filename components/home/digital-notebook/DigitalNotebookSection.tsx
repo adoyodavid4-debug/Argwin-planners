@@ -88,7 +88,7 @@ export default function DigitalNotebookSection() {
                   <motion.span
                     layoutId="dn-tab-pill"
                     className="absolute inset-0 rounded-full"
-                    style={{ background: 'var(--gold)', boxShadow: '0 4px 16px rgba(224,168,44,0.4)' }}
+                    style={{ background: 'var(--gold)', boxShadow: '0 4px 16px rgba(201,168,76,0.4)' }}
                     transition={{ type: 'spring', stiffness: 400, damping: 32 }}
                   />
                 )}

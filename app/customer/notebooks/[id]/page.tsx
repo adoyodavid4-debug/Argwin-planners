@@ -167,7 +167,7 @@ export default function NotebookDetailPage() {
             className="rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize"
             style={{
               background: nb._effective_role === 'owner' || nb._effective_role === 'admin'
-                ? 'rgba(224,168,44,0.15)' : 'rgba(148,163,184,0.12)',
+                ? 'rgba(201,168,76,0.15)' : 'rgba(148,163,184,0.12)',
               color: nb._effective_role === 'owner' || nb._effective_role === 'admin'
                 ? 'var(--gold)' : '#64748b',
             }}
@@ -211,7 +211,7 @@ export default function NotebookDetailPage() {
           >
             <div
               className="w-10 h-10 rounded-xl flex items-center justify-center mb-3"
-              style={{ background: 'rgba(224,168,44,0.12)' }}
+              style={{ background: 'rgba(201,168,76,0.12)' }}
             >
               <Edit2 size={18} style={{ color: 'var(--gold)' }} />
             </div>

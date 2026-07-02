@@ -24,7 +24,7 @@ function SectionCard({ title, icon: Icon, children }: { title: string; icon: Rea
   return (
     <div className="rounded-2xl border overflow-hidden" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
       <div className="flex items-center gap-3 px-6 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
-        <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'rgba(224,168,44,0.12)' }}>
+        <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'rgba(201,168,76,0.12)' }}>
           <Icon size={15} style={{ color: 'var(--gold)' }} />
         </div>
         <h2 className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{title}</h2>
@@ -201,7 +201,7 @@ export default function SettingsClient({ settings, integrations }: Props) {
               className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium border-b last:border-0 transition-colors"
               style={{
                 borderColor: 'var(--border)',
-                background:  activeSection === item.id ? 'rgba(224,168,44,0.08)' : 'transparent',
+                background:  activeSection === item.id ? 'rgba(201,168,76,0.08)' : 'transparent',
                 color:       activeSection === item.id ? 'var(--gold)' : 'var(--text-secondary)',
               }}
             >

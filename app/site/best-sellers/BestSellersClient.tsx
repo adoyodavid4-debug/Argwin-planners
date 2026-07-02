@@ -18,7 +18,7 @@ const PER_PAGE = 12
 const price$ = (n: number) => `$${n.toFixed(2)}`
 const compact = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}k` : `${n}`)
 
-const MEDALS = ['#E0A82C', '#AEB6BF', '#CD7F4E'] // gold / silver / bronze
+const MEDALS = ['#C9A84C', '#AEB6BF', '#CD7F4E'] // gold / silver / bronze
 
 interface Props {
   products:       Product[]
@@ -69,7 +69,7 @@ function PodiumCard({ p, rank }: { p: Product; rank: number }) {
       transition={{ duration: 0.5, delay: (rank - 1) * 0.1 }}
       className={`relative ${featured ? 'lg:-mt-6' : ''}`}>
       <div className="relative rounded-3xl border overflow-hidden h-full transition-all duration-300 hover:-translate-y-1.5 hover:shadow-product-hover"
-        style={{ background: 'var(--bg-card)', borderColor: featured ? medal : 'var(--border)', boxShadow: featured ? `0 0 0 1px ${medal}, 0 18px 50px rgba(224,168,44,0.18)` : undefined }}>
+        style={{ background: 'var(--bg-card)', borderColor: featured ? medal : 'var(--border)', boxShadow: featured ? `0 0 0 1px ${medal}, 0 18px 50px rgba(201,168,76,0.18)` : undefined }}>
         {/* rank ribbon */}
         <div className="absolute top-0 left-0 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-br-2xl text-xs font-bold text-white" style={{ background: medal }}>
           {featured ? <Crown size={13} /> : <Award size={13} />} #{rank}
@@ -289,9 +289,9 @@ export default function BestSellersClient({ products, totalDownloads, totalRevie
           </div>
           <div className="grid md:grid-cols-3 gap-5">
             {[
-              { name: 'Sophie L.', grad: 'linear-gradient(135deg,#A98FE3,#7B6FAE)', text: 'Changed how I plan my entire week. I keep recommending it to everyone at work.' },
-              { name: 'Marcus T.', grad: 'linear-gradient(135deg,#E0A82C,#F6D265)', text: 'Bought three so far. The quality and detail is unmatched for the price.' },
-              { name: 'Nadia K.', grad: 'linear-gradient(135deg,#F0B0A8,#C9847C)', text: 'Downloaded instantly, set up in GoodNotes in minutes. Absolutely beautiful.' },
+              { name: 'Sophie L.', grad: 'linear-gradient(135deg,#B8A9D4,#7B6FAE)', text: 'Changed how I plan my entire week. I keep recommending it to everyone at work.' },
+              { name: 'Marcus T.', grad: 'linear-gradient(135deg,#C9A84C,#E2C97E)', text: 'Bought three so far. The quality and detail is unmatched for the price.' },
+              { name: 'Nadia K.', grad: 'linear-gradient(135deg,#E8C5C0,#C9847C)', text: 'Downloaded instantly, set up in GoodNotes in minutes. Absolutely beautiful.' },
             ].map((r, i) => (
               <motion.div key={r.name} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45, delay: i * 0.1 }}
                 className="p-6 rounded-2xl border flex flex-col" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>

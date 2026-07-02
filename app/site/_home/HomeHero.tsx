@@ -75,13 +75,13 @@ export default function HomeHero() {
         <div className="relative h-[360px] sm:h-[440px] lg:h-[520px] hidden sm:block">
           <motion.div className="absolute inset-0 flex items-center justify-center" style={reduce ? undefined : { y }}>
             <motion.div className="absolute" style={{ transform: 'translateX(-38%) rotate(-9deg)', zIndex: 1 }} animate={reduce ? undefined : { y: [0, -14, 0] }} transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}>
-              <div style={{ transform: 'scale(0.86)' }}><Cover hex="#9CC38C" spine="#83AE73" ink="#33502C" label="Wellness" /></div>
+              <div style={{ transform: 'scale(0.86)' }}><Cover hex="#A8B5A0" spine="#83AE73" ink="#33502C" label="Wellness" /></div>
             </motion.div>
             <motion.div className="absolute" style={{ transform: 'translateX(38%) rotate(9deg)', zIndex: 1 }} animate={reduce ? undefined : { y: [0, 16, 0] }} transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 0.6 }}>
               <div style={{ transform: 'scale(0.86)' }}><Cover hex="#F2C6A6" spine="#E3AC85" ink="#7E4A30" label="Budget" /></div>
             </motion.div>
             <motion.div className="absolute" style={{ zIndex: 3 }} animate={reduce ? undefined : { y: [0, -10, 0] }} transition={{ duration: 6.5, repeat: Infinity, ease: 'easeInOut', delay: 0.3 }}>
-              <Cover hex="#E0A82C" spine="#C28E1C" ink="#6B4E10" label="Daily Planner" />
+              <Cover hex="#C9A84C" spine="#C28E1C" ink="#6B4E10" label="Daily Planner" />
             </motion.div>
           </motion.div>
         </div>

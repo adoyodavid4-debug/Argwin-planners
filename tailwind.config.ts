@@ -12,11 +12,11 @@ const config: Config = {
       colors: {
         // Arwign brand palette — sophisticated & editorial
         ivory:    { DEFAULT: '#FAF8F4', 50: '#FDFCFA', 100: '#FAF8F4', 200: '#F2EDE4' },
-        gold:     { DEFAULT: '#E0A82C', light: '#F6D265', dark: '#B47F12', muted: '#E6C45A' },
-        lavender: { DEFAULT: '#A98FE3', soft: '#CFC2F0', deep: '#7B6FAE', mist: '#EDE9F6' },
-        blush:    { DEFAULT: '#F0B0A8', soft: '#F5E3E0', deep: '#C9847C' },
+        gold:     { DEFAULT: '#C9A84C', light: '#E2C97E', dark: '#9E7A2A', muted: '#D4B96A' },
+        lavender: { DEFAULT: '#B8A9D4', soft: '#D6CEEB', deep: '#7B6FAE', mist: '#EDE9F6' },
+        blush:    { DEFAULT: '#E8C5C0', soft: '#F5E3E0', deep: '#C9847C' },
         cream:    { DEFAULT: '#F7F2E8', warm: '#EDE4D3' },
-        sage:     { DEFAULT: '#9CC38C', light: '#C8D4C0', dark: '#6E7E66' },
+        sage:     { DEFAULT: '#A8B5A0', light: '#C8D4C0', dark: '#6E7E66' },
         charcoal: { DEFAULT: '#2C2A35', soft: '#3D3A4A', light: '#5A5668' },
         // Dark mode surfaces
         dark: {
@@ -44,7 +44,7 @@ const config: Config = {
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-mesh':   'radial-gradient(at 40% 20%, hsla(265,40%,80%,0.3) 0px, transparent 50%), radial-gradient(at 80% 0%, hsla(32,60%,75%,0.2) 0px, transparent 50%), radial-gradient(at 0% 50%, hsla(340,40%,80%,0.2) 0px, transparent 50%)',
-        'gradient-gold':   'linear-gradient(135deg, #E0A82C 0%, #F6D265 50%, #E0A82C 100%)',
+        'gradient-gold':   'linear-gradient(135deg, #C9A84C 0%, #E2C97E 50%, #C9A84C 100%)',
         'gradient-brand':  'linear-gradient(135deg, #B8A9D4 0%, #E8C5C0 50%, #F7F2E8 100%)',
         'gradient-dark':   'linear-gradient(135deg, #231F2E 0%, #1A1820 100%)',
       },
@@ -52,8 +52,8 @@ const config: Config = {
         'glass':     '0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.4)',
         'glass-md':  '0 16px 48px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.3)',
         'glass-lg':  '0 24px 64px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.2)',
-        'gold':      '0 4px 24px rgba(224,168,44,0.30)',
-        'gold-lg':   '0 8px 40px rgba(224,168,44,0.42)',
+        'gold':      '0 4px 24px rgba(201,168,76,0.25)',
+        'gold-lg':   '0 8px 40px rgba(201,168,76,0.35)',
         'product':   '0 2px 8px rgba(44,42,53,0.06), 0 8px 32px rgba(44,42,53,0.08)',
         'product-hover': '0 4px 16px rgba(44,42,53,0.1), 0 16px 48px rgba(44,42,53,0.14)',
         'nav':       '0 1px 0 rgba(0,0,0,0.06), 0 4px 24px rgba(0,0,0,0.04)',
@@ -92,7 +92,7 @@ const config: Config = {
         scaleIn:    { '0%': { opacity: '0', transform: 'scale(0.92)' }, '100%': { opacity: '1', transform: 'scale(1)' } },
         float:      { '0%,100%': { transform: 'translateY(0px)' }, '50%': { transform: 'translateY(-12px)' } },
         shimmer:    { '0%': { backgroundPosition: '-200% 0' }, '100%': { backgroundPosition: '200% 0' } },
-        pulseGold:  { '0%,100%': { boxShadow: '0 0 0 0 rgba(224,168,44,0.45)' }, '50%': { boxShadow: '0 0 0 12px rgba(224,168,44,0)' } },
+        pulseGold:  { '0%,100%': { boxShadow: '0 0 0 0 rgba(201,168,76,0.4)' }, '50%': { boxShadow: '0 0 0 12px rgba(201,168,76,0)' } },
         marquee:    { '0%': { transform: 'translateX(0%)' }, '100%': { transform: 'translateX(-50%)' } },
         grain:      { '0%,100%': { transform: 'translate(0,0)' }, '10%': { transform: 'translate(-2%,-3%)' }, '20%': { transform: 'translate(3%,2%)' }, '30%': { transform: 'translate(-1%,4%)' }, '40%': { transform: 'translate(2%,-1%)' }, '50%': { transform: 'translate(-3%,2%)' }, '60%': { transform: 'translate(1%,-4%)' }, '70%': { transform: 'translate(-2%,3%)' }, '80%': { transform: 'translate(3%,-2%)' }, '90%': { transform: 'translate(-1%,1%)' } },
       },

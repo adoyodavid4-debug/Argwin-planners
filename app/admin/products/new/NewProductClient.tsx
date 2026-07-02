@@ -365,7 +365,7 @@ export default function NewProductClient() {
                     className="flex items-center gap-2.5 p-3 rounded-xl border text-left transition-all duration-200"
                     style={{
                       borderColor: active ? 'var(--gold)' : 'var(--border)',
-                      background:  active ? 'rgba(224,168,44,0.09)' : 'transparent',
+                      background:  active ? 'rgba(201,168,76,0.09)' : 'transparent',
                     }}
                   >
                     <cat.icon
@@ -523,7 +523,7 @@ export default function NewProductClient() {
                 className="border-2 border-dashed rounded-xl py-8 flex flex-col items-center gap-2 cursor-pointer transition-all"
                 style={{
                   borderColor: dragging ? 'var(--gold)' : 'var(--border)',
-                  background:  dragging ? 'rgba(224,168,44,0.04)' : 'transparent',
+                  background:  dragging ? 'rgba(201,168,76,0.04)' : 'transparent',
                 }}>
                 <ImageIcon size={24} style={{ color: 'var(--text-muted)' }} />
                 <span className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
@@ -569,7 +569,7 @@ export default function NewProductClient() {
                       className="px-3 py-1.5 rounded-lg text-xs font-medium border transition-all duration-200"
                       style={{
                         borderColor: formats.includes(fmt) ? 'var(--gold)' : 'var(--border)',
-                        background:  formats.includes(fmt) ? 'rgba(224,168,44,0.1)' : 'transparent',
+                        background:  formats.includes(fmt) ? 'rgba(201,168,76,0.1)' : 'transparent',
                         color:       formats.includes(fmt) ? 'var(--gold)' : 'var(--text-secondary)',
                         fontFamily:  'var(--font-jost)',
                       }}>

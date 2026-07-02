@@ -31,9 +31,9 @@ export interface Colourway {
 
 export const COLOURWAYS: Colourway[] = [
   { id: 'cream',      label: 'Warm Cream', accent: '#EDE4D3' },
-  { id: 'peach',      label: 'Soft Peach', accent: '#F0B0A8' },
-  { id: 'sage',       label: 'Garden Sage', accent: '#9CC38C' },
-  { id: 'golden',     label: 'Golden Hour', accent: '#E0A82C' },
+  { id: 'peach',      label: 'Soft Peach', accent: '#E8C5C0' },
+  { id: 'sage',       label: 'Garden Sage', accent: '#A8B5A0' },
+  { id: 'golden',     label: 'Golden Hour', accent: '#C9A84C' },
   { id: 'terracotta', label: 'Terracotta', accent: '#C47A5A' },
 ]
 

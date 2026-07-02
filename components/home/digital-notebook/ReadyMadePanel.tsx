@@ -86,7 +86,7 @@ export default function ReadyMadePanel({ size, colour, onSizeChange, onColourCha
                 className="px-4 py-2 rounded-xl text-sm font-semibold border transition-all"
                 style={
                   selected
-                    ? { borderColor: 'var(--gold)', background: 'rgba(224,168,44,0.1)', color: 'var(--text-primary)' }
+                    ? { borderColor: 'var(--gold)', background: 'rgba(201,168,76,0.1)', color: 'var(--text-primary)' }
                     : { borderColor: 'var(--border)', background: 'var(--bg-card)', color: 'var(--text-secondary)' }
                 }
               >

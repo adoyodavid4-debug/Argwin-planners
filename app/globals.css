@@ -6,18 +6,18 @@
 
 /* ─── CSS Variables ─────────────────────────────────────────── */
 :root {
-  /* Brand — vivid & luminous (same hues, higher chroma) */
-  --gold:         #E0A82C;
-  --gold-rgb:     224, 168, 44;
-  --gold-light:   #F6D265;
-  --gold-dark:    #B47F12;
-  --lavender:     #A98FE3;
-  --lavender-soft:#CFC2F0;
-  --blush:        #F0B0A8;
+  /* Brand — sophisticated & editorial */
+  --gold:         #C9A84C;
+  --gold-rgb:     201, 168, 76;
+  --gold-light:   #E2C97E;
+  --gold-dark:    #9E7A2A;
+  --lavender:     #B8A9D4;
+  --lavender-soft:#D6CEEB;
+  --blush:        #E8C5C0;
   --cream:        #F7F2E8;
   --ivory:        #FAF8F4;
   --charcoal:     #2C2A35;
-  --sage:         #9CC38C;
+  --sage:         #A8B5A0;
 
   /* Semantic */
   --bg-primary:   #FAF8F4;
@@ -27,7 +27,7 @@
   --text-secondary: #5A5668;
   --text-muted:   #8A869A;
   --border:       rgba(44,42,53,0.10);
-  --border-gold:  rgba(224,168,44,0.30);
+  --border-gold:  rgba(201,168,76,0.30);
 
   /* Glass */
   --glass-bg:     rgba(255,255,255,0.65);
@@ -135,7 +135,7 @@ h4, h5, h6 { font-family: var(--font-jost); font-weight: 600; }
   align-items: center;
   gap: 0.5rem;
   padding: 0.875rem 2rem;
-  background: linear-gradient(135deg, #E8AE33 0%, #F1C04C 45%, #D99A1F 100%);
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 50%, var(--gold) 100%);
   background-size: 200% 100%;
   color: #fff;
   font-family: var(--font-jost);
@@ -147,14 +147,13 @@ h4, h5, h6 { font-family: var(--font-jost); font-weight: 600; }
   border: none;
   cursor: pointer;
   transition: background-position 0.4s var(--ease-smooth), transform 0.2s var(--ease-spring), box-shadow 0.3s var(--ease-smooth);
-  box-shadow: 0 4px 16px rgba(var(--gold-rgb), 0.45), inset 0 1px 0 rgba(255,255,255,0.45);
-  text-shadow: 0 1px 2px rgba(140,98,12,0.35);
+  box-shadow: 0 4px 16px rgba(var(--gold-rgb), 0.3);
   text-decoration: none;
 }
 .btn-primary:hover {
   background-position: -100% 0;
   transform: translateY(-2px);
-  box-shadow: 0 10px 34px rgba(var(--gold-rgb), 0.6), inset 0 1px 0 rgba(255,255,255,0.55);
+  box-shadow: 0 8px 32px rgba(var(--gold-rgb), 0.4);
 }
 .btn-primary:active { transform: translateY(0); }
 

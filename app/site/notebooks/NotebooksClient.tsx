@@ -12,10 +12,10 @@ import {
 import { OptInForm } from '@/components/funnel/OptInForm'
 
 const COVERS = [
-  { name: 'Lavender', hex: '#A98FE3' },
-  { name: 'Blush',    hex: '#F0B0A8', dark: true },
-  { name: 'Sage',     hex: '#9CC38C' },
-  { name: 'Gold',     hex: '#E0A82C' },
+  { name: 'Lavender', hex: '#B8A9D4' },
+  { name: 'Blush',    hex: '#E8C5C0', dark: true },
+  { name: 'Sage',     hex: '#A8B5A0' },
+  { name: 'Gold',     hex: '#C9A84C' },
   { name: 'Charcoal', hex: '#2C2A35' },
   { name: 'Cream',    hex: '#F2E9D8', dark: true },
 ]
@@ -379,9 +379,9 @@ export default function NotebooksClient({ notebooks, faqs }: { notebooks: Notebo
           </div>
           <div className="grid md:grid-cols-3 gap-5">
             {[
-              { name: 'Lena M.', grad: 'linear-gradient(135deg,#A98FE3,#7B6FAE)', text: 'The hyperlinks are a game-changer — my whole study system finally lives in one tidy notebook.' },
-              { name: 'Tomas R.', grad: 'linear-gradient(135deg,#E0A82C,#F6D265)', text: 'Imported into GoodNotes in seconds and the layouts are gorgeous. Easily my favourite purchase this year.' },
-              { name: 'Aisha B.', grad: 'linear-gradient(135deg,#F0B0A8,#C9847C)', text: 'I asked for a custom journal and they nailed it. It feels like it was made just for me — because it was.' },
+              { name: 'Lena M.', grad: 'linear-gradient(135deg,#B8A9D4,#7B6FAE)', text: 'The hyperlinks are a game-changer — my whole study system finally lives in one tidy notebook.' },
+              { name: 'Tomas R.', grad: 'linear-gradient(135deg,#C9A84C,#E2C97E)', text: 'Imported into GoodNotes in seconds and the layouts are gorgeous. Easily my favourite purchase this year.' },
+              { name: 'Aisha B.', grad: 'linear-gradient(135deg,#E8C5C0,#C9847C)', text: 'I asked for a custom journal and they nailed it. It feels like it was made just for me — because it was.' },
             ].map((r, i) => (
               <motion.div key={r.name} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45, delay: i * 0.1 }}
                 className="p-6 rounded-2xl border flex flex-col" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>

@@ -22,7 +22,7 @@ export function CompatibilityBadges() {
           <li
             key={name}
             className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold border"
-            style={{ borderColor: 'var(--border-gold)', background: 'rgba(224,168,44,0.06)', color: 'var(--text-primary)' }}
+            style={{ borderColor: 'var(--border-gold)', background: 'rgba(201,168,76,0.06)', color: 'var(--text-primary)' }}
           >
             <Check size={13} style={{ color: 'var(--gold)' }} aria-hidden="true" />
             {name}
@@ -52,7 +52,7 @@ export function FeatureGrid() {
               className="rounded-2xl border p-5"
               style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}
             >
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style={{ background: 'rgba(224,168,44,0.1)' }}>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style={{ background: 'rgba(201,168,76,0.1)' }}>
                 <Icon size={18} style={{ color: 'var(--gold)' }} />
               </div>
               <p className="font-semibold text-sm mb-1" style={{ color: 'var(--text-primary)' }}>{f.title}</p>
