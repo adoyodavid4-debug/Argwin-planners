@@ -65,7 +65,7 @@ export default function AboutClient() {
 
       {/* ══ 1. HERO ════════════════════════════════════════════ */}
       <section ref={heroRef} className="relative w-full pt-12 pb-16 lg:pb-20 border-b overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, rgba(201,168,76,0.13) 0%, rgba(184,169,212,0.09) 55%, rgba(201,168,76,0.05) 100%)', borderColor: 'var(--border)' }}>
+        style={{ background: 'linear-gradient(135deg, rgba(201,168,76,0.13) 0%, rgba(205,199,190,0.09) 55%, rgba(201,168,76,0.05) 100%)', borderColor: 'var(--border)' }}>
         <div aria-hidden className="absolute -top-24 -right-24 w-96 h-96 rounded-full opacity-20 pointer-events-none blur-3xl" style={{ background: 'var(--gold-light)' }} />
         <div className="container-site relative">
           <nav className="flex items-center gap-1.5 mb-8 text-xs" aria-label="Breadcrumb" style={{ color: 'var(--text-muted)' }}>

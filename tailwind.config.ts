@@ -43,7 +43,7 @@ const config: Config = {
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-mesh':   'radial-gradient(at 40% 20%, hsla(265,40%,80%,0.3) 0px, transparent 50%), radial-gradient(at 80% 0%, hsla(32,60%,75%,0.2) 0px, transparent 50%), radial-gradient(at 0% 50%, hsla(340,40%,80%,0.2) 0px, transparent 50%)',
+        'gradient-mesh':   'radial-gradient(at 30% 0%, rgba(201,168,76,0.06) 0px, transparent 55%), radial-gradient(at 85% 12%, rgba(201,168,76,0.04) 0px, transparent 50%), var(--bg-neutral)',
         'gradient-gold':   'linear-gradient(135deg, #C9A84C 0%, #E2C97E 50%, #C9A84C 100%)',
         'gradient-brand':  'linear-gradient(135deg, #B8A9D4 0%, #E8C5C0 50%, #F7F2E8 100%)',
         'gradient-dark':   'linear-gradient(135deg, #231F2E 0%, #1A1820 100%)',

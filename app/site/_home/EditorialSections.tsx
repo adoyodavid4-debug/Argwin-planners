@@ -210,10 +210,10 @@ export function HowItWorks() {
 export function FinalCTA() {
   const reduce = useReducedMotion()
   return (
-    <section className="relative overflow-hidden border-t py-20 lg:py-28" style={{ borderColor: 'var(--border)', background: `linear-gradient(135deg, rgba(var(--gold-rgb),0.16) 0%, rgba(184,169,212,0.10) 55%, rgba(var(--gold-rgb),0.06) 100%)` }} aria-label="Shop the collection">
+    <section className="relative overflow-hidden border-t py-20 lg:py-28" style={{ borderColor: 'var(--border)', background: `linear-gradient(135deg, rgba(var(--gold-rgb),0.16) 0%, rgba(205,199,190,0.10) 55%, rgba(var(--gold-rgb),0.06) 100%)` }} aria-label="Shop the collection">
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute rounded-full blur-3xl opacity-30 animate-float" style={{ width: 320, height: 320, top: -110, left: '10%', background: 'var(--gold)' }} />
-        <div className="absolute rounded-full blur-3xl opacity-25 animate-float-delayed" style={{ width: 260, height: 260, bottom: -90, right: '8%', background: 'var(--lavender)' }} />
+        <div className="absolute rounded-full blur-3xl opacity-25 animate-float-delayed" style={{ width: 260, height: 260, bottom: -90, right: '8%', background: '#E5DFD5' }} />
       </div>
       <motion.div initial={reduce ? false : { opacity: 0, y: 22 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.55 }}
         className="container-site relative text-center max-w-2xl mx-auto">

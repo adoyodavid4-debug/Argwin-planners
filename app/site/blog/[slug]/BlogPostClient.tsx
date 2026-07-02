@@ -720,7 +720,7 @@ function InlineProduct({ sp, compact }: { sp: { name: string; blurb: string; pri
   if (compact) {
     return (
       <Link href={sp.href} className="group flex items-center gap-4 my-8 p-4 rounded-2xl border transition-all duration-300 hover:-translate-y-0.5 hover:shadow-product"
-        style={{ borderColor: 'var(--border)', background: 'linear-gradient(135deg, rgba(201,168,76,0.10) 0%, rgba(184,169,212,0.06) 100%)' }}>
+        style={{ borderColor: 'var(--border)', background: 'linear-gradient(135deg, rgba(201,168,76,0.10) 0%, rgba(205,199,190,0.06) 100%)' }}>
         <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(201,168,76,0.16)' }}><BookOpen size={18} style={{ color: 'var(--gold)' }} /></div>
         <div className="flex-1 min-w-0">
           <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--gold)', letterSpacing: '0.1em' }}>Featured in this article</p>
@@ -732,7 +732,7 @@ function InlineProduct({ sp, compact }: { sp: { name: string; blurb: string; pri
   }
   return (
     <div className="my-10 rounded-3xl border overflow-hidden" style={{ borderColor: 'var(--border)' }}>
-      <div className="p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center gap-6" style={{ background: 'linear-gradient(135deg, rgba(201,168,76,0.14) 0%, rgba(184,169,212,0.08) 100%)' }}>
+      <div className="p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center gap-6" style={{ background: 'linear-gradient(135deg, rgba(201,168,76,0.14) 0%, rgba(205,199,190,0.08) 100%)' }}>
         <div className="flex-1">
           <p className="text-[11px] font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--gold)', letterSpacing: '0.1em' }}>The planner behind this article</p>
           <h3 className="font-display text-2xl mb-2" style={{ color: 'var(--text-primary)' }}>{sp.name}</h3>
@@ -940,7 +940,7 @@ export default function BlogPostClient({ post, related }: Props) {
       </div>
 
       {/* ── End-of-post CTA ──────────────────────────────── */}
-      <section className="border-t py-16" style={{ borderColor: 'var(--border)', background: 'linear-gradient(135deg, rgba(201,168,76,0.12) 0%, rgba(184,169,212,0.07) 60%, rgba(201,168,76,0.04) 100%)' }}>
+      <section className="border-t py-16" style={{ borderColor: 'var(--border)', background: 'linear-gradient(135deg, rgba(201,168,76,0.12) 0%, rgba(205,199,190,0.07) 60%, rgba(201,168,76,0.04) 100%)' }}>
         <div className="container-site max-w-xl mx-auto text-center">
           <div className="divider-gold mb-6" />
           <h2 className="font-display text-3xl mb-3" style={{ color: 'var(--text-primary)' }}>Put it into practice</h2>

@@ -101,7 +101,7 @@ export default function BundlesClient({ featured, sections }: Props) {
       {/* ── Hero ─────────────────────────────────────────────── */}
       <section
         className="w-full pt-10 pb-12 border-b"
-        style={{ background: 'linear-gradient(135deg, rgba(201,168,76,0.18) 0%, rgba(184,169,212,0.12) 100%)', borderColor: 'var(--border)' }}
+        style={{ background: 'linear-gradient(135deg, rgba(201,168,76,0.18) 0%, rgba(205,199,190,0.12) 100%)', borderColor: 'var(--border)' }}
       >
         <div className="container-site">
           <nav className="flex items-center gap-1.5 mb-6 text-xs" aria-label="Breadcrumb" style={{ color: 'var(--text-muted)' }}>

@@ -141,7 +141,7 @@ export default function BestSellersClient({ products, totalDownloads, totalRevie
 
       {/* ══ HERO ══════════════════════════════════════════════ */}
       <section className="relative w-full pt-10 pb-14 border-b overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, rgba(var(--gold-rgb),0.16) 0%, rgba(184,169,212,0.12) 60%, rgba(var(--gold-rgb),0.06) 100%)', borderColor: 'var(--border)' }}>
+        style={{ background: 'linear-gradient(135deg, rgba(var(--gold-rgb),0.16) 0%, rgba(205,199,190,0.12) 60%, rgba(var(--gold-rgb),0.06) 100%)', borderColor: 'var(--border)' }}>
         <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute rounded-full blur-3xl opacity-30 animate-float" style={{ width: 300, height: 300, top: -90, right: '8%', background: 'var(--gold)' }} />
         </div>
@@ -185,7 +185,7 @@ export default function BestSellersClient({ products, totalDownloads, totalRevie
 
       {/* ══ TRENDING MARQUEE ══════════════════════════════════ */}
       {products.length > 0 && (
-        <div className="border-b overflow-hidden py-3" style={{ borderColor: 'var(--border)', background: 'linear-gradient(90deg, rgba(var(--gold-rgb),0.10) 0%, rgba(184,169,212,0.12) 50%, rgba(var(--gold-rgb),0.10) 100%)' }}>
+        <div className="border-b overflow-hidden py-3" style={{ borderColor: 'var(--border)', background: 'linear-gradient(90deg, rgba(var(--gold-rgb),0.10) 0%, rgba(205,199,190,0.12) 50%, rgba(var(--gold-rgb),0.10) 100%)' }}>
           <div className="marquee-track items-center" style={{ gap: '2.5rem' }}>
             {[...products, ...products].map((p, i) => (
               <span key={i} className="inline-flex items-center gap-2 text-sm font-medium whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>

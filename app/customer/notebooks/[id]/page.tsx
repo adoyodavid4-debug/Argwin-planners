@@ -283,7 +283,7 @@ export default function NotebookDetailPage() {
                     <span
                       className="text-xs rounded-full px-1.5 py-0.5 font-medium capitalize"
                       style={{
-                        background: c.role === 'editor' ? 'rgba(123,111,174,0.12)' : 'rgba(110,126,102,0.12)',
+                        background: c.role === 'editor' ? 'rgba(196,189,179,0.12)' : 'rgba(110,126,102,0.12)',
                         color:      c.role === 'editor' ? '#7B6FAE' : '#6E7E66',
                       }}
                     >

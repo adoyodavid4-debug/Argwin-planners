@@ -138,7 +138,7 @@ export default function BlogClient({ posts, searchParams }: Props) {
       <section
         className="w-full pt-12 pb-14 border-b"
         style={{
-          background: 'linear-gradient(135deg, rgba(201,168,76,0.12) 0%, rgba(184,169,212,0.08) 60%, rgba(201,168,76,0.04) 100%)',
+          background: 'linear-gradient(135deg, rgba(201,168,76,0.12) 0%, rgba(205,199,190,0.08) 60%, rgba(201,168,76,0.04) 100%)',
           borderColor: 'var(--border)',
         }}
       >

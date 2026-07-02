@@ -110,7 +110,7 @@ export default function CategoriesClient({ categories, counts, totalProducts }: 
       {/* ══ HERO ══════════════════════════════════════════════ */}
       <section className="relative w-full pt-12 pb-16 border-b overflow-hidden bg-gradient-mesh" style={{ borderColor: 'var(--border)' }}>
         <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute rounded-full blur-3xl opacity-30 animate-float" style={{ width: 320, height: 320, top: -100, right: '6%', background: 'var(--lavender)' }} />
+          <div className="absolute rounded-full blur-3xl opacity-30 animate-float" style={{ width: 320, height: 320, top: -100, right: '6%', background: '#E5DFD5' }} />
           <div className="absolute rounded-full blur-3xl opacity-25 animate-float-delayed" style={{ width: 240, height: 240, bottom: -80, left: '2%', background: 'var(--gold)' }} />
 
           {/* 3D floating planner mockups */}

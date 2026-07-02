@@ -23,6 +23,7 @@
   --bg-primary:   #FAF8F4;
   --bg-secondary: #F2EDE4;
   --bg-card:      #FFFFFF;
+  --bg-neutral:   #F4F3F0;
   --text-primary: #2C2A35;
   --text-secondary: #5A5668;
   --text-muted:   #8A869A;
@@ -57,7 +58,7 @@
   --nav-height: 88px;
 
   /* Header */
-  --header-bg: linear-gradient(120deg, #e6d9de 0%, #fff7d1 100%);
+  --header-bg: var(--bg-neutral);
 }
 
 .dark {
@@ -72,6 +73,7 @@
   --glass-bg:     rgba(35,31,46,0.75);
   --glass-border: rgba(255,255,255,0.08);
   --glass-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  --bg-neutral:   #231F2E;
 
   /* Header */
   --header-bg: #231F2E;
@@ -252,11 +254,11 @@ h4, h5, h6 { font-family: var(--font-jost); font-weight: 600; }
 /* ─── Scrollbar ─────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-secondary); }
-::-webkit-scrollbar-thumb { background: var(--lavender); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: #CFC8BE; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
 
 /* ─── Selection ─────────────────────────────────────────────── */
-::selection { background: rgba(184,169,212,0.35); color: var(--charcoal); }
+::selection { background: rgba(205,199,190,0.35); color: var(--charcoal); }
 
 /* ─── Focus Ring ────────────────────────────────────────────── */
 :focus-visible {
@@ -297,7 +299,7 @@ h4, h5, h6 { font-family: var(--font-jost); font-weight: 600; }
   border-radius: 100px;
 }
 .badge-gold    { background: rgba(var(--gold-rgb),0.15); color: var(--gold-dark); }
-.badge-new     { background: rgba(184,169,212,0.2); color: #7B6FAE; }
+.badge-new     { background: rgba(205,199,190,0.2); color: #7B6FAE; }
 .badge-sale    { background: rgba(232,197,192,0.3); color: #C9847C; }
 .badge-popular { background: rgba(168,181,160,0.2); color: #6E7E66; }
 
@@ -377,7 +379,7 @@ h4, h5, h6 { font-family: var(--font-jost); font-weight: 600; }
 /* ─── Newsletter ────────────────────────────────────────────── */
 .newsletter-gradient {
   background: linear-gradient(135deg,
-    rgba(184,169,212,0.15) 0%,
+    rgba(205,199,190,0.15) 0%,
     rgba(232,197,192,0.10) 50%,
     rgba(var(--gold-rgb),0.08) 100%
   );

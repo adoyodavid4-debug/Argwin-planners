@@ -107,9 +107,9 @@ export default function NewArrivalsClient({ products, categories, related, lates
     <div className="w-full" style={{ background: 'var(--bg-primary)' }}>
 
       {/* ══ HERO + SPOTLIGHT ══════════════════════════════════ */}
-      <section className="relative overflow-hidden border-b" style={{ borderColor: 'var(--border)', background: 'linear-gradient(150deg, rgba(184,169,212,0.18) 0%, rgba(var(--gold-rgb),0.10) 55%, var(--bg-primary) 100%)' }}>
+      <section className="relative overflow-hidden border-b" style={{ borderColor: 'var(--border)', background: 'linear-gradient(150deg, rgba(205,199,190,0.18) 0%, rgba(var(--gold-rgb),0.10) 55%, var(--bg-primary) 100%)' }}>
         <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute rounded-full blur-3xl opacity-30 animate-float" style={{ width: 300, height: 300, top: -90, right: '6%', background: 'var(--lavender)' }} />
+          <div className="absolute rounded-full blur-3xl opacity-30 animate-float" style={{ width: 300, height: 300, top: -90, right: '6%', background: '#E5DFD5' }} />
         </div>
         <div className="container-site relative py-12 lg:py-14">
           <nav className="flex items-center gap-1.5 mb-6 text-xs" style={{ color: 'var(--text-muted)' }}>
@@ -119,7 +119,7 @@ export default function NewArrivalsClient({ products, categories, related, lates
 
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 lg:items-center">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border mb-5" style={{ background: 'rgba(184,169,212,0.18)', borderColor: 'rgba(184,169,212,0.45)' }}>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border mb-5" style={{ background: 'rgba(205,199,190,0.18)', borderColor: 'rgba(205,199,190,0.45)' }}>
                 <Sparkles size={14} style={{ color: 'var(--gold)' }} />
                 <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--gold-dark)', letterSpacing: '0.1em' }}>Just Landed</span>
               </div>

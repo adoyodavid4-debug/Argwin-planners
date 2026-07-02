@@ -152,7 +152,7 @@ export default function NotebooksClient({ notebooks, faqs }: { notebooks: Notebo
       {/* ══ HERO ══════════════════════════════════════════════ */}
       <section className="relative w-full pt-12 pb-16 border-b overflow-hidden bg-gradient-mesh" style={{ borderColor: 'var(--border)' }}>
         <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute rounded-full blur-3xl opacity-30 animate-float" style={{ width: 320, height: 320, top: -110, right: '4%', background: 'var(--lavender)' }} />
+          <div className="absolute rounded-full blur-3xl opacity-30 animate-float" style={{ width: 320, height: 320, top: -110, right: '4%', background: '#E5DFD5' }} />
           <div className="absolute rounded-full blur-3xl opacity-25 animate-float-delayed" style={{ width: 240, height: 240, bottom: -80, left: '0%', background: 'var(--gold)' }} />
         </div>
 

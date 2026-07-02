@@ -66,7 +66,7 @@ export default function Footer() {
         <div className="container-site pt-16 pb-4">
           <div className="relative overflow-hidden rounded-3xl border animate-fade-up"
             style={{
-              background: 'linear-gradient(135deg, rgba(var(--gold-rgb),0.12) 0%, rgba(184,169,212,0.08) 55%, var(--bg-card) 100%)',
+              background: 'linear-gradient(135deg, rgba(var(--gold-rgb),0.12) 0%, rgba(205,199,190,0.08) 55%, var(--bg-card) 100%)',
               borderColor: 'var(--border-gold)',
               boxShadow: '0 10px 40px rgba(44,42,53,0.08)',
             }}>

@@ -31,7 +31,7 @@ const CATEGORY_META: Record<string, {
     subheadline: 'Hyperlinked & GoodNotes Ready',
     description: 'Fully interactive digital planners built for iPad, GoodNotes, Notability, and any PDF app. Tap to navigate, type to fill — no paper needed.',
     accentColor: 'var(--lavender)',
-    bgGradient: 'linear-gradient(135deg, rgba(184,169,212,0.18) 0%, rgba(201,168,76,0.08) 100%)',
+    bgGradient: 'linear-gradient(135deg, rgba(205,199,190,0.18) 0%, rgba(201,168,76,0.08) 100%)',
     features: [
       { icon: Zap,         label: 'Instant Download' },
       { icon: Smartphone,  label: 'GoodNotes & Notability' },
@@ -76,7 +76,7 @@ const CATEGORY_META: Record<string, {
     subheadline: 'From Assignments to A-Grades',
     description: 'Academic planners built for students at every level. Track assignments, exams, study sessions, and goals — all in one organised hub.',
     accentColor: '#7B6FAE',
-    bgGradient: 'linear-gradient(135deg, rgba(123,111,174,0.14) 0%, rgba(184,169,212,0.20) 100%)',
+    bgGradient: 'linear-gradient(135deg, rgba(196,189,179,0.14) 0%, rgba(205,199,190,0.20) 100%)',
     features: [
       { icon: Zap,         label: 'Semester & Term Views' },
       { icon: Download,    label: 'Assignment Trackers' },
@@ -91,7 +91,7 @@ const CATEGORY_META: Record<string, {
     subheadline: 'Nurture Your Mind, Body & Soul',
     description: 'Holistic wellness planners to help you track mood, sleep, gratitude, water intake, and self-care rituals — one beautiful day at a time.',
     accentColor: 'var(--blush)',
-    bgGradient: 'linear-gradient(135deg, rgba(232,197,192,0.22) 0%, rgba(184,169,212,0.14) 100%)',
+    bgGradient: 'linear-gradient(135deg, rgba(232,197,192,0.22) 0%, rgba(205,199,190,0.14) 100%)',
     features: [
       { icon: Star,        label: 'Daily Mood Check-Ins' },
       { icon: Download,    label: 'Gratitude & Affirmations' },
@@ -121,7 +121,7 @@ const CATEGORY_META: Record<string, {
     subheadline: 'More Planning, More Savings',
     description: 'Get our most popular planners bundled together at massive savings. The perfect way to set up your entire planning system at once.',
     accentColor: 'var(--gold)',
-    bgGradient: 'linear-gradient(135deg, rgba(201,168,76,0.18) 0%, rgba(184,169,212,0.12) 100%)',
+    bgGradient: 'linear-gradient(135deg, rgba(201,168,76,0.18) 0%, rgba(205,199,190,0.12) 100%)',
     features: [
       { icon: Zap,         label: 'Up to 65% Off Individual Price' },
       { icon: Download,    label: 'Multiple Planners in One' },
@@ -138,7 +138,7 @@ const defaultMeta = {
   subheadline: 'Premium Collection',
   description: 'Browse our collection of premium planners — instant download, PDF & GoodNotes ready.',
   accentColor: 'var(--gold)',
-  bgGradient: 'linear-gradient(135deg, rgba(201,168,76,0.12) 0%, rgba(184,169,212,0.10) 100%)',
+  bgGradient: 'linear-gradient(135deg, rgba(201,168,76,0.12) 0%, rgba(205,199,190,0.10) 100%)',
   features: [
     { icon: Zap,        label: 'Instant Download' },
     { icon: Smartphone, label: 'Multi-Device Ready' },

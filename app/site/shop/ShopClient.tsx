@@ -165,7 +165,7 @@ export default function ShopClient({ products, categories, featured }: Props) {
     <div className="w-full" style={{ background: 'var(--bg-primary)' }}>
 
       {/* ══ HEADER ════════════════════════════════════════════ */}
-      <section className="border-b" style={{ borderColor: 'var(--border)', background: 'linear-gradient(135deg, rgba(var(--gold-rgb),0.10) 0%, rgba(184,169,212,0.08) 60%, var(--bg-primary) 100%)' }}>
+      <section className="border-b" style={{ borderColor: 'var(--border)', background: 'linear-gradient(135deg, rgba(var(--gold-rgb),0.10) 0%, rgba(205,199,190,0.08) 60%, var(--bg-primary) 100%)' }}>
         <div className="container-site py-10">
           <nav className="flex items-center gap-1.5 mb-5 text-xs" style={{ color: 'var(--text-muted)' }}>
             <Link href="/" className="hover:text-gold transition-colors" style={{ color: 'var(--text-muted)' }}>Home</Link>

@@ -30,11 +30,7 @@ export default function HomeHero() {
   const y = useSpring(yRaw, { stiffness: 60, damping: 20 })
 
   return (
-    <section ref={ref} className="relative overflow-hidden bg-gradient-mesh" style={{ borderBottom: '1px solid var(--border)' }}>
-      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute rounded-full blur-3xl opacity-30 animate-float" style={{ width: 380, height: 380, top: -120, right: '4%', background: 'var(--lavender)' }} />
-        <div className="absolute rounded-full blur-3xl opacity-25 animate-float-delayed" style={{ width: 300, height: 300, bottom: -100, left: '-2%', background: 'var(--gold)' }} />
-      </div>
+    <section ref={ref} className="relative overflow-hidden" style={{ background: 'var(--bg-neutral)', borderBottom: '1px solid var(--border)' }}>
 
       <div className="container-site relative grid lg:grid-cols-2 gap-10 lg:gap-8 items-center" style={{ minHeight: 'min(88vh, 760px)', paddingTop: '3.5rem', paddingBottom: '3.5rem' }}>
         {/* Copy */}

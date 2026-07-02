@@ -42,7 +42,7 @@ const chartData = [
 export default function AdminDashboardClient({ stats }: { stats: Stats }) {
   const kpis = [
     { label: 'Monthly Revenue',   value: `$${stats.monthRevenue.toFixed(0)}`,  icon: DollarSign, color: 'rgba(201,168,76,0.12)',  accent: 'var(--gold)' },
-    { label: 'Orders This Month', value: stats.thisMonthOrders.toLocaleString(), icon: ShoppingBag, color: 'rgba(184,169,212,0.15)', accent: '#7B6FAE' },
+    { label: 'Orders This Month', value: stats.thisMonthOrders.toLocaleString(), icon: ShoppingBag, color: 'rgba(205,199,190,0.15)', accent: '#7B6FAE' },
     { label: 'Active Products',   value: stats.totalProducts.toLocaleString(),  icon: Package,     color: 'rgba(168,181,160,0.15)', accent: '#6E7E66' },
     { label: 'Newsletter Subs',   value: stats.totalSubscribers.toLocaleString(), icon: Users,     color: 'rgba(232,197,192,0.15)', accent: '#C9847C' },
   ]

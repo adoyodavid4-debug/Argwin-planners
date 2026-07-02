@@ -114,7 +114,7 @@ export default function GeneralClient({ product, related }: { product: NbProduct
     <div className="w-full" style={{ background: 'var(--bg-primary)' }}>
 
       {/* ══ HERO + VARIANT SELECTOR ═══════════════════════════ */}
-      <section className="relative overflow-hidden border-b" style={{ borderColor: 'var(--border)', background: `linear-gradient(160deg, ${colour.hex}22 0%, rgba(184,169,212,0.08) 55%, var(--bg-primary) 100%)`, transition: 'background 0.6s ease' }}>
+      <section className="relative overflow-hidden border-b" style={{ borderColor: 'var(--border)', background: `linear-gradient(160deg, ${colour.hex}22 0%, rgba(205,199,190,0.08) 55%, var(--bg-primary) 100%)`, transition: 'background 0.6s ease' }}>
         <div className="container-site py-12 lg:py-16">
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 lg:items-start">
 

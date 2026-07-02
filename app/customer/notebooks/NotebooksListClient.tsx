@@ -558,7 +558,7 @@ export default function NotebooksListClient({
                       <span
                         className="rounded-full px-2 py-0.5 text-xs font-medium capitalize"
                         style={{
-                          background: c.role === 'editor' ? 'rgba(123,111,174,0.15)' : 'rgba(148,163,184,0.12)',
+                          background: c.role === 'editor' ? 'rgba(196,189,179,0.15)' : 'rgba(148,163,184,0.12)',
                           color:      c.role === 'editor' ? '#7B6FAE' : '#64748b',
                         }}
                       >

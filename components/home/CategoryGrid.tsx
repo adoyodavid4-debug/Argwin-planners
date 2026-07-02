@@ -5,19 +5,19 @@ import { motion } from 'framer-motion'
 import { Tablet, Printer, Wallet, BookOpen, HeartPulse, Briefcase, CheckCircle, Utensils, Brain, Target, PiggyBank, LayoutTemplate, Package } from 'lucide-react'
 
 const categories = [
-  { name: 'Digital Planners',   slug: 'digital-planners',   icon: Tablet,         color: 'rgba(184,169,212,0.15)', accent: '#7B6FAE' },
+  { name: 'Digital Planners',   slug: 'digital-planners',   icon: Tablet,         color: 'rgba(205,199,190,0.15)', accent: '#7B6FAE' },
   { name: 'Printable Planners', slug: 'printable-planners', icon: Printer,        color: 'rgba(232,197,192,0.15)', accent: '#C9847C' },
   { name: 'Budget Planners',    slug: 'budget-planners',    icon: Wallet,         color: 'rgba(201,168,76,0.15)',  accent: '#C9A84C' },
   { name: 'Student Planners',   slug: 'student-planners',   icon: BookOpen,       color: 'rgba(168,181,160,0.15)', accent: '#6E7E66' },
   { name: 'Wellness Planners',  slug: 'wellness-planners',  icon: HeartPulse,     color: 'rgba(232,197,192,0.2)',  accent: '#E8A0A0' },
   { name: 'Business Planners',  slug: 'business-planners',  icon: Briefcase,      color: 'rgba(44,42,53,0.06)',    accent: '#5A5668' },
-  { name: 'Habit Trackers',     slug: 'habit-trackers',     icon: CheckCircle,    color: 'rgba(184,169,212,0.12)', accent: '#B8A9D4' },
+  { name: 'Habit Trackers',     slug: 'habit-trackers',     icon: CheckCircle,    color: 'rgba(205,199,190,0.12)', accent: '#B8A9D4' },
   { name: 'ADHD Planners',      slug: 'adhd-planners',      icon: Brain,          color: 'rgba(201,168,76,0.1)',   accent: '#C9A84C' },
   { name: 'Goal Trackers',      slug: 'goal-trackers',      icon: Target,         color: 'rgba(168,181,160,0.12)', accent: '#A8B5A0' },
   { name: 'Meal Planners',      slug: 'meal-planners',      icon: Utensils,       color: 'rgba(232,197,192,0.12)', accent: '#C9847C' },
   { name: 'Savings Challenges', slug: 'savings-challenges', icon: PiggyBank,      color: 'rgba(201,168,76,0.12)',  accent: '#9E7A2A' },
   { name: 'Notion Templates',   slug: 'notion-templates',   icon: LayoutTemplate, color: 'rgba(44,42,53,0.05)',    accent: '#3D3A4A' },
-  { name: 'Planner Bundles',    slug: 'planner-bundles',    icon: Package,        color: 'rgba(184,169,212,0.2)',  accent: '#7B6FAE' },
+  { name: 'Planner Bundles',    slug: 'planner-bundles',    icon: Package,        color: 'rgba(205,199,190,0.2)',  accent: '#7B6FAE' },
 ]
 
 export default function CategoryGrid() {

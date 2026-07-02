@@ -37,7 +37,7 @@ export default function HeroSection() {
           className="absolute inset-0"
           style={{
             background: `
-              radial-gradient(ellipse 80% 60% at 20% 0%, rgba(184,169,212,0.18) 0%, transparent 60%),
+              radial-gradient(ellipse 80% 60% at 20% 0%, rgba(205,199,190,0.18) 0%, transparent 60%),
               radial-gradient(ellipse 70% 50% at 80% 100%, rgba(232,197,192,0.15) 0%, transparent 60%),
               radial-gradient(ellipse 60% 70% at 50% 50%, rgba(201,168,76,0.06) 0%, transparent 70%),
               var(--bg-primary)
