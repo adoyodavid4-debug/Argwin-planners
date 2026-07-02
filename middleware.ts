@@ -11,23 +11,35 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
 
   // ── Supabase session refresh ──────────────────────────────
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get: (name) => req.cookies.get(name)?.value,
-        set: (name, value, opts) => {
-          res.cookies.set({ name, value, ...opts })
-        },
-        remove: (name, opts) => {
-          res.cookies.set({ name, value: '', ...opts })
-        },
-      },
-    }
-  )
+  // Runs on every route (see matcher), so any throw here would 500 the
+  // ENTIRE site with MIDDLEWARE_INVOCATION_FAILED. Guard it and fail open:
+  // a transient Supabase/cold-start/env hiccup degrades to "no session"
+  // rather than taking the whole app down.
+  let session = null
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-  const { data: { session } } = await supabase.auth.getSession()
+    if (supabaseUrl && supabaseAnonKey) {
+      const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+        cookies: {
+          get: (name) => req.cookies.get(name)?.value,
+          set: (name, value, opts) => {
+            res.cookies.set({ name, value, ...opts })
+          },
+          remove: (name, opts) => {
+            res.cookies.set({ name, value: '', ...opts })
+          },
+        },
+      })
+
+      const { data } = await supabase.auth.getSession()
+      session = data.session
+    }
+  } catch (err) {
+    // Never let an auth hiccup crash the middleware.
+    console.error('[middleware] session refresh failed, failing open:', err)
+  }
 
   // ── Admin protection ──────────────────────────────────────
   // TODO: restore when /auth/login page is built
