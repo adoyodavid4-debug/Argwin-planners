@@ -8,7 +8,15 @@ import { ShoppingCart, Search, Heart, Menu, X, Sun, Moon, ChevronDown } from 'lu
 import { useCartStore, useUIStore } from '@/lib/store'
 import { motion, AnimatePresence } from 'framer-motion'
 
-const navLinks = [
+export interface NavItem {
+  label: string
+  href: string
+  children?: { label: string; href: string }[]
+}
+
+const DEFAULT_ANNOUNCEMENT = '✦ Free instant download on all digital planners · Shop Now ✦'
+
+const navLinks: NavItem[] = [
   { label: 'Shop', href: '/shop' },
   {
     label: 'Categories',
@@ -41,7 +49,18 @@ const navLinks = [
   { label: 'About',        href: '/about' },
 ]
 
-export default function Navbar() {
+export default function Navbar({
+  links,
+  announcement,
+}: {
+  links?: NavItem[]
+  announcement?: string
+} = {}) {
+  // DB-driven links/announcement win; hardcoded fallbacks keep the navbar
+  // rendering even if the props are absent or the tables are empty.
+  const items = links && links.length > 0 ? links : navLinks
+  const announcementText = announcement || DEFAULT_ANNOUNCEMENT
+
   const [scrolled,      setScrolled]      = useState(false)
   const [dropdownOpen,  setDropdownOpen]  = useState<string | null>(null)
   const [mounted,       setMounted]       = useState(false)
@@ -64,7 +83,7 @@ export default function Navbar() {
         className="text-center py-2.5 px-4 text-xs font-medium tracking-widest uppercase"
         style={{ background: 'var(--gold)', color: 'white', letterSpacing: '0.1em' }}
       >
-        ✦ Free instant download on all digital planners · Shop Now ✦
+        {announcementText}
       </div>
 
       {/* ── Main Nav ─────────────────────────────────────── */}
@@ -101,8 +120,8 @@ export default function Navbar() {
 
           {/* Desktop Links */}
           <ul className="hidden lg:flex items-center gap-1" role="menubar">
-            {navLinks.map((link) => (
-              <li key={link.href} role="none" className="relative"
+            {items.map((link) => (
+              <li key={`${link.label}-${link.href}`} role="none" className="relative"
                 onMouseEnter={() => link.children && setDropdownOpen(link.label)}
                 onMouseLeave={() => setDropdownOpen(null)}
               >
@@ -135,7 +154,7 @@ export default function Navbar() {
                         >
                           {link.children.map((child) => (
                             <Link
-                              key={child.href}
+                              key={`${child.label}-${child.href}`}
                               href={child.href}
                               role="menuitem"
                               className="flex items-center px-4 py-2.5 text-sm rounded-xl transition-all duration-200 hover:bg-black/5 dark:hover:bg-white/5"
@@ -259,8 +278,8 @@ export default function Navbar() {
             <div className="p-6 pt-20">
               <nav>
                 <ul className="space-y-1">
-                  {navLinks.map((link) => (
-                    <li key={link.href}>
+                  {items.map((link) => (
+                    <li key={`${link.label}-${link.href}`}>
                       <Link
                         href={link.href}
                         className="block px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 hover:bg-black/5 dark:hover:bg-white/5"
@@ -269,10 +288,10 @@ export default function Navbar() {
                       >
                         {link.label}
                       </Link>
-                      {link.children && (
+                      {link.children && link.children.length > 0 && (
                         <ul className="ml-4 mt-1 space-y-1">
                           {link.children.map((child) => (
-                            <li key={child.href}>
+                            <li key={`${child.label}-${child.href}`}>
                               <Link
                                 href={child.href}
                                 className="block px-4 py-2 rounded-lg text-sm transition-all hover:bg-black/5 dark:hover:bg-white/5"

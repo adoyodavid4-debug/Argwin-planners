@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/server'
+import { fulfilDigitalOrder } from '@/lib/orders'
 
 // Safaricom posts to this URL after the user completes (or cancels) the PIN prompt.
 // Must reply 200 quickly — do heavy work asynchronously.
@@ -59,6 +60,14 @@ export async function POST(req: NextRequest) {
           },
         })
         .eq('id', order.id)
+
+      // Generate download tokens + send the confirmation email (idempotent;
+      // errors are logged so we always still ACK Safaricom)
+      try {
+        await fulfilDigitalOrder(supabase, order.id)
+      } catch (err) {
+        console.error('[mpesa/callback] fulfilment failed:', err)
+      }
     } else {
       // ── Cancelled or failed ─────────────────────────────────
       await supabase

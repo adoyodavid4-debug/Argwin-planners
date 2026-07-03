@@ -255,6 +255,10 @@ export default function ProductsTable({ initialProducts, categories }: Props) {
                   {/* Actions */}
                   <td className="px-4 py-3 whitespace-nowrap">
                     <div className="flex items-center gap-3 text-xs">
+                      <Link href={`/admin/products/${product.id}/edit`}
+                        className="hover:underline" style={{ color: 'var(--gold)' }}>
+                        Edit
+                      </Link>
                       <Link href={`/shop/${product.slug}`} target="_blank"
                         className="hover:underline" style={{ color: 'var(--text-muted)' }}>
                         View ↗

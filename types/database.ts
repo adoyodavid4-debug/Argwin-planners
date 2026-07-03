@@ -192,6 +192,60 @@ export interface NotebookCollaborator {
   profiles?: Pick<Profile, 'id' | 'email' | 'full_name' | 'avatar_url'>
 }
 
+export type NavLocation = 'header' | 'footer_shop' | 'footer_company' | 'footer_support'
+
+export interface Testimonial {
+  id: string
+  name: string
+  role: string | null
+  quote: string
+  rating: number
+  product_label: string | null
+  gradient: string | null
+  is_featured: boolean
+  is_active: boolean
+  sort_order: number
+  created_at: string
+  updated_at: string
+}
+
+export interface NavLink {
+  id: string
+  label: string
+  href: string
+  location: NavLocation
+  parent_id: string | null
+  sort_order: number
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface SiteSetting {
+  key: string
+  value: unknown
+  updated_at?: string
+}
+
+export interface PlannerTemplate {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  template_key: string
+  accent_hex: string | null
+  price: number
+  compare_price: number | null
+  category_slug: string
+  page_count: number | null
+  is_active: boolean
+  sort_order: number
+  last_generated_at: string | null
+  product_id: string | null
+  created_at: string
+  updated_at: string
+}
+
 export interface NotebookActivityLog {
   id: string
   notebook_id: string
@@ -216,6 +270,10 @@ export interface Database {
       coupons:                { Row: Coupon;     Insert: Partial<Coupon>;     Update: Partial<Coupon>     } & R
       blog_posts:             { Row: BlogPost;   Insert: Partial<BlogPost>;   Update: Partial<BlogPost>   } & R
       newsletter_subscribers: { Row: { id: string; email: string; locale: string; source: string | null; is_active: boolean; created_at: string }; Insert: { email: string; locale?: string; source?: string }; Update: { email?: string; locale?: string; source?: string; is_active?: boolean } } & R
+      testimonials:           { Row: Testimonial;      Insert: Partial<Testimonial>;      Update: Partial<Testimonial>      } & R
+      nav_links:              { Row: NavLink;          Insert: Partial<NavLink>;          Update: Partial<NavLink>          } & R
+      site_settings:          { Row: SiteSetting;      Insert: Partial<SiteSetting>;      Update: Partial<SiteSetting>      } & R
+      planner_templates:      { Row: PlannerTemplate;  Insert: Partial<PlannerTemplate>;  Update: Partial<PlannerTemplate>  } & R
       notebooks:              { Row: Notebook;             Insert: Partial<Notebook>;             Update: Partial<Notebook>             } & R
       notebook_collaborators: { Row: NotebookCollaborator; Insert: Partial<NotebookCollaborator>; Update: Partial<NotebookCollaborator> } & R
       notebook_activity_log:  { Row: NotebookActivityLog;  Insert: Partial<NotebookActivityLog>;  Update: Partial<NotebookActivityLog>  } & R

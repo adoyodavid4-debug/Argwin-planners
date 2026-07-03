@@ -11,6 +11,8 @@ export interface BlogPost {
   readMins:    number
   publishedAt: string
   viewCount:   number
+  /** Markdown body — present for DB-managed posts, absent for static ones. */
+  body?:       string | null
 }
 
 export const STATIC_POSTS: BlogPost[] = [

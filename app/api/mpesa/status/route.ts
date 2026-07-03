@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { queryStkStatus } from '@/lib/mpesa'
 import { createServiceRoleClient } from '@/lib/supabase/server'
+import { fulfilDigitalOrder } from '@/lib/orders'
 
 // GET /api/mpesa/status?checkoutRequestId=xxx&orderId=xxx
 export async function GET(req: NextRequest) {
@@ -17,11 +18,16 @@ export async function GET(req: NextRequest) {
     const supabase = createServiceRoleClient()
     const { data: order } = await supabase
       .from('orders')
-      .select('status, metadata')
+      .select('status, metadata, download_tokens')
       .eq('id', orderId)
       .single()
 
     if (order?.status === 'completed') {
+      // Safety net — if the callback marked it completed but fulfilment
+      // failed, retry here (idempotent: won't regenerate tokens or resend)
+      if (!order.download_tokens || !order.metadata?.order_confirmation_sent) {
+        try { await fulfilDigitalOrder(supabase, orderId) } catch (err) { console.error('[mpesa/status] fulfilment failed:', err) }
+      }
       return NextResponse.json({
         status:        'completed',
         receipt:       order.metadata?.mpesa_receipt,
@@ -49,6 +55,9 @@ export async function GET(req: NextRequest) {
         .update({ status: 'completed' })
         .eq('id', orderId)
         .eq('status', 'pending')
+
+      // Download tokens + confirmation email (idempotent)
+      try { await fulfilDigitalOrder(supabase, orderId) } catch (err) { console.error('[mpesa/status] fulfilment failed:', err) }
 
       return NextResponse.json({ status: 'completed', receipt: result.MpesaReceiptNumber ?? '' })
     }

@@ -166,6 +166,87 @@ const templates: Record<string, (locale: Locale, data: Record<string, unknown>) 
       <p style="font-size:13px;color:#888;text-align:center">Expires in ${expiry}.</p>
     `)
   },
+  // Transactional order receipt / invoice — no unsubscribe footer (purchase receipt, not marketing)
+  'order.confirmation': (locale, data) => {
+    const invoiceNumber = String(data.invoice_number ?? '')
+    const orderDate     = String(data.order_date ?? '')
+    const currency      = String(data.currency ?? 'USD').toUpperCase()
+    const total         = Number(data.total ?? 0)
+    const paymentMethod = String(data.payment_method ?? 'Card')
+    const supportEmail  = String(data.support_email ?? 'hello@arwignplanners.com')
+    const items         = (data.items ?? []) as { title: string; price: number; quantity: number }[]
+    const downloads     = (data.downloads ?? []) as { title: string; url: string }[]
+
+    const money = (n: number) =>
+      new Intl.NumberFormat('en-GB', { style: 'currency', currency }).format(n)
+
+    const itemRows = items.map((i) => `
+      <tr>
+        <td style="padding:12px 0;border-bottom:1px solid #E8E4DB;color:#1A1820;font-size:14px">${i.title}${i.quantity > 1 ? ` <span style="color:#888">× ${i.quantity}</span>` : ''}</td>
+        <td style="padding:12px 0;border-bottom:1px solid #E8E4DB;color:#1A1820;font-size:14px;text-align:right;white-space:nowrap">${money(i.price * i.quantity)}</td>
+      </tr>`).join('')
+
+    const downloadRows = downloads.map((d) => `
+      <tr>
+        <td style="padding:10px 0">
+          <span style="color:#1A1820;font-size:14px">${d.title}</span>
+        </td>
+        <td style="padding:10px 0;text-align:right">
+          <a href="${d.url}" style="background:#C9A84C;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600;font-size:13px;display:inline-block;white-space:nowrap">Download ↓</a>
+        </td>
+      </tr>`).join('')
+
+    const subject = `Your Arwign Planners order ${invoiceNumber} — receipt & downloads`
+    const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#FAF8F4;color:#1A1820;margin:0;padding:0}a{color:#C9A84C}.container{max-width:560px;margin:40px auto;background:#fff;border-radius:12px;padding:40px;border:1px solid #E8E4DB}</style></head><body><div class="container">
+      <p style="font-size:20px;font-weight:700;letter-spacing:2px;color:#C9A84C;margin:0 0 4px">ARWIGN PLANNERS</p>
+      <h2 style="color:#1A1820;margin:0 0 24px">Thank you for your order 💛</h2>
+      <p style="margin:0 0 24px">Your payment has been received and your planners are ready to download below.</p>
+
+      <table role="presentation" width="100%" style="border-collapse:collapse;background:#FAF8F4;border:1px solid #E8E4DB;border-radius:8px;margin-bottom:24px">
+        <tr>
+          <td style="padding:16px 20px;font-size:13px;color:#888">Invoice number<br><strong style="color:#1A1820;font-size:14px">${invoiceNumber}</strong></td>
+          <td style="padding:16px 20px;font-size:13px;color:#888">Order date<br><strong style="color:#1A1820;font-size:14px">${orderDate}</strong></td>
+          <td style="padding:16px 20px;font-size:13px;color:#888">Paid with<br><strong style="color:#1A1820;font-size:14px">${paymentMethod}</strong></td>
+        </tr>
+      </table>
+
+      <table role="presentation" width="100%" style="border-collapse:collapse;margin-bottom:8px">
+        ${itemRows}
+        <tr>
+          <td style="padding:14px 0;font-weight:700;color:#1A1820;font-size:15px">Total</td>
+          <td style="padding:14px 0;font-weight:700;color:#C9A84C;font-size:15px;text-align:right">${money(total)}</td>
+        </tr>
+      </table>
+
+      ${downloads.length ? `
+      <h3 style="color:#1A1820;margin:24px 0 8px">Your downloads</h3>
+      <table role="presentation" width="100%" style="border-collapse:collapse">
+        ${downloadRows}
+      </table>
+      <p style="font-size:13px;color:#888;margin-top:16px">Download links are personal to you and expire in 12 months. Please save your files somewhere safe.</p>
+      ` : ''}
+
+      <p style="margin-top:32px">Need a hand? Just reply to this email or write to <a href="mailto:${supportEmail}">${supportEmail}</a> — we're happy to help.</p>
+      <p style="margin:24px 0 0">Happy planning!<br>— The Arwign Planners Team</p>
+    </div></body></html>`
+
+    const text = [
+      `Thank you for your order — Arwign Planners`,
+      `Invoice: ${invoiceNumber}`,
+      `Date: ${orderDate}`,
+      `Paid with: ${paymentMethod}`,
+      '',
+      ...items.map((i) => `${i.title}${i.quantity > 1 ? ` x${i.quantity}` : ''} — ${money(i.price * i.quantity)}`),
+      `Total: ${money(total)}`,
+      '',
+      ...(downloads.length ? ['Your downloads (links expire in 12 months):', ...downloads.map((d) => `${d.title}: ${d.url}`)] : []),
+      '',
+      `Support: ${supportEmail}`,
+    ].join('\n')
+
+    return { subject, html, text }
+  },
+
   // Internal admin notification — no unsubscribe footer (not a subscriber-facing email)
   'notebook_request.admin': (locale, data) => {
     const subject = `New personalized notebook idea from ${data.name}`

@@ -4,7 +4,22 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Tablet, Printer, Wallet, BookOpen, HeartPulse, Briefcase, CheckCircle, Utensils, Brain, Target, PiggyBank, LayoutTemplate, Package } from 'lucide-react'
 
-const categories = [
+// Shape passed in from the DB via the server wrapper (CategoryGridServer).
+export interface CategoryInput {
+  name: string
+  slug: string
+  icon: string | null
+}
+
+interface CategoryItem {
+  name: string
+  slug: string
+  icon: React.ElementType
+  color: string
+  accent: string
+}
+
+const categories: CategoryItem[] = [
   { name: 'Digital Planners',   slug: 'digital-planners',   icon: Tablet,         color: 'rgba(205,199,190,0.15)', accent: '#7B6FAE' },
   { name: 'Printable Planners', slug: 'printable-planners', icon: Printer,        color: 'rgba(232,197,192,0.15)', accent: '#C9847C' },
   { name: 'Budget Planners',    slug: 'budget-planners',    icon: Wallet,         color: 'rgba(201,168,76,0.15)',  accent: '#C9A84C' },
@@ -20,7 +35,32 @@ const categories = [
   { name: 'Planner Bundles',    slug: 'planner-bundles',    icon: Package,        color: 'rgba(205,199,190,0.2)',  accent: '#7B6FAE' },
 ]
 
-export default function CategoryGrid() {
+// Map lucide icon names (stored in the DB `icon` column) to components.
+const ICON_MAP: Record<string, React.ElementType> = {
+  Tablet, Printer, Wallet, BookOpen, HeartPulse, Briefcase, CheckCircle,
+  Utensils, Brain, Target, PiggyBank, LayoutTemplate, Package,
+}
+
+// Palette cycled for DB categories that aren't in the hardcoded list.
+const PALETTE = categories.map(({ color, accent }) => ({ color, accent }))
+
+export default function CategoryGrid({ dbCategories }: { dbCategories?: CategoryInput[] } = {}) {
+  // DB categories win; hardcoded list is the fallback so the grid never breaks.
+  const items: CategoryItem[] =
+    dbCategories && dbCategories.length > 0
+      ? dbCategories.map((c, i) => {
+          const known = categories.find((k) => k.slug === c.slug)
+          const palette = known ?? PALETTE[i % PALETTE.length]
+          return {
+            name:   c.name,
+            slug:   c.slug,
+            icon:   (c.icon && ICON_MAP[c.icon]) || known?.icon || Package,
+            color:  palette.color,
+            accent: palette.accent,
+          }
+        })
+      : categories
+
   return (
     <section className="section w-full" aria-labelledby="categories-heading">
       <div className="container-site">
@@ -38,7 +78,7 @@ export default function CategoryGrid() {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {categories.map((cat, i) => (
+          {items.map((cat, i) => (
             <motion.div
               key={cat.slug}
               initial={{ opacity: 0, y: 20 }}

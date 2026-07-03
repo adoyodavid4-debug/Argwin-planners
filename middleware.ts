@@ -16,12 +16,13 @@ export async function middleware(req: NextRequest) {
   // a transient Supabase/cold-start/env hiccup degrades to "no session"
   // rather than taking the whole app down.
   let session = null
+  let supabase: ReturnType<typeof createServerClient> | null = null
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
     if (supabaseUrl && supabaseAnonKey) {
-      const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+      supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
         cookies: {
           get: (name) => req.cookies.get(name)?.value,
           set: (name, value, opts) => {
@@ -42,8 +43,34 @@ export async function middleware(req: NextRequest) {
   }
 
   // ── Admin protection ──────────────────────────────────────
-  // TODO: restore when /auth/login page is built
-  // if (ADMIN_ROUTES.some((r) => pathname.startsWith(r))) { ... }
+  // Both /admin pages and /api/admin routes require a signed-in user whose
+  // profile role is admin or super_admin. The role is read with the user's
+  // own session client (RLS lets users read their own profile row).
+  const isAdminPage = ADMIN_ROUTES.some((r) => pathname.startsWith(r))
+  const isAdminApi  = pathname.startsWith('/api/admin')
+
+  if (isAdminPage || isAdminApi) {
+    const deny = () =>
+      isAdminApi
+        ? NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        : NextResponse.redirect(new URL(`/auth/login?redirect=${encodeURIComponent(pathname)}`, req.url))
+
+    if (!session || !supabase) return deny()
+
+    let role: string | null = null
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single()
+      role = (profile as { role?: string } | null)?.role ?? null
+    } catch (err) {
+      console.error('[middleware] admin role check failed:', err)
+    }
+
+    if (role !== 'admin' && role !== 'super_admin') return deny()
+  }
 
   // ── Customer auth protection ──────────────────────────────
   if (AUTH_ROUTES.some((r) => pathname.startsWith(r))) {

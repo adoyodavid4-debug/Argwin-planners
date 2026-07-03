@@ -251,7 +251,16 @@ export function FeaturedProducts({ products, title, showAll }: FeaturedProductsP
 
 // ─────────────────────────────────────────────────────────────
 
-const blogPosts = [
+export interface BlogPreviewPost {
+  slug:     string
+  title:    string
+  excerpt:  string
+  category: string
+  readTime: number
+  image:    string
+}
+
+const blogPosts: BlogPreviewPost[] = [
   {
     slug:    'best-digital-planners-for-productivity',
     title:   'Best Digital Planners for Productivity in 2025',
@@ -278,7 +287,9 @@ const blogPosts = [
   },
 ]
 
-export function BlogPreview() {
+export function BlogPreview({ posts }: { posts?: BlogPreviewPost[] }) {
+  // DB-provided posts win; fall back to the hardcoded set when absent/empty.
+  const items = posts && posts.length > 0 ? posts : blogPosts
   return (
     <section className="section w-full border-t" style={{ borderColor: 'var(--border)' }} aria-labelledby="blog-preview-heading">
       <div className="container-site">
@@ -293,7 +304,7 @@ export function BlogPreview() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {blogPosts.map((post, i) => (
+          {items.map((post, i) => (
             <motion.article
               key={post.slug}
               initial={{ opacity: 0, y: 24 }}

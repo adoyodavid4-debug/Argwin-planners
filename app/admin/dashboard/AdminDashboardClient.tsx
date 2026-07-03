@@ -1,9 +1,8 @@
 'use client'
-import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
-import { DollarSign, ShoppingBag, Package, Users, TrendingUp, Plus, Settings, FileText, Printer, BookOpen, Mail, Magnet, NotebookPen, Lightbulb } from 'lucide-react'
+import { DollarSign, ShoppingBag, Package, Users, Plus } from 'lucide-react'
 
 interface Stats {
   totalOrders:      number
@@ -15,21 +14,8 @@ interface Stats {
   topProducts:      any[]
 }
 
-const adminNav = [
-  { label: 'Dashboard',       href: '/admin/dashboard',      icon: TrendingUp },
-  { label: 'Products',        href: '/admin/products',        icon: Package },
-  { label: 'Orders',          href: '/admin/orders',          icon: ShoppingBag },
-  { label: 'Print Products',  href: '/admin/print-products',  icon: Printer },
-  { label: 'Fulfillment',     href: '/admin/fulfillment',     icon: BookOpen },
-  { label: 'Lead Magnets',    href: '/admin/lead-magnets',    icon: Magnet },
-  { label: 'Subscribers',     href: '/admin/subscribers',     icon: Users },
-  { label: 'Sequences',       href: '/admin/sequences',       icon: Mail },
-  { label: 'Funnel Metrics',  href: '/admin/funnel',          icon: TrendingUp },
-  { label: 'Notebooks',        href: '/admin/notebooks',       icon: NotebookPen },
-  { label: 'Notebook Requests', href: '/admin/notebook-requests', icon: Lightbulb },
-  { label: 'Blog',            href: '/admin/blog',            icon: FileText },
-  { label: 'Settings',        href: '/admin/settings',        icon: Settings },
-]
+// The admin sidebar nav now lives in app/admin/AdminSidebar.tsx, rendered by
+// the shared app/admin/layout.tsx for every admin page.
 
 // Mock chart data — in production pull from analytics_events
 const chartData = [
@@ -48,49 +34,9 @@ export default function AdminDashboardClient({ stats }: { stats: Stats }) {
   ]
 
   return (
-    <div className="min-h-screen flex" style={{ background: 'var(--bg-secondary)' }}>
-      {/* Sidebar */}
-      <aside
-        className="w-64 hidden lg:flex flex-col border-r sticky top-0 h-screen"
-        style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
-      >
-        <div className="p-6 border-b" style={{ borderColor: 'var(--border)' }}>
-          <Link href="/" className="flex items-center gap-3">
-            <Image
-              src="/logo.png"
-              alt="Arwign Planners"
-              width={40}
-              height={40}
-              className="w-10 h-10 object-contain rounded-lg"
-            />
-            <div>
-              <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>Arwign Planners</p>
-              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Admin Panel</p>
-            </div>
-          </Link>
-        </div>
-        <nav className="flex-1 p-4 space-y-1">
-          {adminNav.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all hover:bg-black/5 dark:hover:bg-white/5"
-              style={{ color: 'var(--text-secondary)' }}
-            >
-              <item.icon size={16} />
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-        <div className="p-4 border-t" style={{ borderColor: 'var(--border)' }}>
-          <Link href="/admin/products/new" className="btn-primary w-full justify-center text-xs">
-            <Plus size={14} /> Add Product
-          </Link>
-        </div>
-      </aside>
-
+    <div className="min-h-screen" style={{ background: 'var(--bg-secondary)' }}>
       {/* Main */}
-      <main className="flex-1 p-8 overflow-auto">
+      <main className="p-8 overflow-auto">
         <div className="max-w-5xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <div>

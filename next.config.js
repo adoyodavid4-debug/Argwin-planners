@@ -40,8 +40,8 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: blob: https://*.supabase.co https://images.unsplash.com https://www.googletagmanager.com",
-              "connect-src 'self' https://*.supabase.co https://api.stripe.com https://www.google-analytics.com",
-              "frame-src https://js.stripe.com https://www.paypal.com",
+              "connect-src 'self' https://*.supabase.co https://api.stripe.com https://www.google-analytics.com https://www.paypal.com https://www.sandbox.paypal.com",
+              "frame-src https://js.stripe.com https://www.paypal.com https://www.sandbox.paypal.com",
               "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self'",
@@ -66,6 +66,10 @@ const nextConfig = {
       // Clean URL → site layout segment
       { source: '/shop',            destination: '/site/shop',            permanent: false },
       { source: '/shop/:path*',     destination: '/site/shop/:path*',     permanent: false },
+
+      // Checkout flow
+      { source: '/checkout',        destination: '/site/checkout',        permanent: false },
+      { source: '/checkout/:path*', destination: '/site/checkout/:path*', permanent: false },
 
       // Site pages
       { source: '/best-sellers',    destination: '/site/best-sellers',    permanent: false },

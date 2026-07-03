@@ -9,6 +9,7 @@ import {
   List, ArrowUpRight, Twitter, Facebook, Linkedin, Link as LinkIcon,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
+import Markdown from '@/components/blog/Markdown'
 import type { BlogPost } from '../blog-data'
 
 const slugifyHeading = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
@@ -334,6 +335,11 @@ function HabitLoopArticle() {
       </Section>
     </>
   )
+}
+
+// Markdown body for DB-managed posts (edited from the admin CMS)
+function MarkdownArticle({ post }: { post: BlogPost }) {
+  return <Markdown content={post.body ?? ''} />
 }
 
 // Generic body for posts without full content yet
@@ -822,7 +828,10 @@ interface Props {
 }
 
 export default function BlogPostClient({ post, related }: Props) {
-  const ArticleBody = CONTENT[post.slug] ?? ComingSoonBody
+  // Priority: markdown body from the CMS → hand-crafted article component → coming-soon stub
+  const ArticleBody = post.body?.trim()
+    ? MarkdownArticle
+    : (CONTENT[post.slug] ?? ComingSoonBody)
   const sp = SIDEBAR_PRODUCTS[post.slug] ?? DEFAULT_PRODUCT
   const reduce = !!useReducedMotion()
   const articleRef = useRef<HTMLDivElement>(null)

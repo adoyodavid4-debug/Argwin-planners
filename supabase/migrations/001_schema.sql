@@ -102,7 +102,9 @@ CREATE TABLE products (
 
 -- Full text search index on products
 CREATE INDEX products_fts ON products
-  USING GIN (to_tsvector('english', coalesce(title,'') || ' ' || coalesce(description,'') || ' ' || array_to_string(tags,',')));
+  USING GIN (to_tsvector('english', coalesce(title,'') || ' ' || coalesce(description,'')));
+-- Tags get their own array index (array_to_string is not allowed in index expressions)
+CREATE INDEX products_tags_idx ON products USING GIN (tags);
 
 -- ─── PRODUCT FAQs ────────────────────────────────────────────
 CREATE TABLE product_faqs (

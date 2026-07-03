@@ -1,48 +1,164 @@
 'use client'
-import { useRef } from 'react'
 import Link from 'next/link'
-import { motion, useScroll, useTransform, useSpring, useReducedMotion } from 'framer-motion'
+import Image from 'next/image'
+import { motion, useReducedMotion } from 'framer-motion'
 import { ArrowRight, Sparkles, Check, Star, Shield, Zap } from 'lucide-react'
 
-// Stylised CSS planner cover (no image → fast LCP, no broken assets)
-function Cover({ hex, spine, ink, label }: { hex: string; spine: string; ink: string; label: string }) {
+export interface HeroProduct {
+  id: string
+  title: string
+  slug: string
+  price: number
+  currency: string | null
+  thumbnail: string | null
+  rating_avg: number | null
+  rating_count: number | null
+}
+
+const fmt = (n: number, c?: string | null) =>
+  new Intl.NumberFormat('en-GB', { style: 'currency', currency: c ?? 'USD' }).format(n)
+
+function BadgePill({ variant }: { variant: 'best' | 'new' }) {
+  const isBest = variant === 'best'
   return (
-    <div className="rounded-[10px_18px_18px_10px] overflow-hidden" style={{ width: 190, aspectRatio: '3/4', background: `linear-gradient(135deg, ${hex} 0%, ${spine} 100%)`, boxShadow: '0 30px 60px rgba(44,42,53,0.28)', border: '3px solid var(--bg-card)' }}>
-      <div className="relative h-full">
-        <div className="absolute left-0 top-0 bottom-0" style={{ width: 14, background: spine, boxShadow: 'inset -5px 0 10px rgba(0,0,0,0.22)' }} />
-        <div className="absolute rounded-[6px]" style={{ inset: '16px 16px 16px 26px', border: `1.5px solid ${ink}33` }} />
-        <div className="absolute left-1 right-0 text-center" style={{ top: '38%' }}>
-          <div className="mx-auto mb-2 flex items-center justify-center rounded-full" style={{ width: 40, height: 40, border: `1.5px solid ${ink}66` }}><Sparkles size={18} style={{ color: ink }} /></div>
-          <p style={{ fontFamily: 'var(--font-cormorant)', fontSize: 20, color: ink, fontWeight: 600, lineHeight: 1 }}>Arwign</p>
-          <p style={{ fontSize: 8, letterSpacing: '0.25em', textTransform: 'uppercase', color: ink, opacity: 0.85, marginTop: 5 }}>{label}</p>
-        </div>
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(115deg, rgba(255,255,255,0.22) 0%, transparent 42%)' }} />
-      </div>
+    <span
+      className="absolute left-3 top-3 z-10 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em]"
+      style={
+        isBest
+          ? { background: '#254A38', color: '#F7F2E8' }
+          : { background: '#C79A3E', color: '#2C2A35' }
+      }
+    >
+      {isBest ? <Star size={10} style={{ fill: 'currentColor' }} /> : <Sparkles size={10} />}
+      {isBest ? 'Best Seller' : 'New Arrival'}
+    </span>
+  )
+}
+
+function FallbackCover({ label }: { label: string }) {
+  return (
+    <div className="flex h-full w-full flex-col items-center justify-center" style={{ background: '#F7F2E8' }}>
+      <span
+        className="mb-2 flex items-center justify-center rounded-full"
+        style={{ width: 44, height: 44, border: '1.5px solid #9E7A2A' }}
+      >
+        <Sparkles size={18} style={{ color: '#9E7A2A' }} />
+      </span>
+      <p style={{ fontFamily: 'var(--font-cormorant)', fontSize: 22, color: '#2C2A35', fontWeight: 600 }}>Arwign</p>
+      <p className="mt-1 text-[9px] uppercase" style={{ letterSpacing: '0.25em', color: '#9E7A2A' }}>{label}</p>
     </div>
   )
 }
 
-export default function HomeHero() {
+function ShowcaseCard({
+  product,
+  variant,
+  index,
+}: {
+  product: HeroProduct | null
+  variant: 'best' | 'new'
+  index: number
+}) {
   const reduce = useReducedMotion()
-  const ref = useRef<HTMLElement>(null)
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
-  const yRaw = useTransform(scrollYProgress, [0, 1], [0, -80])
-  const y = useSpring(yRaw, { stiffness: 60, damping: 20 })
+  const isBest = variant === 'best'
+  const collectionHref = isBest ? '/best-sellers' : '/new-arrivals'
+  const collectionLabel = isBest ? 'View all best sellers' : 'View all new arrivals'
+  const cardHref = product ? `/shop/${product.slug}` : collectionHref
+  const alt = product
+    ? `${product.title} — ${isBest ? 'Best Seller' : 'New Arrival'} digital planner cover`
+    : `Arwign ${isBest ? 'best sellers' : 'new arrivals'} collection`
 
   return (
-    <section ref={ref} className="relative overflow-hidden" style={{ background: 'var(--bg-neutral)', borderBottom: '1px solid var(--border)' }}>
+    <motion.div
+      initial={reduce ? false : { opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.1 * index, ease: 'easeOut' }}
+      className={`group w-full max-w-[240px] ${index === 0 ? 'lg:-translate-y-6' : 'lg:translate-y-6'}`}
+    >
+      <Link
+        href={cardHref}
+        className="block rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C79A3E] motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out motion-safe:group-hover:-translate-y-1"
+      >
+        <span className="relative block aspect-[3/4] overflow-hidden rounded-2xl shadow-[0_20px_50px_-20px_rgba(37,42,32,0.25)] motion-safe:transition-shadow motion-safe:duration-300 group-hover:shadow-[0_26px_56px_-18px_rgba(37,42,32,0.35)]">
+          <BadgePill variant={variant} />
+          {product?.thumbnail ? (
+            <Image
+              src={product.thumbnail}
+              alt={alt}
+              fill
+              sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 220px"
+              className="object-cover motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out motion-safe:group-hover:scale-[1.03]"
+              priority={index === 0}
+            />
+          ) : (
+            <FallbackCover label={isBest ? 'Best Seller' : 'New Arrival'} />
+          )}
+        </span>
+        {product && (
+          <span className="mt-3 block px-0.5">
+            <span
+              className="line-clamp-2 block text-[0.98rem] leading-snug"
+              style={{ fontFamily: 'var(--font-cormorant)', fontWeight: 600, color: 'var(--text-primary)' }}
+            >
+              {product.title}
+            </span>
+            <span className="mt-1 flex items-center gap-2 text-sm">
+              <span className="font-medium" style={{ color: 'var(--text-primary)' }}>
+                {fmt(product.price, product.currency)}
+              </span>
+              <span className="inline-flex items-center gap-1 text-xs" style={{ color: 'var(--text-muted)' }}>
+                <Star size={11} style={{ fill: 'var(--gold)', stroke: 'var(--gold)' }} />
+                {(product.rating_avg ?? 4.9).toFixed(1)}
+                {product.rating_count ? ` · ${product.rating_count}` : ''}
+              </span>
+            </span>
+          </span>
+        )}
+      </Link>
+      <Link
+        href={collectionHref}
+        className="mt-2 inline-block px-0.5 text-xs font-medium hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C79A3E]"
+        style={{ color: '#9E7A2A' }}
+      >
+        {collectionLabel} →
+      </Link>
+    </motion.div>
+  )
+}
 
-      <div className="container-site relative grid lg:grid-cols-2 gap-10 lg:gap-8 items-center" style={{ minHeight: 'min(88vh, 760px)', paddingTop: '3.5rem', paddingBottom: '3.5rem' }}>
+export default function HomeHero({
+  bestSeller = null,
+  newArrival = null,
+  eyebrow = 'Premium digital & printable planners',
+  headline = 'Plan your best life,',
+  headlineAccent = 'beautifully.',
+  subcopy = 'Hyperlinked planners & notebooks designed to make organising a joy — instant download, ready for GoodNotes, Notability or print.',
+}: {
+  bestSeller?: HeroProduct | null
+  newArrival?: HeroProduct | null
+  eyebrow?: string
+  headline?: string
+  headlineAccent?: string
+  subcopy?: string
+}) {
+  const reduce = useReducedMotion()
+
+  return (
+    <section
+      className="relative overflow-hidden bg-[#F7F4EE] dark:bg-[var(--bg-neutral)]"
+      style={{ borderBottom: '1px solid var(--border)' }}
+    >
+      <div className="container-site relative grid items-center gap-12 py-20 lg:grid-cols-2 lg:gap-8 lg:py-28">
         {/* Copy */}
         <motion.div initial={reduce ? false : { opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
           <p className="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-semibold mb-5 px-3 py-1.5 rounded-full" style={{ color: 'var(--gold-dark)', background: 'rgba(var(--gold-rgb),0.14)', letterSpacing: '0.14em' }}>
-            <Sparkles size={12} /> Premium digital & printable planners
+            <Sparkles size={12} /> {eyebrow}
           </p>
           <h1 className="font-display mb-5" style={{ fontSize: 'clamp(2.6rem, 6vw, 4.4rem)', lineHeight: 1.02, color: 'var(--text-primary)' }}>
-            Plan your best life,<br /><span style={{ color: 'var(--gold)' }}>beautifully.</span>
+            {headline}<br /><span style={{ color: 'var(--gold)' }}>{headlineAccent}</span>
           </h1>
           <p className="leading-relaxed max-w-md mb-8" style={{ color: 'var(--text-secondary)', fontSize: '1.12rem' }}>
-            Hyperlinked planners & notebooks designed to make organising a joy — instant download, ready for GoodNotes, Notability or print.
+            {subcopy}
           </p>
           <div className="flex flex-wrap items-center gap-3 mb-9">
             <Link href="/shop" className="btn-primary">Shop the collection <ArrowRight size={16} /></Link>
@@ -67,19 +183,10 @@ export default function HomeHero() {
           </div>
         </motion.div>
 
-        {/* Floating covers */}
-        <div className="relative h-[360px] sm:h-[440px] lg:h-[520px] hidden sm:block">
-          <motion.div className="absolute inset-0 flex items-center justify-center" style={reduce ? undefined : { y }}>
-            <motion.div className="absolute" style={{ transform: 'translateX(-38%) rotate(-9deg)', zIndex: 1 }} animate={reduce ? undefined : { y: [0, -14, 0] }} transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}>
-              <div style={{ transform: 'scale(0.86)' }}><Cover hex="#A8B5A0" spine="#83AE73" ink="#33502C" label="Wellness" /></div>
-            </motion.div>
-            <motion.div className="absolute" style={{ transform: 'translateX(38%) rotate(9deg)', zIndex: 1 }} animate={reduce ? undefined : { y: [0, 16, 0] }} transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 0.6 }}>
-              <div style={{ transform: 'scale(0.86)' }}><Cover hex="#F2C6A6" spine="#E3AC85" ink="#7E4A30" label="Budget" /></div>
-            </motion.div>
-            <motion.div className="absolute" style={{ zIndex: 3 }} animate={reduce ? undefined : { y: [0, -10, 0] }} transition={{ duration: 6.5, repeat: Infinity, ease: 'easeInOut', delay: 0.3 }}>
-              <Cover hex="#C9A84C" spine="#C28E1C" ink="#6B4E10" label="Daily Planner" />
-            </motion.div>
-          </motion.div>
+        {/* Two-Card Showcase */}
+        <div className="flex items-center justify-center gap-4 sm:gap-6 lg:justify-end lg:pr-2">
+          <ShowcaseCard product={bestSeller} variant="best" index={0} />
+          <ShowcaseCard product={newArrival} variant="new" index={1} />
         </div>
       </div>
     </section>

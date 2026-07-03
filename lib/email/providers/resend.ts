@@ -22,7 +22,7 @@ export class ResendProvider implements EmailProvider {
     idempotencyKey: string
   }) {
     const { subject, html } = resolveTemplate(input.templateKey, input.locale, input.data)
-    const from = process.env.EMAIL_FROM ?? 'Arwign Planners <hello@arwignplanners.com>'
+    const from = process.env.EMAIL_FROM ?? process.env.FROM_EMAIL ?? 'Arwign Planners <hello@arwignplanners.com>'
 
     const { data, error } = await this.client.emails.send({
       from,

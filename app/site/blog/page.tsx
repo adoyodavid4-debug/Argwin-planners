@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { createServiceRoleClient } from '@/lib/supabase/server'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { type BlogPost, STATIC_POSTS } from './blog-data'
 import BlogClient from './BlogClient'
 
@@ -19,7 +19,7 @@ export default async function BlogPage({
 }: {
   searchParams: { category?: string; q?: string; page?: string }
 }) {
-  const supabase = createServiceRoleClient()
+  const supabase = createServerSupabaseClient()
 
   // Try to fetch published posts from DB; fall back to static content
   const { data: dbPosts } = await supabase

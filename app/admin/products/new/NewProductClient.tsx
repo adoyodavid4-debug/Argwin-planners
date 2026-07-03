@@ -11,7 +11,8 @@ import {
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
-const CATEGORIES = [
+// Fallback list used only when the categories table is empty/unreachable.
+const FALLBACK_CATEGORIES = [
   { slug: 'digital-planners',   name: 'Digital Planners',     icon: Tablet },
   { slug: 'printable-planners', name: 'Printable Planners',   icon: Printer },
   { slug: 'budget-planners',    name: 'Budget Planners',       icon: Wallet },
@@ -27,6 +28,13 @@ const CATEGORIES = [
   { slug: 'planner-bundles',    name: 'Planner Bundles',       icon: Package },
   { slug: 'digital-notebooks',  name: 'Digital Notebooks',     icon: BookOpen },
 ]
+
+// Known slug → icon mapping so DB categories keep their familiar icons.
+const CATEGORY_ICONS: Record<string, React.ElementType> = Object.fromEntries(
+  FALLBACK_CATEGORIES.map((c) => [c.slug, c.icon])
+)
+
+export interface DbCategory { id: string; name: string; slug: string; icon: string | null }
 
 const DELIVERY_TYPES = [
   { value: 'digital',   label: 'Digital Download' },
@@ -142,9 +150,14 @@ function PlannerFileSlot({
   )
 }
 
-export default function NewProductClient() {
+export default function NewProductClient({ dbCategories = [] }: { dbCategories?: DbCategory[] }) {
   const router = useRouter()
   const imageInputRef = useRef<HTMLInputElement>(null)
+
+  // Categories come from the database; fall back to the hardcoded list if empty.
+  const CATEGORIES = dbCategories.length > 0
+    ? dbCategories.map((c) => ({ slug: c.slug, name: c.name, icon: CATEGORY_ICONS[c.slug] ?? Package }))
+    : FALLBACK_CATEGORIES
 
   // ── form state ────────────────────────────────────────────────────────────
   const [title,         setTitle]         = useState('')

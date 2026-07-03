@@ -15,7 +15,7 @@ interface Props {
   items:     CartItem[]
   total:     number
   onClose:   () => void
-  onSuccess: () => void
+  onSuccess: (orderId?: string) => void
 }
 
 type Phase = 'idle' | 'waiting' | 'success' | 'error'
@@ -106,7 +106,7 @@ export default function MpesaCheckout({ items, total, onClose, onSuccess }: Prop
   }
 
   function handleSuccess() {
-    onSuccess()
+    onSuccess(orderIdRef.current || undefined)
     onClose()
   }
 

@@ -3,6 +3,19 @@ import Image from 'next/image'
 import { Instagram, Youtube, Gift, FileText, Lightbulb, Percent, Rocket, Sparkles } from 'lucide-react'
 import NewsletterForm from '@/components/home/NewsletterForm'
 
+export interface FooterLink { label: string; href: string }
+
+export interface FooterProps {
+  shopLinks?:    FooterLink[]
+  companyLinks?: FooterLink[]
+  supportLinks?: FooterLink[]
+  socialUrls?:   { instagram?: string; youtube?: string; pinterest?: string; tiktok?: string }
+  blurb?:        string
+  storeName?:    string
+}
+
+const DEFAULT_BLURB = 'Premium digital and printable planners designed to help you organize your life, reach your goals, and build the habits that matter most.'
+
 const footerLinks = {
   shop: [
     { label: 'Digital Planners',   href: '/shop/category/digital-planners' },
@@ -55,8 +68,29 @@ const socials = [
   },
 ]
 
-export default function Footer() {
+export default function Footer({
+  shopLinks,
+  companyLinks,
+  supportLinks,
+  socialUrls,
+  blurb,
+  storeName,
+}: FooterProps = {}) {
   const year = new Date().getFullYear()
+
+  // DB-driven content wins; hardcoded arrays are the fallback so the footer
+  // always renders even when props are absent or the tables are empty.
+  const shop    = shopLinks    && shopLinks.length    > 0 ? shopLinks    : footerLinks.shop
+  const company = companyLinks && companyLinks.length > 0 ? companyLinks : footerLinks.company
+  const support = supportLinks && supportLinks.length > 0 ? supportLinks : footerLinks.support
+  const footerBlurb = blurb || DEFAULT_BLURB
+  const brand = storeName || 'Arwign Planners'
+
+  const socialItems = socials.map((s) => {
+    const key = s.label.toLowerCase() as keyof NonNullable<FooterProps['socialUrls']>
+    const override = socialUrls?.[key]
+    return { ...s, href: override || s.href }
+  })
 
   return (
     <footer aria-label="Site footer" style={{ background: 'var(--bg-secondary)', borderTop: '1px solid var(--border)' }}>
@@ -143,11 +177,11 @@ export default function Footer() {
               />
             </Link>
             <p className="text-sm leading-relaxed mb-6 max-w-xs" style={{ color: 'var(--text-secondary)' }}>
-              Premium digital and printable planners designed to help you organize your life, reach your goals, and build the habits that matter most.
+              {footerBlurb}
             </p>
             {/* Socials */}
             <div className="flex items-center gap-3">
-              {socials.map((social) => (
+              {socialItems.map((social) => (
                 <a
                   key={social.label}
                   href={social.href}
@@ -155,7 +189,7 @@ export default function Footer() {
                   rel="noopener noreferrer"
                   className="w-9 h-9 rounded-xl flex items-center justify-center border transition-all duration-200 hover:border-gold hover:text-gold"
                   style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}
-                  aria-label={`Follow Arwign Planners on ${social.label}`}
+                  aria-label={`Follow ${brand} on ${social.label}`}
                 >
                   <social.icon />
                 </a>
@@ -169,7 +203,7 @@ export default function Footer() {
               Shop
             </h3>
             <ul className="space-y-3">
-              {footerLinks.shop.map((link) => (
+              {shop.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
@@ -189,7 +223,7 @@ export default function Footer() {
               Company
             </h3>
             <ul className="space-y-3">
-              {footerLinks.company.map((link) => (
+              {company.map((link) => (
                 <li key={link.href}>
                   <Link href={link.href} className="text-sm transition-colors duration-200 hover:text-gold" style={{ color: 'var(--text-secondary)' }}>
                     {link.label}
@@ -205,7 +239,7 @@ export default function Footer() {
               Support
             </h3>
             <ul className="space-y-3">
-              {footerLinks.support.map((link) => (
+              {support.map((link) => (
                 <li key={link.href}>
                   <Link href={link.href} className="text-sm transition-colors duration-200 hover:text-gold" style={{ color: 'var(--text-secondary)' }}>
                     {link.label}
@@ -221,7 +255,7 @@ export default function Footer() {
       <div className="border-t" style={{ borderColor: 'var(--border)' }}>
         <div className="container-site py-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-            © {year} Arwign Planners. All rights reserved. Premium Digital & Printable Planner & Notebook Shop.
+            © {year} {brand}. All rights reserved. Premium Digital & Printable Planner & Notebook Shop.
           </p>
           <div className="flex items-center gap-6">
             {/* Payment badges */}
