@@ -19,7 +19,7 @@ const DEFAULT_ANNOUNCEMENT = '✦ Free instant download on all digital planners 
 const navLinks: NavItem[] = [
   { label: 'Shop', href: '/shop' },
   {
-    label: 'Categories',
+    label: 'Digital Planners',
     href: '/categories',
     children: [
       { label: 'Digital Planners',   href: '/shop/category/digital-planners' },
@@ -43,6 +43,7 @@ const navLinks: NavItem[] = [
       { label: 'General Notebooks',          href: '/notebooks/general' },
     ],
   },
+  { label: 'Arwign Calendar', href: '/calendar' },
   { label: 'Best Sellers', href: '/best-sellers' },
   { label: 'New Arrivals', href: '/new-arrivals' },
   { label: 'Blog',         href: '/blog' },

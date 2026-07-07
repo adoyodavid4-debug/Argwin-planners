@@ -33,7 +33,7 @@ export const COLOURWAYS: Colourway[] = [
   { id: 'cream',      label: 'Warm Cream', accent: '#EDE4D3' },
   { id: 'peach',      label: 'Soft Peach', accent: '#E8C5C0' },
   { id: 'sage',       label: 'Garden Sage', accent: '#A8B5A0' },
-  { id: 'golden',     label: 'Golden Hour', accent: '#C9A84C' },
+  { id: 'golden',     label: 'Golden Hour', accent: '#A0830E' },
   { id: 'terracotta', label: 'Terracotta', accent: '#C47A5A' },
 ]
 

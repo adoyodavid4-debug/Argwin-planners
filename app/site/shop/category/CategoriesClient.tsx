@@ -6,6 +6,7 @@ import {
   Tablet, Printer, Wallet, BookOpen, HeartPulse, Briefcase, CheckCircle,
   Utensils, Brain, Target, PiggyBank, LayoutTemplate, Package, Notebook,
   Sparkles, Search, ArrowRight, ChevronRight, X, Zap, Shield, Layers, Star,
+  CalendarRange,
 } from 'lucide-react'
 import type { Category } from '@/types/database'
 
@@ -13,20 +14,21 @@ import type { Category } from '@/types/database'
 const CAT_META: Record<string, { icon: React.ElementType; accent: string; blurb: string }> = {
   'digital-planners':   { icon: Tablet,         accent: '#7B6FAE', blurb: 'Hyperlinked, GoodNotes-ready planners for iPad & tablet.' },
   'printable-planners': { icon: Printer,         accent: '#C9847C', blurb: 'Print-at-home pages in A4 & A5, ready to bind.' },
-  'budget-planners':    { icon: Wallet,          accent: '#C9A84C', blurb: 'Track spending, crush debt and grow your savings.' },
+  'budget-planners':    { icon: Wallet,          accent: '#A0830E', blurb: 'Track spending, crush debt and grow your savings.' },
   'student-planners':   { icon: BookOpen,        accent: '#6E7E66', blurb: 'Assignments, exams and study schedules, organised.' },
   'wellness-planners':  { icon: HeartPulse,      accent: '#E8A0A0', blurb: 'Mood, sleep, gratitude and self-care rituals.' },
   'business-planners':  { icon: Briefcase,       accent: '#5A5668', blurb: 'Plan projects, clients and goals like a pro.' },
   'habit-trackers':     { icon: CheckCircle,     accent: '#B8A9D4', blurb: 'Build routines that stick — 21 & 66-day formats.' },
-  'adhd-planners':      { icon: Brain,           accent: '#C9A84C', blurb: 'Low-overwhelm layouts designed for focus.' },
+  'adhd-planners':      { icon: Brain,           accent: '#A0830E', blurb: 'Low-overwhelm layouts designed for focus.' },
   'goal-trackers':      { icon: Target,          accent: '#A8B5A0', blurb: 'Turn big dreams into weekly action.' },
   'meal-planners':      { icon: Utensils,        accent: '#C9847C', blurb: 'Weekly menus, grocery lists and prep sheets.' },
-  'savings-challenges': { icon: PiggyBank,       accent: '#9E7A2A', blurb: 'Fun, visual challenges to save more, faster.' },
+  'savings-challenges': { icon: PiggyBank,       accent: '#77610A', blurb: 'Fun, visual challenges to save more, faster.' },
   'notion-templates':   { icon: LayoutTemplate,  accent: '#3D3A4A', blurb: 'All-in-one digital dashboards for Notion.' },
   'planner-bundles':    { icon: Package,         accent: '#7B6FAE', blurb: 'Complete planning systems at big savings.' },
   'digital-notebooks':  { icon: Notebook,        accent: '#7B6FAE', blurb: 'Beautiful tabbed notebooks for digital note-taking.' },
+  'content-planner':    { icon: CalendarRange,   accent: '#7B6FAE', blurb: 'Content calendars & campaign trackers for creators.' },
 }
-const FALLBACK = { icon: Sparkles, accent: '#C9A84C', blurb: 'Premium planners crafted for productivity.' }
+const FALLBACK = { icon: Sparkles, accent: '#A0830E', blurb: 'Premium planners crafted for productivity.' }
 
 const hexToRgba = (hex: string, a: number) => {
   const h = hex.replace('#', '')
@@ -121,7 +123,7 @@ export default function CategoriesClient({ categories, counts, totalProducts }: 
             </motion.div>
             <motion.div className="absolute" style={{ top: 50, right: '7%', rotateX: 12, rotateY: -22, transformStyle: 'preserve-3d', opacity: 0.9 }}
               animate={{ y: [0, -22, 0] }} transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 0.6 }}>
-              <PlannerMock accent="#C9A84C" icon={Wallet} />
+              <PlannerMock accent="#A0830E" icon={Wallet} />
             </motion.div>
             <motion.div className="absolute" style={{ bottom: 24, right: '20%', rotateX: -10, rotateY: -16, transformStyle: 'preserve-3d', opacity: 0.7, scale: 0.8 }}
               animate={{ y: [0, 16, 0] }} transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut', delay: 1 }}>
@@ -294,7 +296,7 @@ export default function CategoriesClient({ categories, counts, totalProducts }: 
             { icon: Shield, title: 'Secure & Trusted',  body: 'Encrypted checkout with global payment options.' },
           ].map(({ icon: Icon, title, body }) => (
             <div key={title} className="flex flex-col gap-2">
-              <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: 'rgba(201,168,76,0.10)' }}><Icon size={18} style={{ color: 'var(--gold)' }} /></div>
+              <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: 'rgba(160,131,14,0.10)' }}><Icon size={18} style={{ color: 'var(--gold)' }} /></div>
               <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{title}</p>
               <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{body}</p>
             </div>

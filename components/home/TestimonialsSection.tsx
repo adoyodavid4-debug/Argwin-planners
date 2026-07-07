@@ -36,12 +36,12 @@ const FEATURED: Testimonial = {
 }
 
 const TESTIMONIALS: Testimonial[] = [
-  { name: 'Daniel K.', role: 'Verified buyer · GoodNotes user', rating: 5, product: 'Budget Planner', grad: 'linear-gradient(135deg,#C9A84C,#E2C97E)', text: 'Downloaded it in seconds and had it set up before my coffee was ready. Worth every penny.' },
+  { name: 'Daniel K.', role: 'Verified buyer · GoodNotes user', rating: 5, product: 'Budget Planner', grad: 'linear-gradient(135deg,#A0830E,#C4A538)', text: 'Downloaded it in seconds and had it set up before my coffee was ready. Worth every penny.' },
   { name: 'Priya S.', role: 'Verified buyer · Manchester', rating: 5, product: 'Wellness Journal', grad: 'linear-gradient(135deg,#E8C5C0,#C9847C)', text: 'I have bought planners I never opened. This one I actually look forward to — the design just makes you want to plan.' },
   { name: 'Tomas R.', role: 'Verified buyer · Notability user', rating: 5, product: 'Academic Planner', grad: 'linear-gradient(135deg,#A8B5A0,#6E7E66)', text: 'The layouts are gorgeous and the tabs just work. Easily my favourite purchase this year.' },
   { name: 'Lena M.', role: 'Verified buyer · Berlin', rating: 5, product: '66-Day Habit Tracker', grad: 'linear-gradient(135deg,#C97B5A,#AE6244)', text: 'A game-changer for my study system — everything finally lives in one tidy, hyperlinked notebook.' },
   { name: 'Sophie L.', role: 'Verified buyer · Etsy', rating: 5, product: 'Student Planner', grad: 'linear-gradient(135deg,#B8A9D4,#7B6FAE)', text: 'Changed how I plan my entire week. I keep recommending it to everyone at work.' },
-  { name: 'Nadia B.', role: 'Verified buyer · Gumroad', rating: 5, product: 'Digital Notebook', grad: 'linear-gradient(135deg,#C9A84C,#C28E1C)', text: 'Beautiful, calm and genuinely useful. Printed the A5 size too and it looks just as lovely on paper.' },
+  { name: 'Nadia B.', role: 'Verified buyer · Gumroad', rating: 5, product: 'Digital Notebook', grad: 'linear-gradient(135deg,#A0830E,#C28E1C)', text: 'Beautiful, calm and genuinely useful. Printed the A5 size too and it looks just as lovely on paper.' },
 ]
 
 function Stars({ value, size = 14 }: { value: number; size?: number }) {
@@ -60,7 +60,7 @@ function Avatar({ name, grad, size = 40 }: { name: string; grad: string; size?: 
   )
 }
 
-const DEFAULT_GRAD = 'linear-gradient(135deg,#C9A84C,#E2C97E)'
+const DEFAULT_GRAD = 'linear-gradient(135deg,#A0830E,#C4A538)'
 
 export default function TestimonialsSection({
   testimonials,

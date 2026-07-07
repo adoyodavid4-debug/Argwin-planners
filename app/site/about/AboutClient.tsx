@@ -36,7 +36,7 @@ const CRAFT = [
 
 const TESTIMONIALS = [
   { quote: 'I have tried every planner app out there. Arwign is the first that actually stayed on my iPad for more than a week.', name: 'Amara N.', role: 'Teacher, Nairobi', grad: 'linear-gradient(135deg,#B8A9D4,#7B6FAE)' },
-  { quote: 'The budget planner genuinely changed my savings habits. Six months in and I have hit every target I set.', name: 'James K.', role: 'Accountant, London', grad: 'linear-gradient(135deg,#C9A84C,#E2C97E)' },
+  { quote: 'The budget planner genuinely changed my savings habits. Six months in and I have hit every target I set.', name: 'James K.', role: 'Accountant, London', grad: 'linear-gradient(135deg,#A0830E,#C4A538)' },
   { quote: 'I ordered the complete bundle and have not touched another planner since. The quality is unreal.', name: 'Sofia R.', role: 'Designer, Melbourne', grad: 'linear-gradient(135deg,#E8C5C0,#C9847C)' },
 ]
 
@@ -65,7 +65,7 @@ export default function AboutClient() {
 
       {/* ══ 1. HERO ════════════════════════════════════════════ */}
       <section ref={heroRef} className="relative w-full pt-12 pb-16 lg:pb-20 border-b overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, rgba(201,168,76,0.13) 0%, rgba(205,199,190,0.09) 55%, rgba(201,168,76,0.05) 100%)', borderColor: 'var(--border)' }}>
+        style={{ background: 'linear-gradient(135deg, rgba(160,131,14,0.13) 0%, rgba(205,199,190,0.09) 55%, rgba(160,131,14,0.05) 100%)', borderColor: 'var(--border)' }}>
         <div aria-hidden className="absolute -top-24 -right-24 w-96 h-96 rounded-full opacity-20 pointer-events-none blur-3xl" style={{ background: 'var(--gold-light)' }} />
         <div className="container-site relative">
           <nav className="flex items-center gap-1.5 mb-8 text-xs" aria-label="Breadcrumb" style={{ color: 'var(--text-muted)' }}>

@@ -2,6 +2,7 @@
 import type { Metadata, Viewport } from 'next'
 import { ThemeProvider } from 'next-themes'
 import { Toaster } from 'react-hot-toast'
+import { GoogleAnalytics } from '@next/third-parties/google'
 import { OrganizationSchema } from '@/components/seo/JsonLd'
 import './globals.css'
 
@@ -113,10 +114,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 fontSize: '0.875rem',
                 boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
               },
-              success: { iconTheme: { primary: '#C9A84C', secondary: 'white' } },
+              success: { iconTheme: { primary: '#A0830E', secondary: 'white' } },
             }}
           />
         </ThemeProvider>
+        {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
+        )}
       </body>
     </html>
   )

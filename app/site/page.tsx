@@ -36,6 +36,32 @@ async function getBestSellers() {
   return data ?? []
 }
 
+// Cover images for the Best Seller hero card's fanned stack. Prefers flagged
+// bestsellers; falls back to the most-downloaded active products so the card is
+// never empty. Separate from getBestSellers() so the BestSellerShowcase section
+// is unaffected.
+async function getHeroBestSellerCovers() {
+  const supabase = createServerSupabaseClient()
+  const cols = 'title, slug, thumbnail'
+  const { data: flagged } = await supabase
+    .from('products')
+    .select(cols)
+    .eq('status', 'active')
+    .eq('is_bestseller', true)
+    .not('thumbnail', 'is', null)
+    .order('download_count', { ascending: false })
+    .limit(3)
+  if (flagged && flagged.length > 0) return flagged
+  const { data: top } = await supabase
+    .from('products')
+    .select(cols)
+    .eq('status', 'active')
+    .not('thumbnail', 'is', null)
+    .order('download_count', { ascending: false })
+    .limit(3)
+  return top ?? []
+}
+
 async function getHeroNewArrival() {
   const supabase = createServerSupabaseClient()
   const { data } = await supabase
@@ -73,8 +99,9 @@ async function getHeroSettings() {
 }
 
 export default async function HomePage() {
-  const [bestsellers, heroNewArrival, heroCopy] = await Promise.all([
+  const [bestsellers, heroBestSellerCovers, heroNewArrival, heroCopy] = await Promise.all([
     getBestSellers(),
+    getHeroBestSellerCovers(),
     getHeroNewArrival(),
     getHeroSettings(),
   ])
@@ -84,6 +111,7 @@ export default async function HomePage() {
     <>
       <HomeHero
         bestSeller={heroBestSeller as any}
+        bestSellerCovers={heroBestSellerCovers as any}
         newArrival={heroNewArrival as any}
         eyebrow={heroCopy.eyebrow}
         headline={heroCopy.headline}

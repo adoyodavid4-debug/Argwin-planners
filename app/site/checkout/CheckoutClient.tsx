@@ -3,11 +3,12 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { CreditCard, Loader2, Lock, Mail, ShoppingBag, Trash2 } from 'lucide-react'
+import { Loader2, Lock, Mail, ShoppingBag, Trash2 } from 'lucide-react'
 import { useCartStore, type CartItem } from '@/lib/store'
 import MpesaCheckout from '@/components/checkout/MpesaCheckout'
+import PesapalCheckout from '@/components/checkout/PesapalCheckout'
 
-type Method = 'card' | 'paypal' | 'mpesa'
+type Method = 'pesapal' | 'paypal' | 'mpesa'
 
 declare global {
   interface Window { paypal?: any }
@@ -20,11 +21,9 @@ export default function CheckoutClient() {
   const { items, removeItem, total, clearCart } = useCartStore()
 
   const [mounted,     setMounted]     = useState(false)
-  const [method,      setMethod]      = useState<Method>('card')
+  const [method,      setMethod]      = useState<Method>('pesapal')
   const [email,       setEmail]       = useState('')
   const [emailError,  setEmailError]  = useState('')
-  const [cardLoading, setCardLoading] = useState(false)
-  const [cardError,   setCardError]   = useState('')
   const [paypalReady, setPaypalReady] = useState(false)
   const [paypalError, setPaypalError] = useState('')
   const [capturing,   setCapturing]   = useState(false)
@@ -48,33 +47,6 @@ export default function CheckoutClient() {
     }
     setEmailError('')
     return true
-  }
-
-  // ── Card (Stripe hosted checkout) ─────────────────────────────
-  async function handleCardCheckout() {
-    if (!validateEmail(email)) return
-    setCardLoading(true)
-    setCardError('')
-    try {
-      const res = await fetch('/api/checkout', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: items.map(({ id, slug, title, price }) => ({ id, slug, title, price })),
-          email: email.trim(),
-        }),
-      })
-      const data = await res.json()
-      if (!res.ok || !data.url) {
-        setCardError(data.error ?? 'Could not start checkout. Please try again.')
-        setCardLoading(false)
-        return
-      }
-      window.location.href = data.url
-    } catch {
-      setCardError('Network error. Check your connection and try again.')
-      setCardLoading(false)
-    }
   }
 
   // ── PayPal buttons ────────────────────────────────────────────
@@ -209,9 +181,9 @@ export default function CheckoutClient() {
   }
 
   const methods: { key: Method; label: string }[] = [
-    { key: 'card',   label: 'Card' },
-    { key: 'paypal', label: 'PayPal' },
-    { key: 'mpesa',  label: 'M-Pesa' },
+    { key: 'pesapal', label: 'Card' },
+    { key: 'paypal',  label: 'PayPal' },
+    { key: 'mpesa',   label: 'M-Pesa' },
   ]
 
   return (
@@ -275,25 +247,14 @@ export default function CheckoutClient() {
               ))}
             </div>
 
-            {/* Card */}
-            {method === 'card' && (
-              <div>
-                <p className="text-xs mb-4" style={{ color: 'var(--text-muted)' }}>
-                  Visa, Mastercard and American Express — processed securely by Stripe. You&apos;ll be redirected to complete payment.
-                </p>
-                {cardError && <p className="text-xs mb-3" style={{ color: '#dc3545' }}>{cardError}</p>}
-                <button
-                  onClick={handleCardCheckout}
-                  disabled={cardLoading}
-                  className="btn-primary w-full justify-center text-sm"
-                >
-                  {cardLoading ? (
-                    <><Loader2 size={15} className="animate-spin" /> Redirecting…</>
-                  ) : (
-                    <><CreditCard size={15} /> Pay ${total().toFixed(2)} by Card</>
-                  )}
-                </button>
-              </div>
+            {/* Card (PesaPal — Visa / Mastercard) */}
+            {method === 'pesapal' && (
+              <PesapalCheckout
+                items={items}
+                total={total()}
+                email={email}
+                onEmailInvalid={() => validateEmail(email)}
+              />
             )}
 
             {/* PayPal */}
@@ -327,7 +288,7 @@ export default function CheckoutClient() {
               <MpesaCheckout
                 items={items}
                 total={total()}
-                onClose={() => setMethod('card')}
+                onClose={() => setMethod('pesapal')}
                 onSuccess={(orderId) => {
                   clearCart()
                   router.push(orderId ? `/checkout/success?order=${orderId}` : '/shop')

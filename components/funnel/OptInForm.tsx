@@ -120,12 +120,12 @@ export function OptInForm({ locale = 'en', variant = 'inline', leadMagnetId, mag
             type="email"
             placeholder={t.placeholder}
             autoComplete="email"
-            className="flex-1 rounded-lg border border-[var(--border)] bg-[var(--bg-input,white)] px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#C9A84C]"
+            className="flex-1 rounded-lg border border-[var(--border)] bg-[var(--bg-input,white)] px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#A0830E]"
           />
           <button
             type="submit"
             disabled={isSubmitting}
-            className="rounded-lg bg-[#C9A84C] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#b8963e] disabled:opacity-60 transition-colors whitespace-nowrap"
+            className="rounded-lg bg-[#A0830E] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#b8963e] disabled:opacity-60 transition-colors whitespace-nowrap"
           >
             {isSubmitting ? '...' : t.cta}
           </button>
@@ -137,7 +137,7 @@ export function OptInForm({ locale = 'en', variant = 'inline', leadMagnetId, mag
 
         <label className="flex items-start gap-2 cursor-pointer">
           <input {...register('consent')} type="checkbox" value="true"
-            className="mt-0.5 accent-[#C9A84C]" />
+            className="mt-0.5 accent-[#A0830E]" />
           <span className="text-xs text-[var(--text-muted)]">{t.consent}</span>
         </label>
         {errors.consent && (

@@ -81,7 +81,7 @@ export default function LoginClient() {
 
       {/* Soft decorative washes */}
       <div aria-hidden className="pointer-events-none absolute -top-32 -right-32 h-96 w-96 rounded-full"
-        style={{ background: 'radial-gradient(closest-side, rgba(201,168,76,0.14), transparent)' }} />
+        style={{ background: 'radial-gradient(closest-side, rgba(160,131,14,0.14), transparent)' }} />
       <div aria-hidden className="pointer-events-none absolute -bottom-40 -left-24 h-[28rem] w-[28rem] rounded-full"
         style={{ background: 'radial-gradient(closest-side, rgba(168,181,160,0.16), transparent)' }} />
 
@@ -122,7 +122,7 @@ export default function LoginClient() {
 
           {/* Gold accent rule */}
           <div aria-hidden className="h-1 w-full"
-            style={{ background: 'linear-gradient(90deg, var(--gold) 0%, #E2C97E 50%, var(--gold) 100%)' }} />
+            style={{ background: 'linear-gradient(90deg, var(--gold) 0%, #C4A538 50%, var(--gold) 100%)' }} />
 
           {/* Mode tabs */}
           <div className="grid grid-cols-2 border-b" style={{ borderColor: 'var(--border)' }}>

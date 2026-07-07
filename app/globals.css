@@ -7,10 +7,10 @@
 /* ─── CSS Variables ─────────────────────────────────────────── */
 :root {
   /* Brand — sophisticated & editorial */
-  --gold:         #C9A84C;
-  --gold-rgb:     201, 168, 76;
-  --gold-light:   #E2C97E;
-  --gold-dark:    #9E7A2A;
+  --gold:         #A0830E;
+  --gold-rgb:     160, 131, 14;
+  --gold-light:   #C4A538;
+  --gold-dark:    #77610A;
   --lavender:     #B8A9D4;
   --lavender-soft:#D6CEEB;
   --blush:        #E8C5C0;
@@ -28,7 +28,7 @@
   --text-secondary: #5A5668;
   --text-muted:   #8A869A;
   --border:       rgba(44,42,53,0.10);
-  --border-gold:  rgba(201,168,76,0.30);
+  --border-gold:  rgba(160,131,14,0.30);
 
   /* Glass */
   --glass-bg:     rgba(255,255,255,0.65);
@@ -58,7 +58,7 @@
   --nav-height: 88px;
 
   /* Header */
-  --header-bg: var(--bg-neutral);
+  --header-bg: #E8E2C4;
 }
 
 .dark {

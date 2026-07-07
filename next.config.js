@@ -82,6 +82,10 @@ const nextConfig = {
       { source: '/notebooks',       destination: '/site/notebooks',       permanent: false },
       { source: '/notebooks/:path*',destination: '/site/notebooks/:path*',permanent: false },
 
+      // Arwign Calendar
+      { source: '/calendar',        destination: '/site/calendar',        permanent: false },
+      { source: '/calendar/:path*', destination: '/site/calendar/:path*', permanent: false },
+
       // Order status
       { source: '/order/:id',       destination: '/site/order/:id',       permanent: false },
 

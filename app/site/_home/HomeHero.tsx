@@ -3,6 +3,10 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion, useReducedMotion } from 'framer-motion'
 import { ArrowRight, Sparkles, Check, Star, Shield, Zap } from 'lucide-react'
+import HeroCalendarCard from './HeroCalendarCard'
+import {
+  HERO_FRAME_CLASS, heroFrameStyle, HeroBadge, HeroCTA, HeroTitle, HeroMeta, FOCUS_RING,
+} from './HeroCardKit'
 
 export interface HeroProduct {
   id: string
@@ -15,113 +19,160 @@ export interface HeroProduct {
   rating_count: number | null
 }
 
+export interface HeroCover {
+  title: string
+  slug: string
+  thumbnail: string | null
+}
+
 const fmt = (n: number, c?: string | null) =>
   new Intl.NumberFormat('en-GB', { style: 'currency', currency: c ?? 'USD' }).format(n)
 
-function BadgePill({ variant }: { variant: 'best' | 'new' }) {
-  const isBest = variant === 'best'
-  return (
-    <span
-      className="absolute left-3 top-3 z-10 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em]"
-      style={
-        isBest
-          ? { background: '#254A38', color: '#F7F2E8' }
-          : { background: '#C79A3E', color: '#2C2A35' }
-      }
-    >
-      {isBest ? <Star size={10} style={{ fill: 'currentColor' }} /> : <Sparkles size={10} />}
-      {isBest ? 'Best Seller' : 'New Arrival'}
-    </span>
-  )
-}
+// ════════════════════════════════════════════════════════════
+//  Best Seller — fanned stack of real covers + gold seal accent
+// ════════════════════════════════════════════════════════════
+const FAN_SLOTS = [
+  { tx: '-34%', rotate: -9, z: 10 }, // back left
+  { tx: '34%',  rotate: 9,  z: 10 }, // back right
+  { tx: '0%',   rotate: 0,  z: 20 }, // front centre (top)
+]
 
-function FallbackCover({ label }: { label: string }) {
-  return (
-    <div className="flex h-full w-full flex-col items-center justify-center" style={{ background: '#F7F2E8' }}>
-      <span
-        className="mb-2 flex items-center justify-center rounded-full"
-        style={{ width: 44, height: 44, border: '1.5px solid #9E7A2A' }}
-      >
-        <Sparkles size={18} style={{ color: '#9E7A2A' }} />
-      </span>
-      <p style={{ fontFamily: 'var(--font-cormorant)', fontSize: 22, color: '#2C2A35', fontWeight: 600 }}>Arwign</p>
-      <p className="mt-1 text-[9px] uppercase" style={{ letterSpacing: '0.25em', color: '#9E7A2A' }}>{label}</p>
-    </div>
-  )
-}
-
-function ShowcaseCard({
-  product,
-  variant,
-  index,
-}: {
-  product: HeroProduct | null
-  variant: 'best' | 'new'
-  index: number
-}) {
+function BestSellerCard({ covers, index }: { covers: HeroCover[]; index: number }) {
   const reduce = useReducedMotion()
-  const isBest = variant === 'best'
-  const collectionHref = isBest ? '/best-sellers' : '/new-arrivals'
-  const collectionLabel = isBest ? 'View all best sellers' : 'View all new arrivals'
-  const cardHref = product ? `/shop/${product.slug}` : collectionHref
-  const alt = product
-    ? `${product.title} — ${isBest ? 'Best Seller' : 'New Arrival'} digital planner cover`
-    : `Arwign ${isBest ? 'best sellers' : 'new arrivals'} collection`
+  const pics = covers.filter((c) => c.thumbnail).slice(0, 3)
+
+  // Arrange so the top seller sits front-and-centre on top of the fan.
+  const arranged =
+    pics.length >= 3 ? [{ c: pics[1], s: FAN_SLOTS[0] }, { c: pics[2], s: FAN_SLOTS[1] }, { c: pics[0], s: FAN_SLOTS[2] }]
+    : pics.length === 2 ? [{ c: pics[1], s: FAN_SLOTS[0] }, { c: pics[0], s: FAN_SLOTS[2] }]
+    : pics.length === 1 ? [{ c: pics[0], s: FAN_SLOTS[2] }]
+    : []
 
   return (
     <motion.div
       initial={reduce ? false : { opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.1 * index, ease: 'easeOut' }}
-      className={`group w-full max-w-[240px] ${index === 0 ? 'lg:-translate-y-6' : 'lg:translate-y-6'}`}
+      className="h-full"
     >
-      <Link
-        href={cardHref}
-        className="block rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C79A3E] motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out motion-safe:group-hover:-translate-y-1"
-      >
-        <span className="relative block aspect-[3/4] overflow-hidden rounded-2xl shadow-[0_20px_50px_-20px_rgba(37,42,32,0.25)] motion-safe:transition-shadow motion-safe:duration-300 group-hover:shadow-[0_26px_56px_-18px_rgba(37,42,32,0.35)]">
-          <BadgePill variant={variant} />
-          {product?.thumbnail ? (
-            <Image
-              src={product.thumbnail}
-              alt={alt}
-              fill
-              sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 220px"
-              className="object-cover motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out motion-safe:group-hover:scale-[1.03]"
-              priority={index === 0}
-            />
-          ) : (
-            <FallbackCover label={isBest ? 'Best Seller' : 'New Arrival'} />
-          )}
-        </span>
-        {product && (
-          <span className="mt-3 block px-0.5">
+      <div className={HERO_FRAME_CLASS} style={heroFrameStyle}>
+        <HeroBadge label="Best Seller" variant="best" icon={Star} />
+        <Link href="/best-sellers" className={`block ${FOCUS_RING} rounded-2xl`} aria-label="Shop Arwign best sellers">
+          {/* Visual — fanned covers or a refined seal fallback */}
+          <span className="relative block aspect-[4/5]" aria-hidden="true">
+            {arranged.length > 0 ? (
+              <>
+                {arranged.map(({ c, s }, i) => (
+                  <span
+                    key={`${c.slug}-${i}`}
+                    className="absolute left-1/2 top-1/2 block w-[58%] overflow-hidden rounded-lg"
+                    style={{
+                      aspectRatio: '3 / 4',
+                      transform: `translate(-50%,-50%) translateX(${s.tx}) rotate(${s.rotate}deg)`,
+                      zIndex: s.z,
+                      boxShadow: '0 10px 22px -8px rgba(60,50,20,0.38)',
+                      border: '2px solid #FBF7EF',
+                    }}
+                  >
+                    <Image src={c.thumbnail as string} alt="" fill sizes="120px" className="object-cover" />
+                  </span>
+                ))}
+                {/* Gold seal — demoted to a small corner accent */}
+                <span
+                  className="absolute bottom-1 right-2 z-30 flex h-9 w-9 items-center justify-center rounded-full"
+                  style={{ background: '#F7F2E8', border: '1.5px solid #A0830E', boxShadow: '0 3px 10px rgba(60,50,20,0.28)' }}
+                >
+                  <Sparkles size={15} style={{ color: '#A0830E' }} />
+                </span>
+              </>
+            ) : (
+              <span className="flex h-full w-full flex-col items-center justify-center gap-2.5">
+                <span className="flex h-14 w-14 items-center justify-center rounded-full" style={{ border: '1.5px solid #A0830E' }}>
+                  <Sparkles size={22} style={{ color: '#A0830E' }} />
+                </span>
+                <span style={{ fontFamily: 'var(--font-cormorant)', fontSize: 22, color: '#2C2A35', fontWeight: 600 }}>Arwign</span>
+              </span>
+            )}
+          </span>
+
+          <span className="block pt-3">
+            <HeroTitle>Reader favourites</HeroTitle>
+            <HeroMeta>
+              <Star size={12} style={{ fill: 'var(--gold)', stroke: 'var(--gold)' }} />
+              4.9 <span style={{ color: 'var(--text-muted)' }}>· 12k+ happy planners</span>
+            </HeroMeta>
+          </span>
+        </Link>
+        <HeroCTA href="/best-sellers" label="View all best sellers →" />
+      </div>
+    </motion.div>
+  )
+}
+
+// ════════════════════════════════════════════════════════════
+//  New Arrival — cover framed in a soft premium mat
+// ════════════════════════════════════════════════════════════
+function NewArrivalCard({ product, index }: { product: HeroProduct | null; index: number }) {
+  const reduce = useReducedMotion()
+  const cardHref = product ? `/shop/${product.slug}` : '/new-arrivals'
+  const alt = product ? `${product.title} — New Arrival digital planner cover` : 'Arwign new arrivals'
+
+  return (
+    <motion.div
+      initial={reduce ? false : { opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.1 * index, ease: 'easeOut' }}
+      className="h-full"
+    >
+      <div className={HERO_FRAME_CLASS} style={heroFrameStyle}>
+        <HeroBadge label="New Arrival" variant="new" icon={Sparkles} />
+        <Link href={cardHref} className={`block ${FOCUS_RING} rounded-2xl`} aria-label={product ? `Shop ${product.title}` : 'Shop new arrivals'}>
+          {/* Framed cover — mat + drop shadow + gentle hover zoom */}
+          <span
+            className="relative flex aspect-[4/5] items-center justify-center rounded-xl"
+            style={{ background: 'linear-gradient(160deg,#FFFDF8 0%,#F3EBDD 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.7)' }}
+          >
             <span
-              className="line-clamp-2 block text-[0.98rem] leading-snug"
-              style={{ fontFamily: 'var(--font-cormorant)', fontWeight: 600, color: 'var(--text-primary)' }}
+              className="relative block w-[74%] overflow-hidden rounded-lg"
+              style={{ aspectRatio: '3 / 4', boxShadow: '0 14px 28px -10px rgba(60,50,20,0.42)', border: '2px solid #FFFFFF' }}
             >
-              {product.title}
-            </span>
-            <span className="mt-1 flex items-center gap-2 text-sm">
-              <span className="font-medium" style={{ color: 'var(--text-primary)' }}>
-                {fmt(product.price, product.currency)}
-              </span>
-              <span className="inline-flex items-center gap-1 text-xs" style={{ color: 'var(--text-muted)' }}>
-                <Star size={11} style={{ fill: 'var(--gold)', stroke: 'var(--gold)' }} />
-                {(product.rating_avg ?? 4.9).toFixed(1)}
-                {product.rating_count ? ` · ${product.rating_count}` : ''}
-              </span>
+              {product?.thumbnail ? (
+                <Image
+                  src={product.thumbnail}
+                  alt={alt}
+                  fill
+                  sizes="(max-width: 640px) 45vw, 160px"
+                  className="object-cover transition-transform duration-300 ease-out motion-safe:group-hover/card:scale-[1.04]"
+                />
+              ) : (
+                <span className="flex h-full w-full items-center justify-center" style={{ background: '#F7F2E8' }}>
+                  <Sparkles size={20} style={{ color: '#A0830E' }} />
+                </span>
+              )}
             </span>
           </span>
-        )}
-      </Link>
-      <Link
-        href={collectionHref}
-        className="mt-2 inline-block px-0.5 text-xs font-medium hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C79A3E]"
-        style={{ color: '#9E7A2A' }}
-      >
-        {collectionLabel} →
-      </Link>
+
+          <span className="block pt-3">
+            <HeroTitle className="line-clamp-2">{product ? product.title : 'New Arrivals'}</HeroTitle>
+            {product && (
+              <HeroMeta>
+                <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{fmt(product.price, product.currency)}</span>
+                {product.rating_count && product.rating_avg ? (
+                  <>
+                    <span style={{ color: 'var(--text-muted)' }}>·</span>
+                    <Star size={12} style={{ fill: 'var(--gold)', stroke: 'var(--gold)' }} />
+                    {product.rating_avg.toFixed(1)}
+                    <span style={{ color: 'var(--text-muted)' }}>({product.rating_count})</span>
+                  </>
+                ) : (
+                  <span style={{ color: 'var(--text-muted)' }}>· Instant download</span>
+                )}
+              </HeroMeta>
+            )}
+          </span>
+        </Link>
+        <HeroCTA href="/new-arrivals" label="View all new arrivals →" />
+      </div>
     </motion.div>
   )
 }
@@ -129,6 +180,7 @@ function ShowcaseCard({
 export default function HomeHero({
   bestSeller = null,
   newArrival = null,
+  bestSellerCovers = [],
   eyebrow = 'Premium digital & printable planners',
   headline = 'Plan your best life,',
   headlineAccent = 'beautifully.',
@@ -136,12 +188,20 @@ export default function HomeHero({
 }: {
   bestSeller?: HeroProduct | null
   newArrival?: HeroProduct | null
+  bestSellerCovers?: HeroCover[]
   eyebrow?: string
   headline?: string
   headlineAccent?: string
   subcopy?: string
 }) {
   const reduce = useReducedMotion()
+
+  // Cover source for the Best Seller fan: the flagged best seller (if any)
+  // first, then the supplied top covers — never changes the card's link.
+  const covers: HeroCover[] = [
+    ...(bestSeller?.thumbnail ? [{ title: bestSeller.title, slug: bestSeller.slug, thumbnail: bestSeller.thumbnail }] : []),
+    ...bestSellerCovers,
+  ].filter((c, i, arr) => c.thumbnail && arr.findIndex((x) => x.slug === c.slug) === i)
 
   return (
     <section
@@ -183,10 +243,17 @@ export default function HomeHero({
           </div>
         </motion.div>
 
-        {/* Two-Card Showcase */}
-        <div className="flex items-center justify-center gap-4 sm:gap-6 lg:justify-end lg:pr-2">
-          <ShowcaseCard product={bestSeller} variant="best" index={0} />
-          <ShowcaseCard product={newArrival} variant="new" index={1} />
+        {/* Hero card cluster — Best Seller · New Arrival · Arwign Calendar */}
+        <div className="relative">
+          {/* Faint shared backdrop glow ties the trio together */}
+          <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center">
+            <div style={{ width: '88%', height: '82%', background: 'radial-gradient(ellipse at center, rgba(160,131,14,0.10) 0%, transparent 70%)' }} />
+          </div>
+          <div className="grid grid-cols-1 items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-4 lg:pr-1">
+            <BestSellerCard covers={covers} index={0} />
+            <NewArrivalCard product={newArrival} index={1} />
+            <HeroCalendarCard index={2} />
+          </div>
         </div>
       </div>
     </section>
