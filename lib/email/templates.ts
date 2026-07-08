@@ -173,7 +173,7 @@ const templates: Record<string, (locale: Locale, data: Record<string, unknown>) 
     const currency      = String(data.currency ?? 'USD').toUpperCase()
     const total         = Number(data.total ?? 0)
     const paymentMethod = String(data.payment_method ?? 'Card')
-    const supportEmail  = String(data.support_email ?? 'hello@arwignplanners.com')
+    const supportEmail  = String(data.support_email ?? 'support@arwignplanners.com')
     const items         = (data.items ?? []) as { title: string; price: number; quantity: number }[]
     const downloads     = (data.downloads ?? []) as { title: string; url: string }[]
 

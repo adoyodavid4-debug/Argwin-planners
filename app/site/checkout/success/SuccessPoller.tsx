@@ -32,7 +32,7 @@ export default function SuccessPoller() {
         <p className="text-sm max-w-sm mx-auto" style={{ color: 'var(--text-muted)' }}>
           Your payment went through — the order confirmation and download links will arrive
           in your inbox shortly. If nothing arrives within 15 minutes, contact{' '}
-          <a href="mailto:hello@arwignplanners.com" style={{ color: 'var(--gold)' }}>hello@arwignplanners.com</a>.
+          <a href="mailto:support@arwignplanners.com" style={{ color: 'var(--gold)' }}>support@arwignplanners.com</a>.
         </p>
       </div>
     )

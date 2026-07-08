@@ -1,9 +1,15 @@
 import { Resend } from 'resend'
 import { createHmac } from 'crypto'
-import type { EmailProvider, EmailEventType, Locale } from '../types'
+import type { EmailProvider, EmailCategory, EmailEventType, Locale } from '../types'
 import { resolveTemplate } from '../templates'
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://arwignplanners.com'
+
+const FROM_ADDRESSES: Record<EmailCategory, string> = {
+  info:    process.env.EMAIL_FROM_INFO    ?? 'Arwign Planners <info@arwignplanners.com>',
+  sales:   process.env.EMAIL_FROM_SALES   ?? 'Arwign Planners <sales@arwignplanners.com>',
+  support: process.env.EMAIL_FROM_SUPPORT ?? 'Arwign Planners <support@arwignplanners.com>',
+}
 
 export class ResendProvider implements EmailProvider {
   readonly id = 'resend'
@@ -20,9 +26,10 @@ export class ResendProvider implements EmailProvider {
     templateKey: string
     data: Record<string, unknown>
     idempotencyKey: string
+    category?: EmailCategory
   }) {
     const { subject, html } = resolveTemplate(input.templateKey, input.locale, input.data)
-    const from = process.env.EMAIL_FROM ?? process.env.FROM_EMAIL ?? 'Arwign Planners <hello@arwignplanners.com>'
+    const from = FROM_ADDRESSES[input.category ?? 'info']
 
     const { data, error } = await this.client.emails.send({
       from,

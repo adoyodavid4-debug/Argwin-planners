@@ -111,7 +111,7 @@ export default async function OrderStatusPage({ params }: { params: { id: string
       )}
 
       <p className="mt-8 text-sm text-[var(--text-muted)] text-center">
-        Questions? <a href="mailto:hello@arwignplanners.com" className="text-[#A0830E] hover:underline">hello@arwignplanners.com</a>
+        Questions? <a href="mailto:support@arwignplanners.com" className="text-[#A0830E] hover:underline">support@arwignplanners.com</a>
       </p>
     </main>
   )

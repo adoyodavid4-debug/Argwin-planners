@@ -18,7 +18,7 @@ function errorPage(status: number, title: string, message: string) {
 <div style="max-width:420px;background:#fff;border:1px solid #E8E4DB;border-radius:12px;padding:40px;text-align:center">
 <h1 style="font-size:20px;margin:0 0 12px">${title}</h1>
 <p style="color:#666;font-size:14px;margin:0 0 24px">${message}</p>
-<a href="mailto:hello@arwignplanners.com" style="color:#C9A84C">hello@arwignplanners.com</a>
+<a href="mailto:support@arwignplanners.com" style="color:#C9A84C">support@arwignplanners.com</a>
 </div></body></html>`
   return new NextResponse(html, { status, headers: { 'Content-Type': 'text/html; charset=utf-8' } })
 }

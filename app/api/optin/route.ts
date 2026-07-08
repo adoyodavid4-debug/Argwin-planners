@@ -94,6 +94,7 @@ export async function POST(req: NextRequest) {
       templateKey: 'optin.confirm',
       data: { token, magnet_title: magnetTitle },
       idempotencyKey: `${sub.id}:confirm`,
+      category: 'sales',
     })
   } catch (err) {
     console.error('[optin] sendTransactional failed:', err)

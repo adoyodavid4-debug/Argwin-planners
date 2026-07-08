@@ -108,8 +108,9 @@ export async function fulfilDigitalOrder(supabase: SupabaseClient, orderId: stri
           downloads:      items
             .filter((i) => tokens[i.product_id])
             .map((i) => ({ title: i.title, url: `${APP_URL}/api/download/${tokens[i.product_id]}` })),
-          support_email:  'hello@arwignplanners.com',
+          support_email:  'support@arwignplanners.com',
         },
+        category: 'sales',
       })
 
       await supabase

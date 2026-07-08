@@ -80,6 +80,7 @@ export async function GET(req: NextRequest) {
               unsub_token: sub.unsub_token,
             },
             idempotencyKey: `${sub.id}:delivery:${sub.source_lead_magnet_id}`,
+            category: 'sales',
           })
         } catch (err) {
           console.error('[confirm] delivery email failed:', err)

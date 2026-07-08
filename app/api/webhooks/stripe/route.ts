@@ -206,8 +206,9 @@ export async function POST(req: NextRequest) {
               currency:       currency.toUpperCase(),
               payment_method: 'Card',
               downloads:      [],
-              support_email:  'hello@arwignplanners.com',
+              support_email:  'support@arwignplanners.com',
             },
+            category: 'info',
           })
         } catch (err) {
           console.error('[stripe-webhook] physical receipt email failed:', err)

@@ -211,7 +211,7 @@ export default async function CheckoutSuccessPage({
 
         <p className="text-xs text-center mb-8" style={{ color: 'var(--text-muted)' }}>
           Download links are valid for 12 months. Need help?{' '}
-          <a href="mailto:hello@arwignplanners.com" style={{ color: 'var(--gold)' }}>hello@arwignplanners.com</a>
+          <a href="mailto:support@arwignplanners.com" style={{ color: 'var(--gold)' }}>support@arwignplanners.com</a>
         </p>
 
         <div className="flex justify-center">

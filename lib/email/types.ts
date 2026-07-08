@@ -1,5 +1,7 @@
 export type Locale = 'en' | 'fr'
 
+export type EmailCategory = 'info' | 'sales' | 'support'
+
 export type EmailEventType =
   | 'sent'
   | 'delivered'
@@ -18,6 +20,7 @@ export interface EmailProvider {
     templateKey: string
     data: Record<string, unknown>
     idempotencyKey: string
+    category?: EmailCategory
   }): Promise<{ messageId: string }>
 
   upsertContact(input: {

@@ -56,6 +56,7 @@ export async function POST(req: NextRequest) {
             unsub_token: row.unsub_token,
           },
           idempotencyKey,
+          category: 'sales',
         })
 
         await supabase.from('email_events').insert({

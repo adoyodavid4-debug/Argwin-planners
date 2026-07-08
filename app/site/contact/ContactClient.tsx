@@ -185,8 +185,8 @@ export default function ContactClient() {
               </div>
               <div>
                 <p className="text-xs uppercase tracking-wide mb-1" style={{ color: 'var(--text-muted)', letterSpacing: '0.08em' }}>Email us</p>
-                <a href="mailto:hello@arwignplanners.com" className="text-sm font-semibold hover:underline" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-jost)' }}>
-                  hello@arwignplanners.com
+                <a href="mailto:info@arwignplanners.com" className="text-sm font-semibold hover:underline" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-jost)' }}>
+                  info@arwignplanners.com
                 </a>
               </div>
             </div>

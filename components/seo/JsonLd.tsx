@@ -36,7 +36,7 @@ export function OrganizationSchema(_props: BaseProps = {}) {
             'https://pinterest.com/arwignplanners',
             'https://tiktok.com/@arwignplanners',
           ],
-          contactPoint: { '@type': 'ContactPoint', contactType: 'customer support', email: 'hello@arwignplanners.com' },
+          contactPoint: { '@type': 'ContactPoint', contactType: 'customer support', email: 'support@arwignplanners.com' },
         },
         {
           '@type': 'WebSite',

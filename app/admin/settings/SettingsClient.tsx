@@ -246,7 +246,7 @@ export default function SettingsClient({ settings, integrations }: Props) {
               <Input value={tagline} onChange={setTagline} placeholder="Capture the chaos. Find the clarity." />
             </Field>
             <Field label="Contact Email" hint="Displayed publicly for customer enquiries">
-              <Input type="email" value={contactEmail} onChange={setContactEmail} placeholder="hello@arwignplanners.com" />
+              <Input type="email" value={contactEmail} onChange={setContactEmail} placeholder="info@arwignplanners.com" />
             </Field>
             <Field label="Support Email" hint="Used as reply-to in transactional emails">
               <Input type="email" value={supportEmail} onChange={setSupportEmail} placeholder="support@arwignplanners.com" />

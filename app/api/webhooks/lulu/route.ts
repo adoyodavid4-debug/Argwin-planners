@@ -58,6 +58,7 @@ export async function POST(req: NextRequest) {
           unsub_token:     '',
         },
         idempotencyKey: `${po.id}:shipped`,
+        category: 'sales',
       })
     } catch (e) {
       console.error('[lulu-webhook] email failed:', e)

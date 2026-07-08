@@ -62,6 +62,7 @@ export async function POST(req: NextRequest) {
         templateKey: 'notebook_request.admin',
         data: { name, email, idea, locale },
         idempotencyKey: `notebook-request:${email}:${idea.slice(0, 40)}`,
+        category: 'info',
       })
     } catch (err) {
       console.error('[notebook-requests] admin notification failed:', err)

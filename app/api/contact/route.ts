@@ -62,6 +62,7 @@ export async function POST(req: NextRequest) {
         templateKey: 'contact.admin',
         data: { name, email, subject, message },
         idempotencyKey: `contact:${email}:${message.slice(0, 40)}`,
+        category: 'info',
       })
     } catch (err) {
       console.error('[contact] admin notification failed:', err)
