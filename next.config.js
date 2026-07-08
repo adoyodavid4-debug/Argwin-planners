@@ -39,7 +39,7 @@ const nextConfig = {
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.paypal.com https://www.googletagmanager.com https://connect.facebook.net",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' data: blob: https://*.supabase.co https://images.unsplash.com https://www.googletagmanager.com",
+              "img-src 'self' data: blob: https://*.supabase.co https://images.unsplash.com https://www.googletagmanager.com https://www.paypalobjects.com",
               "connect-src 'self' https://*.supabase.co https://api.stripe.com https://www.google-analytics.com https://www.paypal.com https://www.sandbox.paypal.com",
               "frame-src https://js.stripe.com https://www.paypal.com https://www.sandbox.paypal.com",
               "object-src 'none'",
