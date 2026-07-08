@@ -477,7 +477,7 @@ export default function CategoryClient({ category, products, relatedCategories }
               { icon: Zap,        label: 'Instant Download' },
               { icon: Shield,     label: 'Secure Checkout' },
               { icon: Smartphone, label: 'Works on Any Device' },
-              { icon: CreditCard, label: 'Card · PayPal · M-Pesa' },
+              { icon: CreditCard, label: 'Card · PayPal' },
             ].map(({ icon: Icon, label }) => (
               <div key={label} className="flex items-center gap-2 text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
                 <Icon size={14} style={{ color: 'var(--gold)' }} />{label}
@@ -1302,7 +1302,7 @@ function WhatsInside({ accent, bgGradient }: { accent: string; bgGradient: strin
 // ── How it works ──────────────────────────────────────────────
 function HowItWorks() {
   const steps = [
-    { icon: ShoppingCart, title: 'Choose Your Planner', body: 'Pick a design you love and check out securely with card, PayPal or M-Pesa.' },
+    { icon: ShoppingCart, title: 'Choose Your Planner', body: 'Pick a design you love and check out securely with card or PayPal.' },
     { icon: Download,     title: 'Download Instantly',  body: 'Your files arrive by email and in your account the moment payment clears.' },
     { icon: Sparkles,     title: 'Start Planning',       body: 'Import to GoodNotes or print at home and begin building the life you want.' },
   ]

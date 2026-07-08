@@ -5,10 +5,9 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Loader2, Lock, Mail, ShoppingBag, Trash2 } from 'lucide-react'
 import { useCartStore, type CartItem } from '@/lib/store'
-import MpesaCheckout from '@/components/checkout/MpesaCheckout'
 import PesapalCheckout from '@/components/checkout/PesapalCheckout'
 
-type Method = 'pesapal' | 'paypal' | 'mpesa'
+type Method = 'pesapal' | 'paypal'
 
 declare global {
   interface Window { paypal?: any }
@@ -180,10 +179,9 @@ export default function CheckoutClient() {
     )
   }
 
-  const methods: { key: Method; label: string }[] = [
-    { key: 'pesapal', label: 'Card' },
-    { key: 'paypal',  label: 'PayPal' },
-    { key: 'mpesa',   label: 'M-Pesa' },
+  const methods: { key: Method; label: string; icon: string; iconAlt: string }[] = [
+    { key: 'pesapal', label: 'Card',   icon: '/images/payments/visa-mastercard.jpg', iconAlt: 'Visa and Mastercard' },
+    { key: 'paypal',  label: 'PayPal', icon: '/images/payments/paypal.jpg',          iconAlt: 'PayPal' },
   ]
 
   return (
@@ -228,13 +226,13 @@ export default function CheckoutClient() {
               Payment method
             </p>
 
-            <div className="grid grid-cols-3 gap-2 mb-6">
+            <div className="grid grid-cols-2 gap-2 mb-6">
               {methods.map((m) => (
                 <button
                   key={m.key}
                   type="button"
                   onClick={() => setMethod(m.key)}
-                  className="py-2.5 rounded-xl text-sm font-semibold border transition-all"
+                  className="py-2.5 rounded-xl text-sm font-semibold border transition-all flex items-center justify-center gap-2"
                   style={{
                     borderColor: method === m.key ? 'var(--gold)' : 'var(--border)',
                     background:  method === m.key ? 'rgba(var(--gold-rgb),0.08)' : 'transparent',
@@ -242,6 +240,9 @@ export default function CheckoutClient() {
                     fontFamily:  'var(--font-jost)',
                   }}
                 >
+                  <span className="rounded flex items-center justify-center" style={{ background: '#fff', padding: '2px 5px' }}>
+                    <Image src={m.icon} alt={m.iconAlt} width={200} height={80} style={{ height: 14, width: 'auto' }} />
+                  </span>
                   {m.label}
                 </button>
               ))}
@@ -281,19 +282,6 @@ export default function CheckoutClient() {
                   </>
                 )}
               </div>
-            )}
-
-            {/* M-Pesa */}
-            {method === 'mpesa' && (
-              <MpesaCheckout
-                items={items}
-                total={total()}
-                onClose={() => setMethod('pesapal')}
-                onSuccess={(orderId) => {
-                  clearCart()
-                  router.push(orderId ? `/checkout/success?order=${orderId}` : '/shop')
-                }}
-              />
             )}
 
             <div className="flex items-center justify-center gap-1.5 text-xs mt-6" style={{ color: 'var(--text-muted)' }}>

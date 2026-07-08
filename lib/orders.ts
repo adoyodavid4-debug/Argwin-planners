@@ -1,5 +1,5 @@
 // lib/orders.ts — shared digital-order fulfilment: download tokens + confirmation email.
-// Used by the Stripe webhook, PayPal capture and the M-Pesa callback/status routes.
+// Used by the Stripe webhook and PayPal capture route.
 // All operations are idempotent so retried webhooks / polling never double-fulfil.
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { addDays, format } from 'date-fns'
@@ -13,7 +13,6 @@ const APP_URL =
 const PAYMENT_METHOD_LABELS: Record<string, string> = {
   stripe_card: 'Card',
   paypal:      'PayPal',
-  mpesa:       'M-Pesa',
   apple_pay:   'Apple Pay',
   google_pay:  'Google Pay',
 }

@@ -2,13 +2,13 @@
 import { useState } from 'react'
 import {
   Store, Bell, Plug, FileText, ChevronRight,
-  CheckCircle, XCircle, CreditCard, Mail, Database, Smartphone,
+  CheckCircle, XCircle, CreditCard, Mail, Database,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 interface Props {
   settings:     Record<string, unknown>
-  integrations: { stripe: boolean; supabase: boolean; resend: boolean; mpesa: boolean }
+  integrations: { stripe: boolean; supabase: boolean; resend: boolean }
 }
 
 type Section = 'general' | 'notifications' | 'integrations' | 'policies'
@@ -317,12 +317,6 @@ export default function SettingsClient({ settings, integrations }: Props) {
               connected={integrations.resend}
               icon={Mail}
               description="Transactional and marketing email delivery"
-            />
-            <IntegrationRow
-              name="M-Pesa"
-              connected={integrations.mpesa}
-              icon={Smartphone}
-              description="Mobile money payments for East Africa"
             />
           </SectionCard>
         )}

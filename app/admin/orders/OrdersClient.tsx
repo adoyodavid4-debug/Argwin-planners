@@ -17,7 +17,6 @@ const PAYMENT_LABELS: Record<string, string> = {
   paypal:      'PayPal',
   apple_pay:   'Apple Pay',
   google_pay:  'Google Pay',
-  mpesa:       'M-Pesa',
 }
 
 interface Props {

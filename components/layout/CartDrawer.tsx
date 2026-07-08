@@ -1,16 +1,13 @@
 'use client'
-import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
 import { X, ShoppingCart, Trash2, ArrowRight, Lock } from 'lucide-react'
 import { useCartStore, useUIStore } from '@/lib/store'
-import MpesaCheckout from '@/components/checkout/MpesaCheckout'
 
 export default function CartDrawer() {
   const { cartOpen, setCartOpen } = useUIStore()
-  const { items, removeItem, total, clearCart } = useCartStore()
-  const [showMpesa, setShowMpesa] = useState(false)
+  const { items, removeItem, total } = useCartStore()
 
   return (
     <>
@@ -124,90 +121,40 @@ export default function CartDrawer() {
         {/* Footer */}
         {items.length > 0 && (
           <div className="p-6 border-t space-y-4" style={{ borderColor: 'var(--border)' }}>
-            <AnimatePresence mode="wait">
-              {showMpesa ? (
-                /* ── M-Pesa inline panel ─────────────────────── */
-                <motion.div
-                  key="mpesa"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{   opacity: 0, x: -20 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <MpesaCheckout
-                    items={items}
-                    total={total()}
-                    onClose={() => setShowMpesa(false)}
-                    onSuccess={() => { clearCart(); setCartOpen(false) }}
-                  />
-                </motion.div>
-              ) : (
-                /* ── Default checkout panel ──────────────────── */
-                <motion.div
-                  key="checkout"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{   opacity: 0 }}
-                  transition={{ duration: 0.15 }}
-                  className="space-y-4"
-                >
-                  {/* Totals */}
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm" style={{ color: 'var(--text-secondary)' }}>
-                      <span>Subtotal</span>
-                      <span>${total().toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between font-bold text-base" style={{ color: 'var(--text-primary)' }}>
-                      <span>Total</span>
-                      <span style={{ color: 'var(--gold)' }}>${total().toFixed(2)}</span>
-                    </div>
-                  </div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.15 }}
+              className="space-y-4"
+            >
+              {/* Totals */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm" style={{ color: 'var(--text-secondary)' }}>
+                  <span>Subtotal</span>
+                  <span>${total().toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between font-bold text-base" style={{ color: 'var(--text-primary)' }}>
+                  <span>Total</span>
+                  <span style={{ color: 'var(--gold)' }}>${total().toFixed(2)}</span>
+                </div>
+              </div>
 
-                  {/* Stripe / card checkout */}
-                  <Link
-                    href="/checkout"
-                    className="btn-primary w-full justify-center text-sm"
-                    onClick={() => setCartOpen(false)}
-                  >
-                    Secure Checkout
-                    <ArrowRight size={15} />
-                  </Link>
+              {/* Stripe / card checkout */}
+              <Link
+                href="/checkout"
+                className="btn-primary w-full justify-center text-sm"
+                onClick={() => setCartOpen(false)}
+              >
+                Secure Checkout
+                <ArrowRight size={15} />
+              </Link>
 
-                  {/* Divider */}
-                  <div className="flex items-center gap-3">
-                    <div className="flex-1 h-px" style={{ background: 'var(--border)' }} />
-                    <span className="text-xs" style={{ color: 'var(--text-muted)' }}>or pay with</span>
-                    <div className="flex-1 h-px" style={{ background: 'var(--border)' }} />
-                  </div>
-
-                  {/* M-Pesa */}
-                  <button
-                    onClick={() => setShowMpesa(true)}
-                    className="w-full flex items-center justify-center gap-2.5 py-2.5 rounded-xl font-bold text-sm border transition-all"
-                    style={{
-                      background:   '#00A651',
-                      borderColor:  '#00A651',
-                      color:        'white',
-                      fontFamily:   'var(--font-jost)',
-                    }}
-                  >
-                    <span
-                      className="w-6 h-6 rounded-lg flex items-center justify-center font-black text-xs"
-                      style={{ background: 'rgba(255,255,255,0.25)' }}
-                    >
-                      M
-                    </span>
-                    Lipa Na M-Pesa
-                  </button>
-
-                  {/* Trust */}
-                  <div className="flex items-center justify-center gap-1.5 text-xs" style={{ color: 'var(--text-muted)' }}>
-                    <Lock size={11} />
-                    256-bit SSL encrypted · Instant download after payment
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+              {/* Trust */}
+              <div className="flex items-center justify-center gap-1.5 text-xs" style={{ color: 'var(--text-muted)' }}>
+                <Lock size={11} />
+                256-bit SSL encrypted · Instant download after payment
+              </div>
+            </motion.div>
           </div>
         )}
       </div>

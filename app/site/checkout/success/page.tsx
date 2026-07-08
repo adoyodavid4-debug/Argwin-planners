@@ -1,6 +1,6 @@
 // app/site/checkout/success/page.tsx
 // Order confirmation: resolves the order from ?session_id= (Stripe) or
-// ?order= (PayPal / M-Pesa) and shows download buttons per digital product.
+// ?order= (PayPal) and shows download buttons per digital product.
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { CheckCircle2, Download } from 'lucide-react'
@@ -20,7 +20,6 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 const PAYMENT_LABELS: Record<string, string> = {
   stripe_card: 'Card',
   paypal:      'PayPal',
-  mpesa:       'M-Pesa',
   apple_pay:   'Apple Pay',
   google_pay:  'Google Pay',
 }

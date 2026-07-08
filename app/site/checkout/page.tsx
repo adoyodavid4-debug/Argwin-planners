@@ -4,7 +4,7 @@ import CheckoutClient from './CheckoutClient'
 
 export const metadata: Metadata = {
   title: 'Secure Checkout — Arwign Planners',
-  description: 'Complete your order securely with card, PayPal or M-Pesa. Instant digital download after payment.',
+  description: 'Complete your order securely with card or PayPal. Instant digital download after payment.',
   robots: { index: false, follow: false },
 }
 

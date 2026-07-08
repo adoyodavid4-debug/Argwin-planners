@@ -208,7 +208,7 @@ export default function NotebooksClient({ notebooks, faqs }: { notebooks: Notebo
       {/* ══ TRUST STRIP ═══════════════════════════════════════ */}
       <section className="border-b py-6" style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}>
         <div className="container-site flex flex-wrap items-center justify-center gap-x-10 gap-y-3">
-          {[{ icon: Zap, l: 'Instant Delivery' }, { icon: Shield, l: 'Secure Checkout' }, { icon: Smartphone, l: 'Any Device' }, { icon: Printer, l: 'Print or Digital' }, { icon: CreditCard, l: 'Card · PayPal · M-Pesa' }].map(({ icon: Icon, l }) => (
+          {[{ icon: Zap, l: 'Instant Delivery' }, { icon: Shield, l: 'Secure Checkout' }, { icon: Smartphone, l: 'Any Device' }, { icon: Printer, l: 'Print or Digital' }, { icon: CreditCard, l: 'Card · PayPal' }].map(({ icon: Icon, l }) => (
             <span key={l} className="inline-flex items-center gap-2 text-xs font-medium" style={{ color: 'var(--text-secondary)' }}><Icon size={15} style={{ color: 'var(--gold)' }} /> {l}</span>
           ))}
         </div>

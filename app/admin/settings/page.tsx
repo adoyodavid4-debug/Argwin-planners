@@ -25,7 +25,6 @@ export default async function AdminSettingsPage() {
     stripe:   !!process.env.STRIPE_SECRET_KEY,
     supabase: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
     resend:   !!process.env.RESEND_API_KEY,
-    mpesa:    !!(process.env.MPESA_CONSUMER_KEY && process.env.MPESA_CONSUMER_SECRET),
   }
 
   return (

@@ -1,7 +1,7 @@
 'use client'
 // Ready-Made (General) product panel: variant selector + add-to-cart.
 // Calls INTO the existing cart/checkout flow (useCartStore + cart drawer →
-// Stripe / Paystack / M-Pesa). It does not rebuild any payment logic.
+// Stripe / Paystack). It does not rebuild any payment logic.
 import { useState } from 'react'
 import { ShoppingCart, Check, Zap, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -170,7 +170,7 @@ export default function ReadyMadePanel({ size, colour, onSizeChange, onColourCha
 
       <p className="text-xs mt-3 flex items-center gap-1.5" style={{ color: 'var(--text-muted)' }}>
         <Zap size={12} style={{ color: 'var(--gold)' }} />
-        Download instantly after checkout · secure payment via Stripe, Paystack &amp; M-Pesa
+        Download instantly after checkout · secure payment via Stripe &amp; Paystack
       </p>
     </div>
   )
