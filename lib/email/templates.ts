@@ -248,6 +248,20 @@ const templates: Record<string, (locale: Locale, data: Record<string, unknown>) 
   },
 
   // Internal admin notification — no unsubscribe footer (not a subscriber-facing email)
+  'contact.admin': (locale, data) => {
+    const subject = `New contact form message from ${data.name}${data.subject ? `: ${data.subject}` : ''}`
+    const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#FAF8F4;color:#1A1820;margin:0;padding:0}.container{max-width:560px;margin:40px auto;background:#fff;border-radius:12px;padding:40px;border:1px solid #E8E4DB}</style></head><body><div class="container">
+      <h2 style="color:#1A1820">New contact form message</h2>
+      <p><strong>Name:</strong> ${data.name}</p>
+      <p><strong>Email:</strong> ${data.email}</p>
+      ${data.subject ? `<p><strong>Subject:</strong> ${data.subject}</p>` : ''}
+      <p><strong>Message:</strong></p>
+      <p style="white-space:pre-wrap;background:#FAF8F4;border:1px solid #E8E4DB;border-radius:8px;padding:16px">${data.message}</p>
+    </div></body></html>`
+    return { subject, html, text: subject }
+  },
+
+  // Internal admin notification — no unsubscribe footer (not a subscriber-facing email)
   'notebook_request.admin': (locale, data) => {
     const subject = `New personalized notebook idea from ${data.name}`
     const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#FAF8F4;color:#1A1820;margin:0;padding:0}.container{max-width:560px;margin:40px auto;background:#fff;border-radius:12px;padding:40px;border:1px solid #E8E4DB}</style></head><body><div class="container">
