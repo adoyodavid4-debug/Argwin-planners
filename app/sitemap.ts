@@ -22,24 +22,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const staticPages: MetadataRoute.Sitemap = [
     { url: BASE, lastModified: new Date(), changeFrequency: 'daily', priority: 1 },
-    { url: `${BASE}/fr`, lastModified: new Date(), changeFrequency: 'daily', priority: 1 },
     { url: `${BASE}/site/shop`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
-    { url: `${BASE}/fr/shop`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
     { url: `${BASE}/site/notebooks`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.85 },
     { url: `${BASE}/site/about`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
     { url: `${BASE}/site/contact`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.4 },
     { url: `${BASE}/site/blog`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.7 },
   ]
 
-  const productPages: MetadataRoute.Sitemap = (products ?? []).flatMap((p) => [
-    { url: `${BASE}/site/shop/${p.slug}`, lastModified: new Date(p.updated_at), changeFrequency: 'weekly' as const, priority: 0.8 },
-    { url: `${BASE}/fr/shop/${p.slug}`, lastModified: new Date(p.updated_at), changeFrequency: 'weekly' as const, priority: 0.8 },
-  ])
+  const productPages: MetadataRoute.Sitemap = (products ?? []).map((p) => ({
+    url: `${BASE}/site/shop/${p.slug}`, lastModified: new Date(p.updated_at), changeFrequency: 'weekly' as const, priority: 0.8,
+  }))
 
-  const categoryPages: MetadataRoute.Sitemap = (categories ?? []).flatMap((c) => [
-    { url: `${BASE}/site/shop/category/${c.slug}`, changeFrequency: 'weekly' as const, priority: 0.7 },
-    { url: `${BASE}/fr/shop/category/${c.slug}`, changeFrequency: 'weekly' as const, priority: 0.7 },
-  ])
+  const categoryPages: MetadataRoute.Sitemap = (categories ?? []).map((c) => ({
+    url: `${BASE}/site/shop/category/${c.slug}`, changeFrequency: 'weekly' as const, priority: 0.7,
+  }))
 
   const blogPages: MetadataRoute.Sitemap = (posts ?? []).map((p) => ({
     url: `${BASE}/site/blog/${p.slug}`,
