@@ -31,7 +31,6 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    alternateLocale: 'fr_FR',
     url: 'https://arwignplanners.com',
     siteName: 'Arwign Planners',
     title: 'Arwign Planners — Premium Digital & Printable Planners',
@@ -75,7 +74,6 @@ export const metadata: Metadata = {
     canonical: 'https://arwignplanners.com',
     languages: {
       'en-US': 'https://arwignplanners.com',
-      'fr-FR': 'https://arwignplanners.com/fr',
     },
   },
 }
