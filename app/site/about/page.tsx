@@ -1,5 +1,8 @@
 import type { Metadata } from 'next'
+import { BreadcrumbSchema } from '@/components/seo/JsonLd'
 import AboutClient from './AboutClient'
+
+const BASE = 'https://arwignplanners.com'
 
 export const metadata: Metadata = {
   title: 'About Us — The Story Behind Arwign Planners',
@@ -13,5 +16,13 @@ export const metadata: Metadata = {
 }
 
 export default function AboutPage() {
-  return <AboutClient />
+  return (
+    <>
+      <BreadcrumbSchema items={[
+        { name: 'Home', url: BASE },
+        { name: 'About', url: `${BASE}/site/about` },
+      ]} />
+      <AboutClient />
+    </>
+  )
 }

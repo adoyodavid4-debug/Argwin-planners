@@ -2,6 +2,9 @@
 import type { Metadata } from 'next'
 import ShopClient from './ShopClient'
 import { createServiceRoleClient } from '@/lib/supabase/server'
+import { BreadcrumbSchema } from '@/components/seo/JsonLd'
+
+const BASE = 'https://arwignplanners.com'
 
 export const revalidate = 300
 
@@ -38,6 +41,12 @@ export default async function ShopPage() {
   const featured = items.filter((p) => p.is_bestseller).slice(0, 10)
 
   return (
-    <ShopClient products={items} categories={usedCategories} featured={featured} />
+    <>
+      <BreadcrumbSchema items={[
+        { name: 'Home', url: BASE },
+        { name: 'Shop', url: `${BASE}/site/shop` },
+      ]} />
+      <ShopClient products={items} categories={usedCategories} featured={featured} />
+    </>
   )
 }

@@ -1,7 +1,10 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { createServiceRoleClient } from '@/lib/supabase/server'
+import { BreadcrumbSchema } from '@/components/seo/JsonLd'
 import CategoryClient from './CategoryClient'
+
+const BASE = 'https://arwignplanners.com'
 
 interface Props {
   params: { slug: string }
@@ -67,10 +70,17 @@ export default async function CategoryPage({ params }: Props) {
     .then((r) => ({ data: r.error ? [] : r.data }))
 
   return (
-    <CategoryClient
-      category={category}
-      products={products ?? []}
-      relatedCategories={relatedCategories ?? []}
-    />
+    <>
+      <BreadcrumbSchema items={[
+        { name: 'Home', url: BASE },
+        { name: 'Shop', url: `${BASE}/site/shop` },
+        { name: category.name, url: `${BASE}/site/shop/category/${category.slug}` },
+      ]} />
+      <CategoryClient
+        category={category}
+        products={products ?? []}
+        relatedCategories={relatedCategories ?? []}
+      />
+    </>
   )
 }

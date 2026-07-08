@@ -1,5 +1,8 @@
 import type { Metadata } from 'next'
+import { BreadcrumbSchema } from '@/components/seo/JsonLd'
 import ContactClient from './ContactClient'
+
+const BASE = 'https://arwignplanners.com'
 
 export const metadata: Metadata = {
   title: 'Contact Us — Arwign Planners',
@@ -13,5 +16,13 @@ export const metadata: Metadata = {
 }
 
 export default function ContactPage() {
-  return <ContactClient />
+  return (
+    <>
+      <BreadcrumbSchema items={[
+        { name: 'Home', url: BASE },
+        { name: 'Contact', url: `${BASE}/site/contact` },
+      ]} />
+      <ContactClient />
+    </>
+  )
 }

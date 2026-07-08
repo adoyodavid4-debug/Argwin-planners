@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { createServiceRoleClient } from '@/lib/supabase/server'
-import { ItemListSchema, FaqSchema } from '@/components/seo/JsonLd'
+import { ItemListSchema, FaqSchema, BreadcrumbSchema } from '@/components/seo/JsonLd'
 import NotebooksClient from './NotebooksClient'
 
 export const revalidate = 600
@@ -43,6 +43,10 @@ export default async function NotebooksPage() {
 
   return (
     <>
+      <BreadcrumbSchema items={[
+        { name: 'Home', url: BASE_URL },
+        { name: 'Digital Notebooks', url: `${BASE_URL}/site/notebooks` },
+      ]} />
       <ItemListSchema
         name="Digital Notebooks"
         url={`${BASE_URL}/notebooks`}

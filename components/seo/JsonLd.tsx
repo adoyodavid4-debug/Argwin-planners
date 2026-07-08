@@ -31,8 +31,10 @@ export function OrganizationSchema(_props: BaseProps = {}) {
           logo: `${BASE}/logo.png`,
           description: 'Premium digital and printable planners for productivity, wellness, and organization.',
           sameAs: [
-            'https://pinterest.com/arwignplanners',
             'https://instagram.com/arwignplanners',
+            'https://youtube.com/@arwignplanners',
+            'https://pinterest.com/arwignplanners',
+            'https://tiktok.com/@arwignplanners',
           ],
           contactPoint: { '@type': 'ContactPoint', contactType: 'customer support', email: 'hello@arwignplanners.com' },
         },
@@ -100,6 +102,44 @@ export function ProductSchema({ name, description, images, price, currency = 'US
   }
 
   return <Script data={data} />
+}
+
+// ─── Organization reviews (real, DB-backed testimonials only) ────────────────
+// Only render this when actual testimonial rows exist — never for hardcoded
+// placeholder/fallback copy, so every Review in the markup is genuine.
+
+export interface OrgReviewItem { author: string; ratingValue: number; reviewBody: string }
+
+export function OrganizationReviewSchema({
+  ratingValue,
+  reviewCount,
+  reviews,
+}: {
+  ratingValue: number
+  reviewCount: number
+  reviews: OrgReviewItem[]
+}) {
+  if (reviewCount <= 0) return null
+  return (
+    <Script data={{
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      '@id': `${BASE}/#org`,
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: ratingValue.toFixed(1),
+        reviewCount,
+        bestRating: '5',
+        worstRating: '1',
+      },
+      review: reviews.slice(0, 10).map((r) => ({
+        '@type': 'Review',
+        author: { '@type': 'Person', name: r.author },
+        reviewRating: { '@type': 'Rating', ratingValue: r.ratingValue, bestRating: '5', worstRating: '1' },
+        reviewBody: r.reviewBody,
+      })),
+    }} />
+  )
 }
 
 // ─── BreadcrumbList ──────────────────────────────────────────────────────────

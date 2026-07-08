@@ -2,7 +2,10 @@ import { notFound }             from 'next/navigation'
 import type { Metadata }         from 'next'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { type BlogPost, STATIC_POSTS } from '../blog-data'
+import { BreadcrumbSchema } from '@/components/seo/JsonLd'
 import BlogPostClient             from './BlogPostClient'
+
+const BASE = 'https://arwignplanners.com'
 
 interface Params { params: { slug: string } }
 
@@ -102,5 +105,14 @@ export default async function BlogPostPage({ params }: Params) {
       : related
   }
 
-  return <BlogPostClient post={post} related={more} />
+  return (
+    <>
+      <BreadcrumbSchema items={[
+        { name: 'Home', url: BASE },
+        { name: 'Blog', url: `${BASE}/site/blog` },
+        { name: post.title, url: `${BASE}/site/blog/${post.slug}` },
+      ]} />
+      <BlogPostClient post={post} related={more} />
+    </>
+  )
 }

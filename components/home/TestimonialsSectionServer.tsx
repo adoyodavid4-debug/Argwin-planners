@@ -3,6 +3,7 @@
 // into the presentational TestimonialsSection. When the table is empty or the
 // fetch fails, no props are passed and the hardcoded fallback renders.
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { OrganizationReviewSchema } from '@/components/seo/JsonLd'
 import TestimonialsSection, { type TestimonialInput } from './TestimonialsSection'
 
 function str(v: unknown): string | undefined {
@@ -40,12 +41,28 @@ export default async function TestimonialsSectionServer() {
     // fall back to hardcoded content inside TestimonialsSection
   }
 
+  // Only emit Review/AggregateRating schema for real, DB-backed testimonials —
+  // never for the hardcoded placeholder copy TestimonialsSection falls back to.
+  const hasRealReviews = !!testimonials && testimonials.length > 0
+  const avgRating = hasRealReviews
+    ? testimonials!.reduce((sum, t) => sum + t.rating, 0) / testimonials!.length
+    : 0
+
   return (
-    <TestimonialsSection
-      testimonials={testimonials}
-      rating={rating}
-      reviews={reviews}
-      customers={customers}
-    />
+    <>
+      {hasRealReviews && (
+        <OrganizationReviewSchema
+          ratingValue={avgRating}
+          reviewCount={testimonials!.length}
+          reviews={testimonials!.map((t) => ({ author: t.name, ratingValue: t.rating, reviewBody: t.quote }))}
+        />
+      )}
+      <TestimonialsSection
+        testimonials={testimonials}
+        rating={rating}
+        reviews={reviews}
+        customers={customers}
+      />
+    </>
   )
 }

@@ -17,6 +17,7 @@ export interface NavItem {
 const DEFAULT_ANNOUNCEMENT = '✦ Free instant download on all digital planners · Shop Now ✦'
 
 const navLinks: NavItem[] = [
+  { label: 'Home', href: '/' },
   { label: 'Shop', href: '/shop' },
   {
     label: 'Digital Planners',
@@ -48,6 +49,8 @@ const navLinks: NavItem[] = [
   { label: 'New Arrivals', href: '/new-arrivals' },
   { label: 'Blog',         href: '/blog' },
   { label: 'About',        href: '/about' },
+  { label: 'Reviews',      href: '/site#testimonials-heading' },
+  { label: 'Contact',      href: '/site/contact' },
 ]
 
 export default function Navbar({

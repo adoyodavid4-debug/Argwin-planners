@@ -1,7 +1,10 @@
 import type { Metadata } from 'next'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { type BlogPost, STATIC_POSTS } from './blog-data'
+import { BreadcrumbSchema } from '@/components/seo/JsonLd'
 import BlogClient from './BlogClient'
+
+const BASE = 'https://arwignplanners.com'
 
 export const metadata: Metadata = {
   title: 'Planning Tips, Guides & Inspiration — Arwign Blog',
@@ -47,9 +50,15 @@ export default async function BlogPage({
       : STATIC_POSTS
 
   return (
-    <BlogClient
-      posts={posts}
-      searchParams={searchParams}
-    />
+    <>
+      <BreadcrumbSchema items={[
+        { name: 'Home', url: BASE },
+        { name: 'Blog', url: `${BASE}/site/blog` },
+      ]} />
+      <BlogClient
+        posts={posts}
+        searchParams={searchParams}
+      />
+    </>
   )
 }
