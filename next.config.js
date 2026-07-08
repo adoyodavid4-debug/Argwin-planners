@@ -75,6 +75,7 @@ const nextConfig = {
       { source: '/best-sellers',    destination: '/site/best-sellers',    permanent: false },
       { source: '/new-arrivals',    destination: '/site/new-arrivals',    permanent: false },
       { source: '/about',           destination: '/site/about',           permanent: false },
+      { source: '/contact',         destination: '/site/contact',         permanent: false },
       { source: '/blog',            destination: '/site/blog',            permanent: false },
       { source: '/blog/:path*',     destination: '/site/blog/:path*',     permanent: false },
 
