@@ -251,30 +251,26 @@ export default function Footer({
         </div>
       </div>
 
-      {/* Payment methods */}
-      <div className="border-t" style={{ borderColor: 'var(--border)' }}>
-        <div className="container-site py-7 flex flex-col items-center gap-3">
-          <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
-            We Accept
-          </span>
-          <div className="rounded-xl border" style={{ borderColor: 'var(--border)', background: '#E8EAED', padding: '10px 16px' }} aria-label="Accepted payment methods">
-            <Image
-              src="/images/payments/accepted-methods.jpg"
-              alt="We accept Visa, Mastercard, PayPal and American Express"
-              width={736}
-              height={552}
-              style={{ width: 200, height: 'auto', display: 'block' }}
-            />
-          </div>
-        </div>
-      </div>
-
       {/* Bottom Bar */}
       <div className="border-t" style={{ borderColor: 'var(--border)' }}>
-        <div className="container-site py-6 flex items-center justify-center">
-          <p className="text-xs text-center" style={{ color: 'var(--text-muted)' }}>
+        <div className="container-site py-6 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-center md:text-left" style={{ color: 'var(--text-muted)' }}>
             © {year} {brand}. All rights reserved. Premium Digital & Printable Planner & Notebook Shop.
           </p>
+          <div className="flex items-center gap-2.5" aria-label="Accepted payment methods">
+            <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
+              We Accept
+            </span>
+            <div className="rounded-lg border" style={{ borderColor: 'var(--border)', background: '#E8EAED', padding: '4px 10px' }}>
+              <Image
+                src="/images/payments/accepted-methods.jpg"
+                alt="We accept Visa, Mastercard, PayPal and American Express"
+                width={736}
+                height={552}
+                style={{ width: 140, height: 'auto', display: 'block' }}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </footer>
