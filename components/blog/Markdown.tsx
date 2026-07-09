@@ -28,7 +28,7 @@ function renderInline(text: string): React.ReactNode {
     const link = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/)
     if (link) {
       return (
-        <a key={i} href={link[2]} className="underline hover:no-underline" style={{ color: 'var(--gold)' }}
+        <a key={i} href={link[2]} className="underline hover:no-underline break-words" style={{ color: 'var(--gold)' }}
           target={link[2].startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer">
           {renderInline(link[1])}
         </a>
@@ -141,7 +141,7 @@ export default function Markdown({ content }: { content: string }) {
             return (
               <ul key={i} className="ml-5 mb-5 space-y-2 list-disc list-outside">
                 {block.items.map((item, j) => (
-                  <li key={j} className="text-[0.96rem] leading-[1.85]" style={{ color: 'var(--text-secondary)' }}>
+                  <li key={j} className="text-[0.96rem] leading-[1.85] break-words" style={{ color: 'var(--text-secondary)' }}>
                     {renderInline(item)}
                   </li>
                 ))}
@@ -151,7 +151,7 @@ export default function Markdown({ content }: { content: string }) {
             return (
               <ol key={i} className="ml-5 mb-5 space-y-2 list-decimal list-outside">
                 {block.items.map((item, j) => (
-                  <li key={j} className="text-[0.96rem] leading-[1.85]" style={{ color: 'var(--text-secondary)' }}>
+                  <li key={j} className="text-[0.96rem] leading-[1.85] break-words" style={{ color: 'var(--text-secondary)' }}>
                     {renderInline(item)}
                   </li>
                 ))}
@@ -159,7 +159,7 @@ export default function Markdown({ content }: { content: string }) {
             )
           default:
             return (
-              <p key={i} className="text-[0.96rem] leading-[1.85] mb-5" style={{ color: 'var(--text-secondary)' }}>
+              <p key={i} className="text-[0.96rem] leading-[1.85] mb-5 break-words" style={{ color: 'var(--text-secondary)' }}>
                 {renderInline(block.text)}
               </p>
             )

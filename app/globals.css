@@ -54,12 +54,15 @@
   --ease-smooth:  cubic-bezier(0.4, 0, 0.2, 1);
   --ease-elegant: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
-  /* Nav height */
-  --nav-height: 88px;
+  /* Nav height — matches header h-16 sm:h-20 lg:h-22 */
+  --nav-height: 64px;
 
   /* Header */
   --header-bg: #E8E2C4;
 }
+
+@media (min-width: 640px)  { :root { --nav-height: 80px; } }
+@media (min-width: 1024px) { :root { --nav-height: 88px; } }
 
 .dark {
   --bg-primary:   #1A1820;
@@ -132,6 +135,9 @@ h4, h5, h6 { font-family: var(--font-jost); font-weight: 600; }
 }
 
 /* ─── Buttons ───────────────────────────────────────────────── */
+/* Kept in the components layer so responsive utilities (hidden, sm:flex,
+   w-full, px-*) written in JSX can override these base styles. */
+@layer components {
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -201,6 +207,28 @@ h4, h5, h6 { font-family: var(--font-jost); font-weight: 600; }
   text-decoration: none;
 }
 .btn-ghost:hover { background: var(--border); color: var(--text-primary); }
+
+/* Icon-only button — compact on phones so the logo keeps its space */
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  min-width: 40px;
+  min-height: 40px;
+  transition: all 0.2s var(--ease-smooth);
+  text-decoration: none;
+}
+.btn-icon:hover { background: var(--border); color: var(--text-primary); }
+@media (min-width: 640px) {
+  .btn-icon { padding: 0.625rem; min-width: 44px; min-height: 44px; }
+}
+} /* end @layer components */
 
 /* ─── Product Cards ─────────────────────────────────────────── */
 .product-card {
@@ -314,8 +342,9 @@ h4, h5, h6 { font-family: var(--font-jost); font-weight: 600; }
   width: 100%;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 1rem;
 }
+@media (min-width: 640px)  { .container-site { padding: 0 1.5rem; } }
 @media (min-width: 768px)  { .container-site { padding: 0 2.5rem; } }
 @media (min-width: 1280px) { .container-site { padding: 0 3rem; } }
 

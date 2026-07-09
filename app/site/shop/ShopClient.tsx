@@ -205,18 +205,18 @@ export default function ShopClient({ products, categories, featured }: Props) {
 
       {/* ══ TOOLBAR (sticky) ══════════════════════════════════ */}
       <div className="sticky top-[var(--nav-height,88px)] z-30 border-b py-3 backdrop-blur" style={{ background: 'color-mix(in srgb, var(--bg-primary) 88%, transparent)', borderColor: 'var(--border)' }}>
-        <div className="container-site flex items-center gap-3">
+        <div className="container-site flex flex-wrap items-center gap-2 sm:gap-3">
           <button onClick={() => setDrawerOpen(true)} className="lg:hidden inline-flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium flex-shrink-0" style={{ borderColor: 'var(--border)', background: 'var(--bg-card)', color: 'var(--text-primary)' }}>
             <SlidersHorizontal size={14} /> Filters {activeCount > 0 && <span className="ml-0.5 px-1.5 rounded-full text-[10px] font-bold text-white" style={{ background: 'var(--gold)' }}>{activeCount}</span>}
           </button>
-          <div className="relative flex-1 max-w-md">
+          <div className="relative flex-1 min-w-[140px] max-w-md">
             <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
             <input value={searchInput} onChange={(e) => setSearchInput(e.target.value)} placeholder="Search planners, trackers…" className="input-field !py-2 !pl-10 !pr-9 text-sm" aria-label="Search products" />
             {searchInput && <button onClick={() => setSearchInput('')} className="absolute right-3 top-1/2 -translate-y-1/2" aria-label="Clear search"><X size={14} style={{ color: 'var(--text-muted)' }} /></button>}
           </div>
           <div className="flex-1 hidden lg:block" />
           <div className="relative">
-            <select value={sort} onChange={(e) => setSort(e.target.value)} className="input-field !py-2 !pr-9 cursor-pointer text-sm appearance-none" style={{ width: 'auto', minWidth: 150 }} aria-label="Sort">
+            <select value={sort} onChange={(e) => setSort(e.target.value)} className="input-field !py-2 !pr-9 cursor-pointer text-sm appearance-none" style={{ width: 'auto' }} aria-label="Sort">
               {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
             <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--text-muted)' }} />

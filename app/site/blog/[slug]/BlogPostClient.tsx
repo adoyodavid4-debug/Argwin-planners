@@ -142,7 +142,7 @@ function HabitLoopArticle() {
         </P>
 
         {/* Stats grid */}
-        <div className="grid grid-cols-3 gap-4 my-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 my-8">
           <Stat value="66 days"  label="Average time to automaticity" />
           <Stat value="18 days"  label="Fastest (simple habits)" />
           <Stat value="254 days" label="Slowest (complex habits)" />
@@ -467,7 +467,8 @@ function GoodNotesVsNotabilityArticle() {
         </P>
 
         {/* Mini comparison table */}
-        <div className="rounded-2xl border overflow-hidden my-6" style={{ borderColor: 'var(--border)' }}>
+        <div className="rounded-2xl border my-6 overflow-x-auto" style={{ borderColor: 'var(--border)' }}>
+          <div className="min-w-[480px]">
           <div className="grid grid-cols-[1fr_1fr_1fr] text-xs font-bold uppercase tracking-wide p-3"
             style={{ background: 'var(--charcoal)', color: 'white', letterSpacing: '0.07em' }}>
             <span>Feature</span>
@@ -480,6 +481,7 @@ function GoodNotesVsNotabilityArticle() {
           <CompareRow feature="Text boxes" gn="Yes, rich formatting" nb="Yes, basic formatting" winner="gn" />
           <CompareRow feature="Shape tools" gn="Yes + shape recognition" nb="Yes + shape recognition" winner="tie" />
           <CompareRow feature="Image insert" gn="Yes" nb="Yes" winner="tie" />
+          </div>
         </div>
       </Section>
 

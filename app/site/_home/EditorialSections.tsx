@@ -53,7 +53,7 @@ function MiniCover({ hex, spine, ink, w = 54, style }: { hex: string; spine: str
 // Step 1 — a product card being selected
 function ChooseScene({ play }: { play: boolean }) {
   return (
-    <div className="relative mx-auto" style={{ width: 200, height: 150 }} aria-hidden>
+    <div className="relative mx-auto w-full" style={{ maxWidth: 200, height: 150 }} aria-hidden>
       <MiniCover hex="#A8B5A0" spine="#83AE73" ink="#33502C" style={{ left: '50%', top: '52%', transform: 'translate(-96%,-50%) rotate(-13deg)' }} />
       <MiniCover hex="#F2C6A6" spine="#E3AC85" ink="#7E4A30" style={{ left: '50%', top: '52%', transform: 'translate(-4%,-50%) rotate(13deg)' }} />
       <motion.div className="absolute" style={{ left: '50%', top: '50%', transformStyle: 'preserve-3d' }}
@@ -77,7 +77,7 @@ function ChooseScene({ play }: { play: boolean }) {
 // Step 2 — a file downloading into a device
 function DownloadScene({ play }: { play: boolean }) {
   return (
-    <div className="relative mx-auto" style={{ width: 200, height: 150 }} aria-hidden>
+    <div className="relative mx-auto w-full" style={{ maxWidth: 200, height: 150 }} aria-hidden>
       <div className="absolute left-1/2" style={{ bottom: 16, transform: 'translateX(-50%)', width: 100, height: 72, borderRadius: 14, background: 'var(--bg-card)', border: '2px solid var(--border)', boxShadow: '0 14px 26px rgba(44,42,53,0.14)' }}>
         <div style={{ position: 'absolute', inset: 8, borderRadius: 9, background: 'var(--bg-secondary)', overflow: 'hidden' }}>
           <motion.div className="absolute left-1/2 flex items-center justify-center" style={{ top: '50%', width: 26, height: 26, borderRadius: '50%', background: 'var(--gold)', transform: 'translate(-50%,-50%)' }}
@@ -104,7 +104,7 @@ function DownloadScene({ play }: { play: boolean }) {
 // Step 3 — a page coming to life in an app
 function UseScene({ play }: { play: boolean }) {
   return (
-    <div className="relative mx-auto" style={{ width: 200, height: 150 }} aria-hidden>
+    <div className="relative mx-auto w-full" style={{ maxWidth: 200, height: 150 }} aria-hidden>
       <div className="absolute" style={{ inset: '10px 14px 12px 14px', borderRadius: 14, background: 'var(--bg-card)', border: '2px solid var(--border)', boxShadow: '0 14px 26px rgba(44,42,53,0.14)', overflow: 'hidden' }}>
         <div className="flex items-center gap-1.5 px-3" style={{ height: 22, background: 'var(--bg-secondary)' }}>
           {['#C97B5A', '#A0830E', '#A8B5A0'].map((c) => <span key={c} style={{ width: 7, height: 7, borderRadius: '50%', background: c, opacity: 0.7 }} />)}
@@ -187,7 +187,7 @@ export function HowItWorks() {
                 {/* content */}
                 <motion.div className="flex-1 md:flex-none min-w-0 md:mt-6"
                   initial={reduce ? false : { opacity: 0, y: 20 }} animate={shown ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.5, delay: 0.2 + i * 0.18 }}>
-                  <div className="group rounded-2xl border p-4 mb-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-product" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }} tabIndex={0} role="img" aria-label={`${title} — step ${i + 1}`}>
+                  <div className="group rounded-2xl border p-4 mb-4 overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-product" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }} tabIndex={0} role="img" aria-label={`${title} — step ${i + 1}`}>
                     <div className="transition-transform duration-300 group-hover:scale-[1.04] group-focus-within:scale-[1.04]"><Scene play={play} /></div>
                   </div>
                   <h3 className="font-semibold text-lg mb-1.5" style={{ color: 'var(--text-primary)' }}>{title}</h3>

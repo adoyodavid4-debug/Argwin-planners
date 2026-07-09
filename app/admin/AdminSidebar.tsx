@@ -49,6 +49,44 @@ export default function AdminSidebar() {
   }
 
   return (
+    <>
+    {/* Mobile / tablet top bar — the sidebar below is desktop-only */}
+    <div className="lg:hidden sticky top-0 z-40 border-b" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+      <div className="flex items-center justify-between gap-3 px-4 py-3">
+        <Link href="/" className="flex items-center gap-2 min-w-0">
+          <Image src="/logo.png" alt="Arwign Planners" width={32} height={32} className="w-8 h-8 object-contain rounded-lg flex-shrink-0" />
+          <span className="font-semibold text-sm truncate" style={{ color: 'var(--text-primary)' }}>Admin Panel</span>
+        </Link>
+        <button
+          onClick={handleSignOut}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border flex-shrink-0"
+          style={{ color: 'var(--text-secondary)', borderColor: 'var(--border)' }}
+        >
+          <LogOut size={13} /> Sign Out
+        </button>
+      </div>
+      <nav className="flex gap-1 overflow-x-auto px-3 pb-2 scrollbar-hide" aria-label="Admin navigation">
+        {adminNav.map((item) => {
+          const active = pathname === item.href || pathname.startsWith(`${item.href}/`)
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap border transition-all"
+              style={{
+                color:       active ? 'var(--gold)' : 'var(--text-secondary)',
+                background:  active ? 'rgba(201,168,76,0.08)' : 'transparent',
+                borderColor: active ? 'var(--border-gold)' : 'var(--border)',
+              }}
+            >
+              <item.icon size={13} />
+              {item.label}
+            </Link>
+          )
+        })}
+      </nav>
+    </div>
+
     <aside
       className="w-64 hidden lg:flex flex-col border-r sticky top-0 h-screen flex-shrink-0"
       style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
@@ -102,5 +140,6 @@ export default function AdminSidebar() {
         </button>
       </div>
     </aside>
+    </>
   )
 }

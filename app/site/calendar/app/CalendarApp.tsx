@@ -229,7 +229,7 @@ export default function CalendarApp({ userEmail }: { userEmail: string }) {
             <button onClick={() => step(-1)} className="btn-ghost" aria-label="Previous"><ChevronLeft size={18} /></button>
             <button onClick={goToday} className="btn-outline px-3 py-1.5 text-sm">Today</button>
             <button onClick={() => step(1)} className="btn-ghost" aria-label="Next"><ChevronRight size={18} /></button>
-            <span className="ml-1 min-w-[180px] font-medium" style={{ color: 'var(--text-primary)' }}>{title}</span>
+            <span className="ml-1 min-w-0 sm:min-w-[180px] truncate font-medium" style={{ color: 'var(--text-primary)' }}>{title}</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="inline-flex rounded-xl border p-0.5" style={{ borderColor: 'var(--border)' }}>
@@ -303,6 +303,8 @@ function MonthView({ cursor, events, onNewDay, onEdit }: {
   const days = Array.from({ length: 42 }, (_, i) => addDays(start, i))
   return (
     <div className="rounded-2xl border overflow-hidden" style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}>
+      <div className="overflow-x-auto">
+      <div className="min-w-[640px]">
       <div className="grid grid-cols-7">
         {DOW.map((d) => (
           <div key={d} className="px-2 py-2 text-center text-[11px] font-semibold uppercase tracking-wider border-b" style={{ color: 'var(--text-muted)', borderColor: 'var(--border)' }}>{d}</div>
@@ -338,6 +340,8 @@ function MonthView({ cursor, events, onNewDay, onEdit }: {
           )
         })}
       </div>
+      </div>
+      </div>
     </div>
   )
 }
@@ -355,6 +359,8 @@ function WeekView({ cursor, events, onNewAt, onEdit }: {
 
   return (
     <div className="rounded-2xl border overflow-hidden" style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}>
+      <div className="overflow-x-auto">
+      <div className="min-w-[664px]">
       {/* day headers */}
       <div className="grid" style={{ gridTemplateColumns: '48px repeat(7, 1fr)' }}>
         <div className="border-b border-r" style={{ borderColor: 'var(--border)' }} />
@@ -414,6 +420,8 @@ function WeekView({ cursor, events, onNewAt, onEdit }: {
             )
           })}
         </div>
+      </div>
+      </div>
       </div>
     </div>
   )

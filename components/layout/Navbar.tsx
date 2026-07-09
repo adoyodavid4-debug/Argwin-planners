@@ -100,11 +100,11 @@ export default function Navbar({
         }}
       >
         <nav
-          className="container-site flex items-center justify-between h-22"
+          className="container-site flex items-center justify-between gap-2 h-16 sm:h-20 lg:h-22"
           aria-label="Main navigation"
         >
           {/* Logo */}
-          <Link href="/" className="flex items-center group">
+          <Link href="/" className="flex items-center group min-w-0 shrink">
             <motion.div
               whileHover={{ scale: 1.06 }}
               whileTap={{ scale: 0.97 }}
@@ -116,7 +116,8 @@ export default function Navbar({
                 alt="Arwign Planners"
                 width={526}
                 height={92}
-                className="h-10 w-auto object-contain mix-blend-multiply dark:mix-blend-normal drop-shadow-[0_2px_12px_rgba(var(--gold-rgb),0.35)] group-hover:drop-shadow-[0_4px_20px_rgba(var(--gold-rgb),0.55)] transition-all duration-300"
+                sizes="(max-width: 640px) 200px, 240px"
+                className="h-8 max-[349px]:h-7 sm:h-10 w-auto max-w-full object-contain mix-blend-multiply dark:mix-blend-normal drop-shadow-[0_2px_12px_rgba(var(--gold-rgb),0.35)] group-hover:drop-shadow-[0_4px_20px_rgba(var(--gold-rgb),0.55)] transition-all duration-300"
                 priority
               />
             </motion.div>
@@ -187,26 +188,26 @@ export default function Navbar({
           </ul>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
             {/* Search */}
             <button
               onClick={() => setSearchOpen(true)}
-              className="btn-ghost"
+              className="btn-icon"
               aria-label="Open search"
             >
               <Search size={18} />
             </button>
 
             {/* Wishlist */}
-            <Link href="/customer/dashboard?tab=wishlist" className="btn-ghost hidden sm:flex" aria-label="Wishlist">
+            <Link href="/customer/dashboard?tab=wishlist" className="btn-icon hidden sm:inline-flex" aria-label="Wishlist">
               <Heart size={18} />
             </Link>
 
-            {/* Theme Toggle */}
+            {/* Theme Toggle — lives in the mobile drawer on phones */}
             {mounted && (
               <button
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="btn-ghost"
+                className="btn-icon hidden md:inline-flex"
                 aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
               >
                 <AnimatePresence mode="wait">
@@ -226,7 +227,7 @@ export default function Navbar({
             {/* Cart */}
             <button
               onClick={() => setCartOpen(true)}
-              className="btn-ghost relative"
+              className="btn-icon relative"
               aria-label={`Cart, ${itemCount()} items`}
             >
               <ShoppingCart size={18} />
@@ -245,7 +246,7 @@ export default function Navbar({
             {/* Mobile Hamburger */}
             <button
               onClick={() => setMobileNavOpen(!mobileNavOpen)}
-              className="btn-ghost lg:hidden"
+              className="btn-icon lg:hidden"
               aria-label={mobileNavOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={mobileNavOpen}
             >
@@ -275,7 +276,7 @@ export default function Navbar({
             animate={{ x: 0 }}
             exit={{  x: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed top-0 right-0 h-full w-80 z-[99] shadow-glass-lg overflow-y-auto"
+            className="fixed top-0 right-0 h-full w-80 max-w-[85vw] z-[99] shadow-glass-lg overflow-y-auto"
             style={{ background: 'var(--bg-card)' }}
             aria-label="Mobile navigation"
           >
@@ -314,8 +315,18 @@ export default function Navbar({
               </nav>
 
               <div className="mt-8 pt-8 border-t" style={{ borderColor: 'var(--border)' }}>
-                <Link href="/auth/login" className="btn-outline w-full justify-center mb-3 block">Sign In</Link>
-                <Link href="/auth/register" className="btn-primary w-full justify-center block">Create Account</Link>
+                {mounted && (
+                  <button
+                    onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                    className="flex md:hidden items-center gap-3 w-full px-4 py-3 mb-3 rounded-xl text-base font-medium transition-all duration-200 hover:bg-black/5 dark:hover:bg-white/5"
+                    style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-jost)' }}
+                  >
+                    {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                    {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                  </button>
+                )}
+                <Link href="/auth/login" className="btn-outline w-full justify-center mb-3">Sign In</Link>
+                <Link href="/auth/register" className="btn-primary w-full justify-center">Create Account</Link>
               </div>
             </div>
           </motion.aside>

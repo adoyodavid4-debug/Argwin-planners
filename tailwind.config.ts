@@ -35,11 +35,12 @@ const config: Config = {
         accent:   ['var(--font-playfair)', 'Georgia', 'serif'],
       },
       fontSize: {
-        'display-2xl': ['5.5rem',  { lineHeight: '1.05', letterSpacing: '-0.03em' }],
-        'display-xl':  ['4.5rem',  { lineHeight: '1.08', letterSpacing: '-0.025em' }],
-        'display-lg':  ['3.5rem',  { lineHeight: '1.1',  letterSpacing: '-0.02em' }],
-        'display-md':  ['2.75rem', { lineHeight: '1.15', letterSpacing: '-0.015em' }],
-        'display-sm':  ['2.25rem', { lineHeight: '1.2',  letterSpacing: '-0.01em' }],
+        // Fluid display sizes — scale down on phones, full size on desktop
+        'display-2xl': ['clamp(2.75rem, 8vw, 5.5rem)',  { lineHeight: '1.05', letterSpacing: '-0.03em' }],
+        'display-xl':  ['clamp(2.5rem, 7vw, 4.5rem)',   { lineHeight: '1.08', letterSpacing: '-0.025em' }],
+        'display-lg':  ['clamp(2.25rem, 6vw, 3.5rem)',  { lineHeight: '1.1',  letterSpacing: '-0.02em' }],
+        'display-md':  ['clamp(1.9rem, 5vw, 2.75rem)',  { lineHeight: '1.15', letterSpacing: '-0.015em' }],
+        'display-sm':  ['clamp(1.65rem, 4.5vw, 2.25rem)', { lineHeight: '1.2',  letterSpacing: '-0.01em' }],
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',

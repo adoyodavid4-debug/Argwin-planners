@@ -155,7 +155,7 @@ export default async function CheckoutSuccessPage({
 
         {/* Order card */}
         <div className="rounded-2xl border overflow-hidden mb-6" style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}>
-          <div className="grid grid-cols-3 gap-4 p-6 border-b" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 sm:p-6 border-b" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
             <div>
               <p className="text-xs mb-1" style={{ color: 'var(--text-muted)' }}>Invoice</p>
               <p className="text-sm font-bold" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-jost)' }}>

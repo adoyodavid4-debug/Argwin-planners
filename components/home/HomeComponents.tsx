@@ -168,7 +168,7 @@ export function TrustSection() {
   return (
     <section className="section-sm w-full" style={{ background: 'var(--bg-secondary)' }}>
       <div className="container-site">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {trustItems.map((item, i) => (
             <motion.div
               key={item.title}
@@ -176,7 +176,7 @@ export function TrustSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.08 }}
-              className="flex items-start gap-4 p-5 rounded-2xl border"
+              className="flex items-start gap-4 p-4 sm:p-5 rounded-2xl border"
               style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}
             >
               <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(201,168,76,0.1)' }}>

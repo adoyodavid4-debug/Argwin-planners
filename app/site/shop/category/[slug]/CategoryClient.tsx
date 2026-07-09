@@ -456,13 +456,13 @@ export default function CategoryClient({ category, products, relatedCategories }
 
             {/* Live stats */}
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, delay: 0.15 }}
-              className="grid grid-cols-3 gap-3 flex-shrink-0">
+              className="grid grid-cols-3 gap-2 sm:gap-3 flex-shrink-0">
               {[
                 { value: <CountUp to={stats.count} suffix="+" />, label: 'Designs' },
                 { value: <span className="inline-flex items-center gap-1"><Star size={18} style={{ fill: 'var(--gold)', stroke: 'var(--gold)' }} />{stats.avg.toFixed(1)}</span>, label: 'Avg Rating' },
                 { value: <CountUp to={stats.downloads || stats.count * 120} suffix="+" />, label: 'Downloads' },
               ].map((s, i) => (
-                <div key={i} className="text-center px-4 py-3 rounded-2xl border min-w-[92px]"
+                <div key={i} className="text-center px-2 sm:px-4 py-3 rounded-2xl border min-w-0"
                   style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
                   <p className="font-display text-2xl lg:text-3xl font-semibold mb-0.5" style={{ color: 'var(--text-primary)' }}>{s.value}</p>
                   <p className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--text-muted)', letterSpacing: '0.08em' }}>{s.label}</p>
@@ -493,7 +493,7 @@ export default function CategoryClient({ category, products, relatedCategories }
       {/* ══ STICKY TOOLBAR ════════════════════════════════════ */}
       <div className="sticky top-[var(--nav-height,88px)] z-30 border-b py-3 backdrop-blur"
         style={{ background: 'color-mix(in srgb, var(--bg-primary) 88%, transparent)', borderColor: 'var(--border)' }}>
-        <div className="container-site flex items-center gap-3">
+        <div className="container-site flex flex-wrap items-center gap-2 sm:gap-3">
           {/* Filters toggle */}
           <button onClick={() => setDrawerOpen(true)}
             className="lg:hidden flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium"
@@ -505,7 +505,7 @@ export default function CategoryClient({ category, products, relatedCategories }
           </button>
 
           {/* Search */}
-          <div className="relative flex-1 max-w-md">
+          <div className="relative flex-1 min-w-[140px] max-w-md">
             <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
             <input
               value={search}
@@ -526,7 +526,7 @@ export default function CategoryClient({ category, products, relatedCategories }
           {/* Sort */}
           <div className="relative">
             <select value={sort} onChange={(e) => setSort(e.target.value)}
-              className="input-field !py-2 !pr-9 cursor-pointer text-sm appearance-none" style={{ width: 'auto', minWidth: 168 }} aria-label="Sort products">
+              className="input-field !py-2 !pr-9 cursor-pointer text-sm appearance-none" style={{ width: 'auto' }} aria-label="Sort products">
               {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
             <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--text-muted)' }} />

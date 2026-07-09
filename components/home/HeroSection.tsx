@@ -190,8 +190,8 @@ export default function HeroSection() {
       >
         <div className="max-w-5xl mx-auto">
           <div
-            className="relative rounded-3xl overflow-hidden shadow-glass-lg border grid grid-cols-3"
-            style={{ borderColor: 'var(--border-gold)', minHeight: 280 }}
+            className="relative rounded-3xl overflow-hidden shadow-glass-lg border grid grid-cols-1 sm:grid-cols-3"
+            style={{ borderColor: 'var(--border-gold)' }}
           >
             {[
               { id: '1529651737248-dad5e287768e', label: 'Daily Planner',     tag: 'Most Popular' },
@@ -200,7 +200,7 @@ export default function HeroSection() {
             ].map((img, i) => (
               <motion.div
                 key={i}
-                className="relative overflow-hidden group"
+                className="relative overflow-hidden group min-h-[180px] sm:min-h-[280px]"
                 initial={{ opacity: 0, scale: 1.08 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 1.1 + i * 0.2, duration: 0.9, ease: [0.25, 0.46, 0.45, 0.94] }}
@@ -210,7 +210,7 @@ export default function HeroSection() {
                   alt={img.label}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-700"
-                  sizes="(max-width: 768px) 33vw, 400px"
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 33vw, 400px"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4">
