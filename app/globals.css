@@ -508,6 +508,41 @@ h4, h5, h6 { font-family: var(--font-jost); font-weight: 600; }
   box-shadow: 0 1px 5px rgba(44,42,53,0.25); cursor: pointer;
 }
 
+/* ─── Rich text (product descriptions: admin editor + public render) ─── */
+.rich-text { color: var(--text-secondary); font-size: 0.98rem; line-height: 1.7; }
+.rich-text > * + * { margin-top: 0.85em; }
+.rich-text h2 {
+  font-family: var(--font-cormorant); font-size: 1.5rem; font-weight: 600;
+  color: var(--text-primary); margin-top: 1.3em; line-height: 1.2;
+}
+.rich-text h3 {
+  font-family: var(--font-jost); font-size: 1.1rem; font-weight: 600;
+  color: var(--text-primary); margin-top: 1.2em;
+}
+.rich-text h2:first-child, .rich-text h3:first-child { margin-top: 0; }
+.rich-text strong { color: var(--text-primary); font-weight: 700; }
+.rich-text a { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
+.rich-text a:hover { color: var(--gold-light); }
+.rich-text ul, .rich-text ol { padding-left: 1.4em; }
+.rich-text ul { list-style: disc; }
+.rich-text ol { list-style: decimal; }
+.rich-text li + li { margin-top: 0.35em; }
+.rich-text li::marker { color: var(--gold); }
+.rich-text blockquote {
+  border-left: 3px solid var(--gold); padding-left: 1em;
+  font-style: italic; color: var(--text-primary);
+}
+.rich-text hr { border: none; border-top: 1px solid var(--border); margin: 1.4em 0; }
+.rich-text mark { border-radius: 3px; padding: 0.05em 0.2em; color: #2C2A35; }
+
+/* Editor-only chrome */
+.rich-text-editor .tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left; height: 0; pointer-events: none;
+  color: var(--text-muted);
+}
+.rich-text-editor .tiptap { caret-color: var(--gold); }
+
 /* ─── Filter checkbox row ───────────────────────────────────── */
 .filter-check {
   display: flex; align-items: center; gap: 0.625rem;

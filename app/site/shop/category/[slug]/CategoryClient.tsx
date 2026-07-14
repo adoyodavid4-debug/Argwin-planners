@@ -11,6 +11,7 @@ import {
   BadgeCheck, Calendar, Link2, Palette, Tablet, Printer,
 } from 'lucide-react'
 import { useCartStore, useWishlistStore } from '@/lib/store'
+import { stripHtml } from '@/lib/richtext'
 import toast from 'react-hot-toast'
 import QuickViewModal from '@/components/shop/QuickViewModal'
 import type { Product, Category } from '@/types/database'
@@ -311,7 +312,7 @@ export default function CategoryClient({ category, products, relatedCategories }
     const q = search.trim().toLowerCase()
     let list = products.filter((p) => {
       if (q) {
-        const hay = `${p.title} ${p.description ?? ''} ${(p.tags ?? []).join(' ')}`.toLowerCase()
+        const hay = `${p.title} ${stripHtml(p.description)} ${(p.tags ?? []).join(' ')}`.toLowerCase()
         if (!hay.includes(q)) return false
       }
       if (formats.length && !formats.some((f) => (p.file_formats ?? []).includes(f))) return false
@@ -1063,7 +1064,7 @@ function ProductRow({ product, index, inCompare, onCompare, onQuickView }: CardP
           </button>
         </div>
         <div className="flex items-center gap-1.5 mt-1"><Stars value={product.rating_avg || 5} size={12} />{product.rating_count > 0 && <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>({product.rating_count})</span>}</div>
-        {product.description && <p className="text-xs mt-1.5 line-clamp-2 hidden sm:block" style={{ color: 'var(--text-secondary)' }}>{product.description}</p>}
+        {product.description && <p className="text-xs mt-1.5 line-clamp-2 hidden sm:block" style={{ color: 'var(--text-secondary)' }}>{stripHtml(product.description)}</p>}
         <div className="flex flex-wrap gap-1 mt-2">
           {(product.file_formats ?? []).slice(0, 4).map((f) => (
             <span key={f} className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'var(--bg-secondary)', color: 'var(--text-muted)' }}>{f}</span>

@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { X, ShoppingCart, ExternalLink } from 'lucide-react'
 import { useCartStore } from '@/lib/store'
+import { stripHtml } from '@/lib/richtext'
 import toast from 'react-hot-toast'
 import type { Product } from '@/types/database'
 
@@ -126,7 +127,7 @@ export default function QuickViewModal({ product, onClose }: Props) {
 
             {product.description && (
               <p className="text-sm leading-relaxed line-clamp-5" style={{ color: 'var(--text-secondary)' }}>
-                {product.description}
+                {stripHtml(product.description)}
               </p>
             )}
 

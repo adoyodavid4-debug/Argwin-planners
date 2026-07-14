@@ -10,6 +10,7 @@ import {
   Wand2, CreditCard, Clock,
 } from 'lucide-react'
 import { OptInForm } from '@/components/funnel/OptInForm'
+import { stripHtml } from '@/lib/richtext'
 
 const COVERS = [
   { name: 'Lavender', hex: '#B8A9D4' },
@@ -114,7 +115,7 @@ function NotebookCard({ p, index }: { p: NotebookItem; index: number }) {
         </div>
         <div className="p-5">
           <h3 className="font-semibold text-base mb-1 line-clamp-2 transition-colors group-hover:text-gold" style={{ color: 'var(--text-primary)' }}>{p.title}</h3>
-          {p.description && <p className="text-sm mb-3 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>{p.description}</p>}
+          {p.description && <p className="text-sm mb-3 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>{stripHtml(p.description)}</p>}
           <span className="font-bold text-lg" style={{ color: 'var(--text-primary)' }}>{price}</span>
         </div>
       </Link>

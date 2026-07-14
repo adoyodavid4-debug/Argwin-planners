@@ -8,6 +8,7 @@ import {
   ShoppingCart, Heart, Eye, Check, Star, Plus, Clock, Layers, Crown, Sparkles, BookOpen,
 } from 'lucide-react'
 import { useCartStore, useWishlistStore } from '@/lib/store'
+import { stripHtml } from '@/lib/richtext'
 import QuickViewModal from '@/components/shop/QuickViewModal'
 import toast from 'react-hot-toast'
 import type { Product, Category } from '@/types/database'
@@ -114,7 +115,7 @@ export default function ShopClient({ products, categories, featured }: Props) {
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
     let list = products.filter((p) => {
-      if (q && !`${p.title} ${p.description ?? ''} ${(p.tags ?? []).join(' ')}`.toLowerCase().includes(q)) return false
+      if (q && !`${p.title} ${stripHtml(p.description)} ${(p.tags ?? []).join(' ')}`.toLowerCase().includes(q)) return false
       if (category && (p.category as any)?.slug !== category) return false
       if (formats.length && !formats.some((f) => (p.file_formats ?? []).includes(f))) return false
       if (sizes.length && !sizes.some((s) => sizesOf(p).includes(s))) return false
@@ -511,7 +512,7 @@ function ShopRow({ p, index, onQuickView }: { p: Product; index: number; onQuick
           <button onClick={wish} aria-label="Wishlist" className="flex-shrink-0"><Heart size={16} style={{ fill: isWished ? 'var(--blush)' : 'transparent', stroke: isWished ? '#C9847C' : 'var(--text-muted)' }} /></button>
         </div>
         <div className="flex items-center gap-1.5 mt-1"><Stars value={p.rating_avg || 5} size={12} />{p.rating_count > 0 && <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>({p.rating_count})</span>}</div>
-        {p.description && <p className="text-xs mt-1.5 line-clamp-2 hidden sm:block" style={{ color: 'var(--text-secondary)' }}>{p.description}</p>}
+        {p.description && <p className="text-xs mt-1.5 line-clamp-2 hidden sm:block" style={{ color: 'var(--text-secondary)' }}>{stripHtml(p.description)}</p>}
         <div className="mt-2"><Tags p={p} /></div>
         <div className="flex items-center gap-3 mt-auto pt-2">
           <span className="text-base font-bold" style={{ color: 'var(--text-primary)' }}>{money(p.price, p.currency)}</span>

@@ -9,6 +9,7 @@ import {
   ItemListSchema,
 } from '@/components/seo/JsonLd'
 import ProductDetailClient from './ProductDetailClient'
+import { descriptionExcerpt } from '@/lib/richtext'
 
 const BASE = 'https://arwignplanners.com'
 
@@ -66,15 +67,16 @@ async function getReviews(productId: string) {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const p = await getProduct(params.slug)
   if (!p) return { title: 'Product not found' }
+  const plainDesc = descriptionExcerpt(p.description, 160)
   const ogImageUrl = p.og_image
-    ?? `${BASE}/api/og?title=${encodeURIComponent(p.title)}&subtitle=${encodeURIComponent(p.description?.slice(0, 120) ?? '')}&image=${encodeURIComponent(p.thumbnail ?? '')}`
+    ?? `${BASE}/api/og?title=${encodeURIComponent(p.title)}&subtitle=${encodeURIComponent(descriptionExcerpt(p.description, 120))}&image=${encodeURIComponent(p.thumbnail ?? '')}`
   return {
     title: p.title,
-    description: p.description?.slice(0, 160),
+    description: plainDesc,
     alternates: { canonical: `${BASE}/shop/${p.slug}` },
     openGraph: {
       title: p.title,
-      description: p.description?.slice(0, 160) ?? '',
+      description: plainDesc,
       url: `${BASE}/shop/${p.slug}`,
       images: [{ url: ogImageUrl, width: 1200, height: 630, alt: p.title }],
       type: 'website',
@@ -125,7 +127,7 @@ export default async function ProductPage({ params }: Props) {
 
   return (
     <>
-      <ProductSchema name={p.title} description={p.description ?? ''} images={(p.images as string[] | null) ?? []}
+      <ProductSchema name={p.title} description={descriptionExcerpt(p.description, 5000)} images={(p.images as string[] | null) ?? []}
         price={p.price} currency={p.currency ?? 'USD'} url={productUrl} sku={p.id}
         ratingValue={p.rating_avg ?? undefined} reviewCount={p.rating_count ?? undefined} />
       <BreadcrumbSchema items={[

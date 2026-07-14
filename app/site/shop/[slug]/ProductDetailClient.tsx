@@ -10,6 +10,8 @@ import {
 } from 'lucide-react'
 import { useCartStore, useWishlistStore, useUIStore } from '@/lib/store'
 import toast from 'react-hot-toast'
+import RichTextContent from '@/components/RichTextContent'
+import { stripHtml } from '@/lib/richtext'
 
 const FALLBACK_IMG = 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=800&q=80'
 const SIZE_KEYS: { k: string; l: string }[] = [{ k: 'a4', l: 'A4' }, { k: 'us_letter', l: 'US Letter' }, { k: 'a5', l: 'A5' }]
@@ -65,7 +67,7 @@ export default function ProductDetailClient({ product: p, related, reviews, bund
 
   const sale = p.compare_price && p.compare_price > p.price
   const off = sale ? Math.round((1 - p.price / p.compare_price!) * 100) : 0
-  const tagline = (p.description.split(/(?<=[.!?])\s+/)[0] ?? '').slice(0, 120)
+  const tagline = (stripHtml(p.description).split(/(?<=[.!?])\s+/)[0] ?? '').slice(0, 120)
 
   const doAdd = (buyNow = false) => {
     const title = size ? `${p.title} — ${size}` : p.title
@@ -256,11 +258,7 @@ export default function ProductDetailClient({ product: p, related, reviews, bund
           <motion.section {...reveal()} className="mt-16 grid lg:grid-cols-[1.4fr_1fr] gap-10 items-start">
             <div>
               <h2 className="font-display text-2xl mb-4" style={{ color: 'var(--text-primary)' }}>About this planner</h2>
-              <div className="flex flex-col gap-4">
-                {p.description.split(/\n{2,}|(?<=[.!?])\s{2,}/).filter(Boolean).slice(0, 5).map((para, i) => (
-                  <p key={i} className="text-[0.98rem] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{para.trim()}</p>
-                ))}
-              </div>
+              <RichTextContent html={p.description} style={{ color: 'var(--text-secondary)' }} />
             </div>
             <div className="rounded-2xl border p-6" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
               <h3 className="font-semibold text-sm mb-4" style={{ color: 'var(--text-primary)' }}>What&rsquo;s inside</h3>

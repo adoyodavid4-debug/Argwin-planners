@@ -8,6 +8,7 @@ import {
   ArrowLeft, Upload, X, ImageIcon, FileText, Loader2, Plus, Folder,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
+import RichTextEditor from '@/components/admin/RichTextEditor'
 
 interface DbCategory { id: string; name: string; slug: string; icon: string | null }
 
@@ -408,9 +409,14 @@ export default function EditProductClient({
               </div>
               <div>
                 <FieldLabel>Description</FieldLabel>
-                <textarea value={description} onChange={(e) => setDescription(e.target.value)}
+                <RichTextEditor
+                  value={description}
+                  onChange={setDescription}
                   placeholder="Describe your planner — what's included, who it's for, key features..."
-                  className="input-field" rows={5} style={{ resize: 'vertical' }} />
+                />
+                <p className="text-xs mt-1.5" style={{ color: 'var(--text-muted)' }}>
+                  Use the toolbar to bold text, change colours, font sizes and fonts, add lists, headings and links.
+                </p>
               </div>
             </div>
           </Card>

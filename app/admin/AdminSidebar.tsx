@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import {
   TrendingUp, ShoppingBag, Package, Wand2, FolderTree, FileText, Quote,
   Compass, PenSquare, Settings, BookOpen, Printer, NotebookPen, Lightbulb,
-  Magnet, Mail, Users, Filter, Plus, LogOut,
+  Magnet, Mail, Users, Filter, Plus, LogOut, Tags,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
@@ -15,6 +15,7 @@ const adminNav = [
   { label: 'Dashboard',         href: '/admin/dashboard',         icon: TrendingUp },
   { label: 'Orders',            href: '/admin/orders',            icon: ShoppingBag },
   { label: 'Products',          href: '/admin/products',          icon: Package },
+  { label: 'Pricing',           href: '/admin/pricing',           icon: Tags },
   { label: 'Planner Generator', href: '/admin/generator',         icon: Wand2 },
   { label: 'Categories',        href: '/admin/categories',        icon: FolderTree },
   { label: 'Blog',              href: '/admin/blog',              icon: FileText },

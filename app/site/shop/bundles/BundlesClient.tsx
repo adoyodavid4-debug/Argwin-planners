@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { ChevronRight, ArrowRight, Sparkles } from 'lucide-react'
 import type { Product } from '@/types/database'
+import { stripHtml } from '@/lib/richtext'
 
 interface Section {
   title: string
@@ -68,7 +69,7 @@ function BundleCard({ bundle, index }: { bundle: Product; index: number }) {
             {bundle.title.split('—')[0].trim()}
           </h3>
           <p className="text-sm leading-relaxed mb-4 flex-1" style={{ color: 'var(--text-secondary)' }}>
-            {bundle.description}
+            {stripHtml(bundle.description)}
           </p>
           <div className="flex items-center justify-between mt-auto">
             <div className="flex items-baseline gap-2">
@@ -169,7 +170,7 @@ export default function BundlesClient({ featured, sections }: Props) {
                   {featured.title}
                 </h2>
                 <p className="text-sm leading-relaxed mb-6" style={{ color: 'var(--text-secondary)' }}>
-                  {featured.description}
+                  {stripHtml(featured.description)}
                 </p>
                 <div className="flex items-center gap-3">
                   <span className="font-bold text-2xl" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-jost)' }}>
