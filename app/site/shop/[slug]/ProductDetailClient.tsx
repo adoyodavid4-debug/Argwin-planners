@@ -93,7 +93,7 @@ export default function ProductDetailClient({ product: p, related, reviews, bund
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
           {/* Gallery */}
           <div>
-            <div className="relative rounded-3xl overflow-hidden border group" style={{ borderColor: 'var(--border)', background: '#151119', aspectRatio: '3/4' }}
+            <div className="relative rounded-3xl overflow-hidden border group" style={{ borderColor: 'var(--border)', background: 'linear-gradient(180deg, #F7F2E8 0%, #EDE4D3 100%)', aspectRatio: '3/4' }}
               tabIndex={0} role="group" aria-label="Product gallery"
               onKeyDown={(e) => { if (e.key === 'ArrowLeft') setActive((a) => (a - 1 + imgs.length) % imgs.length); if (e.key === 'ArrowRight') setActive((a) => (a + 1) % imgs.length) }}>
               <AnimatePresence mode="wait">
@@ -187,7 +187,7 @@ export default function ProductDetailClient({ product: p, related, reviews, bund
           <motion.section {...reveal()} className="mt-16">
             <h2 className="font-display text-2xl mb-2" style={{ color: 'var(--text-primary)' }}>Take a closer look</h2>
             <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>Every page and preview, shown in full — tap any image to enlarge.</p>
-            <div className="mx-auto flex max-w-3xl flex-col gap-4 rounded-3xl p-3 sm:p-5" style={{ background: '#151119' }}>
+            <div className="mx-auto flex max-w-3xl flex-col gap-4 rounded-3xl p-3 sm:p-5" style={{ background: '#F7F2E8' }}>
               {imgs.slice(1).map((src, idx) => {
                 const i = idx + 1
                 return (
@@ -196,7 +196,7 @@ export default function ProductDetailClient({ product: p, related, reviews, bund
                   onClick={() => { setActive(i); setLightbox(true) }}
                   aria-label={`Enlarge preview ${idx + 1}`}
                   className="group block w-full overflow-hidden rounded-2xl border transition-shadow hover:shadow-product"
-                  style={{ borderColor: 'rgba(255,255,255,0.08)', background: '#151119' }}
+                  style={{ borderColor: 'var(--border)', background: '#F7F2E8' }}
                 >
                   <Image
                     src={src}
