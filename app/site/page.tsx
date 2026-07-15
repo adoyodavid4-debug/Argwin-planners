@@ -4,7 +4,6 @@ import { Suspense } from 'react'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 // Reused existing sections (server wrappers fetch DB content w/ fallbacks)
-import CategoryGrid            from '@/components/home/CategoryGridServer'
 import DigitalNotebookSection  from '@/components/home/digital-notebook/DigitalNotebookSection'
 import NewArrivals, { NewArrivalsSkeleton } from '@/components/home/NewArrivals'
 import TestimonialsSection     from '@/components/home/TestimonialsSectionServer'
@@ -16,7 +15,7 @@ import SocialProof         from './_home/SocialProof'
 import BestSellerShowcase  from './_home/BestSellerShowcase'
 import InteriorPreview     from './_home/InteriorPreview'
 import StickyShopCTA       from './_home/StickyShopCTA'
-import { WhyArwign, HowItWorks, FinalCTA } from './_home/EditorialSections'
+import { HowItWorks, FinalCTA } from './_home/EditorialSections'
 
 export const metadata: Metadata = {
   title: 'Arwign Planners — Premium Digital & Printable Planners',
@@ -120,11 +119,10 @@ export default async function HomePage() {
       />
       <SocialProof />
       {/* Below-fold sections skip rendering until scrolled near (cv-auto) —
-          keeps first paint fast on slower phones. */}
-      <div className="cv-auto"><CategoryGrid /></div>
+          keeps first paint fast on slower phones. Products lead: best sellers
+          straight after the hero, then the notebook products. */}
       <div className="cv-auto"><BestSellerShowcase products={bestsellers as any} /></div>
       <div className="cv-auto"><DigitalNotebookSection /></div>
-      <div className="cv-auto"><WhyArwign /></div>
       <div className="cv-auto"><InteriorPreview /></div>
       <div className="cv-auto">
         <Suspense fallback={<NewArrivalsSkeleton />}>

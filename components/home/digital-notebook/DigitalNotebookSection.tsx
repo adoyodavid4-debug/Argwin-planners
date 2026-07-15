@@ -7,9 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import PreviewCarousel from './PreviewCarousel'
 import ReadyMadePanel from './ReadyMadePanel'
 import PersonalisedPanel from './PersonalisedPanel'
-import HyperlinkedTabsDemo from './HyperlinkedTabsDemo'
-import FaqAccordion from './FaqAccordion'
-import { CompatibilityBadges, FeatureGrid, SocialProof } from './SharedShowcase'
+import { CompatibilityBadges } from './SharedShowcase'
 import { SECTION_ID, SIZES, COLOURWAYS } from './data'
 
 type TabId = 'ready' | 'custom'
@@ -147,22 +145,6 @@ export default function DigitalNotebookSection() {
           <div className="px-6 sm:px-8 py-6 border-t" style={{ borderColor: 'var(--border)' }}>
             <CompatibilityBadges />
           </div>
-        </div>
-
-        {/* Feature highlights */}
-        <div className="mt-12">
-          <FeatureGrid />
-        </div>
-
-        {/* Hyperlinked-tabs demo + FAQ */}
-        <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
-          <HyperlinkedTabsDemo />
-          <FaqAccordion />
-        </div>
-
-        {/* Social proof */}
-        <div className="mt-12">
-          <SocialProof />
         </div>
       </div>
     </section>
