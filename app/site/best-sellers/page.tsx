@@ -7,7 +7,7 @@ export const revalidate = 300
 export const metadata: Metadata = {
   title: 'Best Selling Planners — Most Loved by 50,000+ Customers | Arwign',
   description: 'Shop our best selling digital and printable planners. Customer favourites, highest rated, most downloaded — all in one place. Instant download.',
-  alternates: { canonical: 'https://arwignplanners.com/best-sellers' },
+  alternates: { canonical: 'https://www.arwignplanners.com/best-sellers' },
   openGraph: {
     title: 'Best Sellers | Arwign Planners',
     description: 'Our most loved planners — top rated, most downloaded, customer favourites.',

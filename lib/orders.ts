@@ -8,7 +8,7 @@ import { getEmailProvider } from '@/lib/email'
 const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL
   ?? process.env.NEXT_PUBLIC_SITE_URL
-  ?? 'https://arwignplanners.com'
+  ?? 'https://www.arwignplanners.com'
 
 const PAYMENT_METHOD_LABELS: Record<string, string> = {
   stripe_card: 'Card',

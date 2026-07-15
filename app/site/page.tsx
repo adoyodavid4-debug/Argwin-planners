@@ -21,7 +21,7 @@ import { WhyArwign, HowItWorks, FinalCTA } from './_home/EditorialSections'
 export const metadata: Metadata = {
   title: 'Arwign Planners — Premium Digital & Printable Planners',
   description: 'Shop premium digital planners, printable planners, budget trackers, habit trackers, wellness planners, and ADHD planners. Instant download. GoodNotes ready.',
-  alternates: { canonical: 'https://arwignplanners.com' },
+  alternates: { canonical: 'https://www.arwignplanners.com' },
 }
 
 async function getBestSellers() {

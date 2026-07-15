@@ -4,7 +4,7 @@ import { createServiceRoleClient } from '@/lib/supabase/server'
 import { BreadcrumbSchema } from '@/components/seo/JsonLd'
 import CategoryClient from './CategoryClient'
 
-const BASE = 'https://arwignplanners.com'
+const BASE = 'https://www.arwignplanners.com'
 
 interface Props {
   params: { slug: string }
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description:
       cat.description ??
       `Shop our full collection of ${cat.name}. Instant download, PDF & GoodNotes ready. Designed for productivity.`,
-    alternates: { canonical: `https://arwignplanners.com/shop/category/${params.slug}` },
+    alternates: { canonical: `https://www.arwignplanners.com/shop/category/${params.slug}` },
     openGraph: {
       title: `${cat.name} | Arwign Planners`,
       description: cat.description ?? `Premium ${cat.name} — instant download.`,

@@ -6,7 +6,7 @@ interface TemplateOutput {
   text: string
 }
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://arwignplanners.com'
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.arwignplanners.com'
 
 function wrap(locale: Locale, subject: string, body: string): TemplateOutput {
   const footer = locale === 'fr'

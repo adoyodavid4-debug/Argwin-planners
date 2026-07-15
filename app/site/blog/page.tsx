@@ -4,13 +4,13 @@ import { type BlogPost, STATIC_POSTS } from './blog-data'
 import { BreadcrumbSchema } from '@/components/seo/JsonLd'
 import BlogClient from './BlogClient'
 
-const BASE = 'https://arwignplanners.com'
+const BASE = 'https://www.arwignplanners.com'
 
 export const metadata: Metadata = {
   title: 'Planning Tips, Guides & Inspiration — Arwign Blog',
   description:
     'Discover planning tips, productivity guides, digital planner tutorials, and lifestyle inspiration from the Arwign Planners team.',
-  alternates: { canonical: 'https://arwignplanners.com/blog' },
+  alternates: { canonical: 'https://www.arwignplanners.com/blog' },
   openGraph: {
     title: 'The Arwign Blog — Planning Tips & Inspiration',
     description: 'Productivity guides, digital planner tutorials, and planning inspiration.',

@@ -4,7 +4,7 @@ import { ItemListSchema, BreadcrumbSchema } from '@/components/seo/JsonLd'
 import BundlesClient from './BundlesClient'
 import type { Product } from '@/types/database'
 
-const BASE = 'https://arwignplanners.com'
+const BASE = 'https://www.arwignplanners.com'
 
 // ── Curated section layout ──────────────────────────────────────
 // Maps theme sections to bundle slugs. Any active bundle not listed

@@ -5,7 +5,7 @@ import { type BlogPost, STATIC_POSTS } from '../blog-data'
 import { BreadcrumbSchema } from '@/components/seo/JsonLd'
 import BlogPostClient             from './BlogPostClient'
 
-const BASE = 'https://arwignplanners.com'
+const BASE = 'https://www.arwignplanners.com'
 
 interface Params { params: { slug: string } }
 
@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   return {
     title:       `${post.title} — Arwign Blog`,
     description: post.excerpt.slice(0, 160),
-    alternates:  { canonical: `https://arwignplanners.com/blog/${post.slug}` },
+    alternates:  { canonical: `https://www.arwignplanners.com/blog/${post.slug}` },
     openGraph: {
       title:       post.title,
       description: post.excerpt.slice(0, 160),

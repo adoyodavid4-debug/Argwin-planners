@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: 'Shop by Category — Premium Digital & Printable Planners | Arwign',
   description:
     'Browse every Arwign planner collection — digital, printable, budget, student, wellness, habit trackers and more. Instant download, GoodNotes & print ready.',
-  alternates: { canonical: 'https://arwignplanners.com/shop/category' },
+  alternates: { canonical: 'https://www.arwignplanners.com/shop/category' },
   openGraph: {
     title: 'Shop by Category | Arwign Planners',
     description: 'Find your perfect planner across every Arwign collection — instant download.',

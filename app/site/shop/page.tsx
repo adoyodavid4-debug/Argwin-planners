@@ -4,18 +4,18 @@ import ShopClient from './ShopClient'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { BreadcrumbSchema } from '@/components/seo/JsonLd'
 
-const BASE = 'https://arwignplanners.com'
+const BASE = 'https://www.arwignplanners.com'
 
 export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'Shop All Digital & Printable Planners',
   description: 'Browse our full collection of premium digital planners, printable planners, budget trackers, habit trackers, and wellness planners. Instant download.',
-  alternates: { canonical: 'https://arwignplanners.com/shop' },
+  alternates: { canonical: 'https://www.arwignplanners.com/shop' },
   openGraph: {
     title: 'Shop Premium Planners — Arwign Planners',
     description: 'Download premium digital and printable planners. GoodNotes, iPad, PDF ready.',
-    url: 'https://arwignplanners.com/shop',
+    url: 'https://www.arwignplanners.com/shop',
   },
 }
 

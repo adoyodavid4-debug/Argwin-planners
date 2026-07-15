@@ -1,5 +1,5 @@
 # Arwign Planners — AI / LLM Access Guide
-# https://arwignplanners.com
+# https://www.arwignplanners.com
 
 ## About
 Arwign Planners sells premium digital and printable planners for productivity, wellness, budgeting, and organization.
@@ -7,11 +7,11 @@ Products are available as instant downloads in PDF, GoodNotes, and Notability fo
 The store is available in English (arwignplanners.com) and French (arwignplanners.com/fr).
 
 ## Key URLs
-- Homepage:      https://arwignplanners.com
-- Shop (all):    https://arwignplanners.com/shop
-- Blog:          https://arwignplanners.com/blog
-- Sitemap:       https://arwignplanners.com/sitemap.xml
-- Categories:    https://arwignplanners.com/shop/category/[slug]
+- Homepage:      https://www.arwignplanners.com
+- Shop (all):    https://www.arwignplanners.com/shop
+- Blog:          https://www.arwignplanners.com/blog
+- Sitemap:       https://www.arwignplanners.com/sitemap.xml
+- Categories:    https://www.arwignplanners.com/shop/category/[slug]
 
 ## Product categories
 digital-planners, printable-planners, budget-planners, student-planners, wellness-planners,

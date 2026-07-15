@@ -4,7 +4,7 @@ import { createServiceRoleClient } from '@/lib/supabase/server'
 // MetadataRoute.Sitemap type cannot emit the image: namespace.
 // The main sitemap lives in app/sitemap.ts — this route only adds images.
 
-const BASE_URL = 'https://arwignplanners.com'
+const BASE_URL = 'https://www.arwignplanners.com'
 
 export const revalidate = 3600 // regenerate every hour, matching app/sitemap.ts
 

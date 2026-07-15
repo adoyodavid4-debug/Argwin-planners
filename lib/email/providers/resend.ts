@@ -3,7 +3,7 @@ import { createHmac } from 'crypto'
 import type { EmailProvider, EmailCategory, EmailEventType, Locale } from '../types'
 import { resolveTemplate } from '../templates'
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://arwignplanners.com'
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.arwignplanners.com'
 
 const FROM_ADDRESSES: Record<EmailCategory, string> = {
   info:    process.env.EMAIL_FROM_INFO    ?? 'Arwign Planners <info@arwignplanners.com>',

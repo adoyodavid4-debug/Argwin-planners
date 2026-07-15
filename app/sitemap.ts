@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 
-const BASE = 'https://arwignplanners.com'
+const BASE = 'https://www.arwignplanners.com'
 
 export const revalidate = 3600 // regenerate every hour
 

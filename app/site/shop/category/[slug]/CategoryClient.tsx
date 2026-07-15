@@ -393,8 +393,8 @@ export default function CategoryClient({ category, products, relatedCategories }
       {
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://arwignplanners.com' },
-          { '@type': 'ListItem', position: 2, name: 'Shop', item: 'https://arwignplanners.com/shop' },
+          { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.arwignplanners.com' },
+          { '@type': 'ListItem', position: 2, name: 'Shop', item: 'https://www.arwignplanners.com/shop' },
           { '@type': 'ListItem', position: 3, name: category.name },
         ],
       },
@@ -403,7 +403,7 @@ export default function CategoryClient({ category, products, relatedCategories }
         numberOfItems: filtered.length,
         itemListElement: visibleProducts.slice(0, 12).map((p, i) => ({
           '@type': 'ListItem', position: i + 1, name: p.title,
-          url: `https://arwignplanners.com/shop/${p.slug}`,
+          url: `https://www.arwignplanners.com/shop/${p.slug}`,
         })),
       },
     ],

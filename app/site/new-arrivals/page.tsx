@@ -7,7 +7,7 @@ export const revalidate = 300
 export const metadata: Metadata = {
   title: 'New Arrivals — Fresh Digital & Printable Planners | Arwign',
   description: 'Discover the newest digital and printable planners from Arwign. Fresh designs, just dropped — instant download, GoodNotes & Notability ready.',
-  alternates: { canonical: 'https://arwignplanners.com/new-arrivals' },
+  alternates: { canonical: 'https://www.arwignplanners.com/new-arrivals' },
   openGraph: {
     title: 'New Arrivals | Arwign Planners',
     description: 'The latest planners, just dropped. Fresh designs ready for instant download.',

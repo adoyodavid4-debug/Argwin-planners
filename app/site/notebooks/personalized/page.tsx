@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import PersonalizedClient from './PersonalizedClient'
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://arwignplanners.com'
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.arwignplanners.com'
 
 export const metadata: Metadata = {
   title: 'Personalised Notebooks — Designed Around You | Arwign Planners',

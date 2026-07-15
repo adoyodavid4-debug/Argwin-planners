@@ -5,7 +5,7 @@ interface BaseProps { children?: never }
 
 // ─── Shared helpers ──────────────────────────────────────────────────────────
 
-const BASE = 'https://arwignplanners.com'
+const BASE = 'https://www.arwignplanners.com'
 
 function Script({ data }: { data: Record<string, unknown> }) {
   return (

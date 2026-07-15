@@ -33,6 +33,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   return {
     title: `${title} — Free Download | Arwign Planners`,
     description: desc,
+    alternates: { canonical: `https://www.arwignplanners.com/free/${params.slug}` },
     openGraph: {
       title,
       description: desc,
@@ -54,8 +55,8 @@ export default async function FreeMagnetPage({ params, searchParams }: Props) {
     '@type': 'WebPage',
     name: title,
     description,
-    url: `https://arwignplanners.com/free/${params.slug}`,
-    isPartOf: { '@type': 'WebSite', name: 'Arwign Planners', url: 'https://arwignplanners.com' },
+    url: `https://www.arwignplanners.com/free/${params.slug}`,
+    isPartOf: { '@type': 'WebSite', name: 'Arwign Planners', url: 'https://www.arwignplanners.com' },
   }
 
   return (

@@ -11,7 +11,7 @@ import {
 import ProductDetailClient from './ProductDetailClient'
 import { descriptionExcerpt } from '@/lib/richtext'
 
-const BASE = 'https://arwignplanners.com'
+const BASE = 'https://www.arwignplanners.com'
 
 interface Props { params: { slug: string } }
 

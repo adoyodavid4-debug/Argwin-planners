@@ -5,7 +5,7 @@ import NotebooksClient from './NotebooksClient'
 
 export const revalidate = 600
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://arwignplanners.com'
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.arwignplanners.com'
 
 const NOTEBOOK_FAQS = [
   { q: 'How do I receive my notebook after purchase?', a: 'Instantly. A secure download link is emailed to you the moment payment clears, and it stays in your account so you can re-download any time.' },

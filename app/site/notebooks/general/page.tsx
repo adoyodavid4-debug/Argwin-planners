@@ -6,7 +6,7 @@ import { FAQS } from './data'
 
 export const revalidate = 600
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://arwignplanners.com'
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.arwignplanners.com'
 
 export const metadata: Metadata = {
   title: 'General Notebooks — Ready-Made, Instant Download | Arwign Planners',

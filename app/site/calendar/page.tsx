@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { FaqSchema } from '@/components/seo/JsonLd'
 import CalendarClient from './CalendarClient'
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://arwignplanners.com'
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.arwignplanners.com'
 
 const CALENDAR_FAQS = [
   { q: 'When is Arwign Calendar launching?', a: 'We’re building it in careful, trustworthy phases — starting with a rock-solid core calendar and two-way Google/Outlook sync. Join the waitlist and you’ll be first in line for early access.' },

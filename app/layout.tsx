@@ -42,7 +42,7 @@ const playfair = Playfair_Display({
 const fontVars = `${jost.variable} ${cormorant.variable} ${dmSerif.variable} ${playfair.variable}`
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://arwignplanners.com'),
+  metadataBase: new URL('https://www.arwignplanners.com'),
   title: {
     default: 'Arwign Planners — Premium Digital & Printable Planners',
     template: '%s | Arwign Planners',
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     'Notion templates', 'life planner', 'digital organization tools',
     'downloadable planners', 'planner templates', 'Etsy planner alternative',
   ],
-  authors: [{ name: 'Arwign Planners', url: 'https://arwignplanners.com' }],
+  authors: [{ name: 'Arwign Planners', url: 'https://www.arwignplanners.com' }],
   creator: 'Arwign Planners',
   publisher: 'Arwign Planners',
   category: 'productivity',
@@ -66,7 +66,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://arwignplanners.com',
+    url: 'https://www.arwignplanners.com',
     siteName: 'Arwign Planners',
     title: 'Arwign Planners — Premium Digital & Printable Planners',
     description: 'Download premium digital planners, printable planners, and productivity tools. Plan your best life with Arwign.',
@@ -106,9 +106,9 @@ export const metadata: Metadata = {
   manifest: '/site.webmanifest',
 
   alternates: {
-    canonical: 'https://arwignplanners.com',
+    canonical: 'https://www.arwignplanners.com',
     languages: {
-      'en-US': 'https://arwignplanners.com',
+      'en-US': 'https://www.arwignplanners.com',
     },
   },
 }
