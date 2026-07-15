@@ -371,9 +371,21 @@ function Lightbox({ imgs, active, setActive, onClose, title, reduce }: { imgs: s
       <button onClick={onClose} aria-label="Close" className="absolute top-5 right-5 w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.14)', color: '#fff' }}><X size={18} /></button>
       <button onClick={() => setActive((a) => (a - 1 + imgs.length) % imgs.length)} aria-label="Previous" className="absolute left-4 w-11 h-11 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.14)', color: '#fff' }}><ChevronLeft size={20} /></button>
       <button onClick={() => setActive((a) => (a + 1) % imgs.length)} aria-label="Next" className="absolute right-4 w-11 h-11 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.14)', color: '#fff' }}><ChevronRight size={20} /></button>
-      <motion.div key={active} initial={{ opacity: 0, scale: reduce ? 1 : 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: reduce ? 0 : 0.25 }} className="relative" style={{ width: 'min(90vw, 560px)', aspectRatio: '3/4' }}>
-        <Image src={imgs[active]} alt={`${title} — image ${active + 1}`} fill sizes="90vw" className="object-contain" />
-      </motion.div>
+      {/* Cream mount board — fixed warm tones (not theme vars) so dark mode
+          never reintroduces a dark letterbox behind the artwork. */}
+      <div
+        className="relative overflow-hidden rounded-3xl p-6 md:p-10 shadow-[0_24px_60px_-20px_rgba(47,79,62,0.25)]"
+        style={{
+          width: 'min(90vw, 560px)',
+          aspectRatio: '3/4',
+          background: 'linear-gradient(180deg, #F7F2E8 0%, #EDE4D3 100%)',
+          border: '1px solid rgba(110,126,102,0.18)',
+        }}
+      >
+        <motion.div key={active} initial={{ opacity: 0, scale: reduce ? 1 : 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: reduce ? 0 : 0.25 }} className="relative h-full w-full">
+          <Image src={imgs[active]} alt={`${title} — image ${active + 1}`} fill sizes="90vw" className="object-contain" />
+        </motion.div>
+      </div>
       <p className="absolute bottom-5 text-xs text-white/70">{active + 1} / {imgs.length}</p>
     </motion.div>
   )
