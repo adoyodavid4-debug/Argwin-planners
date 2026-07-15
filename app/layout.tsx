@@ -1,10 +1,45 @@
 // app/layout.tsx
 import type { Metadata, Viewport } from 'next'
+import { Cormorant_Garamond, DM_Serif_Display, Jost, Playfair_Display } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 import { Toaster } from 'react-hot-toast'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { OrganizationSchema } from '@/components/seo/JsonLd'
 import './globals.css'
+
+// Self-hosted via next/font — no render-blocking Google Fonts CSS request on
+// mobile. Only Jost (body text) is preloaded; the display serifs load with
+// swap so first paint is never blocked on them.
+const jost = Jost({
+  subsets: ['latin'],
+  variable: '--nf-jost',
+  display: 'swap',
+})
+const cormorant = Cormorant_Garamond({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  style: ['normal', 'italic'],
+  variable: '--nf-cormorant',
+  display: 'swap',
+  preload: false,
+})
+const dmSerif = DM_Serif_Display({
+  subsets: ['latin'],
+  weight: '400',
+  style: ['normal', 'italic'],
+  variable: '--nf-dm-serif',
+  display: 'swap',
+  preload: false,
+})
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  style: ['normal', 'italic'],
+  variable: '--nf-playfair',
+  display: 'swap',
+  preload: false,
+})
+
+const fontVars = `${jost.variable} ${cormorant.variable} ${dmSerif.variable} ${playfair.variable}`
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://arwignplanners.com'),
@@ -85,16 +120,15 @@ export const viewport: Viewport = {
   ],
   width: 'device-width',
   initialScale: 1,
+  // Lets env(safe-area-inset-*) work on notched phones (sticky CTA spacing).
+  viewportFit: 'cover',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={fontVars}>
       <head>
         <OrganizationSchema />
-        {/* Preconnect for performance */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className="grain">
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange={false}>

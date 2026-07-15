@@ -16,17 +16,24 @@ export default function PreviewCarousel({ accent, accentLabel }: Props) {
   const [index, setIndex] = useState(0)
   const count = SPREADS.length
   const thumbsRef = useRef<HTMLDivElement>(null)
+  const mounted = useRef(false)
 
   const go = useCallback((next: number) => {
     setIndex((next + count) % count)
   }, [count])
 
-  // Keep the active thumbnail in view as the slide changes.
+  // Keep the active thumbnail in view as the slide changes. Scrolls the strip
+  // itself only — scrollIntoView would also scroll the page's ancestors, which
+  // yanked the homepage down to this section on initial load. Skips the mount
+  // so page-load scroll position is never touched.
   useEffect(() => {
+    if (!mounted.current) { mounted.current = true; return }
     const strip = thumbsRef.current
     if (!strip) return
     const active = strip.querySelector<HTMLElement>(`[data-thumb="${index}"]`)
-    active?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
+    if (!active) return
+    const left = active.offsetLeft - (strip.clientWidth - active.clientWidth) / 2
+    strip.scrollTo({ left, behavior: 'smooth' })
   }, [index])
 
   const onKeyDown = (e: React.KeyboardEvent) => {

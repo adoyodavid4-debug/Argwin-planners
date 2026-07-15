@@ -1,5 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=DM+Serif+Display:ital@0;1&family=Jost:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap');
-
+/* Fonts are self-hosted via next/font in app/layout.tsx (--nf-* variables) —
+   no render-blocking Google Fonts import. */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -35,11 +35,12 @@
   --glass-border: rgba(255,255,255,0.5);
   --glass-shadow: 0 8px 32px rgba(44,42,53,0.08);
 
-  /* Fonts */
-  --font-cormorant: 'Cormorant Garamond', Georgia, serif;
-  --font-dm-serif:  'DM Serif Display', Georgia, serif;
-  --font-jost:      'Jost', system-ui, sans-serif;
-  --font-playfair:  'Playfair Display', Georgia, serif;
+  /* Fonts — the --nf-* variables come from next/font in app/layout.tsx and
+     already carry size-adjusted fallbacks. */
+  --font-cormorant: var(--nf-cormorant, 'Cormorant Garamond'), Georgia, serif;
+  --font-dm-serif:  var(--nf-dm-serif, 'DM Serif Display'), Georgia, serif;
+  --font-jost:      var(--nf-jost, 'Jost'), system-ui, sans-serif;
+  --font-playfair:  var(--nf-playfair, 'Playfair Display'), Georgia, serif;
   --font-dm-mono:   'DM Mono', monospace;
 
   /* Radius */
@@ -86,10 +87,22 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 html {
-  scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Smooth anchor scrolling only for users who haven't asked for reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+/* Snappier taps on touch devices — no grey flash, no double-tap-zoom delay. */
+a, button, [role='button'], input, select, textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+a, button, [role='button'] {
+  touch-action: manipulation;
 }
 
 body {
@@ -132,6 +145,21 @@ h4, h5, h6 { font-family: var(--font-jost); font-weight: 600; }
 .glass-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 16px 48px rgba(0,0,0,0.10);
+}
+
+/* Heavy backdrop blurs are among the most expensive effects on mobile GPUs —
+   dial them down on small screens so scrolling stays at 60fps. */
+@media (max-width: 640px) {
+  .glass {
+    backdrop-filter: blur(10px) saturate(150%);
+    -webkit-backdrop-filter: blur(10px) saturate(150%);
+  }
+  .glass-card {
+    backdrop-filter: blur(8px) saturate(140%);
+    -webkit-backdrop-filter: blur(8px) saturate(140%);
+  }
+  .search-overlay { backdrop-filter: blur(10px); }
+  .mobile-nav-overlay { backdrop-filter: none; }
 }
 
 /* ─── Buttons ───────────────────────────────────────────────── */
@@ -279,6 +307,18 @@ h4, h5, h6 { font-family: var(--font-jost); font-weight: 600; }
   animation: grain 8s steps(10) infinite;
 }
 
+/* On phones (and for reduced-motion users) the grain stays as a static
+   texture: the animated 400%-sized fixed layer forces constant compositing
+   and visibly drags scrolling on low-end devices. */
+@media (max-width: 767px), (prefers-reduced-motion: reduce) {
+  .grain::before {
+    animation: none;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
 /* ─── Scrollbar ─────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-secondary); }
@@ -335,9 +375,20 @@ h4, h5, h6 { font-family: var(--font-jost); font-weight: 600; }
 .star-filled  { color: var(--gold); }
 .star-empty   { color: var(--border); }
 
-/* ─── Section Spacing ───────────────────────────────────────── */
-.section { padding: 6rem 0; }
-.section-sm { padding: 4rem 0; }
+/* ─── Section Spacing — tighter on phones, airy from tablet up ─ */
+.section { padding: 4rem 0; }
+.section-sm { padding: 3rem 0; }
+@media (min-width: 768px) {
+  .section { padding: 6rem 0; }
+  .section-sm { padding: 4rem 0; }
+}
+
+/* Skip layout/paint for below-fold sections until they near the viewport —
+   big first-render win on slower phones. */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 640px;
+}
 .container-site {
   width: 100%;
   max-width: 1280px;

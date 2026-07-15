@@ -208,13 +208,13 @@ export default function HomeHero({
       className="relative overflow-hidden bg-[#F7F4EE] dark:bg-[var(--bg-neutral)]"
       style={{ borderBottom: '1px solid var(--border)' }}
     >
-      <div className="container-site relative grid items-center gap-12 py-20 lg:grid-cols-2 lg:gap-8 lg:py-28">
+      <div className="container-site relative grid items-center gap-10 py-14 sm:py-20 lg:grid-cols-2 lg:gap-8 lg:py-28">
         {/* Copy */}
         <motion.div initial={reduce ? false : { opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
           <p className="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-semibold mb-5 px-3 py-1.5 rounded-full" style={{ color: 'var(--gold-dark)', background: 'rgba(var(--gold-rgb),0.14)', letterSpacing: '0.14em' }}>
             <Sparkles size={12} /> {eyebrow}
           </p>
-          <h1 className="font-display mb-5" style={{ fontSize: 'clamp(2.6rem, 6vw, 4.4rem)', lineHeight: 1.02, color: 'var(--text-primary)' }}>
+          <h1 className="font-display mb-5" style={{ fontSize: 'clamp(2.25rem, 7vw, 4.4rem)', lineHeight: 1.05, color: 'var(--text-primary)' }}>
             {headline}<br /><span style={{ color: 'var(--gold)' }}>{headlineAccent}</span>
           </h1>
           <p className="leading-relaxed max-w-md mb-8" style={{ color: 'var(--text-secondary)', fontSize: '1.12rem' }}>

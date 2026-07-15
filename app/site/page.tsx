@@ -119,18 +119,22 @@ export default async function HomePage() {
         subcopy={heroCopy.subcopy}
       />
       <SocialProof />
-      <CategoryGrid />
-      <BestSellerShowcase products={bestsellers as any} />
-      <DigitalNotebookSection />
-      <WhyArwign />
-      <InteriorPreview />
-      <Suspense fallback={<NewArrivalsSkeleton />}>
-        <NewArrivals />
-      </Suspense>
-      <HowItWorks />
-      <BlogPreview />
-      <TestimonialsSection />
-      <FinalCTA />
+      {/* Below-fold sections skip rendering until scrolled near (cv-auto) —
+          keeps first paint fast on slower phones. */}
+      <div className="cv-auto"><CategoryGrid /></div>
+      <div className="cv-auto"><BestSellerShowcase products={bestsellers as any} /></div>
+      <div className="cv-auto"><DigitalNotebookSection /></div>
+      <div className="cv-auto"><WhyArwign /></div>
+      <div className="cv-auto"><InteriorPreview /></div>
+      <div className="cv-auto">
+        <Suspense fallback={<NewArrivalsSkeleton />}>
+          <NewArrivals />
+        </Suspense>
+      </div>
+      <div className="cv-auto"><HowItWorks /></div>
+      <div className="cv-auto"><BlogPreview /></div>
+      <div className="cv-auto"><TestimonialsSection /></div>
+      <div className="cv-auto"><FinalCTA /></div>
       <StickyShopCTA />
     </>
   )

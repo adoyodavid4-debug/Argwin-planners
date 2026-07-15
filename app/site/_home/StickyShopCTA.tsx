@@ -22,7 +22,8 @@ export default function StickyShopCTA() {
     <AnimatePresence>
       {show && (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}
-          className="fixed bottom-4 inset-x-4 sm:inset-x-auto sm:right-6 z-40 flex justify-center sm:block">
+          className="fixed inset-x-4 sm:inset-x-auto sm:right-6 z-40 flex justify-center sm:block"
+          style={{ bottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}>
           <Link href="/shop" className="btn-primary shadow-gold-lg !py-3.5 !px-7 w-full sm:w-auto justify-center">
             <ShoppingBag size={16} /> Shop now <ArrowRight size={15} />
           </Link>
