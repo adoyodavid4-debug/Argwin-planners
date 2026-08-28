@@ -6,49 +6,75 @@ const ADMIN_ROUTES   = ['/admin']
 const AUTH_ROUTES    = ['/customer/dashboard', '/customer/notebooks']
 const PUBLIC_AUTH    = ['/auth/login', '/auth/register', '/auth/forgot-password']
 
+// Cap every Supabase network call. A paused/unreachable backend must NOT be
+// able to hang the Edge middleware — that is what produces a site-wide
+// MIDDLEWARE_INVOCATION_TIMEOUT (504). On timeout we reject, the catch below
+// fails open ("no session"), and the request proceeds.
+const SUPABASE_TIMEOUT_MS = 2500
+function withTimeout<T>(p: PromiseLike<T>, ms: number, label: string): Promise<T> {
+  return Promise.race([
+    Promise.resolve(p),
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(`[middleware] ${label} timed out after ${ms}ms`)), ms),
+    ),
+  ])
+}
+
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next()
   const { pathname } = req.nextUrl
 
-  // ── Supabase session refresh ──────────────────────────────
-  // Runs on every route (see matcher), so any throw here would 500 the
-  // ENTIRE site with MIDDLEWARE_INVOCATION_FAILED. Guard it and fail open:
-  // a transient Supabase/cold-start/env hiccup degrades to "no session"
-  // rather than taking the whole app down.
+  const isAdminPage  = ADMIN_ROUTES.some((r) => pathname.startsWith(r))
+  const isAdminApi   = pathname.startsWith('/api/admin')
+  const isAuthRoute  = AUTH_ROUTES.some((r) => pathname.startsWith(r))
+  const isPublicAuth = PUBLIC_AUTH.includes(pathname)
+
+  // ── Session is only needed on protected / auth routes ─────
+  // Public pages (home, shop, product, blog, generic API) must never depend
+  // on Supabase — otherwise a backend outage 504s the ENTIRE site. We only
+  // reach out to Supabase for routes that actually gate on a session.
+  const needsSession = isAdminPage || isAdminApi || isAuthRoute || isPublicAuth
+
   let session = null
   let supabase: ReturnType<typeof createServerClient> | null = null
-  try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-    if (supabaseUrl && supabaseAnonKey) {
-      supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-        cookies: {
-          get: (name) => req.cookies.get(name)?.value,
-          set: (name, value, opts) => {
-            res.cookies.set({ name, value, ...opts })
-          },
-          remove: (name, opts) => {
-            res.cookies.set({ name, value: '', ...opts })
-          },
-        },
-      })
+  if (needsSession) {
+    // Guard BOTH throws and hangs: a transient Supabase/cold-start/env hiccup
+    // degrades to "no session" (fail open) rather than taking the app down.
+    try {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-      const { data } = await supabase.auth.getSession()
-      session = data.session
+      if (supabaseUrl && supabaseAnonKey) {
+        supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+          cookies: {
+            get: (name) => req.cookies.get(name)?.value,
+            set: (name, value, opts) => {
+              res.cookies.set({ name, value, ...opts })
+            },
+            remove: (name, opts) => {
+              res.cookies.set({ name, value: '', ...opts })
+            },
+          },
+        })
+
+        const { data } = await withTimeout(
+          supabase.auth.getSession(),
+          SUPABASE_TIMEOUT_MS,
+          'getSession',
+        )
+        session = data.session
+      }
+    } catch (err) {
+      // Never let an auth hiccup crash the middleware.
+      console.error('[middleware] session refresh failed, failing open:', err)
     }
-  } catch (err) {
-    // Never let an auth hiccup crash the middleware.
-    console.error('[middleware] session refresh failed, failing open:', err)
   }
 
   // ── Admin protection ──────────────────────────────────────
   // Both /admin pages and /api/admin routes require a signed-in user whose
   // profile role is admin or super_admin. The role is read with the user's
   // own session client (RLS lets users read their own profile row).
-  const isAdminPage = ADMIN_ROUTES.some((r) => pathname.startsWith(r))
-  const isAdminApi  = pathname.startsWith('/api/admin')
-
   if (isAdminPage || isAdminApi) {
     const deny = () =>
       isAdminApi
@@ -59,11 +85,15 @@ export async function middleware(req: NextRequest) {
 
     let role: string | null = null
     try {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', session.user.id)
-        .single()
+      const { data: profile } = await withTimeout(
+        supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single(),
+        SUPABASE_TIMEOUT_MS,
+        'admin role check',
+      )
       role = (profile as { role?: string } | null)?.role ?? null
     } catch (err) {
       console.error('[middleware] admin role check failed:', err)
@@ -73,14 +103,14 @@ export async function middleware(req: NextRequest) {
   }
 
   // ── Customer auth protection ──────────────────────────────
-  if (AUTH_ROUTES.some((r) => pathname.startsWith(r))) {
+  if (isAuthRoute) {
     if (!session) {
       return NextResponse.redirect(new URL(`/auth/login?redirect=${encodeURIComponent(pathname)}`, req.url))
     }
   }
 
   // ── Redirect logged-in users from auth pages ──────────────
-  if (PUBLIC_AUTH.includes(pathname) && session) {
+  if (isPublicAuth && session) {
     return NextResponse.redirect(new URL('/customer/dashboard', req.url))
   }
 
