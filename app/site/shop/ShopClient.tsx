@@ -145,6 +145,14 @@ export default function ShopClient({ products, categories, featured }: Props) {
   const visibleList = filtered.slice(0, visible)
   const recent = useMemo(() => recentIds.map((id) => products.find((p) => p.id === id)).filter(Boolean).slice(0, 6) as Product[], [recentIds, products])
 
+  // Default browse state → group products into a labelled section per category.
+  const browse = !hasFilters && sort === 'featured'
+  const grouped = useMemo(() =>
+    categories
+      .map((c) => ({ category: c, items: filtered.filter((p) => (p.category as any)?.slug === c.slug) }))
+      .filter((g) => g.items.length > 0)
+  , [categories, filtered])
+
   const toggle = (arr: string[], set: (v: string[]) => void, v: string) => set(arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v])
   const clearAll = () => { setSearchInput(''); setSearch(''); setCategory(null); setFormats([]); setSizes([]); setPrice(null); setMinRating(0); setOnlyNew(false); setOnlyBest(false) }
 
@@ -247,7 +255,9 @@ export default function ShopClient({ products, categories, featured }: Props) {
           {/* count + reopen sidebar + chips */}
           <div className="flex items-center gap-3 mb-5 flex-wrap">
             {!sidebarOpen && <button onClick={() => setSidebarOpen(true)} className="hidden lg:inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border" style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}><SlidersHorizontal size={13} /> Filters{activeCount > 0 ? ` (${activeCount})` : ''}</button>}
-            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Showing <b style={{ color: 'var(--text-primary)' }}>{Math.min(visible, filtered.length)}</b> of <b style={{ color: 'var(--text-primary)' }}>{filtered.length}</b> {filtered.length === 1 ? 'planner' : 'planners'}</p>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{browse
+              ? <>Browsing <b style={{ color: 'var(--text-primary)' }}>{grouped.length}</b> {grouped.length === 1 ? 'category' : 'categories'} · <b style={{ color: 'var(--text-primary)' }}>{filtered.length}</b> planners</>
+              : <>Showing <b style={{ color: 'var(--text-primary)' }}>{Math.min(visible, filtered.length)}</b> of <b style={{ color: 'var(--text-primary)' }}>{filtered.length}</b> {filtered.length === 1 ? 'planner' : 'planners'}</>}</p>
           </div>
 
           {hasFilters && (
@@ -270,6 +280,16 @@ export default function ShopClient({ products, categories, featured }: Props) {
               <p className="font-display text-2xl mb-2" style={{ color: 'var(--text-primary)' }}>No planners found</p>
               <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>Try a different search or clear your filters.</p>
               <button className="btn-outline" onClick={clearAll}>Clear all filters</button>
+            </div>
+          ) : browse ? (
+            <div className="flex flex-col gap-14">
+              {grouped.map(({ category, items }) => (
+                <CategorySection
+                  key={category.slug} category={category} items={items} cols={cols}
+                  onQuickView={openQuickView}
+                  onViewAll={() => { setCategory(category.slug); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                />
+              ))}
             </div>
           ) : view === 'list' ? (
             <div className="flex flex-col gap-4">
@@ -337,6 +357,30 @@ export default function ShopClient({ products, categories, featured }: Props) {
 }
 
 // ── Sub-components ────────────────────────────────────────────
+function CategorySection({ category, items, cols, onQuickView, onViewAll }: { category: Category; items: Product[]; cols: 3 | 4; onQuickView: (p: Product) => void; onViewAll: () => void }) {
+  const SHOWN = 8
+  const shown = items.slice(0, SHOWN)
+  return (
+    <section>
+      <div className="flex items-end justify-between gap-4 mb-5 pb-3 border-b" style={{ borderColor: 'var(--border)' }}>
+        <div>
+          <h2 className="font-display text-2xl" style={{ color: 'var(--text-primary)' }}>{category.name}</h2>
+          <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>{items.length} {items.length === 1 ? 'planner' : 'planners'}</p>
+        </div>
+        <button onClick={onViewAll} className="text-xs font-semibold inline-flex items-center gap-1 flex-shrink-0 transition-colors hover:text-gold" style={{ color: 'var(--text-primary)' }}>View all <ChevronRight size={13} /></button>
+      </div>
+      <div className={`grid gap-5 ${cols === 4 ? 'grid-cols-2 md:grid-cols-3 xl:grid-cols-4' : 'grid-cols-2 md:grid-cols-3'}`}>
+        {shown.map((p, i) => <ShopCard key={p.id} p={p} index={i} onQuickView={() => onQuickView(p)} />)}
+      </div>
+      {items.length > SHOWN && (
+        <div className="mt-6">
+          <button onClick={onViewAll} className="btn-outline">View all {items.length} in {category.name} <ChevronRight size={14} /></button>
+        </div>
+      )}
+    </section>
+  )
+}
+
 function Chip({ label, onClear }: { label: string; onClear: () => void }) {
   return <button onClick={onClear} className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border transition-all hover:opacity-80" style={{ background: 'rgba(var(--gold-rgb),0.12)', borderColor: 'rgba(var(--gold-rgb),0.35)', color: 'var(--gold-dark)' }}>{label} <X size={10} /></button>
 }
