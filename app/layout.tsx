@@ -98,7 +98,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className="grain">
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange={false}>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} themes={['light', 'dark', 'warm']} disableTransitionOnChange={false}>
           {children}
           <Toaster
             position="top-center"
@@ -113,7 +113,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 fontSize: '0.875rem',
                 boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
               },
-              success: { iconTheme: { primary: '#C9A84C', secondary: 'white' } },
+              success: { iconTheme: { primary: '#A0830E', secondary: 'white' } },
             }}
           />
         </ThemeProvider>

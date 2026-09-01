@@ -247,6 +247,70 @@ const templates: Record<string, (locale: Locale, data: Record<string, unknown>) 
     return { subject, html, text }
   },
 
+  // ── Arwign Calendar (transactional; no unsubscribe footer) ──
+  'calendar.booking': (locale, data) => {
+    const role = String(data.role ?? 'guest')
+    const title = String(data.title ?? 'Meeting')
+    const when = String(data.when ?? '')
+    const location = data.location ? String(data.location) : ''
+    const joinUrl = data.join_url ? String(data.join_url) : ''
+    const cancelUrl = data.cancel_url ? String(data.cancel_url) : ''
+    const guestName = data.guest_name ? String(data.guest_name) : ''
+    const subject = role === 'owner'
+      ? `New booking: ${title} — ${when}`
+      : `Confirmed: ${title} — ${when}`
+    const heading = role === 'owner' ? 'You have a new booking' : 'Your meeting is confirmed'
+    const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#FAF8F4;color:#1A1820;margin:0;padding:0}a{color:#A0830E}.container{max-width:560px;margin:40px auto;background:#fff;border-radius:12px;padding:40px;border:1px solid #E8E4DB}.row{padding:8px 0;border-bottom:1px solid #F0ECE2}</style></head><body><div class="container">
+      <p style="font-size:18px;font-weight:700;letter-spacing:2px;color:#A0830E;margin:0 0 4px">ARWIGN CALENDAR</p>
+      <h2 style="margin:0 0 20px">${heading}</h2>
+      <div class="row"><strong>${title}</strong></div>
+      <div class="row">🗓️ ${when}</div>
+      ${location ? `<div class="row">📍 ${location}</div>` : ''}
+      ${guestName ? `<div class="row">👤 ${guestName}</div>` : ''}
+      ${joinUrl ? `<p style="margin:24px 0"><a href="${joinUrl}" style="background:#A0830E;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600">Join the meeting →</a></p>` : ''}
+      ${cancelUrl ? `<p style="font-size:13px;color:#888">Need to change it? <a href="${cancelUrl}">Cancel or reschedule</a>.</p>` : ''}
+      <p style="margin-top:28px;color:#888;font-size:13px">Sent by Arwign Calendar</p>
+    </div></body></html>`
+    return { subject, html, text: `${heading}: ${title} — ${when}${location ? ` @ ${location}` : ''}` }
+  },
+
+  'calendar.reminder': (locale, data) => {
+    const title = String(data.title ?? 'Event')
+    const when = String(data.when ?? '')
+    const location = data.location ? String(data.location) : ''
+    const joinUrl = data.join_url ? String(data.join_url) : ''
+    const subject = `Reminder: ${title} — ${when}`
+    const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#FAF8F4;color:#1A1820;margin:0;padding:0}a{color:#A0830E}.container{max-width:520px;margin:40px auto;background:#fff;border-radius:12px;padding:36px;border:1px solid #E8E4DB}</style></head><body><div class="container">
+      <p style="font-size:16px;font-weight:700;letter-spacing:2px;color:#A0830E;margin:0 0 12px">ARWIGN CALENDAR</p>
+      <h2 style="margin:0 0 8px">${title}</h2>
+      <p style="margin:0 0 4px;color:#5A5668">🗓️ ${when}</p>
+      ${location ? `<p style="margin:0;color:#5A5668">📍 ${location}</p>` : ''}
+      ${joinUrl ? `<p style="margin:24px 0"><a href="${joinUrl}" style="background:#A0830E;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600">Join now →</a></p>` : ''}
+    </div></body></html>`
+    return { subject, html, text: subject }
+  },
+
+  'calendar.briefing': (locale, data) => {
+    const headline = String(data.headline ?? 'Your day ahead')
+    const dateLabel = String(data.date_label ?? '')
+    const appUrl = String(data.app_url ?? `${BASE_URL}/calendar/app`)
+    const items = (data.items ?? []) as { time: string; title: string; flag?: string }[]
+    const rows = items.length ? items.map((i) => `
+      <tr>
+        <td style="padding:10px 0;border-bottom:1px solid #F0ECE2;color:#8A869A;font-size:13px;font-family:monospace;width:70px;vertical-align:top">${i.time}</td>
+        <td style="padding:10px 0;border-bottom:1px solid #F0ECE2;color:#1A1820;font-size:14px">${i.title}${i.flag ? ` <span style="color:#A0830E;font-size:12px">· ${i.flag}</span>` : ''}</td>
+      </tr>`).join('') : `<tr><td style="padding:16px 0;color:#8A869A">Nothing scheduled — enjoy the open day.</td></tr>`
+    const subject = `${dateLabel}: ${headline}`
+    const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#FAF8F4;color:#1A1820;margin:0;padding:0}a{color:#A0830E}.container{max-width:560px;margin:40px auto;background:#fff;border-radius:12px;padding:40px;border:1px solid #E8E4DB}</style></head><body><div class="container">
+      <p style="font-size:16px;font-weight:700;letter-spacing:2px;color:#A0830E;margin:0 0 4px">GOOD MORNING</p>
+      <h2 style="margin:0 0 6px">${dateLabel}</h2>
+      <p style="margin:0 0 20px;color:#5A5668;font-size:15px">${headline}</p>
+      <table role="presentation" width="100%" style="border-collapse:collapse">${rows}</table>
+      <p style="margin:28px 0 0"><a href="${appUrl}" style="background:#A0830E;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600">Open your calendar →</a></p>
+    </div></body></html>`
+    return { subject, html, text: `${dateLabel}: ${headline}` }
+  },
+
   // Internal admin notification — no unsubscribe footer (not a subscriber-facing email)
   'notebook_request.admin': (locale, data) => {
     const subject = `New personalized notebook idea from ${data.name}`
