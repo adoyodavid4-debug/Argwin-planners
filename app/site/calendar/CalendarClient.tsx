@@ -4,8 +4,9 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
   CalendarDays, Sparkles, ShieldCheck, Wand2, Users, Palette, Bell, Mail,
-  MessageSquare, Clock, MapPin, RefreshCcw, Repeat, Layers, Globe2, Zap,
+  MessageSquare, Clock, MapPin, RefreshCcw, Repeat, Layers, Globe2,
   Check, ArrowRight, ChevronDown, Brain, PlugZap, CalendarClock, BellRing,
+  BarChart3, FileText, LifeBuoy, Route, Moon, WifiOff, Vote,
 } from 'lucide-react'
 
 // ════════════════════════════════════════════════════════════
@@ -37,8 +38,11 @@ const PILLARS = [
     points: [
       'Two-way sync with Google Calendar & Microsoft 365 / Outlook',
       'Apple Calendar via CalDAV + ICS import / export',
-      'One unified, conflict-aware view across every account',
+      'Email connectivity for event detection — Gmail & Microsoft Graph (read-only)',
+      'Task managers: Todoist, Notion, Asana, ClickUp, Linear & Trello',
+      'CRM: HubSpot, Salesforce & Pipedrive — meetings logged to the record',
       'Auto Google Meet / Zoom / Teams links on every event',
+      'One unified, conflict-aware view across every account',
     ],
   },
   {
@@ -49,6 +53,9 @@ const PILLARS = [
       'Ranks the best meeting times across everyone’s free/busy',
       'Auto time-blocks your tasks into real, defended slots',
       'Natural language: “coffee with Amara Thursday 3pm” → event',
+      'Smart reschedule — proposes the least-disruptive shift on conflict',
+      'Meeting prep briefs from agenda, attendees & CRM context',
+      'Post-meeting action extraction into your connected task manager',
     ],
   },
   {
@@ -58,6 +65,7 @@ const PILLARS = [
       'Shared team calendars with granular roles',
       'Conference room & resource booking with approvals',
       'Team availability finder across time zones',
+      'Multi-timezone mastery — world-clock strip & keep-in-original-zone',
       'Delegation with a full audit trail',
     ],
   },
@@ -68,6 +76,7 @@ const PILLARS = [
       'Rules-based auto-colour, tags and custom event types',
       'Recurring templates for your regular meetings',
       'Saved views & filters, one click away',
+      'Light, dark & warm themes with a density toggle',
       'Command palette (⌘K) and keyboard-first navigation',
     ],
   },
@@ -100,10 +109,79 @@ const DIFFERENTIATORS = [
     fix: 'Auto time-blocking slots tasks from your task manager into real, defended slots.',
   },
   {
+    icon: Repeat,
+    pain: '“Sometime this week” items don’t fit a rigid time grid.',
+    fix: 'Flexible, floating items the calendar auto-places and re-places as the week fills.',
+  },
+  {
+    icon: Vote,
+    pain: 'Scheduling with others is endless back-and-forth.',
+    fix: 'Built-in booking pages + meeting polls — no separate Calendly or Doodle.',
+  },
+  {
     icon: Globe2,
     pain: 'Time zones cause wrong-time and missed meetings.',
     fix: 'A timezone-correct core, inline “this is 6am for them” warnings and a world-clock strip.',
   },
+  {
+    icon: Layers,
+    pain: 'Double-booking across personal + work accounts.',
+    fix: 'A unified, conflict-aware multi-account view that guards against overlaps.',
+  },
+  {
+    icon: BarChart3,
+    pain: 'No idea where your time actually goes.',
+    fix: 'Calendar-health analytics — meeting load, focus ratio, after-hours creep, biggest time sinks.',
+  },
+  {
+    icon: FileText,
+    pain: 'You arrive at meetings cold, with no context.',
+    fix: 'AI prep briefs assembled from agenda, attendee/CRM history and last-meeting notes.',
+  },
+  {
+    icon: Wand2,
+    pain: 'Meetings end and nothing captures what was decided.',
+    fix: 'Post-meeting action extraction turns notes into tasks in your connected tools.',
+  },
+  {
+    icon: LifeBuoy,
+    pain: 'Overbooked weeks with no way out.',
+    fix: 'Rescue mode — AI proposes what to decline, move, shorten or delegate.',
+  },
+  {
+    icon: Route,
+    pain: 'Back-to-back days with no breathing room.',
+    fix: 'Automatic buffers + travel blocks inserted around your meetings.',
+  },
+  {
+    icon: Bell,
+    pain: 'Notifications are either noisy or silently missed.',
+    fix: 'Respectful, reliable delivery — quiet hours, batching, delivery receipts, no engagement-bait.',
+  },
+  {
+    icon: Moon,
+    pain: 'Evenings and weekends quietly get colonised.',
+    fix: 'Boundary rules — “protect my evenings / no-meeting Fridays” enforced automatically.',
+  },
+  {
+    icon: WifiOff,
+    pain: 'Nothing works properly offline.',
+    fix: 'Local-first architecture — full function offline, clean reconciliation on reconnect.',
+  },
+]
+
+// Everything else from the masterplan, in one scannable checklist
+const MORE = [
+  'Public booking pages — one-off, round-robin, collective & group',
+  'Meeting polls — propose times, invitees vote, auto-books the winner',
+  'Paid bookings via Stripe, Paystack & M-Pesa — invoices & auto-refunds',
+  'Holiday & multi-country calendars, birthdays & weather on outdoor events',
+  'Home-screen & lock-screen widgets; Apple Watch & Wear OS complications',
+  'Snooze, undo & bulk-edit on every event action',
+  'Privacy modes — “Busy”-only sharing, private & end-to-end-encrypted events',
+  'Layered reminders & quiet hours — respectful by default',
+  'Installable PWA now; native iOS & Android apps to follow',
+  'Templates marketplace, a public API & an embeddable booking widget',
 ]
 
 const TIERS = [
@@ -149,8 +227,8 @@ const TIERS = [
 
 const FAQS = [
   {
-    q: 'When is Arwign Calendar launching?',
-    a: 'We’re building it in careful, trustworthy phases — starting with a rock-solid core calendar and two-way Google/Outlook sync. Join the waitlist and you’ll be first in line for early access.',
+    q: 'Is Arwign Calendar available now?',
+    a: 'Yes — the core calendar is live and free: events, recurring series, reminders, day/week/month/agenda/year views, natural-language quick-add, ⌘K, booking pages, meeting polls, a daily email briefing and ICS import/export. Google/Outlook two-way sync and SMS briefings switch on as each provider is connected.',
   },
   {
     q: 'Will it sync with my existing calendar?',
@@ -168,86 +246,38 @@ const FAQS = [
     q: 'Will there be a free plan?',
     a: 'Yes. Arwign Free gives you the full calendar, all views, recurrence, quick-add and one connected account — free forever. Advanced automation, unlimited accounts and SMS briefings live on Plus and Teams.',
   },
+  {
+    q: 'Will there be booking pages and payments?',
+    a: 'Yes — public booking pages (one-off, round-robin, collective and group), Doodle-style meeting polls, and paid bookings via Stripe, Paystack and M-Pesa with automatic invoicing and refunds on cancellation.',
+  },
+  {
+    q: 'Does it work offline?',
+    a: 'Yes. Arwign Calendar is local-first — it works fully offline and reconciles cleanly when you reconnect. It installs as a PWA today, with native iOS and Android apps to follow.',
+  },
+  {
+    q: 'How do you protect my privacy?',
+    a: 'Least-privilege scopes, encrypted tokens and privacy modes: share “Busy” only, keep events private, or opt into end-to-end encryption. Every AI suggestion is logged and reversible, with a full audit trail for shared and delegated actions.',
+  },
 ]
 
 // ════════════════════════════════════════════════════════════
-//  Waitlist form (posts to the existing /api/optin endpoint)
+//  Product call-to-action (the calendar is live)
 // ════════════════════════════════════════════════════════════
-function WaitlistForm() {
-  const [email, setEmail] = useState('')
-  const [state, setState] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
-  const [error, setError] = useState('')
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-      setError('Please enter a valid email address.')
-      setState('error')
-      return
-    }
-    setState('loading'); setError('')
-    try {
-      const res = await fetch('/api/optin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          locale: 'en',
-          utm: { utm_source: 'arwign-calendar', utm_campaign: 'calendar-waitlist' },
-          consent_text: 'I want early access to Arwign Calendar and agree to receive emails about it.',
-          honeypot: '',
-        }),
-      })
-      if (res.ok) { setState('done') }
-      else {
-        const data = await res.json().catch(() => ({}))
-        setError(data.error?.email?.[0] ?? data.error ?? 'Something went wrong. Please try again.')
-        setState('error')
-      }
-    } catch {
-      setError('Network error. Please try again.')
-      setState('error')
-    }
-  }
-
-  if (state === 'done') {
-    return (
-      <div className="rounded-2xl border p-6 text-center" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-        <div className="text-4xl mb-2">🗓️</div>
-        <p className="font-semibold" style={{ color: 'var(--text-primary)' }}>You’re on the list!</p>
-        <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
-          We’ll email you the moment early access opens.
-        </p>
-      </div>
-    )
-  }
-
+function ProductCTA({ center = false }: { center?: boolean }) {
   return (
-    <form onSubmit={submit} className="w-full max-w-md">
-      <div className="flex flex-col sm:flex-row gap-2">
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => { setEmail(e.target.value); if (state === 'error') setState('idle') }}
-          placeholder="Your email address"
-          autoComplete="email"
-          className="flex-1 rounded-xl border px-4 py-3 text-sm outline-none focus:ring-2"
-          style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
-        />
-        <button
-          type="submit"
-          disabled={state === 'loading'}
-          className="btn-primary justify-center whitespace-nowrap px-6 py-3 disabled:opacity-60"
-        >
-          {state === 'loading' ? 'Joining…' : 'Join the waitlist'}
-          {state !== 'loading' && <ArrowRight size={16} />}
-        </button>
+    <div className={center ? 'flex flex-col items-center gap-3' : 'w-full max-w-md'}>
+      <div className={`flex flex-col sm:flex-row gap-3 ${center ? 'justify-center' : ''}`}>
+        <Link href="/calendar/app" className="btn-primary justify-center whitespace-nowrap px-6 py-3">
+          Create your free calendar <ArrowRight size={16} />
+        </Link>
+        <Link href="/calendar/book/arwign" className="btn-outline justify-center whitespace-nowrap px-6 py-3">
+          Book a meeting with us
+        </Link>
       </div>
-      {state === 'error' && <p className="text-xs text-red-500 mt-2">{error}</p>}
-      <p className="text-[11px] mt-2 opacity-70" style={{ color: 'var(--text-muted)' }}>
-        Be first to try it. No spam — just launch news. Unsubscribe any time.
+      <p className="text-[11px] mt-1 opacity-70" style={{ color: 'var(--text-muted)' }}>
+        Free forever plan · no card required · works offline.
       </p>
-    </form>
+    </div>
   )
 }
 
@@ -279,7 +309,7 @@ export default function CalendarClient() {
             >
               <CalendarDays size={14} style={{ color: 'var(--gold)' }} />
               <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--gold-dark)', letterSpacing: '0.1em' }}>
-                Arwign Calendar · Coming soon
+                Arwign Calendar · Now live
               </span>
             </div>
 
@@ -296,7 +326,7 @@ export default function CalendarClient() {
               time management that respects your attention.
             </p>
 
-            <WaitlistForm />
+            <ProductCTA />
 
             <p className="mt-5 text-sm" style={{ color: 'var(--text-muted)' }}>
               Already have an account?{' '}
@@ -472,6 +502,28 @@ export default function CalendarClient() {
         </div>
       </section>
 
+      {/* ── More, by design ──────────────────────────────── */}
+      <section className="py-16" style={{ background: 'var(--bg-card)' }}>
+        <div className="container-site">
+          <div className="text-center max-w-2xl mx-auto mb-10">
+            <h2 className="font-display font-semibold mb-3" style={{ fontSize: 'clamp(2rem, 4vw, 2.75rem)', color: 'var(--text-primary)' }}>
+              And everything else, by design
+            </h2>
+            <p style={{ color: 'var(--text-secondary)' }}>
+              The whole toolkit — scheduling, payments, privacy and platform reach — built to the same calm standard.
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 max-w-4xl mx-auto">
+            {MORE.map((m) => (
+              <div key={m} className="flex items-start gap-2.5 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                <Check size={16} className="flex-shrink-0 mt-0.5" style={{ color: 'var(--gold)' }} />
+                {m}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── Pricing ──────────────────────────────────────── */}
       <section className="container-site py-16">
         <div className="text-center max-w-2xl mx-auto mb-12">
@@ -512,7 +564,7 @@ export default function CalendarClient() {
           ))}
         </div>
         <p className="text-center text-xs mt-6 opacity-70" style={{ color: 'var(--text-muted)' }}>
-          Final pricing announced at launch. Waitlist members get founder pricing.
+          Enterprise (SSO/SCIM, audit exports & data-residency) follows for larger teams. Final pricing announced at launch — waitlist members get founder pricing.
         </p>
       </section>
 
@@ -544,13 +596,13 @@ export default function CalendarClient() {
         <div className="container-site text-center max-w-2xl mx-auto">
           <Sparkles size={28} className="mx-auto mb-5" style={{ color: 'var(--gold)' }} />
           <h2 className="font-display font-semibold mb-4" style={{ fontSize: 'clamp(2rem, 4vw, 2.75rem)', color: 'var(--text-primary)' }}>
-            Be first to a calmer calendar
+            Start with a calmer calendar
           </h2>
           <p className="mb-8" style={{ color: 'var(--text-secondary)' }}>
-            Join the waitlist for early access and founder pricing when Arwign Calendar launches.
+            Create your free calendar, connect an account and let Arwign do the rest — no card required.
           </p>
           <div className="flex justify-center">
-            <WaitlistForm />
+            <ProductCTA center />
           </div>
           <p className="mt-8 text-sm" style={{ color: 'var(--text-muted)' }}>
             Looking for our planners in the meantime?{' '}

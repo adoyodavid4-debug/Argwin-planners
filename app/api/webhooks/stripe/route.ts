@@ -4,6 +4,7 @@ import { constructWebhookEvent } from '@/lib/stripe'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { fulfilDigitalOrder, incrementDownloadCount } from '@/lib/orders'
 import { getEmailProvider } from '@/lib/email'
+import { createBookingEvent, sendBookingEmails } from '@/lib/calendar/booking'
 import Stripe from 'stripe'
 import { format } from 'date-fns'
 
@@ -26,6 +27,42 @@ export async function POST(req: NextRequest) {
       const session = event.data.object as Stripe.Checkout.Session
 
       if (session.payment_status !== 'paid') break
+
+      // ── Arwign Calendar paid booking ──────────────────────────
+      if (session.metadata?.type === 'calendar_booking') {
+        const bookingId = session.metadata.booking_id
+        const { data: booking } = await supabase
+          .from('bookings')
+          .select('id, owner_id, booking_page_id, name, email, notes, start_at, end_at, payment_status, event_id')
+          .eq('id', bookingId).maybeSingle()
+        if (!booking) break
+        if (booking.payment_status === 'paid') break // idempotent — already handled
+
+        const { data: page } = await supabase
+          .from('booking_pages')
+          .select('id, owner_id, title, timezone, location, colour')
+          .eq('id', booking.booking_page_id).maybeSingle()
+
+        await supabase.from('bookings')
+          .update({ payment_status: 'paid', payment_ref: (session.payment_intent as string) ?? session.id })
+          .eq('id', booking.id)
+
+        if (page && !booking.event_id) {
+          await createBookingEvent(supabase, page, {
+            id: booking.id, name: booking.name, email: booking.email, notes: booking.notes,
+            start: booking.start_at, end: booking.end_at,
+          })
+        }
+        if (page) {
+          try {
+            await sendBookingEmails(supabase, getEmailProvider(), page, {
+              id: booking.id, name: booking.name, email: booking.email, start: new Date(booking.start_at),
+            })
+          } catch (e) { console.error('[stripe-webhook] booking email failed', e) }
+        }
+        console.log(`[stripe-webhook] Calendar booking ${booking.id} paid`)
+        break
+      }
 
       // Idempotency — Stripe retries webhooks; never create the order twice
       const { data: existing } = await supabase
