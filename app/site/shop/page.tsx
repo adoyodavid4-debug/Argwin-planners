@@ -26,7 +26,7 @@ export default async function ShopPage() {
       .eq('status', 'active')
       .order('is_featured', { ascending: false })
       .order('download_count', { ascending: false })
-      .limit(200)
+      .limit(1000)
       .then((r) => ({ data: r.error ? [] : r.data })),
     supabase.from('categories').select('*').order('sort_order').then((r) => ({ data: r.error ? [] : r.data })),
   ])

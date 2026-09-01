@@ -34,6 +34,19 @@ const SORT_OPTIONS = [
 const sizesOf = (p: Product) => SIZE_KEYS.filter(({ k }) => (p.planner_files as any)?.[k]).map(({ l }) => l)
 const money = (n: number, c?: string | null) => new Intl.NumberFormat('en-GB', { style: 'currency', currency: c ?? 'USD' }).format(n)
 
+function sortProducts(list: Product[], sort: string): Product[] {
+  return [...list].sort((a, b) => {
+    switch (sort) {
+      case 'newest':     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      case 'popular':    return (b.download_count ?? 0) - (a.download_count ?? 0)
+      case 'rating':     return b.rating_avg - a.rating_avg
+      case 'price-asc':  return a.price - b.price
+      case 'price-desc': return b.price - a.price
+      default:           return (Number(b.is_featured) - Number(a.is_featured)) || (b.download_count ?? 0) - (a.download_count ?? 0)
+    }
+  })
+}
+
 function Stars({ value, size = 12 }: { value: number; size?: number }) {
   return <span className="inline-flex items-center gap-0.5" aria-label={`${value.toFixed(1)} out of 5`}>{[1, 2, 3, 4, 5].map((i) => <Star key={i} size={size} style={{ fill: i <= Math.round(value) ? 'var(--gold)' : 'transparent', stroke: i <= Math.round(value) ? 'var(--gold)' : 'var(--border)' }} />)}</span>
 }
@@ -111,6 +124,14 @@ export default function ShopClient({ products, categories, featured }: Props) {
   const allFormats = useMemo(() => { const s = new Set<string>(); products.forEach((p) => (p.file_formats ?? []).forEach((f) => s.add(f))); return FORMAT_OPTIONS.filter((f) => s.has(f)) }, [products])
   const allSizes   = useMemo(() => { const s = new Set<string>(); products.forEach((p) => sizesOf(p).forEach((l) => s.add(l))); return SIZE_KEYS.map(({ l }) => l).filter((l) => s.has(l)) }, [products])
 
+  // Categories that actually have products, in sort order, with counts — for the
+  // quick category bar. (Empty categories are hidden so nothing leads to a blank page.)
+  const catList = useMemo(() => {
+    const counts: Record<string, number> = {}
+    for (const p of products) { const s = (p.category as any)?.slug; if (s) counts[s] = (counts[s] ?? 0) + 1 }
+    return categories.filter((c) => counts[c.slug] > 0).map((c) => ({ slug: c.slug, name: c.name, count: counts[c.slug] }))
+  }, [products, categories])
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
     let list = products.filter((p) => {
@@ -124,17 +145,7 @@ export default function ShopClient({ products, categories, featured }: Props) {
       if (onlyBest && !p.is_bestseller) return false
       return true
     })
-    list = [...list].sort((a, b) => {
-      switch (sort) {
-        case 'newest':     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        case 'popular':    return (b.download_count ?? 0) - (a.download_count ?? 0)
-        case 'rating':     return b.rating_avg - a.rating_avg
-        case 'price-asc':  return a.price - b.price
-        case 'price-desc': return b.price - a.price
-        default:           return (Number(b.is_featured) - Number(a.is_featured)) || (b.download_count ?? 0) - (a.download_count ?? 0)
-      }
-    })
-    return list
+    return sortProducts(list, sort)
   }, [products, search, category, formats, sizes, price, minRating, onlyNew, onlyBest, sort])
 
   useEffect(() => { setVisible(PER_PAGE) }, [search, category, formats, sizes, price, minRating, onlyNew, onlyBest, sort])
@@ -142,6 +153,26 @@ export default function ShopClient({ products, categories, featured }: Props) {
   const activeCount = (category ? 1 : 0) + formats.length + sizes.length + (price ? 1 : 0) + (minRating ? 1 : 0) + (onlyNew ? 1 : 0) + (onlyBest ? 1 : 0) + (search ? 1 : 0)
   const hasFilters = activeCount > 0
   const visibleList = filtered.slice(0, visible)
+
+  // Default browse experience: every planner listed under its category. Kicks in
+  // when nothing is filtered/searched and we're in grid view; filtering or list
+  // view falls back to the flat results grid/list below.
+  const showGrouped = !hasFilters && view === 'grid'
+  const groups = useMemo(() => {
+    if (!showGrouped) return [] as { slug: string; name: string; items: Product[] }[]
+    const bySlug = new Map<string, Product[]>()
+    const noCat: Product[] = []
+    for (const p of products) {
+      const slug = (p.category as any)?.slug as string | undefined
+      if (slug) { const arr = bySlug.get(slug) ?? []; arr.push(p); bySlug.set(slug, arr) }
+      else noCat.push(p)
+    }
+    const ordered = categories
+      .filter((c) => (bySlug.get(c.slug)?.length ?? 0) > 0)
+      .map((c) => ({ slug: c.slug, name: c.name, items: sortProducts(bySlug.get(c.slug)!, sort) }))
+    if (noCat.length) ordered.push({ slug: '', name: 'More planners', items: sortProducts(noCat, sort) })
+    return ordered
+  }, [showGrouped, products, categories, sort])
   const recent = useMemo(() => recentIds.map((id) => products.find((p) => p.id === id)).filter(Boolean).slice(0, 6) as Product[], [recentIds, products])
 
   const toggle = (arr: string[], set: (v: string[]) => void, v: string) => set(arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v])
@@ -182,6 +213,30 @@ export default function ShopClient({ products, categories, featured }: Props) {
         </div>
       </section>
 
+      {/* ══ CATEGORY BAR — click to filter to the right planners ══ */}
+      {catList.length > 0 && (
+        <div className="border-b" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
+          <div className="container-site py-3 flex gap-2 overflow-x-auto scrollbar-hide" role="tablist" aria-label="Shop by category">
+            <button role="tab" aria-selected={!category} onClick={() => setCategory(null)}
+              className="flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium border transition-all"
+              style={{ borderColor: !category ? 'var(--gold)' : 'var(--border)', background: !category ? 'var(--gold)' : 'var(--bg-card)', color: !category ? '#fff' : 'var(--text-primary)' }}>
+              All planners
+            </button>
+            {catList.map((c) => {
+              const on = category === c.slug
+              return (
+                <button key={c.slug} role="tab" aria-selected={on} onClick={() => setCategory(c.slug)}
+                  className="flex-shrink-0 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium border transition-all"
+                  style={{ borderColor: on ? 'var(--gold)' : 'var(--border)', background: on ? 'var(--gold)' : 'var(--bg-card)', color: on ? '#fff' : 'var(--text-primary)' }}>
+                  {c.name}
+                  <span className="text-[11px] tabular-nums" style={{ opacity: 0.7 }}>{c.count}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
       {/* ══ FEATURED STRIP (merchandising) ════════════════════ */}
       {!hasFilters && featured.length >= 4 && (
         <section className="border-b py-8" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
@@ -190,8 +245,8 @@ export default function ShopClient({ products, categories, featured }: Props) {
             <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
               {featured.map((p) => (
                 <Link key={p.id} href={`/shop/${p.slug}`} className="flex-shrink-0 w-36 group">
-                  <div className="relative rounded-xl overflow-hidden mb-2" style={{ aspectRatio: '3/4', background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-                    <Image src={p.thumbnail || FALLBACK_IMG} alt={p.title} fill loading="lazy" sizes="144px" className="object-cover transition-transform duration-300 group-hover:scale-105" />
+                  <div className="relative rounded-xl overflow-hidden mb-2" style={{ aspectRatio: '3/4', background: '#000', border: '1px solid var(--border)' }}>
+                    <Image src={p.thumbnail || FALLBACK_IMG} alt={p.title} fill loading="lazy" sizes="144px" className="object-contain transition-transform duration-300 group-hover:scale-105" />
                     <span className="absolute top-2 left-2 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-white text-[9px] font-black" style={{ background: 'linear-gradient(135deg, var(--gold), var(--gold-light))' }}><Crown size={8} /> BEST</span>
                   </div>
                   <p className="text-xs font-semibold line-clamp-2 group-hover:text-gold transition-colors" style={{ color: 'var(--text-primary)' }}>{p.title}</p>
@@ -246,7 +301,11 @@ export default function ShopClient({ products, categories, featured }: Props) {
           {/* count + reopen sidebar + chips */}
           <div className="flex items-center gap-3 mb-5 flex-wrap">
             {!sidebarOpen && <button onClick={() => setSidebarOpen(true)} className="hidden lg:inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border" style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}><SlidersHorizontal size={13} /> Filters{activeCount > 0 ? ` (${activeCount})` : ''}</button>}
-            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Showing <b style={{ color: 'var(--text-primary)' }}>{Math.min(visible, filtered.length)}</b> of <b style={{ color: 'var(--text-primary)' }}>{filtered.length}</b> {filtered.length === 1 ? 'planner' : 'planners'}</p>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+              {showGrouped
+                ? <>All <b style={{ color: 'var(--text-primary)' }}>{products.length}</b> planners across <b style={{ color: 'var(--text-primary)' }}>{groups.length}</b> {groups.length === 1 ? 'category' : 'categories'}</>
+                : <>Showing <b style={{ color: 'var(--text-primary)' }}>{Math.min(visible, filtered.length)}</b> of <b style={{ color: 'var(--text-primary)' }}>{filtered.length}</b> {filtered.length === 1 ? 'planner' : 'planners'}</>}
+            </p>
           </div>
 
           {hasFilters && (
@@ -270,6 +329,27 @@ export default function ShopClient({ products, categories, featured }: Props) {
               <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>Try a different search or clear your filters.</p>
               <button className="btn-outline" onClick={clearAll}>Clear all filters</button>
             </div>
+          ) : showGrouped ? (
+            <div className="flex flex-col gap-14">
+              {groups.map((g) => (
+                <section key={g.slug || '_more'} id={`cat-${g.slug || 'more'}`} className="scroll-mt-40">
+                  <div className="mb-4 flex items-center justify-between gap-3 border-b pb-2" style={{ borderColor: 'var(--border)' }}>
+                    <div className="flex items-baseline gap-2">
+                      <h2 className="font-display text-2xl" style={{ color: 'var(--text-primary)' }}>{g.name}</h2>
+                      <span className="text-xs tabular-nums" style={{ color: 'var(--text-muted)' }}>{g.items.length} {g.items.length === 1 ? 'planner' : 'planners'}</span>
+                    </div>
+                    {g.slug && (
+                      <button onClick={() => { setCategory(g.slug); window.scrollTo({ top: 0, behavior: 'smooth' }) }} className="inline-flex flex-shrink-0 items-center gap-1 text-xs font-semibold hover:opacity-80" style={{ color: 'var(--gold)' }}>
+                        View all <ChevronRight size={13} />
+                      </button>
+                    )}
+                  </div>
+                  <div className={`grid gap-5 ${cols === 4 ? 'grid-cols-2 md:grid-cols-3 xl:grid-cols-4' : 'grid-cols-2 md:grid-cols-3'}`}>
+                    {g.items.map((p, i) => <ShopCard key={p.id} p={p} index={i} onQuickView={() => openQuickView(p)} />)}
+                  </div>
+                </section>
+              ))}
+            </div>
           ) : view === 'list' ? (
             <div className="flex flex-col gap-4">
               {visibleList.map((p, i) => <ShopRow key={p.id} p={p} index={i} onQuickView={() => openQuickView(p)} />)}
@@ -282,7 +362,7 @@ export default function ShopClient({ products, categories, featured }: Props) {
             </AnimatePresence>
           )}
 
-          {visible < filtered.length && (
+          {!showGrouped && visible < filtered.length && (
             <div className="flex flex-col items-center gap-3 mt-12">
               <div className="w-full max-w-xs h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
                 <div className="h-full rounded-full" style={{ width: `${(Math.min(visible, filtered.length) / filtered.length) * 100}%`, background: 'linear-gradient(90deg, var(--gold), var(--gold-light))' }} />
@@ -301,8 +381,8 @@ export default function ShopClient({ products, categories, featured }: Props) {
             <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
               {recent.map((p) => (
                 <Link key={p.id} href={`/shop/${p.slug}`} className="flex-shrink-0 w-36 group">
-                  <div className="relative rounded-xl overflow-hidden mb-2" style={{ aspectRatio: '3/4', background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-                    <Image src={p.thumbnail || FALLBACK_IMG} alt={p.title} fill loading="lazy" sizes="144px" className="object-cover transition-transform duration-300 group-hover:scale-105" />
+                  <div className="relative rounded-xl overflow-hidden mb-2" style={{ aspectRatio: '3/4', background: '#000', border: '1px solid var(--border)' }}>
+                    <Image src={p.thumbnail || FALLBACK_IMG} alt={p.title} fill loading="lazy" sizes="144px" className="object-contain transition-transform duration-300 group-hover:scale-105" />
                   </div>
                   <p className="text-xs font-semibold line-clamp-2 group-hover:text-gold transition-colors" style={{ color: 'var(--text-primary)' }}>{p.title}</p>
                   <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{money(p.price, p.currency)}</p>
@@ -470,10 +550,10 @@ function ShopCard({ p, index, onQuickView }: { p: Product; index: number; onQuic
   return (
     <motion.div layout initial={reduce ? false : { opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reduce ? 0 : 0.4, delay: reduce ? 0 : Math.min(index * 0.03, 0.25) }} className="group">
       <div className="rounded-xl overflow-hidden tile-hover h-full flex flex-col" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-        <div className="relative overflow-hidden" style={{ aspectRatio: '3/4' }}>
+        <div className="relative overflow-hidden" style={{ aspectRatio: '3/4', background: '#000' }}>
           {!loaded && <div className="absolute inset-0 skeleton" />}
           <Badges p={p} />
-          <Link href={`/shop/${p.slug}`} aria-label={p.title}><Image src={p.thumbnail || FALLBACK_IMG} alt={`${p.title} cover`} fill sizes="(max-width:640px) 50vw, 25vw" priority={index < 4} onLoad={() => setLoaded(true)} className={`object-cover transition-all duration-500 ${loaded ? 'opacity-100' : 'opacity-0'} group-hover:scale-[1.05]`} /></Link>
+          <Link href={`/shop/${p.slug}`} aria-label={p.title}><Image src={p.thumbnail || FALLBACK_IMG} alt={`${p.title} cover`} fill sizes="(max-width:640px) 50vw, 25vw" priority={index < 4} onLoad={() => setLoaded(true)} className={`object-contain transition-all duration-500 ${loaded ? 'opacity-100' : 'opacity-0'} group-hover:scale-[1.05]`} /></Link>
           <button onClick={wish} aria-label="Toggle wishlist" className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full flex items-center justify-center transition-transform hover:scale-110" style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(6px)' }}><Heart size={14} style={{ fill: isWished ? 'var(--blush)' : 'transparent', stroke: isWished ? '#C9847C' : '#888' }} /></button>
           <div className="absolute inset-x-0 bottom-0 p-3 flex gap-2 translate-y-full group-hover:translate-y-0 transition-transform duration-300" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.55), transparent)' }}>
             <button onClick={(e) => { e.preventDefault(); onQuickView() }} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-full text-xs font-semibold" style={{ background: 'rgba(255,255,255,0.92)', color: 'var(--charcoal)' }}><Eye size={13} /> Quick view</button>
@@ -498,9 +578,9 @@ function ShopRow({ p, index, onQuickView }: { p: Product; index: number; onQuick
   const sale = p.compare_price && p.compare_price > p.price
   return (
     <motion.div layout initial={reduce ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reduce ? 0 : 0.35, delay: reduce ? 0 : Math.min(index * 0.03, 0.2) }} className="flex gap-4 p-3 rounded-2xl border tile-hover" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-      <Link href={`/shop/${p.slug}`} className="relative flex-shrink-0 rounded-xl overflow-hidden" style={{ width: 128, aspectRatio: '3/4', background: 'var(--bg-secondary)' }}>
+      <Link href={`/shop/${p.slug}`} className="relative flex-shrink-0 rounded-xl overflow-hidden" style={{ width: 128, aspectRatio: '3/4', background: '#000' }}>
         <Badges p={p} />
-        <Image src={p.thumbnail || FALLBACK_IMG} alt={p.title} fill loading="lazy" sizes="128px" className="object-cover" />
+        <Image src={p.thumbnail || FALLBACK_IMG} alt={p.title} fill loading="lazy" sizes="128px" className="object-contain" />
       </Link>
       <div className="flex-1 min-w-0 flex flex-col">
         <div className="flex items-start gap-2">
