@@ -59,12 +59,12 @@ function ChooseScene({ play }: { play: boolean }) {
       <motion.div className="absolute" style={{ left: '50%', top: '50%', transformStyle: 'preserve-3d' }}
         animate={play ? { y: [0, -7, 0], rotateZ: [0, -1.5, 0] } : undefined} transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}>
         <div style={{ transform: 'translate(-50%,-50%)', position: 'relative' }}>
-          <div style={{ width: 66, aspectRatio: '3/4', borderRadius: '5px 10px 10px 5px', background: 'linear-gradient(135deg, #C9A84C, #C28E1C)', boxShadow: '0 16px 30px rgba(201,168,76,0.4)', border: '2px solid var(--bg-card)', position: 'relative' }}>
+          <div style={{ width: 66, aspectRatio: '3/4', borderRadius: '5px 10px 10px 5px', background: 'linear-gradient(135deg, #A0830E, #C28E1C)', boxShadow: '0 16px 30px rgba(160,131,14,0.4)', border: '2px solid var(--bg-card)', position: 'relative' }}>
             <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, background: '#C28E1C', borderRadius: '5px 0 0 5px' }} />
             <div style={{ position: 'absolute', inset: '10px 8px 10px 12px', border: '1px solid rgba(255,255,255,0.5)', borderRadius: 4 }} />
             <motion.span className="absolute" style={{ inset: -6, borderRadius: 14, border: '2px solid var(--gold)' }} animate={play ? { opacity: [0.35, 1, 0.35], scale: [0.98, 1.03, 0.98] } : { opacity: 1 }} transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }} />
           </div>
-          <motion.span className="absolute flex items-center justify-center" style={{ left: -9, top: -9, width: 22, height: 22, borderRadius: '50%', background: 'var(--gold)', boxShadow: '0 2px 6px rgba(201,168,76,0.5)' }}
+          <motion.span className="absolute flex items-center justify-center" style={{ left: -9, top: -9, width: 22, height: 22, borderRadius: '50%', background: 'var(--gold)', boxShadow: '0 2px 6px rgba(160,131,14,0.5)' }}
             initial={{ scale: 0 }} animate={play ? { scale: [0, 1.15, 1, 1, 0] } : { scale: 1 }} transition={{ duration: 2.6, repeat: Infinity, times: [0, 0.18, 0.28, 0.85, 1] }}>
             <Check size={12} color="#fff" strokeWidth={3} />
           </motion.span>
@@ -107,7 +107,7 @@ function UseScene({ play }: { play: boolean }) {
     <div className="relative mx-auto" style={{ width: 200, height: 150 }} aria-hidden>
       <div className="absolute" style={{ inset: '10px 14px 12px 14px', borderRadius: 14, background: 'var(--bg-card)', border: '2px solid var(--border)', boxShadow: '0 14px 26px rgba(44,42,53,0.14)', overflow: 'hidden' }}>
         <div className="flex items-center gap-1.5 px-3" style={{ height: 22, background: 'var(--bg-secondary)' }}>
-          {['#C97B5A', '#C9A84C', '#A8B5A0'].map((c) => <span key={c} style={{ width: 7, height: 7, borderRadius: '50%', background: c, opacity: 0.7 }} />)}
+          {['#C97B5A', '#A0830E', '#A8B5A0'].map((c) => <span key={c} style={{ width: 7, height: 7, borderRadius: '50%', background: c, opacity: 0.7 }} />)}
         </div>
         {/* page */}
         <div className="absolute" style={{ inset: '28px 34px 12px 12px', background: '#fff', borderRadius: 6, boxShadow: 'inset 0 0 0 1px var(--border)' }}>
@@ -120,7 +120,7 @@ function UseScene({ play }: { play: boolean }) {
         </div>
         {/* side tabs */}
         <div className="absolute flex flex-col gap-1.5" style={{ right: 10, top: 30 }}>
-          {['#A8B5A0', '#F2C6A6', '#C9A84C'].map((c, i) => (
+          {['#A8B5A0', '#F2C6A6', '#A0830E'].map((c, i) => (
             <motion.span key={c} style={{ width: 14, height: 12, borderRadius: '0 4px 4px 0', background: c }}
               animate={play ? { opacity: [0.5, 1, 0.5], x: [0, -2, 0] } : { opacity: 0.85 }} transition={{ duration: 1.8, repeat: Infinity, delay: i * 0.4, ease: 'easeInOut' }} />
           ))}
@@ -179,7 +179,7 @@ export function HowItWorks() {
 
                 {/* numbered badge */}
                 <motion.div className="relative z-10 w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 font-display text-lg font-bold"
-                  style={{ background: 'var(--bg-card)', border: '2px solid var(--gold)', color: 'var(--gold-dark)', boxShadow: '0 4px 14px rgba(201,168,76,0.25)' }}
+                  style={{ background: 'var(--bg-card)', border: '2px solid var(--gold)', color: 'var(--gold-dark)', boxShadow: '0 4px 14px rgba(160,131,14,0.25)' }}
                   initial={reduce ? false : { scale: 0, opacity: 0 }} animate={shown ? { scale: 1, opacity: 1 } : {}} transition={{ type: 'spring', stiffness: 260, damping: 15, delay: 0.15 + i * 0.18 }}>
                   {i + 1}
                 </motion.div>

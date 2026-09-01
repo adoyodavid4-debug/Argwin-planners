@@ -98,12 +98,12 @@ export default function QuickViewModal({ product, onClose }: Props) {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 overflow-y-auto">
           {/* Cover */}
-          <div className="relative bg-[var(--bg-secondary)]" style={{ aspectRatio: '3/4', minHeight: 240 }}>
+          <div className="relative bg-black" style={{ aspectRatio: '3/4', minHeight: 240 }}>
             <Image
               src={product.thumbnail || 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=800&q=80'}
               alt={product.title}
               fill
-              className="object-cover"
+              className="object-contain"
               sizes="(max-width: 640px) 100vw, 50vw"
             />
             {/* Badges */}

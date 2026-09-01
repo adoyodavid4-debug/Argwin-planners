@@ -145,8 +145,8 @@ export default function NewArrivalsClient({ products, categories, related, lates
             {spotlight && (
               <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.55, delay: 0.12 }}>
                 <div className="rounded-3xl border overflow-hidden grid sm:grid-cols-2" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', boxShadow: '0 18px 50px rgba(44,42,53,0.12)' }}>
-                  <Link href={`/shop/${spotlight.slug}`} className="relative block group" style={{ aspectRatio: '3/4', background: 'var(--bg-secondary)' }}>
-                    <Image src={spotlight.thumbnail || FALLBACK_IMG} alt={spotlight.title} fill sizes="(max-width:1024px) 100vw, 30vw" priority className="object-cover transition-transform duration-500 group-hover:scale-105" />
+                  <Link href={`/shop/${spotlight.slug}`} className="relative block group" style={{ aspectRatio: '3/4', background: '#000' }}>
+                    <Image src={spotlight.thumbnail || FALLBACK_IMG} alt={spotlight.title} fill sizes="(max-width:1024px) 100vw, 30vw" priority className="object-contain transition-transform duration-500 group-hover:scale-105" />
                     <span className="absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-white text-[10px] font-black" style={{ background: 'linear-gradient(135deg, var(--gold), var(--gold-light))' }}><Sparkles size={9} /> NEWEST</span>
                   </Link>
                   <div className="p-6 flex flex-col">
@@ -241,8 +241,8 @@ export default function NewArrivalsClient({ products, categories, related, lates
               {related.slice(0, 4).map((r, i) => (
                 <motion.div key={r.id} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.05 }}>
                   <Link href={`/shop/${r.slug}`} className="group block rounded-2xl overflow-hidden border tile-hover" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-                    <div className="relative overflow-hidden" style={{ aspectRatio: '3/4', background: 'var(--bg-secondary)' }}>
-                      <Image src={r.thumbnail || FALLBACK_IMG} alt={r.title} fill loading="lazy" sizes="(max-width:768px) 50vw, 25vw" className="object-cover transition-transform duration-500 group-hover:scale-105" />
+                    <div className="relative overflow-hidden" style={{ aspectRatio: '3/4', background: '#000' }}>
+                      <Image src={r.thumbnail || FALLBACK_IMG} alt={r.title} fill loading="lazy" sizes="(max-width:768px) 50vw, 25vw" className="object-contain transition-transform duration-500 group-hover:scale-105" />
                     </div>
                     <div className="p-4">
                       <p className="text-sm font-semibold line-clamp-2 transition-colors group-hover:text-gold" style={{ color: 'var(--text-primary)' }}>{r.title}</p>
@@ -299,11 +299,11 @@ function NewCard({ product, index, onQuickView, fmt }: { product: Product; index
   return (
     <motion.div layout initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: Math.min(index * 0.04, 0.3) }} className="group">
       <div className="rounded-xl overflow-hidden tile-hover h-full flex flex-col" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-        <div className="relative overflow-hidden" style={{ aspectRatio: '3/4' }}>
+        <div className="relative overflow-hidden" style={{ aspectRatio: '3/4', background: '#000' }}>
           {!loaded && <div className="absolute inset-0 skeleton" />}
           <Link href={`/shop/${product.slug}`} aria-label={product.title}>
             <Image src={product.thumbnail || FALLBACK_IMG} alt={`${product.title} cover`} fill sizes="(max-width:640px) 50vw, (max-width:1024px) 33vw, 25vw" priority={index < 4}
-              onLoad={() => setLoaded(true)} className={`object-cover transition-all duration-500 ${loaded ? 'opacity-100' : 'opacity-0'} group-hover:scale-[1.05]`} />
+              onLoad={() => setLoaded(true)} className={`object-contain transition-all duration-500 ${loaded ? 'opacity-100' : 'opacity-0'} group-hover:scale-[1.05]`} />
           </Link>
           {/* badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-1.5">

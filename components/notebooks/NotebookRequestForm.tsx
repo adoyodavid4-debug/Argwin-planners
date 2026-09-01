@@ -99,7 +99,7 @@ export function NotebookRequestForm({ locale = 'en', className }: Props) {
               type="text"
               placeholder={t.namePlaceholder}
               autoComplete="name"
-              className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-input,white)] px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#C9A84C]"
+              className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-input,white)] px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#A0830E]"
             />
             {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name.message}</p>}
           </div>
@@ -109,7 +109,7 @@ export function NotebookRequestForm({ locale = 'en', className }: Props) {
               type="email"
               placeholder={t.emailPlaceholder}
               autoComplete="email"
-              className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-input,white)] px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#C9A84C]"
+              className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-input,white)] px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#A0830E]"
             />
             {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>}
           </div>
@@ -120,7 +120,7 @@ export function NotebookRequestForm({ locale = 'en', className }: Props) {
             {...register('idea')}
             rows={4}
             placeholder={t.ideaPlaceholder}
-            className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-input,white)] px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#C9A84C] resize-none"
+            className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-input,white)] px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#A0830E] resize-none"
           />
           {errors.idea && <p className="text-xs text-red-500 mt-1">{errors.idea.message}</p>}
         </div>
@@ -132,7 +132,7 @@ export function NotebookRequestForm({ locale = 'en', className }: Props) {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="rounded-lg bg-[#C9A84C] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#b8963e] disabled:opacity-60 transition-colors"
+          className="rounded-lg bg-[#A0830E] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#b8963e] disabled:opacity-60 transition-colors"
         >
           {isSubmitting ? '...' : t.cta}
         </button>

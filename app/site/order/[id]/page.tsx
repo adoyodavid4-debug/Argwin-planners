@@ -64,10 +64,10 @@ export default async function OrderStatusPage({ params }: { params: { id: string
               <div key={step} className="flex items-center flex-1 min-w-0">
                 <div className="flex flex-col items-center gap-1 flex-shrink-0">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors
-                    ${done ? 'bg-green-500 text-white' : current ? 'bg-[#C9A84C] text-white' : 'bg-[var(--bg-muted)] text-[var(--text-muted)]'}`}>
+                    ${done ? 'bg-green-500 text-white' : current ? 'bg-[#A0830E] text-white' : 'bg-[var(--bg-muted)] text-[var(--text-muted)]'}`}>
                     {done ? '✓' : stepNum}
                   </div>
-                  <span className={`text-xs text-center ${current ? 'font-semibold text-[#C9A84C]' : 'text-[var(--text-muted)]'}`}>{step}</span>
+                  <span className={`text-xs text-center ${current ? 'font-semibold text-[#A0830E]' : 'text-[var(--text-muted)]'}`}>{step}</span>
                 </div>
                 {i < STEPS.length - 1 && (
                   <div className={`h-0.5 flex-1 mx-1 ${done ? 'bg-green-400' : 'bg-[var(--border)]'}`} />
@@ -91,7 +91,7 @@ export default async function OrderStatusPage({ params }: { params: { id: string
           <p className="font-semibold mb-2">Tracking</p>
           {po.tracking_number && <p className="text-sm text-[var(--text-muted)] mb-3">Number: <span className="font-mono">{po.tracking_number}</span></p>}
           <a href={po.tracking_url} target="_blank" rel="noopener"
-            className="inline-block rounded-lg bg-[#C9A84C] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#b8963e]">
+            className="inline-block rounded-lg bg-[#A0830E] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#b8963e]">
             Track my order →
           </a>
         </div>
@@ -111,7 +111,7 @@ export default async function OrderStatusPage({ params }: { params: { id: string
       )}
 
       <p className="mt-8 text-sm text-[var(--text-muted)] text-center">
-        Questions? <a href="mailto:hello@arwignplanners.com" className="text-[#C9A84C] hover:underline">hello@arwignplanners.com</a>
+        Questions? <a href="mailto:hello@arwignplanners.com" className="text-[#A0830E] hover:underline">hello@arwignplanners.com</a>
       </p>
     </main>
   )

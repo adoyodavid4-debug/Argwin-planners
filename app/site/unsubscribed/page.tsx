@@ -9,7 +9,7 @@ export default function UnsubscribedPage() {
         You won't receive any more marketing emails from Arwign Planners. If this was a mistake,
         you can re-subscribe from any of our freebie pages.
       </p>
-      <Link href="/" className="text-[#C9A84C] hover:underline text-sm">← Back to Arwign Planners</Link>
+      <Link href="/" className="text-[#A0830E] hover:underline text-sm">← Back to Arwign Planners</Link>
     </main>
   )
 }

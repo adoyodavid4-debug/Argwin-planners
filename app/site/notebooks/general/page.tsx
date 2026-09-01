@@ -37,16 +37,15 @@ export default async function GeneralNotebooksPage() {
     ? { id: first.id, title: first.title, slug: first.slug, price: first.price, currency: first.currency, thumbnail: (first.images as string[] | null)?.[0] ?? null }
     : null
 
-  const related: RelItem[] = items
-    .filter((p) => !product || p.id !== product.id)
-    .map((p) => ({ id: p.id, title: p.title, slug: p.slug, price: p.price, currency: p.currency, image: (p.images as string[] | null)?.[0] ?? null }))
+  // Every active notebook — rendered as a full "all designs" grid on the page.
+  const all: RelItem[] = items.map((p) => ({ id: p.id, title: p.title, slug: p.slug, price: p.price, currency: p.currency, image: (p.images as string[] | null)?.[0] ?? null }))
 
   return (
     <>
       <ItemListSchema name="General Notebooks" url={`${BASE_URL}/notebooks/general`}
         items={items.map((p, i) => ({ position: i + 1, name: p.title, url: `${BASE_URL}/shop/${p.slug}` }))} />
       <FaqSchema items={FAQS.map((f) => ({ question: f.q, answer: f.a }))} />
-      <GeneralClient product={product} related={related} />
+      <GeneralClient product={product} all={all} />
     </>
   )
 }

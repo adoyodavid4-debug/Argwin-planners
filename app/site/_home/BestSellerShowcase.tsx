@@ -29,11 +29,11 @@ function Card({ p, index, onQuickView }: { p: Product; index: number; onQuickVie
   return (
     <motion.div initial={reduce ? false : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-40px' }} transition={{ duration: 0.4, delay: Math.min(index * 0.06, 0.3) }} className="group">
       <div className="rounded-xl overflow-hidden tile-hover h-full flex flex-col" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-        <div className="relative overflow-hidden" style={{ aspectRatio: '3/4' }}>
+        <div className="relative overflow-hidden" style={{ aspectRatio: '3/4', background: '#000' }}>
           {!loaded && <div className="absolute inset-0 skeleton" />}
           <Link href={`/shop/${p.slug}`} aria-label={p.title}>
             <Image src={p.thumbnail || FALLBACK_IMG} alt={`${p.title} cover`} fill sizes="(max-width:640px) 50vw, 25vw" priority={index < 2} onLoad={() => setLoaded(true)}
-              className={`object-cover transition-all duration-500 ${loaded ? 'opacity-100' : 'opacity-0'} group-hover:scale-[1.05]`} />
+              className={`object-contain transition-all duration-500 ${loaded ? 'opacity-100' : 'opacity-0'} group-hover:scale-[1.05]`} />
           </Link>
           {p.is_bestseller && <span className="absolute top-3 left-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-white text-[10px] font-black" style={{ background: 'linear-gradient(135deg, var(--gold), var(--gold-light))' }}><Crown size={9} /> BESTSELLER</span>}
           <div className="absolute top-3 right-3 flex flex-col gap-2">

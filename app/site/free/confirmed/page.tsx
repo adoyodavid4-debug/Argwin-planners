@@ -24,7 +24,7 @@ function ConfirmedContent() {
             href={downloadUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-xl bg-[#C9A84C] px-8 py-3 font-semibold text-white hover:bg-[#b8963e] transition-colors mb-6"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#A0830E] px-8 py-3 font-semibold text-white hover:bg-[#b8963e] transition-colors mb-6"
           >
             Download now ↓
           </a>
@@ -36,7 +36,7 @@ function ConfirmedContent() {
       )}
       <p className="text-sm text-[var(--text-muted)]">
         While you wait, browse our full collection →{' '}
-        <Link href="/shop" className="text-[#C9A84C] hover:underline">Arwign Shop</Link>
+        <Link href="/shop" className="text-[#A0830E] hover:underline">Arwign Shop</Link>
       </p>
     </main>
   )
@@ -44,7 +44,7 @@ function ConfirmedContent() {
 
 export default function ConfirmedPage() {
   return (
-    <Suspense fallback={<main className="min-h-screen bg-[var(--bg-primary,#FAF8F4)] flex items-center justify-center"><div className="w-8 h-8 rounded-full border-2 border-[#C9A84C] border-t-transparent animate-spin" /></main>}>
+    <Suspense fallback={<main className="min-h-screen bg-[var(--bg-primary,#FAF8F4)] flex items-center justify-center"><div className="w-8 h-8 rounded-full border-2 border-[#A0830E] border-t-transparent animate-spin" /></main>}>
       <ConfirmedContent />
     </Suspense>
   )

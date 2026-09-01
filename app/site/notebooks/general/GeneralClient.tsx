@@ -31,7 +31,7 @@ function Stars({ value, size = 14 }: { value: number; size?: number }) {
   )
 }
 
-export default function GeneralClient({ product, related }: { product: NbProduct | null; related: RelItem[] }) {
+export default function GeneralClient({ product, all }: { product: NbProduct | null; all: RelItem[] }) {
   const reduce = useReducedMotion()
   const [colourId, setColourId] = useState(COLOURWAYS[0].id)
   const [sizeId, setSizeId]     = useState(SIZES[0].id)
@@ -192,6 +192,34 @@ export default function GeneralClient({ product, related }: { product: NbProduct
       {/* mobile buy panel */}
       <section className="container-site py-8 lg:hidden"><BuyPanel /></section>
 
+      {/* ══ ALL NOTEBOOK DESIGNS ══════════════════════════════ */}
+      {all.length > 0 && (
+        <section id="designs" className="border-t py-16" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
+          <div className="container-site">
+            <motion.div {...reveal()} className="text-center mb-10 max-w-xl mx-auto">
+              <p className="text-xs uppercase tracking-widest font-semibold mb-2" style={{ color: 'var(--gold)', letterSpacing: '0.12em' }}>Choose Your Design</p>
+              <h2 className="font-display text-display-sm" style={{ color: 'var(--text-primary)' }}>All {all.length} Notebook Designs</h2>
+              <p className="text-sm mt-2" style={{ color: 'var(--text-secondary)' }}>Every cover comes in six colour shades and three sizes — tap any design to view and download.</p>
+            </motion.div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+              {all.map((r, i) => (
+                <motion.div key={r.id} {...reveal(Math.min(i * 0.03, 0.3))}>
+                  <Link href={`/shop/${r.slug}`} className="group block rounded-2xl overflow-hidden border tile-hover" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+                    <div className="relative overflow-hidden" style={{ aspectRatio: '3/4', background: '#000' }}>
+                      {r.image ? <Image src={r.image} alt={r.title} fill loading="lazy" sizes="(max-width:640px) 50vw, (max-width:1024px) 33vw, 20vw" className="object-contain transition-transform duration-500 group-hover:scale-105" /> : <div className="absolute inset-0 flex items-center justify-center"><Sparkles size={28} style={{ color: 'var(--text-muted)' }} /></div>}
+                    </div>
+                    <div className="p-4">
+                      <p className="text-sm font-semibold line-clamp-2 transition-colors group-hover:text-gold" style={{ color: 'var(--text-primary)' }}>{r.title}</p>
+                      {r.price != null && <p className="text-sm font-bold mt-1" style={{ color: 'var(--text-primary)' }}>{relFmt(r.price, r.currency)}</p>}
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ══ INTERIOR PREVIEW ══════════════════════════════════ */}
       <section className="container-site py-16">
         <motion.div {...reveal()} className="max-w-2xl mb-8">
@@ -278,30 +306,6 @@ export default function GeneralClient({ product, related }: { product: NbProduct
         </motion.div>
         <div className="flex flex-col gap-3">{FAQS.map((f, i) => <FaqItem key={i} q={f.q} a={f.a} reduce={!!reduce} />)}</div>
       </section>
-
-      {/* ══ YOU MAY ALSO LIKE ═════════════════════════════════ */}
-      {related.length > 0 && (
-        <section className="border-t py-16" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
-          <div className="container-site">
-            <motion.h2 {...reveal()} className="font-display text-display-sm mb-8" style={{ color: 'var(--text-primary)' }}>You may also like</motion.h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-              {related.slice(0, 4).map((r, i) => (
-                <motion.div key={r.id} {...reveal(i * 0.05)}>
-                  <Link href={`/shop/${r.slug}`} className="group block rounded-2xl overflow-hidden border tile-hover" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-                    <div className="relative overflow-hidden" style={{ aspectRatio: '3/4', background: 'var(--bg-secondary)' }}>
-                      {r.image ? <Image src={r.image} alt={r.title} fill loading="lazy" sizes="(max-width:768px) 50vw, 25vw" className="object-cover transition-transform duration-500 group-hover:scale-105" /> : <div className="absolute inset-0 flex items-center justify-center"><Sparkles size={28} style={{ color: 'var(--text-muted)' }} /></div>}
-                    </div>
-                    <div className="p-4">
-                      <p className="text-sm font-semibold line-clamp-2 transition-colors group-hover:text-gold" style={{ color: 'var(--text-primary)' }}>{r.title}</p>
-                      {r.price != null && <p className="text-sm font-bold mt-1" style={{ color: 'var(--text-primary)' }}>{relFmt(r.price, r.currency)}</p>}
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* ══ STICKY CTA ════════════════════════════════════════ */}
       <AnimatePresence>

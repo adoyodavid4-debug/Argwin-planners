@@ -91,12 +91,12 @@ export default function ProductDetailClient({ product: p, related, reviews, bund
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
           {/* Gallery */}
           <div>
-            <div className="relative rounded-3xl overflow-hidden border group" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)', aspectRatio: '3/4' }}
+            <div className="relative rounded-3xl overflow-hidden border group" style={{ borderColor: 'var(--border)', background: '#151119', aspectRatio: '3/4' }}
               tabIndex={0} role="group" aria-label="Product gallery"
               onKeyDown={(e) => { if (e.key === 'ArrowLeft') setActive((a) => (a - 1 + imgs.length) % imgs.length); if (e.key === 'ArrowRight') setActive((a) => (a + 1) % imgs.length) }}>
               <AnimatePresence mode="wait">
                 <motion.div key={active} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : 0.3 }} className="absolute inset-0">
-                  <Image src={imgs[active]} alt={`${p.title} — image ${active + 1}`} fill priority={active === 0} sizes="(max-width:1024px) 100vw, 45vw" className="object-cover" />
+                  <Image src={imgs[active]} alt={`${p.title} — image ${active + 1}`} fill priority={active === 0} sizes="(max-width:1024px) 100vw, 45vw" className="object-contain" />
                 </motion.div>
               </AnimatePresence>
               {/* badges */}
@@ -179,6 +179,38 @@ export default function ProductDetailClient({ product: p, related, reviews, bund
             <Share title={p.title} slug={p.slug} />
           </div>
         </div>
+
+        {/* Take a closer look — every uploaded image, full-width & uncropped */}
+        {imgs.length > 1 && (
+          <motion.section {...reveal()} className="mt-16">
+            <h2 className="font-display text-2xl mb-2" style={{ color: 'var(--text-primary)' }}>Take a closer look</h2>
+            <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>Every page and preview, shown in full — tap any image to enlarge.</p>
+            <div className="mx-auto flex max-w-3xl flex-col gap-4 rounded-3xl p-3 sm:p-5" style={{ background: '#151119' }}>
+              {imgs.slice(1).map((src, idx) => {
+                const i = idx + 1
+                return (
+                <button
+                  key={i}
+                  onClick={() => { setActive(i); setLightbox(true) }}
+                  aria-label={`Enlarge preview ${idx + 1}`}
+                  className="group block w-full overflow-hidden rounded-2xl border transition-shadow hover:shadow-product"
+                  style={{ borderColor: 'rgba(255,255,255,0.08)', background: '#151119' }}
+                >
+                  <Image
+                    src={src}
+                    alt={`${p.title} — preview ${i + 1}`}
+                    width={0}
+                    height={0}
+                    sizes="(max-width: 768px) 100vw, 768px"
+                    loading="lazy"
+                    className="h-auto w-full transition-transform duration-500 group-hover:scale-[1.01]"
+                  />
+                </button>
+                )
+              })}
+            </div>
+          </motion.section>
+        )}
 
         {/* Bundle contents */}
         {p.is_bundle && bundleItems.length > 0 && (
@@ -274,8 +306,8 @@ export default function ProductDetailClient({ product: p, related, reviews, bund
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
               {related.slice(0, 4).map((r) => (
                 <Link key={r.id} href={`/shop/${r.slug}`} className="group block rounded-2xl overflow-hidden border tile-hover" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-                  <div className="relative overflow-hidden" style={{ aspectRatio: '3/4', background: 'var(--bg-secondary)' }}>
-                    <Image src={r.thumbnail || FALLBACK_IMG} alt={r.title} fill loading="lazy" sizes="(max-width:768px) 50vw, 25vw" className="object-cover transition-transform duration-500 group-hover:scale-105" />
+                  <div className="relative overflow-hidden" style={{ aspectRatio: '3/4', background: '#000' }}>
+                    <Image src={r.thumbnail || FALLBACK_IMG} alt={r.title} fill loading="lazy" sizes="(max-width:768px) 50vw, 25vw" className="object-contain transition-transform duration-500 group-hover:scale-105" />
                     {r.is_bestseller && <span className="badge badge-popular absolute top-3 left-3">Bestseller</span>}
                   </div>
                   <div className="p-4">

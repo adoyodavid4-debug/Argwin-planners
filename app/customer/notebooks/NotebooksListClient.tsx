@@ -34,7 +34,7 @@ interface Notebook {
   _shared_as?: 'editor' | 'viewer'
 }
 
-const COVER_COLORS = ['#C9A84C', '#7B6FAE', '#6E7E66', '#C9847C', '#4A7FA5', '#374151']
+const COVER_COLORS = ['#A0830E', '#7B6FAE', '#6E7E66', '#C9847C', '#4A7FA5', '#374151']
 
 function initials(name: string) {
   return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || '?'
@@ -47,7 +47,7 @@ function visibilityIcon(v: string) {
 }
 
 function visibilityColor(v: string) {
-  if (v === 'public')  return '#C9A84C'
+  if (v === 'public')  return '#A0830E'
   if (v === 'shared')  return '#3b82f6'
   return                      '#94a3b8'
 }
@@ -79,7 +79,7 @@ export default function NotebooksListClient({
   const [createModal, setCreateModal] = useState<CreateModal>({ type: null })
   const [shareModal,  setShareModal]  = useState<ShareModal>(null)
   const [customName,  setCustomName]  = useState('')
-  const [customColor, setCustomColor] = useState('#C9A84C')
+  const [customColor, setCustomColor] = useState('#A0830E')
   const [customDesc,  setCustomDesc]  = useState('')
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteRole,  setInviteRole]  = useState<'editor' | 'viewer'>('viewer')
@@ -126,7 +126,7 @@ export default function NotebooksListClient({
       setOwnedList(prev => [nb, ...prev])
       toast.success(`Created "${nb.name}"`)
       setCreateModal({ type: null })
-      setCustomName(''); setCustomDesc(''); setCustomColor('#C9A84C')
+      setCustomName(''); setCustomDesc(''); setCustomColor('#A0830E')
     } catch (e: any) {
       toast.error(e.message)
     } finally {
@@ -353,7 +353,7 @@ export default function NotebooksListClient({
             </h2>
             <span
               className="text-xs px-2 py-0.5 rounded-full"
-              style={{ background: 'rgba(201,168,76,0.12)', color: 'var(--gold)' }}
+              style={{ background: 'rgba(160,131,14,0.12)', color: 'var(--gold)' }}
             >
               {ownedList.length}
             </span>

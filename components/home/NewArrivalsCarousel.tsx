@@ -85,7 +85,7 @@ function NewArrivalCard({
         aria-label={`View ${product.title} — $${product.price.toFixed(2)}`}
       >
         {/* ── Cover ─────────────────────────────── */}
-        <div className="relative overflow-hidden" style={{ aspectRatio: '3 / 4' }}>
+        <div className="relative overflow-hidden" style={{ aspectRatio: '3 / 4', background: '#000' }}>
           {!imageLoaded && <div className="skeleton absolute inset-0" aria-hidden="true" />}
           <Image
             src={
@@ -96,7 +96,7 @@ function NewArrivalCard({
             fill
             sizes="(max-width: 640px) 78vw, (max-width: 768px) 46vw, (max-width: 1024px) 31vw, 23vw"
             loading="lazy"
-            className={`object-cover product-image transition-opacity duration-300 ${
+            className={`object-contain product-image transition-opacity duration-300 ${
               imageLoaded ? 'opacity-100' : 'opacity-0'
             }`}
             onLoad={() => setImageLoaded(true)}

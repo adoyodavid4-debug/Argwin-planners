@@ -6,7 +6,7 @@ export const COLOURWAYS: Colourway[] = [
   { id: 'cream',      name: 'Cream',      hex: '#EFE6D2', ink: '#6B5536', spine: '#E0D2B4' },
   { id: 'peach',      name: 'Peach',      hex: '#F2C6A6', ink: '#7E4A30', spine: '#E3AC85' },
   { id: 'sage',       name: 'Sage',       hex: '#A8B5A0', ink: '#33502C', spine: '#83AE73' },
-  { id: 'golden',     name: 'Golden',     hex: '#C9A84C', ink: '#6B4E10', spine: '#C28E1C' },
+  { id: 'golden',     name: 'Golden',     hex: '#A0830E', ink: '#6B4E10', spine: '#C28E1C' },
   { id: 'terracotta', name: 'Terracotta', hex: '#C97B5A', ink: '#FBEFE8', spine: '#AE6244' },
 ]
 

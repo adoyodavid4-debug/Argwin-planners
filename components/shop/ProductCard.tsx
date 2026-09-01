@@ -65,7 +65,7 @@ export default function ProductCard({ product, priority = false, index = 0 }: Pr
         aria-label={`View ${product.title} — $${product.price}`}
       >
         {/* ── Image ────────────────────────────────── */}
-        <div className="relative overflow-hidden" style={{ aspectRatio: '3/4' }}>
+        <div className="relative overflow-hidden" style={{ aspectRatio: '3/4', background: '#000' }}>
           {!imageLoaded && (
             <div className="absolute inset-0 skeleton" />
           )}
@@ -74,7 +74,7 @@ export default function ProductCard({ product, priority = false, index = 0 }: Pr
             alt={`${product.title} — premium ${product.delivery_type} planner`}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className={`object-cover product-image transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+            className={`object-contain product-image transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
             priority={priority}
             onLoad={() => setImageLoaded(true)}
           />
