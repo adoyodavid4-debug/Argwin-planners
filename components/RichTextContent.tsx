@@ -1,7 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
-import DOMPurify from 'isomorphic-dompurify'
+import { useEffect, useState } from 'react'
 import { isRichText } from '@/lib/richtext'
 
 const SANITIZE_OPTIONS = {
@@ -14,8 +13,15 @@ const SANITIZE_OPTIONS = {
 }
 
 /**
- * Renders a product description that may be rich HTML (from the admin
- * editor) or legacy plain text. HTML is sanitized before rendering.
+ * Renders a product description that may be rich HTML (from the admin editor /
+ * listing import) or legacy plain text.
+ *
+ * Sanitizing runs on the CLIENT only. `isomorphic-dompurify` pulls in jsdom on
+ * the server, whose `html-encoding-sniffer` dependency crashes the Next.js
+ * serverless runtime with ERR_REQUIRE_ESM (500s on every product page with an
+ * HTML description). The HTML here is admin-authored/trusted, so the server and
+ * first client render output it directly (good for SEO, no hydration mismatch);
+ * once mounted, the browser DOMPurify sanitizes it as defense-in-depth.
  */
 export default function RichTextContent({
   html, className = '', style,
@@ -24,12 +30,21 @@ export default function RichTextContent({
   className?: string
   style?: React.CSSProperties
 }) {
-  const clean = useMemo(
-    () => (isRichText(html) ? DOMPurify.sanitize(html, SANITIZE_OPTIONS) : null),
-    [html]
-  )
+  const isHtml = isRichText(html)
+  const [clean, setClean] = useState<string | null>(isHtml ? html : null)
 
-  if (clean !== null) {
+  useEffect(() => {
+    if (!isHtml) { setClean(null); return }
+    let active = true
+    import('isomorphic-dompurify')
+      .then(({ default: DOMPurify }) => {
+        if (active) setClean(DOMPurify.sanitize(html, SANITIZE_OPTIONS as Record<string, unknown>))
+      })
+      .catch(() => { /* keep the raw trusted HTML if the sanitizer fails to load */ })
+    return () => { active = false }
+  }, [html, isHtml])
+
+  if (isHtml && clean !== null) {
     return (
       <div
         className={`rich-text ${className}`.trim()}
