@@ -45,11 +45,8 @@ const navLinks: NavItem[] = [
     ],
   },
   { label: 'Arwign Calendar', href: '/calendar' },
-  { label: 'Best Sellers', href: '/best-sellers' },
-  { label: 'New Arrivals', href: '/new-arrivals' },
   { label: 'Blog',         href: '/blog' },
   { label: 'About',        href: '/about' },
-  { label: 'Reviews',      href: '/site#testimonials-heading' },
   { label: 'Contact',      href: '/site/contact' },
 ]
 

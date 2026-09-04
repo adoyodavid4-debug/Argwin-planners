@@ -526,7 +526,7 @@ function Badges({ p }: { p: Product }) {
   return (
     <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
       {p.is_new && <span className="badge badge-new">New</span>}
-      {p.is_bestseller && <span className="badge badge-popular">Bestseller</span>}
+      {p.is_bestseller && <span className="badge badge-popular">Best</span>}
       {sale && <span className="badge badge-sale">-{off}%</span>}
     </div>
   )

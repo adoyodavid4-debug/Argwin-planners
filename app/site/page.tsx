@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { ArrowRight, Crown } from 'lucide-react'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import ProductCard from '@/components/shop/ProductCard'
-import HeroCalendarCard from './_home/HeroCalendarCard'
+import CalendarPromo from './_home/CalendarPromo'
 import type { Product } from '@/types/database'
 
 export const metadata: Metadata = {
@@ -86,7 +86,7 @@ export default async function HomePage() {
 
         {/* Arwign Calendar — right sidebar on desktop, on top on mobile */}
         <aside className="w-full lg:w-[360px] lg:flex-shrink-0 lg:order-2 lg:sticky lg:top-[calc(var(--nav-height,88px)+16px)]">
-          <HeroCalendarCard index={0} />
+          <CalendarPromo />
         </aside>
 
         {/* Main column — Best Sellers, then Catalogue */}
