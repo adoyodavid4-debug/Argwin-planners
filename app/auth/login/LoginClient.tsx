@@ -11,7 +11,7 @@ import { createClient } from '@/lib/supabase/client'
 export default function LoginClient() {
   const router       = useRouter()
   const searchParams = useSearchParams()
-  const redirectTo   = searchParams.get('redirect') || '/admin/dashboard'
+  const redirectTo   = searchParams.get('redirect') || '/'
   const isAdminArea  = redirectTo.startsWith('/admin')
 
   const [mode,       setMode]       = useState<'signin' | 'signup'>('signin')
@@ -49,7 +49,10 @@ export default function LoginClient() {
         const { data, error } = await supabase.auth.signUp({
           email: email.trim(),
           password,
-          options: { data: { full_name: fullName.trim() } },
+          options: {
+            data: { full_name: fullName.trim() },
+            emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}`,
+          },
         })
         if (error) throw error
         if (data.session) {
