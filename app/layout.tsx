@@ -131,7 +131,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <OrganizationSchema />
       </head>
       <body className="grain">
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange={false}>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} themes={['light', 'dark', 'warm']} disableTransitionOnChange={false}>
           {children}
           <Toaster
             position="top-center"

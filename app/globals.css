@@ -83,6 +83,20 @@
   --header-bg: #231F2E;
 }
 
+/* Warm — calm parchment theme (masterplan §8) */
+.warm {
+  --bg-primary:   #F4ECD8;
+  --bg-secondary: #EDE3CB;
+  --bg-card:      #FBF6EA;
+  --bg-neutral:   #EFE7D3;
+  --text-primary: #2A2317;
+  --text-secondary: #5C513B;
+  --text-muted:   #8A7C60;
+  --border:       rgba(42,35,23,0.12);
+  --border-gold:  rgba(160,131,14,0.34);
+  --header-bg:    #E8DCC0;
+}
+
 /* ─── Base ──────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
 
