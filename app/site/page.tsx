@@ -55,9 +55,9 @@ function SectionHeader({ eyebrow, title, href, linkLabel, icon }: {
     <div className="flex items-end justify-between gap-4 mb-6">
       <div>
         <p className="text-xs uppercase tracking-widest font-semibold mb-2" style={{ color: 'var(--gold)', letterSpacing: '0.12em' }}>{eyebrow}</p>
-        <h2 className="font-display text-display-md flex items-center gap-2" style={{ color: '#F5F3EF' }}>{icon}{title}</h2>
+        <h2 className="font-display text-display-md flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>{icon}{title}</h2>
       </div>
-      <Link href={href} className="hidden sm:inline-flex items-center gap-1 text-sm font-medium flex-shrink-0 transition-colors hover:text-gold" style={{ color: 'rgba(255,255,255,0.75)' }}>{linkLabel} <ArrowRight size={14} /></Link>
+      <Link href={href} className="btn-ghost hidden sm:inline-flex items-center gap-1 text-sm flex-shrink-0">{linkLabel} <ArrowRight size={14} /></Link>
     </div>
   )
 }
@@ -65,8 +65,8 @@ function SectionHeader({ eyebrow, title, href, linkLabel, icon }: {
 function Row({ products }: { products: Product[] }) {
   if (products.length === 0) {
     return (
-      <div className="text-center py-16 rounded-2xl border" style={{ borderColor: 'rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.03)' }}>
-        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.55)' }}>Nothing here yet — check back soon.</p>
+      <div className="text-center py-16 rounded-2xl border" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
+        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Nothing here yet — check back soon.</p>
       </div>
     )
   }
@@ -86,7 +86,6 @@ export default async function HomePage() {
   const [bestsellers, featured] = await Promise.all([getBestSellers(), getFeatured()])
 
   return (
-    <div style={{ background: '#0C0C0E' }}>
     <div className="container-site py-10 lg:py-14">
       <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 items-start">
 
@@ -117,7 +116,6 @@ export default async function HomePage() {
           </section>
         </div>
       </div>
-    </div>
     </div>
   )
 }
