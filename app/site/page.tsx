@@ -55,24 +55,29 @@ function SectionHeader({ eyebrow, title, href, linkLabel, icon }: {
     <div className="flex items-end justify-between gap-4 mb-6">
       <div>
         <p className="text-xs uppercase tracking-widest font-semibold mb-2" style={{ color: 'var(--gold)', letterSpacing: '0.12em' }}>{eyebrow}</p>
-        <h2 className="font-display text-display-md flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>{icon}{title}</h2>
+        <h2 className="font-display text-display-md flex items-center gap-2" style={{ color: '#F5F3EF' }}>{icon}{title}</h2>
       </div>
-      <Link href={href} className="btn-ghost hidden sm:inline-flex items-center gap-1 text-sm flex-shrink-0">{linkLabel} <ArrowRight size={14} /></Link>
+      <Link href={href} className="hidden sm:inline-flex items-center gap-1 text-sm font-medium flex-shrink-0 transition-colors hover:text-gold" style={{ color: 'rgba(255,255,255,0.75)' }}>{linkLabel} <ArrowRight size={14} /></Link>
     </div>
   )
 }
 
-function Grid({ products }: { products: Product[] }) {
+function Row({ products }: { products: Product[] }) {
   if (products.length === 0) {
     return (
-      <div className="text-center py-16 rounded-2xl border" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
-        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Nothing here yet — check back soon.</p>
+      <div className="text-center py-16 rounded-2xl border" style={{ borderColor: 'rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.03)' }}>
+        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.55)' }}>Nothing here yet — check back soon.</p>
       </div>
     )
   }
+  // Horizontal, snap-scrolling row of cards.
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
-      {products.map((p, i) => <ProductCard key={p.id} product={p} index={i} priority={i < 2} />)}
+    <div className="flex gap-5 overflow-x-auto pb-4 -mx-1 px-1 snap-x snap-mandatory scrollbar-hide">
+      {products.map((p, i) => (
+        <div key={p.id} className="snap-start shrink-0 w-[200px] sm:w-[230px]">
+          <ProductCard product={p} index={i} priority={i < 2} />
+        </div>
+      ))}
     </div>
   )
 }
@@ -81,6 +86,7 @@ export default async function HomePage() {
   const [bestsellers, featured] = await Promise.all([getBestSellers(), getFeatured()])
 
   return (
+    <div style={{ background: '#0C0C0E' }}>
     <div className="container-site py-10 lg:py-14">
       <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 items-start">
 
@@ -98,7 +104,7 @@ export default async function HomePage() {
               icon={<Crown size={22} style={{ color: 'var(--gold)' }} />}
             />
             <div id="bestsellers-heading" className="sr-only">Best Sellers</div>
-            <Grid products={bestsellers} />
+            <Row products={bestsellers} />
           </section>
 
           <section aria-labelledby="catalogue-heading">
@@ -107,10 +113,11 @@ export default async function HomePage() {
               href="/shop" linkLabel="Shop all"
             />
             <div id="catalogue-heading" className="sr-only">Catalogue</div>
-            <Grid products={featured} />
+            <Row products={featured} />
           </section>
         </div>
       </div>
+    </div>
     </div>
   )
 }
