@@ -1,21 +1,11 @@
-// app/site/page.tsx — homepage
+// app/site/page.tsx — homepage (minimal: hero + best sellers + featured catalogue)
 import type { Metadata } from 'next'
-import { Suspense } from 'react'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
-// Reused existing sections (server wrappers fetch DB content w/ fallbacks)
-import DigitalNotebookSection  from '@/components/home/digital-notebook/DigitalNotebookSection'
-import NewArrivals, { NewArrivalsSkeleton } from '@/components/home/NewArrivals'
-import TestimonialsSection     from '@/components/home/TestimonialsSectionServer'
-import BlogPreview             from '@/components/home/BlogPreview'
-
-// New homepage-only sections
 import HomeHero            from './_home/HomeHero'
-import SocialProof         from './_home/SocialProof'
 import BestSellerShowcase  from './_home/BestSellerShowcase'
-import InteriorPreview     from './_home/InteriorPreview'
 import StickyShopCTA       from './_home/StickyShopCTA'
-import { HowItWorks, FinalCTA } from './_home/EditorialSections'
+import FeaturedProducts    from '@/components/home/FeaturedProducts'
 
 export const metadata: Metadata = {
   title: 'Arwign Planners — Premium Digital & Printable Planners',
@@ -35,10 +25,29 @@ async function getBestSellers() {
   return data ?? []
 }
 
-// Cover images for the Best Seller hero card's fanned stack. Prefers flagged
-// bestsellers; falls back to the most-downloaded active products so the card is
-// never empty. Separate from getBestSellers() so the BestSellerShowcase section
-// is unaffected.
+// Featured planners for the homepage catalogue. Prefers is_featured; if none are
+// flagged yet, falls back to the most-downloaded active planners so the section
+// is never empty.
+async function getFeatured() {
+  const supabase = createServerSupabaseClient()
+  const cols = '*, category:categories(name, slug)'
+  const { data: featured } = await supabase
+    .from('products')
+    .select(cols)
+    .eq('status', 'active')
+    .eq('is_featured', true)
+    .order('download_count', { ascending: false })
+    .limit(8)
+  if (featured && featured.length > 0) return featured
+  const { data: top } = await supabase
+    .from('products')
+    .select(cols)
+    .eq('status', 'active')
+    .order('download_count', { ascending: false })
+    .limit(8)
+  return top ?? []
+}
+
 async function getHeroBestSellerCovers() {
   const supabase = createServerSupabaseClient()
   const cols = 'title, slug, thumbnail'
@@ -73,8 +82,6 @@ async function getHeroNewArrival() {
   return data?.[0] ?? null
 }
 
-// Hero copy from site_settings — missing keys fall back to the component's
-// hardcoded defaults (undefined props).
 async function getHeroSettings() {
   try {
     const supabase = createServerSupabaseClient()
@@ -98,8 +105,9 @@ async function getHeroSettings() {
 }
 
 export default async function HomePage() {
-  const [bestsellers, heroBestSellerCovers, heroNewArrival, heroCopy] = await Promise.all([
+  const [bestsellers, featured, heroBestSellerCovers, heroNewArrival, heroCopy] = await Promise.all([
     getBestSellers(),
+    getFeatured(),
     getHeroBestSellerCovers(),
     getHeroNewArrival(),
     getHeroSettings(),
@@ -117,22 +125,10 @@ export default async function HomePage() {
         headlineAccent={heroCopy.headlineAccent}
         subcopy={heroCopy.subcopy}
       />
-      <SocialProof />
-      {/* Below-fold sections skip rendering until scrolled near (cv-auto) —
-          keeps first paint fast on slower phones. Products lead: best sellers
-          straight after the hero, then the notebook products. */}
       <div className="cv-auto"><BestSellerShowcase products={bestsellers as any} /></div>
-      <div className="cv-auto"><DigitalNotebookSection /></div>
-      <div className="cv-auto"><InteriorPreview /></div>
       <div className="cv-auto">
-        <Suspense fallback={<NewArrivalsSkeleton />}>
-          <NewArrivals />
-        </Suspense>
+        <FeaturedProducts products={featured as any} title="Featured Planners" showAll="/shop" />
       </div>
-      <div className="cv-auto"><HowItWorks /></div>
-      <div className="cv-auto"><BlogPreview /></div>
-      <div className="cv-auto"><TestimonialsSection /></div>
-      <div className="cv-auto"><FinalCTA /></div>
       <StickyShopCTA />
     </>
   )
