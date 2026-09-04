@@ -27,7 +27,7 @@ export default async function ShopPage() {
       .from('products')
       .select('*, category:categories(name, slug)')
       .eq('status', 'active')
-      .order('is_featured', { ascending: false })
+      .eq('is_featured', true)   // catalogue shows featured products only
       .order('download_count', { ascending: false })
       .limit(1000)
       .then((r) => ({ data: r.error ? [] : r.data })),
