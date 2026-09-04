@@ -79,14 +79,6 @@ export default function ProductCard({ product, priority = false, index = 0 }: Pr
             onLoad={() => setImageLoaded(true)}
           />
 
-          {/* Badges */}
-          <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-            {product.is_new       && <span className="badge badge-new">New</span>}
-            {product.is_bestseller && <span className="badge badge-popular">Best Seller</span>}
-            {hasDiscount          && <span className="badge badge-sale">-{discountPct}%</span>}
-            {product.is_bundle    && <span className="badge badge-gold">Bundle</span>}
-          </div>
-
           {/* Wishlist button */}
           <button
             className={`wishlist-btn ${isWished ? 'active' : ''}`}
@@ -126,6 +118,16 @@ export default function ProductCard({ product, priority = false, index = 0 }: Pr
 
         {/* ── Info ─────────────────────────────────── */}
         <div className="p-4">
+          {/* Tags — kept below the cover so they never crowd or cover the artwork */}
+          {(product.is_bestseller || product.is_new || hasDiscount || product.is_bundle) && (
+            <div className="flex flex-wrap items-center gap-1.5 mb-2">
+              {product.is_bestseller && <span className="badge badge-popular">Best</span>}
+              {product.is_new        && <span className="badge badge-new">New</span>}
+              {hasDiscount           && <span className="badge badge-sale">-{discountPct}%</span>}
+              {product.is_bundle     && <span className="badge badge-gold">Bundle</span>}
+            </div>
+          )}
+
           {/* Category */}
           {product.category && (
             <p className="text-xs uppercase tracking-widest mb-1.5" style={{ color: 'var(--text-muted)', letterSpacing: '0.1em', fontFamily: 'var(--font-jost)' }}>
