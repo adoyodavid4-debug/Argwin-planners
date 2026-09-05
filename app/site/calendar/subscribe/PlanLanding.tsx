@@ -534,7 +534,9 @@ function SubscribeCard({ plan, name, price, period }: { plan: Plan; name: string
   const [error, setError] = useState<string | null>(null)
   const [checkEmail, setCheckEmail] = useState(false)
 
-  const nextUrl = `/calendar/subscribe/${plan}`
+  // Teams lands in the team workspace; Plus in the personal calendar app.
+  const dest = plan === 'teams' ? '/calendar/team' : '/calendar/app'
+  const nextUrl = dest
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -546,7 +548,7 @@ function SubscribeCard({ plan, name, price, period }: { plan: Plan; name: string
         const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
         if (error) throw error
         toast.success(`Welcome back! Setting up ${name}…`)
-        router.push('/calendar/app'); router.refresh()
+        router.push(dest); router.refresh()
       } else {
         const { data, error } = await supabase.auth.signUp({
           email: email.trim(), password,
@@ -556,7 +558,7 @@ function SubscribeCard({ plan, name, price, period }: { plan: Plan; name: string
           },
         })
         if (error) throw error
-        if (data.session) { toast.success(`Account created! Setting up ${name}…`); router.push('/calendar/app'); router.refresh() }
+        if (data.session) { toast.success(`Account created! Setting up ${name}…`); router.push(dest); router.refresh() }
         else setCheckEmail(true)
       }
     } catch (err: any) {
