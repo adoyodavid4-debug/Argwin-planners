@@ -108,6 +108,11 @@ const DEFAULT_ON = new Set(['dailyBriefing', 'smartReminders', 'quietDelivery', 
 // Basic E.164-ish check: leading +, 8–15 digits.
 const phoneValid = (p: string) => /^\+\d{8,15}$/.test(p.replace(/[\s()-]/g, ''))
 
+// Section anchor id + short tab label for the in-panel section tabs.
+const gid = (t: string) => 'plus-' + t.toLowerCase().replace(/[^a-z]+/g, '-').replace(/-+$/, '')
+const shortLabel = (t: string) => t.split(/[ ,]/)[0]
+const scrollToSection = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+
 export function PlusContent({ embedded = false, onClose }: { embedded?: boolean; onClose?: () => void }) {
   const supabase = useMemo(() => createClient() as any, [])
   const [s, setS] = useState<CalendarSettings>(() => defaultSettings())
@@ -168,20 +173,27 @@ export function PlusContent({ embedded = false, onClose }: { embedded?: boolean;
 
   return (
     <div className="flex min-h-full flex-col">
-            {/* Header */}
-            <div className="sticky top-0 z-10 flex items-center gap-3 border-b px-4 py-3"
-              style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)' }}>
-              <span className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-widest"
-                style={{ background: 'rgba(var(--gold-rgb),0.12)', borderColor: 'rgba(var(--gold-rgb),0.35)', color: 'var(--gold-dark)', letterSpacing: '0.08em' }}>
-                <Sparkles size={13} /> Arwign Plus
-              </span>
-              <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{activeCount}/{ALL_KEYS.length} on</span>
-              <div className="ml-auto flex items-center gap-2">
-                <button onClick={save} disabled={saving || loading} className="btn-primary px-4 py-2 text-sm disabled:opacity-60">
-                  {saving ? <Loader2 size={15} className="animate-spin" /> : <><Check size={15} /> Save</>}
-                </button>
-                {onClose && <button onClick={onClose} className="btn-ghost" aria-label="Close"><X size={18} /></button>}
+            {/* Header + section tabs */}
+            <div className="sticky top-0 z-10 border-b" style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)' }}>
+              <div className="flex items-center gap-3 px-4 py-3">
+                <span className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-widest"
+                  style={{ background: 'rgba(var(--gold-rgb),0.12)', borderColor: 'rgba(var(--gold-rgb),0.35)', color: 'var(--gold-dark)', letterSpacing: '0.08em' }}>
+                  <Sparkles size={13} /> Arwign Plus
+                </span>
+                <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{activeCount}/{ALL_KEYS.length} on</span>
+                <div className="ml-auto flex items-center gap-2">
+                  <button onClick={save} disabled={saving || loading} className="btn-primary px-4 py-2 text-sm disabled:opacity-60">
+                    {saving ? <Loader2 size={15} className="animate-spin" /> : <><Check size={15} /> Save</>}
+                  </button>
+                  {onClose && <button onClick={onClose} className="btn-ghost" aria-label="Close"><X size={18} /></button>}
+                </div>
               </div>
+              {!loading && (
+                <div className="flex gap-1 overflow-x-auto px-3 pb-2">
+                  <TabBtn label="SMS" onClick={() => scrollToSection('plus-sms')} />
+                  {GROUPS.map((g) => <TabBtn key={g.title} label={shortLabel(g.title)} onClick={() => scrollToSection(gid(g.title))} />)}
+                </div>
+              )}
             </div>
 
             {loading ? (
@@ -196,7 +208,7 @@ export function PlusContent({ embedded = false, onClose }: { embedded?: boolean;
                 )}
 
                 {/* ── SMS & briefings (the phone capture) ── */}
-                <section className="rounded-2xl border p-5" style={{ borderColor: 'rgba(var(--gold-rgb),0.35)', background: 'var(--bg-card)' }}>
+                <section id="plus-sms" className="scroll-mt-28 rounded-2xl border p-5" style={{ borderColor: 'rgba(var(--gold-rgb),0.35)', background: 'var(--bg-card)' }}>
                   <div className="mb-1 flex items-center gap-2">
                     <MessageSquare size={16} style={{ color: 'var(--gold)' }} />
                     <h3 className="font-semibold" style={{ color: 'var(--text-primary)' }}>SMS calendar review & briefings</h3>
@@ -257,7 +269,7 @@ export function PlusContent({ embedded = false, onClose }: { embedded?: boolean;
 
                 {/* ── Capability groups ── */}
                 {GROUPS.map((g) => (
-                  <section key={g.title}>
+                  <section key={g.title} id={gid(g.title)} className="scroll-mt-28">
                     <div className="mb-2">
                       <h3 className="font-semibold" style={{ color: 'var(--text-primary)' }}>{g.title}</h3>
                       <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{g.blurb}</p>
@@ -326,6 +338,13 @@ export default function PlusPanel({ open, onClose }: { open: boolean; onClose: (
 }
 
 // ── Small UI pieces ────────────────────────────────────────────────────
+function TabBtn({ label, onClick }: { label: string; onClick: () => void }) {
+  return (
+    <button onClick={onClick} className="flex-shrink-0 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors hover:bg-black/[0.04]"
+      style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}>{label}</button>
+  )
+}
+
 function Switch({ on, onClick }: { on: boolean; onClick: () => void }) {
   return (
     <button onClick={onClick} role="switch" aria-checked={on}

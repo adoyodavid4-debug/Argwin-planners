@@ -17,7 +17,7 @@ import { parseNaturalLanguage } from '@/lib/calendar/nl'
 import { loadSettings, saveSettings, type CalendarSettings, defaultSettings } from '@/lib/calendar/settings'
 import { REMINDER_PRESETS, CHANNEL_LABELS, describeReminder } from '@/lib/calendar/reminders'
 import type { Reminder, ReminderChannel } from '@/lib/calendar/settings'
-import PlusPanel, { PlusContent } from './PlusPanel'
+import PlusPanel from './PlusPanel'
 
 // ── Types ─────────────────────────────────────────────────────
 type View = 'day' | 'week' | 'month' | 'agenda' | 'year'
@@ -233,6 +233,15 @@ export default function CalendarApp({ userEmail }: { userEmail: string }) {
     if (activeTags.length) list = list.filter((o) => (o.ev.tags ?? []).some((t) => activeTags.includes(t)))
     return list
   }, [allEvents, view, cursor, weekStart, search, activeTags])
+
+  // Today's occurrences, for the right-hand "Today" rail (independent of the
+  // grid's current view/cursor).
+  const todayOccs = useMemo(() => {
+    const ds = startOfDay(new Date()); const de = addDays(ds, 1)
+    const masters = allEvents.filter((e) => !e.recurrence_parent_id)
+    const exceptions = allEvents.filter((e) => e.recurrence_parent_id)
+    return buildOccurrences(masters, exceptions, ds, de).sort((a, b) => a.start.getTime() - b.start.getTime())
+  }, [allEvents])
 
   const allTags = useMemo(() => {
     const s = new Set<string>()
@@ -518,7 +527,7 @@ export default function CalendarApp({ userEmail }: { userEmail: string }) {
                 <button onClick={() => fileRef.current?.click()} className="btn-ghost" title="Import .ics"><Upload size={16} /></button>
                 <button onClick={exportICS} className="btn-ghost" title="Export .ics"><Download size={16} /></button>
                 <button onClick={() => setPaletteOpen(true)} className="btn-ghost" title="Command palette (⌘K)"><Command size={16} /></button>
-                <button onClick={() => setPlusOpen(true)} className="btn-outline lg:hidden px-3 py-2 text-sm" title="Arwign Plus — briefings, SMS & automation"
+                <button onClick={() => setPlusOpen(true)} className="btn-outline px-3 py-2 text-sm" title="Arwign Plus — briefings, SMS & automation"
                   style={{ borderColor: 'rgba(var(--gold-rgb),0.5)', color: 'var(--gold-dark)' }}>
                   <Sparkles size={15} /> <span className="hidden sm:inline">Plus</span>
                 </button>
@@ -552,10 +561,10 @@ export default function CalendarApp({ userEmail }: { userEmail: string }) {
             )}
              </div>
 
-              {/* Static, scrollable Arwign Plus panel — right quarter (desktop) */}
-              <aside className="hidden lg:block lg:w-1/4 lg:flex-shrink-0 self-start sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto rounded-2xl border shadow-glass-md"
-                style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)' }} aria-label="Arwign Plus">
-                <PlusContent embedded />
+              {/* Static, scrollable "Today" rail — right side (desktop) */}
+              <aside className="hidden lg:block lg:w-[360px] lg:flex-shrink-0 self-start sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto rounded-2xl border shadow-glass-md"
+                style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)' }} aria-label="Today">
+                <TodayRail occs={todayOccs} onOpen={openOcc} onOpenPlus={() => setPlusOpen(true)} />
               </aside>
             </div>
           </div>
@@ -800,6 +809,98 @@ function SideLink({ href, icon, label }: { href: string; icon: React.ReactNode; 
     <Link href={href} className="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-black/[0.04]" style={{ color: 'var(--text-secondary)' }}>
       {icon} {label}
     </Link>
+  )
+}
+
+// Right-hand "Today" rail: a live Daily Outlook Briefing + agenda for today.
+function TodayRail({ occs, onOpen, onOpenPlus }: { occs: Occ[]; onOpen: (o: Occ) => void; onOpenPlus: () => void }) {
+  const now = new Date()
+  const dateLabel = new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }).format(now)
+  const timed = occs.filter((o) => !o.ev.all_day)
+  const allDay = occs.filter((o) => o.ev.all_day)
+  const next = timed.find((o) => o.end >= now)
+  const clash = new Set<string>()
+  for (let i = 0; i < timed.length; i++) for (let j = i + 1; j < timed.length; j++) {
+    if (timed[i].start < timed[j].end && timed[j].start < timed[i].end) { clash.add(timed[i].key); clash.add(timed[j].key) }
+  }
+  const conflicts = clash.size / 2
+
+  return (
+    <div className="flex min-h-full flex-col">
+      <div className="sticky top-0 z-10 flex items-center gap-2 border-b px-4 py-3" style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)' }}>
+        <div>
+          <p className="font-display text-base font-semibold" style={{ color: 'var(--text-primary)' }}>Today</p>
+          <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{dateLabel}</p>
+        </div>
+        <button onClick={onOpenPlus} className="btn-outline ml-auto px-2.5 py-1.5 text-xs" style={{ borderColor: 'rgba(var(--gold-rgb),0.5)', color: 'var(--gold-dark)' }}>
+          <Sparkles size={13} /> Plus
+        </button>
+      </div>
+
+      <div className="space-y-4 px-4 py-4">
+        {/* Daily briefing headline */}
+        <div className="rounded-2xl border p-4" style={{ borderColor: 'rgba(var(--gold-rgb),0.35)', background: 'var(--bg-card)' }}>
+          <div className="mb-1.5 flex items-center gap-2">
+            <Bell size={14} style={{ color: 'var(--gold)' }} />
+            <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: 'var(--gold-dark)', letterSpacing: '0.08em' }}>Daily briefing</span>
+          </div>
+          <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+            {occs.length === 0
+              ? 'No events today — enjoy the open space.'
+              : `${occs.length} event${occs.length > 1 ? 's' : ''} today${conflicts ? ` · ${conflicts} conflict${conflicts > 1 ? 's' : ''} to resolve` : ''}.`}
+          </p>
+          {next && (
+            <p className="mt-1 text-xs" style={{ color: 'var(--text-secondary)' }}>
+              Up next: <strong style={{ color: 'var(--text-primary)' }}>{next.ev.title}</strong> at {fmtTime(next.start)}
+            </p>
+          )}
+        </div>
+
+        {allDay.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {allDay.map((o) => (
+              <button key={o.key} onClick={() => onOpen(o)} className="rounded-full border px-2.5 py-1 text-xs"
+                style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}>{o.ev.title}</button>
+            ))}
+          </div>
+        )}
+
+        {timed.length === 0 ? (
+          <p className="py-6 text-center text-sm" style={{ color: 'var(--text-muted)' }}>Nothing scheduled. A good day for focus.</p>
+        ) : (
+          <div className="space-y-1.5">
+            {timed.map((o) => {
+              const isNow = o.start <= now && now <= o.end
+              const isNext = next != null && o.key === next.key && !isNow
+              return (
+                <button key={o.key} onClick={() => onOpen(o)}
+                  className="flex w-full items-start gap-3 rounded-xl border px-3 py-2.5 text-left transition-colors hover:bg-black/[0.03]"
+                  style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}>
+                  <span className="mt-0.5 h-8 w-1 flex-shrink-0 rounded-full" style={{ background: o.ev.colour || 'var(--gold)' }} />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-mono text-xs" style={{ color: 'var(--text-muted)' }}>{fmtTime(o.start)}</span>
+                      {isNow && <span className="rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase text-white" style={{ background: 'var(--gold)' }}>Now</span>}
+                      {isNext && <span className="rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase" style={{ background: 'rgba(var(--gold-rgb),0.16)', color: 'var(--gold-dark)' }}>Next</span>}
+                      {clash.has(o.key) && <span className="text-[10px] font-semibold" style={{ color: '#B4664A' }}>⚠ Clash</span>}
+                    </div>
+                    <p className="truncate text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{o.ev.title}</p>
+                    {o.ev.location && (
+                      <p className="flex items-center gap-1 truncate text-[11px]" style={{ color: 'var(--text-muted)' }}><MapPin size={10} /> {o.ev.location}</p>
+                    )}
+                  </div>
+                  {o.ev.conferencing && <Video size={14} className="mt-0.5 flex-shrink-0" style={{ color: 'var(--gold)' }} />}
+                </button>
+              )
+            })}
+          </div>
+        )}
+
+        <button onClick={onOpenPlus} className="w-full text-center text-xs font-semibold" style={{ color: 'var(--gold)' }}>
+          Briefing, SMS &amp; automation settings →
+        </button>
+      </div>
+    </div>
   )
 }
 
