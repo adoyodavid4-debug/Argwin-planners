@@ -10,11 +10,12 @@ import {
   PlugZap, Brain, Palette, Vote, Bell, MessageSquare, Clock, CalendarDays,
   BellRing, MapPin, RefreshCcw, ShieldCheck, CalendarClock, Layers, Globe2,
   BarChart3, FileText, Wand2, LifeBuoy, Route, Moon, WifiOff, Building2,
+  type LucideIcon,
 } from 'lucide-react'
 
 type Plan = 'plus' | 'teams'
-type Pillar = { icon: React.ComponentType<{ size?: number; style?: React.CSSProperties }>; title: string; points: string[] }
-type Pain = { icon: React.ComponentType<{ size?: number; style?: React.CSSProperties }>; pain: string; fix: string }
+type Pillar = { icon: LucideIcon; title: string; points: string[] }
+type Pain = { icon: LucideIcon; pain: string; fix: string }
 type CompareRow = { label: string; from: string; to: string }
 
 interface TierContent {
