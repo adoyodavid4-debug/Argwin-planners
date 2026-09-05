@@ -513,8 +513,6 @@ export default function CalendarApp({ userEmail }: { userEmail: string }) {
         {/* ── Main ── */}
         <div className="flex-1 min-w-0">
           <div className="container-site py-5">
-            <div className="flex items-start gap-5">
-             <div className="min-w-0 flex-1">
             {/* Toolbar */}
             <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
               <div className="flex items-center gap-2">
@@ -560,6 +558,8 @@ export default function CalendarApp({ userEmail }: { userEmail: string }) {
               <span className="hidden lg:block text-[11px]" style={{ color: 'var(--text-muted)' }}>⌘K · N new · T today</span>
             </div>
 
+            <div className="flex items-start gap-5">
+             <div className="min-w-0 flex-1">
             {/* Body */}
             {needsSetup ? <SetupNotice /> : loading ? (
               <div className="flex items-center justify-center py-24" style={{ color: 'var(--text-muted)' }}><Loader2 size={22} className="animate-spin" /></div>
