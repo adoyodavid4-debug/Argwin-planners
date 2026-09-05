@@ -188,6 +188,10 @@ const TIERS = [
   {
     name: 'Arwign Free',
     tagline: 'Acquisition & habit',
+    price: 'Free',
+    period: 'forever',
+    cta: 'Create your free calendar',
+    href: '/calendar/app',
     highlight: false,
     features: [
       'Full calendar: unlimited events, all views, recurrence',
@@ -200,6 +204,10 @@ const TIERS = [
   {
     name: 'Arwign Plus',
     tagline: 'The individual power user',
+    price: '$9.99',
+    period: '/month',
+    cta: 'Subscribe to Arwign Plus',
+    href: '/calendar/subscribe/plus',
     highlight: true,
     features: [
       'Everything in Free, plus:',
@@ -212,7 +220,11 @@ const TIERS = [
   },
   {
     name: 'Arwign Teams',
-    tagline: 'Per seat',
+    tagline: 'For teams',
+    price: '$23.99',
+    period: '/month',
+    cta: 'Subscribe to Arwign Teams',
+    href: '/calendar/subscribe/teams',
     highlight: false,
     features: [
       'Everything in Plus, plus:',
@@ -551,8 +563,12 @@ export default function CalendarClient() {
                 </span>
               )}
               <h3 className="font-display font-semibold text-xl mb-1" style={{ color: 'var(--text-primary)' }}>{tier.name}</h3>
-              <p className="text-xs uppercase tracking-widest mb-5" style={{ color: 'var(--text-muted)', letterSpacing: '0.08em' }}>{tier.tagline}</p>
-              <ul className="space-y-2.5">
+              <p className="text-xs uppercase tracking-widest mb-3" style={{ color: 'var(--text-muted)', letterSpacing: '0.08em' }}>{tier.tagline}</p>
+              <div className="mb-5 flex items-baseline gap-1.5">
+                <span className="font-display text-3xl font-semibold" style={{ color: 'var(--text-primary)' }}>{tier.price}</span>
+                <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{tier.period}</span>
+              </div>
+              <ul className="space-y-2.5 mb-6">
                 {tier.features.map((f) => (
                   <li key={f} className="flex items-start gap-2.5 text-sm" style={{ color: 'var(--text-secondary)' }}>
                     <Check size={15} className="flex-shrink-0 mt-0.5" style={{ color: 'var(--gold)' }} />
@@ -560,6 +576,9 @@ export default function CalendarClient() {
                   </li>
                 ))}
               </ul>
+              <Link href={tier.href} className={`${tier.highlight ? 'btn-primary' : 'btn-outline'} w-full justify-center py-2.5 text-sm`}>
+                {tier.cta} <ArrowRight size={15} />
+              </Link>
             </div>
           ))}
         </div>
