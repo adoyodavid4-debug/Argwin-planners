@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import PlanSubscribe, { type PlanConfig } from '../PlanSubscribe'
+import PlanLanding from '../PlanLanding'
 
 export const metadata: Metadata = {
   title: 'Subscribe to Arwign Teams — $23.99/month | Arwign Calendar',
@@ -7,25 +7,6 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 }
 
-const TEAMS: PlanConfig = {
-  plan: 'teams',
-  name: 'Arwign Teams',
-  price: '$23.99',
-  period: 'per month',
-  tagline: 'For teams',
-  intro: 'Everything in Plus for your whole team — shared calendars with roles, resource booking, cross-timezone scheduling and centralised admin, so a distributed team can find time and manage it together.',
-  benefits: [
-    'Everything in Arwign Plus, for your team',
-    'Shared team calendars with granular roles (view / propose / edit / manage)',
-    'Conference room & resource booking with approval workflows',
-    'Team availability finder across time zones',
-    'Round-robin & collective booking pages',
-    'Delegation with a full audit trail',
-    'Team calendar-health analytics',
-    'Admin console & centralised billing',
-  ],
-}
-
 export default function SubscribeTeamsPage() {
-  return <PlanSubscribe config={TEAMS} />
+  return <PlanLanding plan="teams" />
 }
