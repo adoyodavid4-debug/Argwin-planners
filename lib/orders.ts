@@ -13,6 +13,8 @@ const APP_URL =
 const PAYMENT_METHOD_LABELS: Record<string, string> = {
   stripe_card: 'Card',
   paypal:      'PayPal',
+  pesapal:     'Card',
+  paystack:    'Paystack',
   apple_pay:   'Apple Pay',
   google_pay:  'Google Pay',
 }

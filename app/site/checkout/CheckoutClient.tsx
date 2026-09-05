@@ -3,11 +3,12 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Loader2, Lock, Mail, ShoppingBag, Trash2 } from 'lucide-react'
+import { Loader2, Lock, Mail, ShoppingBag, Trash2, Zap } from 'lucide-react'
 import { useCartStore, type CartItem } from '@/lib/store'
 import PesapalCheckout from '@/components/checkout/PesapalCheckout'
+import PaystackCheckout from '@/components/checkout/PaystackCheckout'
 
-type Method = 'pesapal' | 'paypal'
+type Method = 'pesapal' | 'paypal' | 'paystack'
 
 declare global {
   interface Window { paypal?: any }
@@ -179,9 +180,10 @@ export default function CheckoutClient() {
     )
   }
 
-  const methods: { key: Method; label: string; icon: string; iconAlt: string }[] = [
-    { key: 'pesapal', label: 'Card',   icon: '/images/payments/visa-mastercard.jpg', iconAlt: 'Visa and Mastercard' },
-    { key: 'paypal',  label: 'PayPal', icon: '/images/payments/paypal.jpg',          iconAlt: 'PayPal' },
+  const methods: { key: Method; label: string; icon?: string; iconAlt: string }[] = [
+    { key: 'pesapal',  label: 'Card',     icon: '/images/payments/visa-mastercard.jpg', iconAlt: 'Visa and Mastercard' },
+    { key: 'paypal',   label: 'PayPal',   icon: '/images/payments/paypal.jpg',          iconAlt: 'PayPal' },
+    { key: 'paystack', label: 'Paystack',                                               iconAlt: 'Paystack' },
   ]
 
   return (
@@ -226,13 +228,13 @@ export default function CheckoutClient() {
               Payment method
             </p>
 
-            <div className="grid grid-cols-2 gap-2 mb-6">
+            <div className="grid grid-cols-3 gap-2 mb-6">
               {methods.map((m) => (
                 <button
                   key={m.key}
                   type="button"
                   onClick={() => setMethod(m.key)}
-                  className="py-2.5 rounded-xl text-sm font-semibold border transition-all flex items-center justify-center gap-2"
+                  className="py-2.5 rounded-xl text-sm font-semibold border transition-all flex items-center justify-center gap-1.5"
                   style={{
                     borderColor: method === m.key ? 'var(--gold)' : 'var(--border)',
                     background:  method === m.key ? 'rgba(var(--gold-rgb),0.08)' : 'transparent',
@@ -240,9 +242,13 @@ export default function CheckoutClient() {
                     fontFamily:  'var(--font-jost)',
                   }}
                 >
-                  <span className="rounded flex items-center justify-center" style={{ background: '#fff', padding: '2px 5px' }}>
-                    <Image src={m.icon} alt={m.iconAlt} width={200} height={80} style={{ height: 14, width: 'auto' }} />
-                  </span>
+                  {m.icon ? (
+                    <span className="rounded flex items-center justify-center" style={{ background: '#fff', padding: '2px 5px' }}>
+                      <Image src={m.icon} alt={m.iconAlt} width={200} height={80} style={{ height: 14, width: 'auto' }} />
+                    </span>
+                  ) : (
+                    <Zap size={14} style={{ color: '#00C195' }} />
+                  )}
                   {m.label}
                 </button>
               ))}
@@ -282,6 +288,16 @@ export default function CheckoutClient() {
                   </>
                 )}
               </div>
+            )}
+
+            {/* Paystack (card & mobile money via hosted page) */}
+            {method === 'paystack' && (
+              <PaystackCheckout
+                items={items}
+                total={total()}
+                email={email}
+                onEmailInvalid={() => validateEmail(email)}
+              />
             )}
 
             <div className="flex items-center justify-center gap-1.5 text-xs mt-6" style={{ color: 'var(--text-muted)' }}>
