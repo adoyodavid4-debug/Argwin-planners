@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, type ElementType } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
@@ -10,12 +10,11 @@ import {
   PlugZap, Brain, Palette, Vote, Bell, MessageSquare, Clock, CalendarDays,
   BellRing, MapPin, RefreshCcw, ShieldCheck, CalendarClock, Layers, Globe2,
   BarChart3, FileText, Wand2, LifeBuoy, Route, Moon, WifiOff, Building2,
-  type LucideIcon,
 } from 'lucide-react'
 
 type Plan = 'plus' | 'teams'
-type Pillar = { icon: LucideIcon; title: string; points: string[] }
-type Pain = { icon: LucideIcon; pain: string; fix: string }
+type Pillar = { icon: ElementType; title: string; points: string[] }
+type Pain = { icon: ElementType; pain: string; fix: string }
 type CompareRow = { label: string; from: string; to: string }
 
 interface TierContent {
