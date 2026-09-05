@@ -251,8 +251,7 @@ export function PlusContent({ embedded = false, onClose }: { embedded?: boolean;
                     </div>
                   </div>
                   <p className="mt-3 text-[11px]" style={{ color: 'var(--text-muted)' }}>
-                    SMS delivery starts once an SMS provider (Africa’s Talking / Twilio) is connected in{' '}
-                    <Link href="/calendar/integrations" className="font-semibold" style={{ color: 'var(--gold)' }}>Integrations</Link>. Your number is stored only for briefings and reminders.
+                    Your briefing is delivered by SMS at your chosen time. Your number is stored only for briefings and reminders — standard message rates may apply.
                   </p>
                 </section>
 

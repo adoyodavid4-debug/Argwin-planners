@@ -16,3 +16,17 @@ export function composeBriefingHeadline(items: BriefItem[]): string {
     'a manageable day'
   return `${n} event${n === 1 ? '' : 's'} today — ${load}, starting with ${first.title} at ${first.time}.`
 }
+
+// Compressed briefing for SMS: a short headline plus a compact agenda. Kept
+// tight to limit Twilio segments; truncates long lists with a "+N more".
+export function composeBriefingSms(dateLabel: string, items: BriefItem[]): string {
+  if (items.length === 0) {
+    return `Arwign · ${dateLabel}\nNo events today — an open day to protect your focus.`
+  }
+  const MAX = 6
+  const lines = items.slice(0, MAX).map((i) => `• ${i.time} ${i.title}`)
+  const more  = items.length > MAX ? `…+${items.length - MAX} more` : ''
+  return [`Arwign · ${dateLabel}`, composeBriefingHeadline(items), ...lines, more]
+    .filter(Boolean)
+    .join('\n')
+}

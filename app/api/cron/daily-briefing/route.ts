@@ -3,12 +3,13 @@ import { createServiceRoleClient } from '@/lib/supabase/server'
 import { getEmailProvider } from '@/lib/email'
 import { parseRRule, expandOccurrences } from '@/lib/calendar/recurrence'
 import { wallTimeToUtc } from '@/lib/calendar/slots'
-import { composeBriefingHeadline } from '@/lib/calendar/briefing'
+import { composeBriefingHeadline, composeBriefingSms } from '@/lib/calendar/briefing'
+import { sendSms, smsConfigured } from '@/lib/sms'
 
 export const dynamic = 'force-dynamic'
 
-// Vercel Cron hourly. Sends each user their morning briefing when the local hour
-// matches their setting and it hasn't been sent today.
+// Vercel Cron hourly. Sends each user their morning briefing (email and/or SMS)
+// when the local hour matches their setting and it hasn't been sent today.
 async function run(req: NextRequest) {
   if (req.headers.get('authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -16,9 +17,14 @@ async function run(req: NextRequest) {
   const supabase = createServiceRoleClient()
   const provider = getEmailProvider()
   const nowInstant = new Date()
-  let sent = 0
+  let sentEmail = 0
+  let sentSms = 0
 
-  const { data: settingsRows } = await supabase.from('calendar_settings').select('*').eq('briefing_email', true)
+  // Anyone with a briefing on for either channel.
+  const { data: settingsRows } = await supabase
+    .from('calendar_settings')
+    .select('*')
+    .or('briefing_email.eq.true,briefing_sms.eq.true')
 
   for (const st of (settingsRows ?? []) as any[]) {
     const tz = st.timezone || 'Africa/Nairobi'
@@ -63,25 +69,62 @@ async function run(req: NextRequest) {
     const dateLabel = new Intl.DateTimeFormat('en-GB', { timeZone: tz, weekday: 'long', day: 'numeric', month: 'long' }).format(nowInstant)
     const headline = composeBriefingHeadline(items.map((i) => ({ time: i.time, title: i.title })))
 
-    try {
-      const { data: u } = await supabase.auth.admin.getUserById(st.user_id)
-      const email = u?.user?.email
-      if (email) {
+    const { data: u } = await supabase.auth.admin.getUserById(st.user_id)
+    const email = u?.user?.email as string | undefined
+
+    const wantEmail = st.briefing_email && !!email
+    const wantSms   = st.briefing_sms && !!st.phone && smsConfigured()
+    if (!wantEmail && !wantSms) continue
+
+    let delivered = false
+
+    // ── Email channel ──
+    if (wantEmail) {
+      try {
         await provider.sendTransactional({
-          to: email, locale: 'en', templateKey: 'calendar.briefing',
+          to: email!, locale: 'en', templateKey: 'calendar.briefing',
           data: { headline, date_label: dateLabel, items: items.map((i) => ({ time: i.time, title: i.title, flag: i.flag })) },
           idempotencyKey: `briefing:${st.user_id}:${localDate}`,
         })
-        await supabase.from('calendar_settings').update({ last_briefing_on: localDate }).eq('user_id', st.user_id)
         await supabase.from('notification_log').insert({
           user_id: st.user_id, kind: 'briefing', channel: 'email',
           idempotency_key: `briefing:${st.user_id}:${localDate}`, status: 'sent', meta: { count: items.length },
         })
-        sent++
+        delivered = true; sentEmail++
+      } catch (e) { console.error('[briefing] email failed', st.user_id, e) }
+    }
+
+    // ── SMS channel (Twilio) ──
+    if (wantSms) {
+      const smsKey = `briefing-sms:${st.user_id}:${localDate}`
+      // Guard against a duplicate paid send if a prior run crashed after Twilio
+      // accepted the message but before last_briefing_on was written.
+      const { data: already } = await supabase
+        .from('notification_log').select('id').eq('idempotency_key', smsKey).maybeSingle()
+      if (!already) {
+        try {
+          await sendSms({
+            to: st.phone,
+            body: composeBriefingSms(dateLabel, items.map((i) => ({ time: i.time, title: i.title }))),
+          })
+          await supabase.from('notification_log').insert({
+            user_id: st.user_id, kind: 'briefing', channel: 'sms',
+            idempotency_key: smsKey, status: 'sent', meta: { count: items.length },
+          })
+          delivered = true; sentSms++
+        } catch (e) { console.error('[briefing] sms failed', st.user_id, e) }
+      } else {
+        delivered = true
       }
-    } catch (e) { console.error('[briefing] failed', e) }
+    }
+
+    // Mark the day done only once at least one channel delivered, so a transient
+    // failure retries on the next hourly run rather than being silently skipped.
+    if (delivered) {
+      await supabase.from('calendar_settings').update({ last_briefing_on: localDate }).eq('user_id', st.user_id)
+    }
   }
-  return NextResponse.json({ ok: true, sent })
+  return NextResponse.json({ ok: true, email: sentEmail, sms: sentSms })
 }
 
 // Vercel Cron invokes GET with an auto-injected Bearer CRON_SECRET header.
