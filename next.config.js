@@ -5,6 +5,12 @@ const nextConfig = {
 
   // Image optimization
   images: {
+    // Vercel Hobby has a monthly image-optimization quota; once exhausted the
+    // /_next/image optimizer returns 402 and every next/image breaks site-wide.
+    // Our source images are already optimized webp served from Supabase, so we
+    // skip the optimizer entirely and serve them directly. (Re-enable by
+    // removing `unoptimized` if the project moves to a Pro plan.)
+    unoptimized: true,
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       { protocol: 'https', hostname: '*.supabase.co' },
