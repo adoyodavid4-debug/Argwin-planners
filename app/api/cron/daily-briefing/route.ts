@@ -8,8 +8,14 @@ import { sendSms, smsConfigured } from '@/lib/sms'
 
 export const dynamic = 'force-dynamic'
 
-// Vercel Cron hourly. Sends each user their morning briefing (email and/or SMS)
-// when the local hour matches their setting and it hasn't been sent today.
+// Vercel Cron. Sends each user their morning briefing (email and/or SMS) once
+// per local day (guarded by last_briefing_on).
+//
+// NOTE: the Vercel Hobby plan only permits DAILY crons, so this is scheduled
+// once at 04:00 UTC (= 07:00 in the Africa/Nairobi default tz, matching the
+// default briefing hour). To honour each user's own `briefing_hour`, upgrade to
+// Vercel Pro, switch the schedule in vercel.json to hourly ("0 * * * *"), and
+// re-add an `if (localHour !== st.briefing_hour) continue` gate below.
 async function run(req: NextRequest) {
   if (req.headers.get('authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -28,13 +34,11 @@ async function run(req: NextRequest) {
 
   for (const st of (settingsRows ?? []) as any[]) {
     const tz = st.timezone || 'Africa/Nairobi'
-    let localHour: number, localDate: string
+    let localDate: string
     try {
-      localHour = Number(new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', hour12: false }).format(nowInstant))
       localDate = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(nowInstant)
     } catch { continue }
 
-    if (localHour !== st.briefing_hour) continue
     if (st.last_briefing_on === localDate) continue
 
     const [y, m, d] = localDate.split('-').map(Number)
