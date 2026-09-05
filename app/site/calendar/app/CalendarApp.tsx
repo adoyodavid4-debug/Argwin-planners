@@ -7,7 +7,7 @@ import {
   ChevronLeft, ChevronRight, Plus, X, Trash2, MapPin, AlignLeft, Clock,
   CalendarDays, Loader2, ArrowLeft, Link2, Search, Repeat, Bell, Tag as TagIcon,
   Command, Upload, Download, Settings as SettingsIcon, Sun, Moon, Palette,
-  Globe2, BarChart3, Video, Check,
+  Globe2, BarChart3, Video, Check, Sparkles,
 } from 'lucide-react'
 import {
   parseRRule, buildRRule, expandOccurrences, describeRRule, type RRule, type Weekday, WEEKDAYS,
@@ -17,6 +17,7 @@ import { parseNaturalLanguage } from '@/lib/calendar/nl'
 import { loadSettings, saveSettings, type CalendarSettings, defaultSettings } from '@/lib/calendar/settings'
 import { REMINDER_PRESETS, CHANNEL_LABELS, describeReminder } from '@/lib/calendar/reminders'
 import type { Reminder, ReminderChannel } from '@/lib/calendar/settings'
+import PlusPanel from './PlusPanel'
 
 // ── Types ─────────────────────────────────────────────────────
 type View = 'day' | 'week' | 'month' | 'agenda' | 'year'
@@ -180,6 +181,7 @@ export default function CalendarApp({ userEmail }: { userEmail: string }) {
   const [search, setSearch] = useState('')
   const [activeTags, setActiveTags] = useState<string[]>([])
   const [paletteOpen, setPaletteOpen] = useState(false)
+  const [plusOpen, setPlusOpen] = useState(false)
   const [scopeAsk, setScopeAsk] = useState<null | { mode: 'edit' | 'delete'; run: (scope: 'this' | 'all') => void }>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
@@ -472,6 +474,11 @@ export default function CalendarApp({ userEmail }: { userEmail: string }) {
           {(settings.world_clocks ?? []).length > 0 && <WorldClocks zones={settings.world_clocks} />}
 
           <nav className="mt-auto space-y-1 text-sm">
+            <button onClick={() => setPlusOpen(true)}
+              className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 font-semibold transition-colors hover:bg-black/[0.04]"
+              style={{ color: 'var(--gold-dark)' }}>
+              <Sparkles size={15} /> Arwign Plus
+            </button>
             <SideLink href="/calendar/booking-pages" icon={<Link2 size={15} />} label="Booking pages" />
             <SideLink href="/calendar/polls" icon={<CalendarDays size={15} />} label="Meeting polls" />
             <SideLink href="/calendar/analytics" icon={<BarChart3 size={15} />} label="Analytics" />
@@ -509,6 +516,10 @@ export default function CalendarApp({ userEmail }: { userEmail: string }) {
                 <button onClick={() => fileRef.current?.click()} className="btn-ghost" title="Import .ics"><Upload size={16} /></button>
                 <button onClick={exportICS} className="btn-ghost" title="Export .ics"><Download size={16} /></button>
                 <button onClick={() => setPaletteOpen(true)} className="btn-ghost" title="Command palette (⌘K)"><Command size={16} /></button>
+                <button onClick={() => setPlusOpen(true)} className="btn-outline px-3 py-2 text-sm" title="Arwign Plus — briefings, SMS & automation"
+                  style={{ borderColor: 'rgba(var(--gold-rgb),0.5)', color: 'var(--gold-dark)' }}>
+                  <Sparkles size={15} /> <span className="hidden sm:inline">Plus</span>
+                </button>
                 <button onClick={() => setDraft(blankDraft(cursor))} className="btn-primary px-3 py-2 text-sm"><Plus size={15} /> New</button>
                 <input ref={fileRef} type="file" accept=".ics,text/calendar" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) importICS(f); e.currentTarget.value = '' }} />
               </div>
@@ -545,6 +556,7 @@ export default function CalendarApp({ userEmail }: { userEmail: string }) {
         <EventModal draft={draft} settings={settings} onChange={setDraft} onClose={() => setDraft(null)} onSave={saveDraft} onDelete={deleteDraft} />
       )}
       {scopeAsk && <ScopeDialog mode={scopeAsk.mode} onPick={scopeAsk.run} onClose={() => setScopeAsk(null)} />}
+      <PlusPanel open={plusOpen} onClose={() => setPlusOpen(false)} />
       {paletteOpen && (
         <CommandPalette
           onClose={() => setPaletteOpen(false)}

@@ -27,6 +27,8 @@ export interface CalendarSettings {
   quiet_end: number | null
   no_meeting_days: number[]
   focus_protect: boolean
+  phone: string | null
+  features: Record<string, boolean>
 }
 
 export const DEFAULT_WORKING_HOURS: WorkingHours = {
@@ -53,6 +55,8 @@ export function defaultSettings(): CalendarSettings {
     quiet_end: null,
     no_meeting_days: [],
     focus_protect: false,
+    phone: null,
+    features: {},
   }
 }
 
