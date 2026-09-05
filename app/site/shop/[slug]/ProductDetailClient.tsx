@@ -49,7 +49,7 @@ export default function ProductDetailClient({ product: p, related, reviews, bund
   const reduce = useReducedMotion()
   const gallery = useMemo(() => {
     const all = [p.thumbnail, ...p.images, ...p.preview_pages].filter(Boolean) as string[]
-    return Array.from(new Set(all)).slice(0, 8)
+    return Array.from(new Set(all))
   }, [p])
   const imgs = gallery.length ? gallery : [FALLBACK_IMG]
 
@@ -91,40 +91,38 @@ export default function ProductDetailClient({ product: p, related, reviews, bund
 
         {/* ── HERO: gallery + buy panel ── */}
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
-          {/* Gallery */}
-          <div>
-            <div className="relative rounded-3xl overflow-hidden border group" style={{ borderColor: 'var(--border)', background: 'transparent', aspectRatio: '3/4' }}
-              tabIndex={0} role="group" aria-label="Product gallery"
-              onKeyDown={(e) => { if (e.key === 'ArrowLeft') setActive((a) => (a - 1 + imgs.length) % imgs.length); if (e.key === 'ArrowRight') setActive((a) => (a + 1) % imgs.length) }}>
-              <AnimatePresence mode="wait">
-                <motion.div key={active} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : 0.3 }} className="absolute inset-0">
-                  <Image src={imgs[active]} alt={`${p.title} — image ${active + 1}`} fill priority={active === 0} sizes="(max-width:1024px) 100vw, 45vw" className="object-contain" />
-                </motion.div>
-              </AnimatePresence>
-              {/* badges */}
-              <div className="absolute top-4 left-4 flex flex-col gap-1.5">
-                {p.is_new && <span className="badge badge-new">New</span>}
-                {p.is_bestseller && <span className="badge badge-popular inline-flex items-center gap-1"><Crown size={9} /> Bestseller</span>}
-                {sale && <span className="badge badge-sale">-{off}%</span>}
-              </div>
-              <button onClick={() => setLightbox(true)} aria-label="Expand image" className="absolute top-4 right-4 w-9 h-9 rounded-full flex items-center justify-center transition-transform hover:scale-110" style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(6px)' }}><Maximize2 size={15} style={{ color: 'var(--charcoal)' }} /></button>
-              {imgs.length > 1 && (
-                <>
-                  <button onClick={() => setActive((a) => (a - 1 + imgs.length) % imgs.length)} aria-label="Previous image" className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full items-center justify-center hidden sm:flex opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: 'rgba(255,255,255,0.92)' }}><ChevronLeft size={17} style={{ color: 'var(--charcoal)' }} /></button>
-                  <button onClick={() => setActive((a) => (a + 1) % imgs.length)} aria-label="Next image" className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full items-center justify-center hidden sm:flex opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: 'rgba(255,255,255,0.92)' }}><ChevronRight size={17} style={{ color: 'var(--charcoal)' }} /></button>
-                </>
-              )}
-            </div>
-            {imgs.length > 1 && (
-              <div className="flex gap-2.5 mt-4 overflow-x-auto scrollbar-hide pb-1" role="tablist" aria-label="Gallery thumbnails">
-                {imgs.map((src, i) => (
-                  <button key={i} onClick={() => setActive(i)} role="tab" aria-selected={i === active} aria-label={`View image ${i + 1}`}
-                    className="relative flex-shrink-0 rounded-xl overflow-hidden transition-all" style={{ width: 68, aspectRatio: '3/4', outline: i === active ? '2px solid var(--gold)' : 'none', outlineOffset: 2, opacity: i === active ? 1 : 0.65 }}>
-                    <Image src={src} alt="" fill loading="lazy" sizes="68px" className="object-cover" />
-                  </button>
-                ))}
-              </div>
-            )}
+          {/* Gallery — every marketing image, stacked & linked, on the left */}
+          <div className="flex flex-col gap-4">
+            {imgs.map((src, i) => (
+              <button
+                key={i}
+                onClick={() => { setActive(i); setLightbox(true) }}
+                aria-label={`Enlarge ${p.title} — image ${i + 1}`}
+                className="group relative block w-full overflow-hidden rounded-3xl border transition-shadow hover:shadow-product"
+                style={{ borderColor: 'var(--border)', background: 'transparent' }}
+              >
+                <Image
+                  src={src}
+                  alt={`${p.title} — image ${i + 1}`}
+                  width={0}
+                  height={0}
+                  sizes="(max-width:1024px) 100vw, 45vw"
+                  priority={i === 0}
+                  loading={i === 0 ? undefined : 'lazy'}
+                  className="h-auto w-full transition-transform duration-500 group-hover:scale-[1.01]"
+                />
+                {i === 0 && (
+                  <>
+                    <div className="absolute top-4 left-4 flex flex-col gap-1.5">
+                      {p.is_new && <span className="badge badge-new">New</span>}
+                      {p.is_bestseller && <span className="badge badge-popular inline-flex items-center gap-1"><Crown size={9} /> Bestseller</span>}
+                      {sale && <span className="badge badge-sale">-{off}%</span>}
+                    </div>
+                    <span className="absolute top-4 right-4 w-9 h-9 rounded-full flex items-center justify-center transition-transform group-hover:scale-110" style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(6px)' }}><Maximize2 size={15} style={{ color: 'var(--charcoal)' }} /></span>
+                  </>
+                )}
+              </button>
+            ))}
           </div>
 
           {/* Buy panel */}
@@ -189,38 +187,6 @@ export default function ProductDetailClient({ product: p, related, reviews, bund
             )}
           </div>
         </div>
-
-        {/* Take a closer look — every uploaded image, full-width & uncropped */}
-        {imgs.length > 1 && (
-          <motion.section {...reveal()} className="mt-16">
-            <h2 className="font-display text-2xl mb-2" style={{ color: 'var(--text-primary)' }}>Take a closer look</h2>
-            <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>Every page and preview, shown in full — tap any image to enlarge.</p>
-            <div className="mx-auto flex max-w-3xl flex-col gap-4 rounded-3xl p-3 sm:p-5" style={{ background: 'transparent' }}>
-              {imgs.slice(1).map((src, idx) => {
-                const i = idx + 1
-                return (
-                <button
-                  key={i}
-                  onClick={() => { setActive(i); setLightbox(true) }}
-                  aria-label={`Enlarge preview ${idx + 1}`}
-                  className="group block w-full overflow-hidden rounded-2xl border transition-shadow hover:shadow-product"
-                  style={{ borderColor: 'var(--border)', background: 'transparent' }}
-                >
-                  <Image
-                    src={src}
-                    alt={`${p.title} — preview ${i + 1}`}
-                    width={0}
-                    height={0}
-                    sizes="(max-width: 768px) 100vw, 768px"
-                    loading="lazy"
-                    className="h-auto w-full transition-transform duration-500 group-hover:scale-[1.01]"
-                  />
-                </button>
-                )
-              })}
-            </div>
-          </motion.section>
-        )}
 
         {/* Bundle contents */}
         {p.is_bundle && bundleItems.length > 0 && (
