@@ -93,7 +93,7 @@ export default function ProductDetailClient({ product: p, related, reviews, bund
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
           {/* Gallery */}
           <div>
-            <div className="relative rounded-3xl overflow-hidden border group" style={{ borderColor: 'var(--border)', background: '#0D0D0F', aspectRatio: '3/4' }}
+            <div className="relative rounded-3xl overflow-hidden border group" style={{ borderColor: 'var(--border)', background: 'transparent', aspectRatio: '3/4' }}
               tabIndex={0} role="group" aria-label="Product gallery"
               onKeyDown={(e) => { if (e.key === 'ArrowLeft') setActive((a) => (a - 1 + imgs.length) % imgs.length); if (e.key === 'ArrowRight') setActive((a) => (a + 1) % imgs.length) }}>
               <AnimatePresence mode="wait">
@@ -195,7 +195,7 @@ export default function ProductDetailClient({ product: p, related, reviews, bund
           <motion.section {...reveal()} className="mt-16">
             <h2 className="font-display text-2xl mb-2" style={{ color: 'var(--text-primary)' }}>Take a closer look</h2>
             <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>Every page and preview, shown in full — tap any image to enlarge.</p>
-            <div className="mx-auto flex max-w-3xl flex-col gap-4 rounded-3xl p-3 sm:p-5" style={{ background: '#0D0D0F' }}>
+            <div className="mx-auto flex max-w-3xl flex-col gap-4 rounded-3xl p-3 sm:p-5" style={{ background: 'transparent' }}>
               {imgs.slice(1).map((src, idx) => {
                 const i = idx + 1
                 return (
@@ -204,7 +204,7 @@ export default function ProductDetailClient({ product: p, related, reviews, bund
                   onClick={() => { setActive(i); setLightbox(true) }}
                   aria-label={`Enlarge preview ${idx + 1}`}
                   className="group block w-full overflow-hidden rounded-2xl border transition-shadow hover:shadow-product"
-                  style={{ borderColor: 'var(--border)', background: '#0D0D0F' }}
+                  style={{ borderColor: 'var(--border)', background: 'transparent' }}
                 >
                   <Image
                     src={src}
@@ -380,7 +380,7 @@ function Lightbox({ imgs, active, setActive, onClose, title, reduce }: { imgs: s
         style={{
           width: 'min(90vw, 560px)',
           aspectRatio: '3/4',
-          background: '#0D0D0F',
+          background: 'transparent',
           border: '1px solid rgba(110,126,102,0.18)',
         }}
       >
