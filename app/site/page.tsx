@@ -39,12 +39,12 @@ async function getFeatured() {
   const { data } = await supabase
     .from('products').select(SELECT)
     .eq('status', 'active').eq('is_featured', true)
-    .order('download_count', { ascending: false }).limit(8)
+    .order('download_count', { ascending: false }).limit(12)
   if (data && data.length > 0) return data as Product[]
   const { data: top } = await supabase
     .from('products').select(SELECT)
     .eq('status', 'active')
-    .order('download_count', { ascending: false }).limit(8)
+    .order('download_count', { ascending: false }).limit(12)
   return (top ?? []) as Product[]
 }
 
@@ -62,7 +62,7 @@ function SectionHeader({ eyebrow, title, href, linkLabel, icon }: {
   )
 }
 
-function Row({ products }: { products: Product[] }) {
+function Grid({ products }: { products: Product[] }) {
   if (products.length === 0) {
     return (
       <div className="text-center py-16 rounded-2xl border" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
@@ -70,13 +70,12 @@ function Row({ products }: { products: Product[] }) {
       </div>
     )
   }
-  // Horizontal, snap-scrolling row of cards.
+  // Responsive grid — 2 columns on phones, 3 on desktop (beside the calendar
+  // sidebar). With 6 best-sellers that's 2 rows; with 12 catalogue items, 4 rows.
   return (
-    <div className="flex gap-5 overflow-x-auto pb-4 -mx-1 px-1 snap-x snap-mandatory scrollbar-hide">
+    <div className="grid grid-cols-2 lg:grid-cols-3 gap-5">
       {products.map((p, i) => (
-        <div key={p.id} className="snap-start shrink-0 w-[200px] sm:w-[230px]">
-          <ProductCard product={p} index={i} priority={i < 2} />
-        </div>
+        <ProductCard key={p.id} product={p} index={i} priority={i < 3} />
       ))}
     </div>
   )
@@ -103,7 +102,7 @@ export default async function HomePage() {
               icon={<Crown size={22} style={{ color: 'var(--gold)' }} />}
             />
             <div id="bestsellers-heading" className="sr-only">Best Sellers</div>
-            <Row products={bestsellers} />
+            <Grid products={bestsellers} />
           </section>
 
           <section aria-labelledby="catalogue-heading">
@@ -112,7 +111,7 @@ export default async function HomePage() {
               href="/shop" linkLabel="Shop all"
             />
             <div id="catalogue-heading" className="sr-only">Catalogue</div>
-            <Row products={featured} />
+            <Grid products={featured} />
           </section>
         </div>
       </div>
