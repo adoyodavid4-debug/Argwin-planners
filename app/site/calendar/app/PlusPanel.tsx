@@ -108,14 +108,13 @@ const DEFAULT_ON = new Set(['dailyBriefing', 'smartReminders', 'quietDelivery', 
 // Basic E.164-ish check: leading +, 8–15 digits.
 const phoneValid = (p: string) => /^\+\d{8,15}$/.test(p.replace(/[\s()-]/g, ''))
 
-export default function PlusPanel({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function PlusContent({ embedded = false, onClose }: { embedded?: boolean; onClose?: () => void }) {
   const supabase = useMemo(() => createClient() as any, [])
   const [s, setS] = useState<CalendarSettings>(() => defaultSettings())
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    if (!open) return
     let cancel = false
     setLoading(true)
     ;(async () => {
@@ -130,7 +129,7 @@ export default function PlusPanel({ open, onClose }: { open: boolean; onClose: (
       setLoading(false)
     })()
     return () => { cancel = true }
-  }, [open, supabase])
+  }, [supabase])
 
   const patch = (p: Partial<CalendarSettings>) => setS((prev) => ({ ...prev, ...p }))
   const toggleFeature = (key: string) => setS((prev) => {
@@ -159,7 +158,7 @@ export default function PlusPanel({ open, onClose }: { open: boolean; onClose: (
         focus_protect: !!s.features.focusProtect,
       })
       toast.success('Arwign Plus preferences saved')
-      onClose()
+      onClose?.()
     } catch {
       toast.error('Could not save — please try again.')
     } finally { setSaving(false) }
@@ -168,22 +167,9 @@ export default function PlusPanel({ open, onClose }: { open: boolean; onClose: (
   const activeCount = ALL_KEYS.filter((k) => s.features[k]).length
 
   return (
-    <AnimatePresence>
-      {open && (
-        <>
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[80]" style={{ background: 'rgba(0,0,0,0.45)' }} onClick={onClose} aria-hidden
-          />
-          <motion.aside
-            initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 32, stiffness: 320 }}
-            className="fixed right-0 top-0 z-[81] h-full w-full max-w-[560px] overflow-y-auto shadow-glass-lg"
-            style={{ background: 'var(--bg-primary)' }}
-            aria-label="Arwign Plus"
-          >
+    <div className="flex min-h-full flex-col">
             {/* Header */}
-            <div className="sticky top-0 z-10 flex items-center gap-3 border-b px-5 py-4"
+            <div className="sticky top-0 z-10 flex items-center gap-3 border-b px-4 py-3"
               style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)' }}>
               <span className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-widest"
                 style={{ background: 'rgba(var(--gold-rgb),0.12)', borderColor: 'rgba(var(--gold-rgb),0.35)', color: 'var(--gold-dark)', letterSpacing: '0.08em' }}>
@@ -194,18 +180,20 @@ export default function PlusPanel({ open, onClose }: { open: boolean; onClose: (
                 <button onClick={save} disabled={saving || loading} className="btn-primary px-4 py-2 text-sm disabled:opacity-60">
                   {saving ? <Loader2 size={15} className="animate-spin" /> : <><Check size={15} /> Save</>}
                 </button>
-                <button onClick={onClose} className="btn-ghost" aria-label="Close"><X size={18} /></button>
+                {onClose && <button onClick={onClose} className="btn-ghost" aria-label="Close"><X size={18} /></button>}
               </div>
             </div>
 
             {loading ? (
               <div className="flex items-center justify-center py-32" style={{ color: 'var(--text-muted)' }}><Loader2 className="animate-spin" /></div>
             ) : (
-              <div className="px-5 py-5 space-y-6">
-                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                  Everything a calendar should have done all along — an assistant that manages your time.
-                  Turn capabilities on, then add your phone to get the Daily Outlook Briefing by SMS.
-                </p>
+              <div className="px-4 py-5 space-y-6">
+                {!embedded && (
+                  <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                    Everything a calendar should have done all along — an assistant that manages your time.
+                    Turn capabilities on, then add your phone to get the Daily Outlook Briefing by SMS.
+                  </p>
+                )}
 
                 {/* ── SMS & briefings (the phone capture) ── */}
                 <section className="rounded-2xl border p-5" style={{ borderColor: 'rgba(var(--gold-rgb),0.35)', background: 'var(--bg-card)' }}>
@@ -309,6 +297,28 @@ export default function PlusPanel({ open, onClose }: { open: boolean; onClose: (
                 <div className="h-4" />
               </div>
             )}
+    </div>
+  )
+}
+
+// Slide-over wrapper (used on small screens / from the toolbar button).
+export default function PlusPanel({ open, onClose }: { open: boolean; onClose: () => void }) {
+  return (
+    <AnimatePresence>
+      {open && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[80]" style={{ background: 'rgba(0,0,0,0.45)' }} onClick={onClose} aria-hidden
+          />
+          <motion.aside
+            initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 32, stiffness: 320 }}
+            className="fixed right-0 top-0 z-[81] h-full w-full max-w-[560px] overflow-y-auto shadow-glass-lg"
+            style={{ background: 'var(--bg-primary)' }}
+            aria-label="Arwign Plus"
+          >
+            <PlusContent onClose={onClose} />
           </motion.aside>
         </>
       )}

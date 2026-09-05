@@ -17,7 +17,7 @@ import { parseNaturalLanguage } from '@/lib/calendar/nl'
 import { loadSettings, saveSettings, type CalendarSettings, defaultSettings } from '@/lib/calendar/settings'
 import { REMINDER_PRESETS, CHANNEL_LABELS, describeReminder } from '@/lib/calendar/reminders'
 import type { Reminder, ReminderChannel } from '@/lib/calendar/settings'
-import PlusPanel from './PlusPanel'
+import PlusPanel, { PlusContent } from './PlusPanel'
 
 // ── Types ─────────────────────────────────────────────────────
 type View = 'day' | 'week' | 'month' | 'agenda' | 'year'
@@ -489,6 +489,8 @@ export default function CalendarApp({ userEmail }: { userEmail: string }) {
         {/* ── Main ── */}
         <div className="flex-1 min-w-0">
           <div className="container-site py-5">
+            <div className="flex items-start gap-5">
+             <div className="min-w-0 flex-1">
             {/* Toolbar */}
             <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
               <div className="flex items-center gap-2">
@@ -516,7 +518,7 @@ export default function CalendarApp({ userEmail }: { userEmail: string }) {
                 <button onClick={() => fileRef.current?.click()} className="btn-ghost" title="Import .ics"><Upload size={16} /></button>
                 <button onClick={exportICS} className="btn-ghost" title="Export .ics"><Download size={16} /></button>
                 <button onClick={() => setPaletteOpen(true)} className="btn-ghost" title="Command palette (⌘K)"><Command size={16} /></button>
-                <button onClick={() => setPlusOpen(true)} className="btn-outline px-3 py-2 text-sm" title="Arwign Plus — briefings, SMS & automation"
+                <button onClick={() => setPlusOpen(true)} className="btn-outline lg:hidden px-3 py-2 text-sm" title="Arwign Plus — briefings, SMS & automation"
                   style={{ borderColor: 'rgba(var(--gold-rgb),0.5)', color: 'var(--gold-dark)' }}>
                   <Sparkles size={15} /> <span className="hidden sm:inline">Plus</span>
                 </button>
@@ -548,6 +550,14 @@ export default function CalendarApp({ userEmail }: { userEmail: string }) {
             ) : (
               <AgendaView cursor={cursor} occs={occs} onOpen={openOcc} onNew={() => setDraft(blankDraft(cursor))} />
             )}
+             </div>
+
+              {/* Static, scrollable Arwign Plus panel — right quarter (desktop) */}
+              <aside className="hidden lg:block lg:w-1/4 lg:flex-shrink-0 self-start sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto rounded-2xl border shadow-glass-md"
+                style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)' }} aria-label="Arwign Plus">
+                <PlusContent embedded />
+              </aside>
+            </div>
           </div>
         </div>
       </div>
