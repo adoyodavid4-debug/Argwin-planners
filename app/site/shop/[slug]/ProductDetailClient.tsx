@@ -179,6 +179,14 @@ export default function ProductDetailClient({ product: p, related, reviews, bund
 
             {/* share */}
             <Share title={p.title} slug={p.slug} />
+
+            {/* Full description — sits to the right of the gallery, below the buy panel */}
+            {p.description && (
+              <div className="mt-6 pt-6 border-t" style={{ borderColor: 'var(--border)' }}>
+                <h2 className="font-display text-xl mb-3" style={{ color: 'var(--text-primary)' }}>About this planner</h2>
+                <RichTextContent html={p.description} style={{ color: 'var(--text-secondary)' }} />
+              </div>
+            )}
           </div>
         </div>
 
@@ -253,23 +261,17 @@ export default function ProductDetailClient({ product: p, related, reviews, bund
           </div>
         </motion.section>
 
-        {/* Story / description */}
-        {p.description && (
-          <motion.section {...reveal()} className="mt-16 grid lg:grid-cols-[1.4fr_1fr] gap-10 items-start">
-            <div>
-              <h2 className="font-display text-2xl mb-4" style={{ color: 'var(--text-primary)' }}>About this planner</h2>
-              <RichTextContent html={p.description} style={{ color: 'var(--text-secondary)' }} />
-            </div>
-            <div className="rounded-2xl border p-6" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
-              <h3 className="font-semibold text-sm mb-4" style={{ color: 'var(--text-primary)' }}>What&rsquo;s inside</h3>
-              <ul className="flex flex-col gap-2.5">
-                {['Instant hyperlinked PDF', p.file_formats.includes('GoodNotes') ? 'GoodNotes-ready template' : 'Works in any PDF app', 'A4, US Letter & A5 sizes', p.page_count ? `${p.page_count} pages` : 'Full year of pages', 'Dotted, lined & blank layouts', 'Personal-use licence'].map((l, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}><Check size={15} style={{ color: 'var(--gold)' }} className="mt-0.5 flex-shrink-0" /> {l}</li>
-                ))}
-              </ul>
-            </div>
-          </motion.section>
-        )}
+        {/* What's inside (description now lives beside the gallery, in the buy panel) */}
+        <motion.section {...reveal()} className="mt-16">
+          <h2 className="font-display text-2xl mb-6" style={{ color: 'var(--text-primary)' }}>What&rsquo;s inside</h2>
+          <div className="rounded-2xl border p-6 max-w-2xl" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
+            <ul className="flex flex-col gap-2.5">
+              {['Instant hyperlinked PDF', p.file_formats.includes('GoodNotes') ? 'GoodNotes-ready template' : 'Works in any PDF app', 'A4, US Letter & A5 sizes', p.page_count ? `${p.page_count} pages` : 'Full year of pages', 'Dotted, lined & blank layouts', 'Personal-use licence'].map((l, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}><Check size={15} style={{ color: 'var(--gold)' }} className="mt-0.5 flex-shrink-0" /> {l}</li>
+              ))}
+            </ul>
+          </div>
+        </motion.section>
 
         {/* How to use */}
         <motion.section {...reveal()} className="mt-16">
