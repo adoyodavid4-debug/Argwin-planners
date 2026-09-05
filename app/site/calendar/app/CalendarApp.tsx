@@ -81,8 +81,22 @@ const COLOURS: Record<string, { dot: string; soft: string; label: string }> = {
   lavender: { dot: '#7B6FAE', soft: 'rgba(123,111,174,0.18)', label: 'Lavender' },
   slate:    { dot: '#5B6B78', soft: 'rgba(91,107,120,0.18)',  label: 'Slate' },
   rose:     { dot: '#B15B7E', soft: 'rgba(177,91,126,0.18)',  label: 'Rose' },
+  ocean:    { dot: '#3E7C97', soft: 'rgba(62,124,151,0.18)',  label: 'Ocean' },
+  honey:    { dot: '#C9902B', soft: 'rgba(201,144,43,0.18)',  label: 'Honey' },
+  forest:   { dot: '#4B7A4E', soft: 'rgba(75,122,78,0.18)',   label: 'Forest' },
+  plum:     { dot: '#8E5B8E', soft: 'rgba(142,91,142,0.18)',  label: 'Plum' },
 }
 const COLOUR_KEYS = Object.keys(COLOURS)
+
+// Stable string hash → palette index, so events auto-vary in colour by their
+// tag / type / title. 'brass' is treated as "auto" (unset); any other explicit
+// colour a user picks is respected as-is.
+const hashStr = (s: string) => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return Math.abs(h) }
+function resolveColour(ev: { colour?: string | null; tags?: string[] | null; event_type?: string | null; title?: string }): string {
+  if (ev.colour && ev.colour !== 'brass' && COLOURS[ev.colour]) return ev.colour
+  const seed = (ev.tags && ev.tags[0]) || ev.event_type || ev.title || 'brass'
+  return COLOUR_KEYS[hashStr(String(seed)) % COLOUR_KEYS.length]
+}
 const localTZ = typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'Africa/Nairobi'
 
 // ── Date helpers (browser-local) ──────────────────────────────
@@ -470,8 +484,9 @@ export default function CalendarApp({ userEmail }: { userEmail: string }) {
                   const on = activeTags.includes(t)
                   return (
                     <button key={t} onClick={() => setActiveTags((a) => on ? a.filter((x) => x !== t) : [...a, t])}
-                      className="rounded-full border px-2.5 py-1 text-xs"
+                      className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs"
                       style={{ background: on ? 'var(--gold)' : 'transparent', color: on ? '#fff' : 'var(--text-secondary)', borderColor: on ? 'var(--gold)' : 'var(--border)' }}>
+                      <span className="h-2 w-2 rounded-full" style={{ background: on ? '#fff' : COLOURS[resolveColour({ tags: [t] })].dot }} />
                       {t}
                     </button>
                   )
@@ -630,8 +645,8 @@ function MonthView({ cursor, weekStart, occs, DOW, compact, onNewDay, onOpen }: 
                 {list.slice(0, cap).map((o) => (
                   <button key={o.key} onClick={(e) => { e.stopPropagation(); onOpen(o) }}
                     className="flex w-full items-center gap-1 rounded px-1 py-0.5 text-left text-[11px] leading-tight truncate"
-                    style={{ background: COLOURS[o.ev.colour]?.soft ?? COLOURS.brass.soft, color: 'var(--text-primary)' }}>
-                    <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full" style={{ background: COLOURS[o.ev.colour]?.dot ?? COLOURS.brass.dot }} />
+                    style={{ background: COLOURS[resolveColour(o.ev)]?.soft ?? COLOURS.brass.soft, color: 'var(--text-primary)' }}>
+                    <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full" style={{ background: COLOURS[resolveColour(o.ev)]?.dot ?? COLOURS.brass.dot }} />
                     {!o.ev.all_day && <span className="flex-shrink-0" style={{ color: 'var(--text-muted)' }}>{fmtTime(o.start)}</span>}
                     <span className="truncate">{o.ev.title}</span>
                     {o.isRecurring && <Repeat size={9} className="flex-shrink-0 opacity-60" />}
@@ -675,7 +690,7 @@ function TimeGrid({ days, cursor, weekStart, occs, DOW, onNewAt, onOpen }: {
           <div key={i} className="min-h-[26px] border-r p-0.5" style={{ borderColor: 'var(--border)' }}>
             {occsOnDay(occs, d).filter((o) => o.ev.all_day).map((o) => (
               <button key={o.key} onClick={() => onOpen(o)} className="mb-0.5 block w-full truncate rounded px-1 text-[10px]"
-                style={{ background: COLOURS[o.ev.colour]?.soft, color: 'var(--text-primary)' }}>{o.ev.title}</button>
+                style={{ background: COLOURS[resolveColour(o.ev)]?.soft, color: 'var(--text-primary)' }}>{o.ev.title}</button>
             ))}
           </div>
         ))}
@@ -702,7 +717,7 @@ function TimeGrid({ days, cursor, weekStart, occs, DOW, onNewAt, onOpen }: {
                   return (
                     <button key={o.key} onClick={(ce) => { ce.stopPropagation(); onOpen(o) }}
                       className="absolute left-0.5 right-0.5 overflow-hidden rounded-md px-1 py-0.5 text-left text-[10px] leading-tight"
-                      style={{ top, height, background: COLOURS[o.ev.colour]?.soft, borderLeft: `3px solid ${COLOURS[o.ev.colour]?.dot}`, color: 'var(--text-primary)' }}>
+                      style={{ top, height, background: COLOURS[resolveColour(o.ev)]?.soft, borderLeft: `3px solid ${COLOURS[resolveColour(o.ev)]?.dot}`, color: 'var(--text-primary)' }}>
                       <div className="truncate font-medium">{o.ev.title}</div>
                       <div style={{ color: 'var(--text-muted)' }}>{fmtTime(o.start)}</div>
                     </button>
@@ -748,7 +763,7 @@ function AgendaView({ cursor, occs, onOpen, onNew }: { cursor: Date; occs: Occ[]
             <div className="space-y-1.5">
               {list.map((o) => (
                 <button key={o.key} onClick={() => onOpen(o)} className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors hover:bg-black/[0.03]">
-                  <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ background: COLOURS[o.ev.colour]?.dot }} />
+                  <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ background: COLOURS[resolveColour(o.ev)]?.dot }} />
                   <span className="w-24 flex-shrink-0 text-xs" style={{ color: 'var(--text-muted)' }}>{o.ev.all_day ? 'All day' : `${fmtTime(o.start)}–${fmtTime(o.end)}`}</span>
                   <span className="flex-1 text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>{o.ev.title}</span>
                   {o.isRecurring && <Repeat size={12} className="opacity-50" style={{ color: 'var(--text-muted)' }} />}
@@ -866,7 +881,10 @@ function TodayRail({ occs, onOpen, onOpenPlus }: { occs: Occ[]; onOpen: (o: Occ)
         )}
 
         {timed.length === 0 ? (
-          <p className="py-6 text-center text-sm" style={{ color: 'var(--text-muted)' }}>Nothing scheduled. A good day for focus.</p>
+          <div className="py-8 text-center">
+            <div className="mb-1 text-3xl" aria-hidden>🌿</div>
+            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Nothing scheduled. A good day for focus.</p>
+          </div>
         ) : (
           <div className="space-y-1.5">
             {timed.map((o) => {
@@ -876,7 +894,7 @@ function TodayRail({ occs, onOpen, onOpenPlus }: { occs: Occ[]; onOpen: (o: Occ)
                 <button key={o.key} onClick={() => onOpen(o)}
                   className="flex w-full items-start gap-3 rounded-xl border px-3 py-2.5 text-left transition-colors hover:bg-black/[0.03]"
                   style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}>
-                  <span className="mt-0.5 h-8 w-1 flex-shrink-0 rounded-full" style={{ background: o.ev.colour || 'var(--gold)' }} />
+                  <span className="mt-0.5 h-8 w-1 flex-shrink-0 rounded-full" style={{ background: COLOURS[resolveColour(o.ev)]?.dot || 'var(--gold)' }} />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
                       <span className="font-mono text-xs" style={{ color: 'var(--text-muted)' }}>{fmtTime(o.start)}</span>
@@ -1016,7 +1034,7 @@ function CommandPalette({ onClose, occs, actions }: {
           {events.length > 0 && <p className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase" style={{ color: 'var(--text-muted)' }}>Events</p>}
           {events.map((o) => (
             <button key={o.key} onClick={() => actions.openOcc(o)} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm hover:bg-black/[0.05]" style={{ color: 'var(--text-primary)' }}>
-              <span className="h-2 w-2 rounded-full" style={{ background: COLOURS[o.ev.colour]?.dot }} />
+              <span className="h-2 w-2 rounded-full" style={{ background: COLOURS[resolveColour(o.ev)]?.dot }} />
               <span className="truncate">{o.ev.title}</span>
               <span className="ml-auto text-xs" style={{ color: 'var(--text-muted)' }}>{ymd(o.start)}</span>
             </button>
