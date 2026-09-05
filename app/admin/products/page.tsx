@@ -15,7 +15,7 @@ export default async function AdminProductsPage() {
     .from('products')
     .select('id, title, slug, status, price, currency, thumbnail, is_featured, is_bestseller, is_new, delivery_type, product_type, fulfillment_options, tags, rating_avg, rating_count, download_count, created_at, updated_at, categories(name, slug)')
     .order('created_at', { ascending: false })
-    .limit(200)
+    .limit(2000)
 
   const { data: categories } = await supabase
     .from('categories')
