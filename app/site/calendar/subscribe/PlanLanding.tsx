@@ -534,8 +534,8 @@ function SubscribeCard({ plan, name, price, period }: { plan: Plan; name: string
   const [error, setError] = useState<string | null>(null)
   const [checkEmail, setCheckEmail] = useState(false)
 
-  // Teams lands in the team workspace; Plus in the personal calendar app.
-  const dest = plan === 'teams' ? '/calendar/team' : '/calendar/app'
+  // Teams lands in the team workspace; Plus in the Plus workspace.
+  const dest = plan === 'teams' ? '/calendar/team' : '/calendar/plus'
   const nextUrl = dest
 
   const submit = async (e: React.FormEvent) => {

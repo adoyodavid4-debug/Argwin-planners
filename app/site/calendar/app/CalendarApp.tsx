@@ -503,6 +503,7 @@ export default function CalendarApp({ userEmail }: { userEmail: string }) {
               style={{ color: 'var(--gold-dark)' }}>
               <Sparkles size={15} /> Arwign Plus
             </button>
+            <SideLink href="/calendar/plus" icon={<Sparkles size={15} />} label="Plus workspace" />
             <SideLink href="/calendar/team" icon={<Users size={15} />} label="Team workspace" />
             <SideLink href="/calendar/booking-pages" icon={<Link2 size={15} />} label="Booking pages" />
             <SideLink href="/calendar/polls" icon={<CalendarDays size={15} />} label="Meeting polls" />
