@@ -474,7 +474,6 @@ export default function CalendarApp({ userEmail }: { userEmail: string }) {
             <span className="font-display text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Arwign</span>
           </div>
           <button onClick={() => setDraft(blankDraft(cursor))} className="btn-primary justify-center py-2.5"><Plus size={16} /> New event</button>
-          <MiniMonth cursor={cursor} weekStart={weekStart} onPick={(d) => { setCursor(d); setView('day') }} />
 
           {allTags.length > 0 && (
             <div>
@@ -497,7 +496,7 @@ export default function CalendarApp({ userEmail }: { userEmail: string }) {
 
           {(settings.world_clocks ?? []).length > 0 && <WorldClocks zones={settings.world_clocks} />}
 
-          <nav className="my-auto space-y-1 text-sm">
+          <nav className="space-y-1 text-sm">
             <button onClick={() => setPlusOpen(true)}
               className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 font-semibold transition-colors hover:bg-black/[0.04]"
               style={{ color: 'var(--gold-dark)' }}>
@@ -919,25 +918,6 @@ function TodayRail({ occs, onOpen, onOpenPlus }: { occs: Occ[]; onOpen: (o: Occ)
         <button onClick={onOpenPlus} className="w-full text-center text-xs font-semibold" style={{ color: 'var(--gold)' }}>
           Briefing, SMS &amp; automation settings →
         </button>
-      </div>
-    </div>
-  )
-}
-
-function MiniMonth({ cursor, weekStart, onPick }: { cursor: Date; weekStart: number; onPick: (d: Date) => void }) {
-  const start = startOfWeek(startOfMonth(cursor), weekStart)
-  const days = Array.from({ length: 42 }, (_, i) => addDays(start, i))
-  return (
-    <div>
-      <p className="mb-2 text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{MONTHS[cursor.getMonth()]} {cursor.getFullYear()}</p>
-      <div className="grid grid-cols-7 gap-0.5 text-center text-[10px]">
-        {dowLabels(weekStart).map((d) => <div key={d} style={{ color: 'var(--text-muted)' }}>{d[0]}</div>)}
-        {days.map((day, i) => (
-          <button key={i} onClick={() => onPick(day)} className="flex h-6 items-center justify-center rounded-md"
-            style={{ opacity: day.getMonth() === cursor.getMonth() ? 1 : 0.35, background: isToday(day) ? 'var(--gold)' : 'transparent', color: isToday(day) ? '#fff' : 'var(--text-secondary)' }}>
-            {day.getDate()}
-          </button>
-        ))}
       </div>
     </div>
   )
