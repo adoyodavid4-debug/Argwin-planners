@@ -97,7 +97,7 @@ export default async function HomePage() {
         <div className="flex-1 min-w-0 lg:order-1 space-y-14">
           <section aria-labelledby="bestsellers-heading">
             <SectionHeader
-              eyebrow="Reader Favourites" title="Best Sellers"
+              eyebrow="Arwigners' Favourite" title="Best Sellers"
               href="/best-sellers" linkLabel="View all"
               icon={<Crown size={22} style={{ color: 'var(--gold)' }} />}
             />

@@ -96,7 +96,7 @@ function BestSellerCard({ covers, index }: { covers: HeroCover[]; index: number 
           </span>
 
           <span className="block pt-3">
-            <HeroTitle>Reader favourites</HeroTitle>
+            <HeroTitle>{"Arwigners' Favourite"}</HeroTitle>
             <HeroMeta>
               <Star size={12} style={{ fill: 'var(--gold)', stroke: 'var(--gold)' }} />
               4.9 <span style={{ color: 'var(--text-muted)' }}>· 12k+ happy planners</span>
