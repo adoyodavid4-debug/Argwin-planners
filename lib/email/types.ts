@@ -21,6 +21,7 @@ export interface EmailProvider {
     data: Record<string, unknown>
     idempotencyKey: string
     category?: EmailCategory
+    attachments?: { filename: string; content: Buffer | string }[]
   }): Promise<{ messageId: string }>
 
   upsertContact(input: {

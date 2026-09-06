@@ -79,15 +79,16 @@ export default async function ReceiptPage({ params }: { params: { id: string } }
       <style>{`@media print { body { background:#fff !important; } .no-print { display:none !important; } @page { margin: 16mm; } }`}</style>
 
       <div style={{ maxWidth: 640, margin: '0 auto', padding: '40px 20px' }}>
-        <ReceiptActions downloadHref={`/checkout/success?order=${o.id}`} />
+        <ReceiptActions downloadHref={`/checkout/success?order=${o.id}`} pdfHref={`/receipt/${o.id}/pdf`} />
 
         {/* Receipt document */}
         <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: '40px', boxShadow: '0 8px 30px rgba(44,42,53,0.06)' }}>
           {/* Header */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
             <div>
-              <p style={{ fontSize: 20, fontWeight: 800, letterSpacing: 2, color: C.gold, margin: 0 }}>ARWIGN PLANNERS</p>
-              <p style={{ fontSize: 13, color: C.muted, margin: '4px 0 0' }}>arwignplanners.com</p>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.png" alt="Arwign Planners" style={{ height: 36, width: 'auto', display: 'block' }} />
+              <p style={{ fontSize: 13, color: C.muted, margin: '8px 0 0' }}>arwignplanners.com</p>
             </div>
             <div style={{ textAlign: 'right' }}>
               <h1 style={{ fontSize: 26, margin: 0, color: C.ink }}>Receipt</h1>
@@ -129,9 +130,10 @@ export default async function ReceiptPage({ params }: { params: { id: string } }
           <div style={{ marginTop: 8, marginLeft: 'auto', width: 'min(100%, 280px)' }}>
             <Row label="Subtotal" value={money(o.amount_subtotal ?? o.amount_total)} />
             {hasDiscount && <Row label={`Discount${o.coupon_code ? ` (${o.coupon_code})` : ''}`} value={`− ${money(o.amount_discount)}`} accent />}
+            <p style={{ fontSize: 11, color: C.muted, textAlign: 'right', margin: '6px 0 0' }}>Digital goods — no tax applied</p>
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0 0', marginTop: 8, borderTop: `2px solid ${C.border}` }}>
               <span style={{ fontWeight: 800, fontSize: 15 }}>Total</span>
-              <span style={{ fontWeight: 800, fontSize: 15, color: C.gold }}>{money(o.amount_total)}</span>
+              <span style={{ fontWeight: 800, fontSize: 15, color: C.gold }}>{money(o.amount_total)} {currency}</span>
             </div>
           </div>
 
@@ -141,7 +143,8 @@ export default async function ReceiptPage({ params }: { params: { id: string } }
           </p>
           <div style={{ marginTop: 24, paddingTop: 18, borderTop: `1px solid ${C.border}`, fontSize: 12, color: C.muted, lineHeight: 1.7 }}>
             <strong style={{ color: C.ink }}>Arwign Planners</strong> · Premium digital &amp; printable planners<br />
-            Questions about this receipt? <a href="mailto:support@arwignplanners.com" style={{ color: C.gold }}>support@arwignplanners.com</a>
+            Questions about this receipt? <a href="mailto:support@arwignplanners.com" style={{ color: C.gold }}>support@arwignplanners.com</a><br />
+            See our <a href="/refund" style={{ color: C.gold }}>refund policy</a>.
           </div>
         </div>
 

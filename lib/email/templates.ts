@@ -213,9 +213,10 @@ const templates: Record<string, (locale: Locale, data: Record<string, unknown>) 
 
       <table role="presentation" width="100%" style="border-collapse:collapse;margin-bottom:8px">
         ${itemRows}
+        <tr><td colspan="2" style="padding:8px 0 0;font-size:11px;color:#8A8578;text-align:right">Digital goods — no tax applied</td></tr>
         <tr>
           <td style="padding:14px 0;font-weight:700;color:#1A1820;font-size:15px">Total</td>
-          <td style="padding:14px 0;font-weight:700;color:#C9A84C;font-size:15px;text-align:right">${money(total)}</td>
+          <td style="padding:14px 0;font-weight:700;color:#C9A84C;font-size:15px;text-align:right">${money(total)} ${currency}</td>
         </tr>
       </table>
 

@@ -27,6 +27,7 @@ export class ResendProvider implements EmailProvider {
     data: Record<string, unknown>
     idempotencyKey: string
     category?: EmailCategory
+    attachments?: { filename: string; content: Buffer | string }[]
   }) {
     const { subject, html } = resolveTemplate(input.templateKey, input.locale, input.data)
     const from = FROM_ADDRESSES[input.category ?? 'info']
@@ -37,6 +38,7 @@ export class ResendProvider implements EmailProvider {
       subject,
       html,
       headers: { 'X-Idempotency-Key': input.idempotencyKey },
+      ...(input.attachments?.length ? { attachments: input.attachments } : {}),
     })
 
     if (error || !data) {
