@@ -33,7 +33,15 @@ export default function SubscribePayPal({ plan, onPaid }: { plan: 'plus' | 'team
       window.paypal.Buttons({
         style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'subscribe', height: 44 },
         createSubscription: (_d: unknown, actions: any) =>
-          actions.subscription.create({ plan_id: planId, custom_id: uid.current }),
+          actions.subscription.create({
+            plan_id: planId,
+            custom_id: uid.current,
+            application_context: {
+              brand_name: 'Arwign Planners',
+              shipping_preference: 'NO_SHIPPING',
+              user_action: 'SUBSCRIBE_NOW',
+            },
+          }),
         onApprove: async (data: { subscriptionID?: string }) => {
           setBusy(true)
           try {

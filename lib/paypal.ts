@@ -55,6 +55,11 @@ export async function createPayPalOrder({
     },
     body: JSON.stringify({
       intent: 'CAPTURE',
+      application_context: {
+        brand_name: 'Arwign Planners',
+        shipping_preference: 'NO_SHIPPING',
+        user_action: 'PAY_NOW',
+      },
       purchase_units: [{
         reference_id: referenceId,
         custom_id:    referenceId,
