@@ -196,7 +196,7 @@ export default function Navbar({
             </button>
 
             {/* Wishlist */}
-            <Link href="/customer/dashboard?tab=wishlist" className="btn-icon hidden sm:inline-flex" aria-label="Wishlist">
+            <Link href="/customer/notebooks" className="btn-icon hidden sm:inline-flex" aria-label="My notebooks">
               <Heart size={18} />
             </Link>
 
@@ -323,7 +323,7 @@ export default function Navbar({
                   </button>
                 )}
                 <Link href="/auth/login" className="btn-outline w-full justify-center mb-3">Sign In</Link>
-                <Link href="/auth/register" className="btn-primary w-full justify-center">Create Account</Link>
+                <Link href="/auth/login?mode=signup" className="btn-primary w-full justify-center">Create Account</Link>
               </div>
             </div>
           </motion.aside>

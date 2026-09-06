@@ -649,48 +649,48 @@ const CONTENT: Record<string, React.FC<{ post: BlogPost }>> = {
 // ── Per-post sidebar product ──────────────────────────────────
 const SIDEBAR_PRODUCTS: Record<string, { name: string; blurb: string; price: string; href: string }> = {
   'science-66-day-habit-loop': {
-    name:  '66-Day Habit Tracker — Printable',
+    name:  'Tiny Anchors — Habit & Routine Builder',
     blurb: 'The tracker built around the research in this article. Track up to 5 habits, log your triggers, and visualise your 66-day arc.',
-    price: '$4.99',
-    href:  '/shop/66-day-habit-tracker-printable',
+    price: '$13.99',
+    href:  '/shop/tiny-anchors-a-habit-routine-builder',
   },
   'goodnotes-vs-notability-planner': {
-    name:  '2025 Ultimate Digital Planner',
+    name:  'Neurodivergent Set — ADHD-Friendly Planner',
     blurb: 'Fully hyperlinked, tested in both GoodNotes 6 and Notability. Works on iPad, iPhone, and Mac — start planning in under 60 seconds.',
-    price: '$14.99',
-    href:  '/shop/ultimate-digital-planner-2025',
+    price: '$13.99',
+    href:  '/shop/neurodivergent-set-adhd-friendly-planner',
   },
   'digital-planner-morning-routine': {
-    name:  'Minimalist Digital Planner — Undated',
+    name:  'Undated Digital Monthly Planner',
     blurb: 'Clean daily and weekly spreads designed for intentional mornings. Start any day of the year.',
     price: '$9.99',
-    href:  '/shop/minimalist-digital-planner-undated',
+    href:  '/shop/undated-monthly-planner-digital-connect',
   },
   'budget-planning-monthly-tracker-guide': {
-    name:  'Monthly Budget Planner & Finance Tracker',
+    name:  'Penny by Penny Savings & Budget Planner',
     blurb: 'Step-by-step budget spreads built around the method described in this guide. Income, bills, savings, and debt — all in one place.',
-    price: '$11.99',
-    href:  '/shop/monthly-budget-planner-finance-tracker',
+    price: '$12.99',
+    href:  '/shop/penny-by-penny-savings-budget-planner',
   },
   'student-planner-guide-academic-year': {
-    name:  'Academic Digital Planner 2025–2026',
+    name:  'The Balanced Student',
     blurb: 'Semester overviews, weekly study plans, assignment trackers, and exam countdowns. Runs August 2025 – July 2026.',
     price: '$12.99',
-    href:  '/shop/academic-digital-planner-2025-2026',
+    href:  '/shop/the-balanced-student',
   },
   'self-care-wellness-routine-that-sticks': {
-    name:  'Self-Care & Wellness Journal',
+    name:  'Small Good Things — A Gratitude Journal',
     blurb: 'Daily mood check-ins, gratitude prompts, water tracker, and weekly reflection spreads. For the wellness routine that actually sticks.',
-    price: '$10.99',
-    href:  '/shop/self-care-wellness-journal',
+    price: '$13.99',
+    href:  '/shop/small-good-things-a-gratitude-journal',
   },
 }
 
 const DEFAULT_PRODUCT = {
-  name:  'The Complete Planner Bundle — 8 Planners',
-  blurb: 'Every Arwign bestseller in one download. Over 60% off individual prices.',
-  price: '$39.99',
-  href:  '/shop/complete-planner-bundle',
+  name:  'Browse the Full Collection',
+  blurb: 'Explore the full Arwign collection — digital and printable planners for every part of your life.',
+  price: 'from $9.99',
+  href:  '/shop',
 }
 
 function formatDate(iso: string) {

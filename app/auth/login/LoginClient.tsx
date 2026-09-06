@@ -14,7 +14,7 @@ export default function LoginClient() {
   const redirectTo   = searchParams.get('redirect') || '/'
   const isAdminArea  = redirectTo.startsWith('/admin')
 
-  const [mode,       setMode]       = useState<'signin' | 'signup'>('signin')
+  const [mode,       setMode]       = useState<'signin' | 'signup'>(searchParams.get('mode') === 'signup' ? 'signup' : 'signin')
   const [fullName,   setFullName]   = useState('')
   const [email,      setEmail]      = useState('')
   const [password,   setPassword]   = useState('')
