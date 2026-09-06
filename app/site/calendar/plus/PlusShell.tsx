@@ -1,11 +1,14 @@
 'use client'
 import { useState, type ReactNode } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import toast from 'react-hot-toast'
 import {
   ArrowLeft, Sparkles, LayoutGrid, BellRing, Brain, ShieldCheck, PlugZap,
-  Link2, Wand2, BarChart3, CreditCard, Menu, X, Info,
+  Link2, Wand2, BarChart3, CreditCard, Menu, X, Info, Loader2, BookOpen,
 } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
+import { saveSettings } from '@/lib/calendar/settings'
 import { type PlusWorkspace } from '@/lib/calendar/plus'
 
 const NAV: { href: string; label: string; icon: typeof LayoutGrid; exact?: boolean }[] = [
@@ -18,6 +21,7 @@ const NAV: { href: string; label: string; icon: typeof LayoutGrid; exact?: boole
   { href: '/calendar/plus/automation', label: 'Automation & rules', icon: Wand2 },
   { href: '/calendar/plus/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/calendar/plus/subscription', label: 'Subscription', icon: CreditCard },
+  { href: '/calendar/plus/guide', label: 'How to use & integrate', icon: BookOpen },
 ]
 
 export default function PlusShell({
@@ -30,8 +34,18 @@ export default function PlusShell({
   children: ReactNode
 }) {
   const pathname = usePathname()
+  const router = useRouter()
   const [mobileNav, setMobileNav] = useState(false)
+  const [busy, setBusy] = useState(false)
   const { profile } = workspace
+
+  const goLive = async () => {
+    setBusy(true)
+    const supabase = createClient() as any
+    try { await saveSettings(supabase, {}); toast.success('Live data enabled'); router.refresh() }
+    catch { toast.error('Could not enable — please try again.') }
+    finally { setBusy(false) }
+  }
 
   const isActive = (href: string, exact?: boolean) =>
     exact ? pathname === href : pathname === href || pathname.startsWith(href + '/')
@@ -97,13 +111,16 @@ export default function PlusShell({
         <div className="min-w-0 flex-1">
           <div className="container-site py-6">
             {!workspace.live && (
-              <div className="mb-5 flex items-start gap-2.5 rounded-xl border px-4 py-3 text-sm"
+              <div className="mb-5 flex flex-wrap items-center gap-3 rounded-xl border px-4 py-3 text-sm"
                 style={{ borderColor: 'rgba(var(--gold-rgb),0.35)', background: 'rgba(var(--gold-rgb),0.08)', color: 'var(--text-secondary)' }}>
-                <Info size={16} className="mt-0.5 flex-shrink-0" style={{ color: 'var(--gold)' }} />
-                <span>
+                <Info size={16} className="flex-shrink-0" style={{ color: 'var(--gold)' }} />
+                <span className="min-w-0 flex-1">
                   <strong style={{ color: 'var(--text-primary)' }}>Preview with sample data.</strong>{' '}
-                  Your real briefing, integrations and rules persist to <code>calendar_settings</code> &amp; migration <code>021_plus.sql</code> — every control below is wired for it.
+                  Enable live data to persist your briefing, connections and rules to your account.
                 </span>
+                <button onClick={goLive} disabled={busy} className="btn-primary px-3.5 py-1.5 text-xs disabled:opacity-60">
+                  {busy ? <Loader2 size={13} className="animate-spin" /> : <>Enable live data</>}
+                </button>
               </div>
             )}
 

@@ -1,12 +1,14 @@
 'use client'
 import { useState, type ReactNode } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import toast from 'react-hot-toast'
 import {
   ArrowLeft, Users, LayoutGrid, CalendarDays, DoorOpen, Globe2, Link2,
-  ShieldCheck, BarChart3, Settings as SettingsIcon, Menu, X, Info, Building2,
+  ShieldCheck, BarChart3, Settings as SettingsIcon, Menu, X, Info, Building2, Loader2, BookOpen,
 } from 'lucide-react'
-import { ROLES, type TeamWorkspace, type Role } from '@/lib/calendar/team'
+import { createClient } from '@/lib/supabase/client'
+import { ROLES, provisionTeam, byId, type TeamWorkspace, type Role } from '@/lib/calendar/team'
 
 const NAV: { href: string; label: string; icon: typeof Users; exact?: boolean }[] = [
   { href: '/calendar/team', label: 'Overview', icon: LayoutGrid, exact: true },
@@ -18,12 +20,14 @@ const NAV: { href: string; label: string; icon: typeof Users; exact?: boolean }[
   { href: '/calendar/team/audit', label: 'Delegation & audit', icon: ShieldCheck },
   { href: '/calendar/team/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/calendar/team/settings', label: 'Admin console', icon: SettingsIcon },
+  { href: '/calendar/team/guide', label: 'How to use & integrate', icon: BookOpen },
 ]
 
 export default function TeamShell({
-  workspace, currentRole = 'owner', title, subtitle, actions, children,
+  workspace, currentRole, title, subtitle, actions, children,
 }: {
   workspace: TeamWorkspace
+  /** Usually omitted — derived from the signed-in member. Pass only to override. */
   currentRole?: Role
   title: string
   subtitle?: string
@@ -31,8 +35,22 @@ export default function TeamShell({
   children: ReactNode
 }) {
   const pathname = usePathname()
+  const router = useRouter()
   const [mobileNav, setMobileNav] = useState(false)
+  const [busy, setBusy] = useState(false)
   const { team } = workspace
+  // The signed-in member's real role drives the footer label and any role UI.
+  const role: Role = currentRole ?? byId(workspace.members, workspace.currentMemberId)?.role ?? 'owner'
+
+  const goLive = async () => {
+    setBusy(true)
+    const supabase = createClient() as any
+    const { data: { user } } = await supabase.auth.getUser()
+    const res = await provisionTeam(supabase, { ownerEmail: user?.email ?? '', timezone: workspace.team.timezone })
+    setBusy(false)
+    if (res.ok) { toast.success('Your team is ready'); router.refresh() }
+    else toast.error(res.error ?? 'Could not create your team')
+  }
 
   const isActive = (href: string, exact?: boolean) =>
     exact ? pathname === href : pathname === href || pathname.startsWith(href + '/')
@@ -75,7 +93,7 @@ export default function TeamShell({
       </nav>
 
       <div className="mt-auto rounded-xl border p-3 text-[11px]" style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}>
-        You are <strong style={{ color: 'var(--text-secondary)' }}>{ROLES[currentRole].label}</strong> on this team.
+        You are <strong style={{ color: 'var(--text-secondary)' }}>{ROLES[role].label}</strong> on this team.
       </div>
     </div>
   )
@@ -103,13 +121,16 @@ export default function TeamShell({
         <div className="min-w-0 flex-1">
           <div className="container-site py-6">
             {!workspace.live && (
-              <div className="mb-5 flex items-start gap-2.5 rounded-xl border px-4 py-3 text-sm"
+              <div className="mb-5 flex flex-wrap items-center gap-3 rounded-xl border px-4 py-3 text-sm"
                 style={{ borderColor: 'rgba(var(--gold-rgb),0.35)', background: 'rgba(var(--gold-rgb),0.08)', color: 'var(--text-secondary)' }}>
-                <Info size={16} className="mt-0.5 flex-shrink-0" style={{ color: 'var(--gold)' }} />
-                <span>
+                <Info size={16} className="flex-shrink-0" style={{ color: 'var(--gold)' }} />
+                <span className="min-w-0 flex-1">
                   <strong style={{ color: 'var(--text-primary)' }}>Preview with sample data.</strong>{' '}
-                  Apply migration <code>020_teams.sql</code> and provision a team to go live — every section below is wired for it.
+                  Create your team to go live — members, roles, resources and approvals then persist to your workspace.
                 </span>
+                <button onClick={goLive} disabled={busy} className="btn-primary px-3.5 py-1.5 text-xs disabled:opacity-60">
+                  {busy ? <Loader2 size={13} className="animate-spin" /> : <>Create my team</>}
+                </button>
               </div>
             )}
 
