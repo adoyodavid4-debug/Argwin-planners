@@ -107,6 +107,7 @@ export async function fulfilDigitalOrder(supabase: SupabaseClient, orderId: stri
           total:          order.amount_total,
           currency:       order.currency ?? 'USD',
           payment_method: PAYMENT_METHOD_LABELS[order.payment_method ?? ''] ?? order.payment_method ?? 'Card',
+          receipt_url:    `${APP_URL}/receipt/${orderId}`,
           downloads:      items
             .filter((i) => tokens[i.product_id])
             .map((i) => ({ title: i.title, url: `${APP_URL}/api/download/${tokens[i.product_id]}` })),

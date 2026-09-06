@@ -174,6 +174,7 @@ const templates: Record<string, (locale: Locale, data: Record<string, unknown>) 
     const total         = Number(data.total ?? 0)
     const paymentMethod = String(data.payment_method ?? 'Card')
     const supportEmail  = String(data.support_email ?? 'support@arwignplanners.com')
+    const receiptUrl    = String(data.receipt_url ?? '')
     const items         = (data.items ?? []) as { title: string; price: number; quantity: number }[]
     const downloads     = (data.downloads ?? []) as { title: string; url: string }[]
 
@@ -226,6 +227,8 @@ const templates: Record<string, (locale: Locale, data: Record<string, unknown>) 
       <p style="font-size:13px;color:#888;margin-top:16px">Download links are personal to you and expire in 12 months. Please save your files somewhere safe.</p>
       ` : ''}
 
+      ${receiptUrl ? `<p style="margin-top:24px"><a href="${receiptUrl}" style="background:#1A1820;color:#fff;padding:11px 22px;border-radius:8px;text-decoration:none;font-weight:600;font-size:13px;display:inline-block">View &amp; print receipt →</a></p>` : ''}
+
       <p style="margin-top:32px">Need a hand? Just reply to this email or write to <a href="mailto:${supportEmail}">${supportEmail}</a> — we're happy to help.</p>
       <p style="margin:24px 0 0">Happy planning!<br>— The Arwign Planners Team</p>
     </div></body></html>`
@@ -241,6 +244,7 @@ const templates: Record<string, (locale: Locale, data: Record<string, unknown>) 
       '',
       ...(downloads.length ? ['Your downloads (links expire in 12 months):', ...downloads.map((d) => `${d.title}: ${d.url}`)] : []),
       '',
+      ...(receiptUrl ? [`View & print receipt: ${receiptUrl}`, ''] : []),
       `Support: ${supportEmail}`,
     ].join('\n')
 

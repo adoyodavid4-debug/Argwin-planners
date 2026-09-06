@@ -214,7 +214,8 @@ export default async function CheckoutSuccessPage({
           <a href="mailto:support@arwignplanners.com" style={{ color: 'var(--gold)' }}>support@arwignplanners.com</a>
         </p>
 
-        <div className="flex justify-center">
+        <div className="flex justify-center gap-3 flex-wrap">
+          <Link href={`/receipt/${order.id}`} className="btn-primary text-sm">View &amp; print receipt</Link>
           <Link href="/shop" className="btn-outline text-sm">Continue Shopping</Link>
         </div>
       </div>
