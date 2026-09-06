@@ -1,10 +1,11 @@
 'use client'
-import { useState, type ElementType } from 'react'
+import { useState, useEffect, type ElementType } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
+import SubscribePayPal from './SubscribePayPal'
 import {
   Check, Loader2, ArrowLeft, ArrowRight, Mail, Lock, User, Sparkles, Users,
   PlugZap, Brain, Palette, Vote, Bell, MessageSquare, Clock, CalendarDays,
@@ -533,6 +534,17 @@ function SubscribeCard({ plan, name, price, period }: { plan: Plan; name: string
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [checkEmail, setCheckEmail] = useState(false)
+  const [payStep, setPayStep] = useState(false)
+
+  // Already signed in? Skip straight to payment.
+  useEffect(() => {
+    let alive = true
+    ;(async () => {
+      const { data: { user } } = await createClient().auth.getUser()
+      if (alive && user) setPayStep(true)
+    })()
+    return () => { alive = false }
+  }, [])
 
   // Teams lands in the team workspace; Plus in the Plus workspace.
   const dest = plan === 'teams' ? '/calendar/team' : '/calendar/plus'
@@ -543,20 +555,11 @@ function SubscribeCard({ plan, name, price, period }: { plan: Plan; name: string
     if (!email.trim() || !password) { setError('Email and password are required.'); return }
     setSubmitting(true); setError(null)
     const supabase = createClient()
-    // Activate the paid plan for the now-authenticated user. (Server-side hook;
-    // gated by a real payment check once billing is live.)
-    const activate = () =>
-      fetch('/api/calendar/activate-plan', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan }),
-      }).catch(() => {})
     try {
       if (mode === 'signin') {
         const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
         if (error) throw error
-        await activate()
-        toast.success(`Welcome back! Setting up ${name}…`)
-        router.push(dest); router.refresh()
+        setPayStep(true) // now authenticated → collect payment
       } else {
         const { data, error } = await supabase.auth.signUp({
           email: email.trim(), password,
@@ -566,7 +569,7 @@ function SubscribeCard({ plan, name, price, period }: { plan: Plan; name: string
           },
         })
         if (error) throw error
-        if (data.session) { await activate(); toast.success(`Account created! Setting up ${name}…`); router.push(dest); router.refresh() }
+        if (data.session) setPayStep(true)
         else setCheckEmail(true)
       }
     } catch (err: any) {
@@ -581,7 +584,25 @@ function SubscribeCard({ plan, name, price, period }: { plan: Plan; name: string
           <div className="mb-3 text-4xl">📩</div>
           <h3 className="font-display text-xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Confirm your email</h3>
           <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-            We’ve sent a confirmation link to <strong>{email}</strong>. Click it to activate your account, and you’ll come right back to finish subscribing to {name}.
+            We’ve sent a confirmation link to <strong>{email}</strong>. Click it to activate your account, then come back to finish subscribing to {name}.
+          </p>
+        </div>
+      ) : payStep ? (
+        <div>
+          <div className="mb-1 flex items-baseline gap-1.5">
+            <span className="font-display text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>{price}</span>
+            <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{period}</span>
+          </div>
+          <p className="mb-4 mt-3 text-sm" style={{ color: 'var(--text-secondary)' }}>
+            You’re signed in. Pay securely to activate <strong>{name}</strong> — one month, billed monthly. Cancel anytime.
+          </p>
+          <SubscribePayPal
+            plan={plan}
+            onPaid={() => { toast.success(`${name} activated — welcome!`); router.push(dest); router.refresh() }}
+          />
+          <p className="mt-4 text-center text-[11px]" style={{ color: 'var(--text-muted)' }}>
+            {price} {period} · secure payment via PayPal or card · by continuing you agree to our{' '}
+            <Link href="/terms" style={{ color: 'var(--gold)' }}>Terms</Link>.
           </p>
         </div>
       ) : (
