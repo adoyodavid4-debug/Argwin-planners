@@ -85,6 +85,12 @@ const nextConfig = {
       { source: '/blog',            destination: '/site/blog',            permanent: false },
       { source: '/blog/:path*',     destination: '/site/blog/:path*',     permanent: false },
 
+      // Support & legal
+      { source: '/faq',             destination: '/site/faq',             permanent: false },
+      { source: '/privacy',         destination: '/site/privacy',         permanent: false },
+      { source: '/terms',           destination: '/site/terms',           permanent: false },
+      { source: '/refund',          destination: '/site/refund',          permanent: false },
+
       // Notebooks
       { source: '/notebooks',       destination: '/site/notebooks',       permanent: false },
       { source: '/notebooks/:path*',destination: '/site/notebooks/:path*',permanent: false },
