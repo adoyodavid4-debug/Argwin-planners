@@ -500,7 +500,7 @@ export default function CalendarApp({ userEmail }: { userEmail: string }) {
             <button onClick={() => setPlusOpen(true)}
               className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 font-semibold transition-colors hover:bg-black/[0.04]"
               style={{ color: 'var(--gold-dark)' }}>
-              <Sparkles size={15} /> Arwign Plus
+              <Sparkles size={15} /> Plans & upgrade
             </button>
             <SideLink href="/calendar/plus" icon={<Sparkles size={15} />} label="Plus workspace" />
             <SideLink href="/calendar/team" icon={<Users size={15} />} label="Team workspace" />
@@ -541,9 +541,9 @@ export default function CalendarApp({ userEmail }: { userEmail: string }) {
                 <button onClick={() => fileRef.current?.click()} className="btn-ghost" title="Import .ics"><Upload size={16} /></button>
                 <button onClick={exportICS} className="btn-ghost" title="Export .ics"><Download size={16} /></button>
                 <button onClick={() => setPaletteOpen(true)} className="btn-ghost" title="Command palette (⌘K)"><Command size={16} /></button>
-                <button onClick={() => setPlusOpen(true)} className="btn-outline px-3 py-2 text-sm" title="Arwign Plus — briefings, SMS & automation"
+                <button onClick={() => setPlusOpen(true)} className="btn-outline px-3 py-2 text-sm" title="Plans & upgrade"
                   style={{ borderColor: 'rgba(var(--gold-rgb),0.5)', color: 'var(--gold-dark)' }}>
-                  <Sparkles size={15} /> <span className="hidden sm:inline">Plus</span>
+                  <Sparkles size={15} /> <span className="hidden sm:inline">Upgrade</span>
                 </button>
                 <button onClick={() => setDraft(blankDraft(cursor))} className="btn-primary px-3 py-2 text-sm"><Plus size={15} /> New</button>
                 <input ref={fileRef} type="file" accept=".ics,text/calendar" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) importICS(f); e.currentTarget.value = '' }} />
@@ -849,7 +849,7 @@ function TodayRail({ occs, onOpen, onOpenPlus }: { occs: Occ[]; onOpen: (o: Occ)
           <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{dateLabel}</p>
         </div>
         <button onClick={onOpenPlus} className="btn-outline ml-auto px-2.5 py-1.5 text-xs" style={{ borderColor: 'rgba(var(--gold-rgb),0.5)', color: 'var(--gold-dark)' }}>
-          <Sparkles size={13} /> Plus
+          <Sparkles size={13} /> Upgrade
         </button>
       </div>
 
@@ -916,7 +916,7 @@ function TodayRail({ occs, onOpen, onOpenPlus }: { occs: Occ[]; onOpen: (o: Occ)
         )}
 
         <button onClick={onOpenPlus} className="w-full text-center text-xs font-semibold" style={{ color: 'var(--gold)' }}>
-          Briefing, SMS &amp; automation settings →
+          See plans &amp; upgrade →
         </button>
       </div>
     </div>
