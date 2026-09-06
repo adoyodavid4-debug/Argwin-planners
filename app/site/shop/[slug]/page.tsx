@@ -107,7 +107,7 @@ export default async function ProductPage({ params }: Props) {
   const howToSteps = [
     { name: 'Purchase & download', text: 'Add to cart, complete checkout — receive an instant download link.' },
     { name: 'Open the file', text: `Open the PDF in your preferred app (${(p.file_formats as string[] | null)?.join(', ') ?? 'PDF'}).` },
-    { name: 'Print or use digitally', text: 'Print at home (A4 or US Letter) or use on your iPad via GoodNotes / Notability.' },
+    { name: 'Print or use digitally', text: 'Print at home in A4 or use on your iPad via GoodNotes / Notability.' },
     { name: 'Plan your day', text: 'Fill in your priorities, tasks, and goals — one page at a time.' },
   ]
 

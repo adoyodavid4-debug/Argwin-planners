@@ -14,7 +14,7 @@ import RichTextContent from '@/components/RichTextContent'
 import { stripHtml } from '@/lib/richtext'
 
 const FALLBACK_IMG = 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=800&q=80'
-const SIZE_KEYS: { k: string; l: string }[] = [{ k: 'a4', l: 'A4' }, { k: 'us_letter', l: 'US Letter' }, { k: 'a5', l: 'A5' }]
+const SIZE_KEYS: { k: string; l: string }[] = [{ k: 'a4', l: 'A4' }]
 
 interface P {
   id: string; title: string; slug: string; description: string
@@ -32,7 +32,7 @@ interface Bundle { id: string; title: string; slug: string; thumbnail: string | 
 const PLACEHOLDER_REVIEWS: Rev[] = [
   { id: 'ph1', reviewer_name: 'Amara N.', rating: 5, title: 'Beautiful and so easy to use', body: 'The hyperlinks make navigating effortless and it looks gorgeous on my iPad. I actually look forward to planning now.', verified: true, created_at: '2026-05-02' },
   { id: 'ph2', reviewer_name: 'Daniel K.', rating: 5, title: 'Set up in minutes', body: 'Downloaded it in seconds and had it in GoodNotes before my coffee was ready. Worth every penny.', verified: true, created_at: '2026-04-20' },
-  { id: 'ph3', reviewer_name: 'Priya S.', rating: 4, title: 'Lovely design', body: 'Gorgeous templates and the sage colourway is my favourite. Printed the A5 size too — just as lovely on paper.', verified: true, created_at: '2026-04-05' },
+  { id: 'ph3', reviewer_name: 'Priya S.', rating: 4, title: 'Lovely design', body: 'Gorgeous templates and the sage colourway is my favourite. Printed it at home too — just as lovely on paper.', verified: true, created_at: '2026-04-05' },
 ]
 
 const money = (n: number, c?: string | null) => new Intl.NumberFormat('en-GB', { style: 'currency', currency: c ?? 'USD' }).format(n)
@@ -210,7 +210,7 @@ export default function ProductDetailClient({ product: p, related, reviews, bund
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
               { icon: FileType, l: 'Formats', v: p.file_formats.length ? p.file_formats.join(', ') : 'PDF' },
-              { icon: Ruler, l: 'Sizes', v: availableSizes.length ? availableSizes.join(' · ') : 'A4 · US Letter · A5' },
+              { icon: Ruler, l: 'Sizes', v: availableSizes.length ? availableSizes.join(' · ') : 'A4' },
               { icon: FileText, l: 'Pages', v: p.page_count ? String(p.page_count) : '—' },
               { icon: Link2, l: 'Navigation', v: 'Hyperlinked tabs' },
               { icon: Layers, l: 'Templates', v: 'Dotted · Lined · Blank' },
@@ -232,7 +232,7 @@ export default function ProductDetailClient({ product: p, related, reviews, bund
           <h2 className="font-display text-2xl mb-6" style={{ color: 'var(--text-primary)' }}>What&rsquo;s inside</h2>
           <div className="rounded-2xl border p-6 max-w-2xl" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
             <ul className="flex flex-col gap-2.5">
-              {['Instant hyperlinked PDF', p.file_formats.includes('GoodNotes') ? 'GoodNotes-ready template' : 'Works in any PDF app', 'A4, US Letter & A5 sizes', p.page_count ? `${p.page_count} pages` : 'Full year of pages', 'Dotted, lined & blank layouts', 'Personal-use licence'].map((l, i) => (
+              {['Instant hyperlinked PDF', p.file_formats.includes('GoodNotes') ? 'GoodNotes-ready template' : 'Works in any PDF app', 'A4 size', p.page_count ? `${p.page_count} pages` : 'Full year of pages', 'Dotted, lined & blank layouts', 'Personal-use licence'].map((l, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}><Check size={15} style={{ color: 'var(--gold)' }} className="mt-0.5 flex-shrink-0" /> {l}</li>
               ))}
             </ul>
@@ -427,7 +427,7 @@ function Faq({ q, a, reduce }: { q: string; a: string; reduce: boolean }) {
 }
 
 const DEFAULT_FAQS = [
-  { question: 'What file formats will I receive?', answer: 'A high-resolution hyperlinked PDF that works in GoodNotes, Notability, Xodo and any PDF app — plus print-ready A4, US Letter and A5 sizing.' },
+  { question: 'What file formats will I receive?', answer: 'A high-resolution hyperlinked PDF that works in GoodNotes, Notability, Xodo and any PDF app — print-ready in A4.' },
   { question: 'How fast is delivery?', answer: 'Instant. A secure download link is emailed to you the moment payment clears, and it stays in your account for re-download any time.' },
   { question: 'How do I import it into GoodNotes or Notability?', answer: 'Open the PDF on your device and choose “Open in GoodNotes / Notability”, or import it from Files — the tabs and links carry across automatically.' },
   { question: 'What is your refund policy?', answer: 'Because these are instant digital downloads we generally cannot offer refunds, but if anything is wrong with your file our team will make it right within 30 days.' },
