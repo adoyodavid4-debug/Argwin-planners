@@ -107,3 +107,58 @@ export async function capturePayPalOrder(paypalOrderId: string): Promise<PayPalO
   }
   return json as PayPalOrderResult
 }
+
+// ── Recurring subscriptions ───────────────────────────────────────────────────
+export function planIdFor(plan: 'plus' | 'teams'): string | undefined {
+  return plan === 'plus'
+    ? process.env.NEXT_PUBLIC_PAYPAL_PLAN_PLUS_ID
+    : process.env.NEXT_PUBLIC_PAYPAL_PLAN_TEAMS_ID
+}
+
+// Fetch a subscription's current state (status, next_billing_time, plan_id…).
+export async function getSubscription(id: string): Promise<any> {
+  const token = await getAccessToken()
+  const res = await fetch(`${PAYPAL_BASE}/v1/billing/subscriptions/${encodeURIComponent(id)}`, {
+    headers: { Authorization: `Bearer ${token}` }, cache: 'no-store',
+  })
+  const json = await res.json()
+  if (!res.ok) throw new Error(`PayPal get subscription failed (${res.status}): ${JSON.stringify(json)}`)
+  return json
+}
+
+// Cancel a subscription (stops future billing; current period stays active).
+export async function cancelSubscription(id: string, reason = 'Cancelled by user'): Promise<void> {
+  const token = await getAccessToken()
+  const res = await fetch(`${PAYPAL_BASE}/v1/billing/subscriptions/${encodeURIComponent(id)}/cancel`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ reason }),
+  })
+  if (!res.ok && res.status !== 204) {
+    throw new Error(`PayPal cancel failed (${res.status}): ${await res.text().catch(() => '')}`)
+  }
+}
+
+// Verify a webhook came from PayPal (needs PAYPAL_WEBHOOK_ID from the dashboard).
+export async function verifyWebhookSignature(
+  headers: Record<string, string | null>, event: unknown,
+): Promise<boolean> {
+  const webhookId = process.env.PAYPAL_WEBHOOK_ID
+  if (!webhookId) return false
+  const token = await getAccessToken()
+  const res = await fetch(`${PAYPAL_BASE}/v1/notifications/verify-webhook-signature`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      auth_algo: headers['paypal-auth-algo'],
+      cert_url: headers['paypal-cert-url'],
+      transmission_id: headers['paypal-transmission-id'],
+      transmission_sig: headers['paypal-transmission-sig'],
+      transmission_time: headers['paypal-transmission-time'],
+      webhook_id: webhookId,
+      webhook_event: event,
+    }),
+  })
+  const json = await res.json().catch(() => ({}))
+  return json.verification_status === 'SUCCESS'
+}

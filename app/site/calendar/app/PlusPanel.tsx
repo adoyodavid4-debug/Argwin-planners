@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
+import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import { getPlanInfo, PLAN_RANK, PLAN_LABEL, type CalendarPlan, type PlanInfo } from '@/lib/calendar/plan'
 import { X, Check, Sparkles, Users, ArrowRight, Lock, CalendarDays } from 'lucide-react'
@@ -84,10 +85,25 @@ function PlanContent({ onClose }: { onClose?: () => void }) {
     ;(async () => { const i = await getPlanInfo(createClient() as any); if (alive) setInfo(i) })()
     return () => { alive = false }
   }, [])
+  const [cancelling, setCancelling] = useState(false)
   const plan: CalendarPlan = info?.plan ?? 'free'
   const rank = PLAN_RANK[plan]
   const stateFor = (tier: CalendarPlan): CardState =>
     rank === PLAN_RANK[tier] ? 'active' : rank > PLAN_RANK[tier] ? 'included' : 'upgrade'
+
+  const doCancel = async () => {
+    if (!window.confirm('Cancel your subscription? You keep access until the end of the current period.')) return
+    setCancelling(true)
+    try {
+      const res = await fetch('/api/calendar/subscribe/cancel', { method: 'POST' })
+      const out = await res.json()
+      if (res.ok && out.ok) {
+        toast.success('Subscription cancelled — access continues until it expires.')
+        setInfo((prev) => (prev ? { ...prev, subscribed: false } : prev))
+      } else toast.error(out.error ?? 'Could not cancel. Please try again.')
+    } catch { toast.error('Network error. Please try again.') }
+    setCancelling(false)
+  }
 
   return (
     <div className="flex min-h-full flex-col">
@@ -100,13 +116,29 @@ function PlanContent({ onClose }: { onClose?: () => void }) {
       <div className="space-y-5 px-4 py-5">
         {plan !== 'free' && info?.expiresAt && !info.isAdmin && (
           <div className="rounded-xl border p-4" style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}>
-            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-              Your <strong style={{ color: 'var(--text-primary)' }}>{PLAN_LABEL[plan]}</strong> is active until{' '}
-              <strong style={{ color: 'var(--text-primary)' }}>{fmtDate(info.expiresAt)}</strong>.
-            </p>
-            <Link href={`/calendar/subscribe/${plan}`} className="btn-outline mt-3 w-full justify-center py-2 text-sm">
-              Renew for another month <ArrowRight size={14} />
-            </Link>
+            {info.subscribed ? (
+              <>
+                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                  Your <strong style={{ color: 'var(--text-primary)' }}>{PLAN_LABEL[plan]}</strong> renews automatically on{' '}
+                  <strong style={{ color: 'var(--text-primary)' }}>{fmtDate(info.expiresAt)}</strong>.
+                </p>
+                <button onClick={doCancel} disabled={cancelling}
+                  className="mt-3 w-full rounded-lg border py-2 text-sm font-medium disabled:opacity-60"
+                  style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}>
+                  {cancelling ? 'Cancelling…' : 'Cancel subscription'}
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                  Your <strong style={{ color: 'var(--text-primary)' }}>{PLAN_LABEL[plan]}</strong> is active until{' '}
+                  <strong style={{ color: 'var(--text-primary)' }}>{fmtDate(info.expiresAt)}</strong> and won’t renew.
+                </p>
+                <Link href={`/calendar/subscribe/${plan}`} className="btn-primary mt-3 w-full justify-center py-2 text-sm">
+                  Resubscribe <ArrowRight size={14} />
+                </Link>
+              </>
+            )}
           </div>
         )}
         {TIERS.map((t) => <TierCard key={t.tier} t={t} state={stateFor(t.tier)} />)}

@@ -1,63 +1,66 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import { Loader2 } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
 
 declare global { interface Window { paypal?: any } }
 
-// Renders the PayPal button for a monthly calendar plan. On a completed capture,
-// the server activates the plan and we call onPaid().
+const PLAN_ID: Record<'plus' | 'teams', string | undefined> = {
+  plus: process.env.NEXT_PUBLIC_PAYPAL_PLAN_PLUS_ID,
+  teams: process.env.NEXT_PUBLIC_PAYPAL_PLAN_TEAMS_ID,
+}
+
+// Renders the PayPal recurring-subscription button for a plan. On approval the
+// server verifies the subscription and activates the plan, then onPaid() fires.
 export default function SubscribePayPal({ plan, onPaid }: { plan: 'plus' | 'teams'; onPaid: () => void }) {
   const ref = useRef<HTMLDivElement>(null)
   const rendered = useRef(false)
+  const uid = useRef<string | undefined>(undefined)
   const [err, setErr] = useState('')
-  const [capturing, setCapturing] = useState(false)
+  const [busy, setBusy] = useState(false)
 
   useEffect(() => {
     const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID
-    if (!clientId) { setErr('PayPal is not available right now. Please try again later.'); return }
+    const planId = PLAN_ID[plan]
+    if (!clientId) { setErr('PayPal is not available right now.'); return }
+    if (!planId) { setErr('This plan isn’t available for subscription yet.'); return }
     let cancelled = false
+    ;(async () => { const { data: { user } } = await createClient().auth.getUser(); uid.current = user?.id })()
 
     function render() {
-      if (cancelled || !window.paypal || !ref.current || rendered.current) return
+      if (cancelled || !window.paypal?.Buttons || !ref.current || rendered.current) return
       rendered.current = true
       window.paypal.Buttons({
-        style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'paypal', height: 44 },
-        createOrder: async () => {
-          setErr('')
-          const res = await fetch('/api/calendar/subscribe/create-order', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ plan }),
-          })
-          const data = await res.json()
-          if (!res.ok || !data.id) { setErr(data.error ?? 'Could not start checkout.'); throw new Error('create-order') }
-          return data.id
-        },
-        onApprove: async (data: { orderID: string }) => {
-          setCapturing(true)
+        style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'subscribe', height: 44 },
+        createSubscription: (_d: unknown, actions: any) =>
+          actions.subscription.create({ plan_id: planId, custom_id: uid.current }),
+        onApprove: async (data: { subscriptionID?: string }) => {
+          setBusy(true)
           try {
-            const res = await fetch('/api/calendar/subscribe/capture', {
+            const res = await fetch('/api/calendar/subscribe/record', {
               method: 'POST', headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ orderID: data.orderID, plan }),
+              body: JSON.stringify({ subscriptionID: data.subscriptionID, plan }),
             })
             const out = await res.json()
             if (res.ok && out.ok) { onPaid(); return }
-            setErr(out.error ?? 'Payment could not be completed. Please try again.')
+            setErr(out.error ?? 'Could not activate your subscription.')
           } catch {
-            setErr('Network error while completing your payment. If you were charged, contact support.')
+            setErr('Network error while activating. If you were charged, contact support.')
           }
-          setCapturing(false)
+          setBusy(false)
         },
-        onError: (e: unknown) => { console.error('[paypal]', e); setErr((p) => p || 'Something went wrong with PayPal. Please try again.') },
+        onError: (e: unknown) => { console.error('[paypal-subs]', e); setErr((p) => p || 'Something went wrong with PayPal. Please try again.') },
       }).render(ref.current)
     }
 
-    if (window.paypal) { render() }
+    if (window.paypal?.Buttons) { render() }
     else {
-      const id = 'paypal-sdk'
+      const id = 'paypal-sdk-subs'
       let s = document.getElementById(id) as HTMLScriptElement | null
       if (!s) {
         s = document.createElement('script')
         s.id = id
-        s.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=USD&intent=capture&components=buttons`
+        s.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&vault=true&intent=subscription&components=buttons`
         s.onerror = () => { if (!cancelled) setErr('Could not load PayPal. Please try again.') }
         document.body.appendChild(s)
       }
@@ -70,7 +73,7 @@ export default function SubscribePayPal({ plan, onPaid }: { plan: 'plus' | 'team
   return (
     <div>
       <div ref={ref} />
-      {capturing && <p className="mt-2 flex items-center gap-2 text-sm" style={{ color: 'var(--text-muted)' }}><Loader2 size={14} className="animate-spin" /> Completing payment…</p>}
+      {busy && <p className="mt-2 flex items-center gap-2 text-sm" style={{ color: 'var(--text-muted)' }}><Loader2 size={14} className="animate-spin" /> Activating your subscription…</p>}
       {err && <p className="mt-2 text-xs text-red-500">{err}</p>}
     </div>
   )
