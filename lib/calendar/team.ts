@@ -141,6 +141,7 @@ export interface Delegation {
 
 export interface TeamWorkspace {
   live: boolean
+  currentMemberId: string // the team_members.id of the signed-in user ('u1' in sample)
   team: Team
   members: Member[]
   calendars: SharedCalendar[]
@@ -187,13 +188,13 @@ export function sampleWorkspace(): TeamWorkspace {
   ): Member => ({ id, name, email, role, title, timezone, tz_offset, hue, status, last_active, meetings_week, focus_hours })
 
   const members: Member[] = [
-    M('u1', 'Amara Odhiambo', 'amara@arwign.com', 'owner', 'Founder & CEO', 'Africa/Nairobi', 3, 28, 'active', 'now', 19, 11),
-    M('u2', 'David Mwangi', 'david@arwign.com', 'manage', 'Head of Ops', 'Africa/Nairobi', 3, 205, 'active', '4m ago', 24, 6),
-    M('u3', 'Lena Fischer', 'lena@arwign.com', 'edit', 'Product Designer', 'Europe/Berlin', 1, 145, 'active', '1h ago', 14, 18),
-    M('u4', 'Marco Rossi', 'marco@arwign.com', 'edit', 'Engineer', 'Europe/Rome', 1, 95, 'active', '2h ago', 9, 26),
-    M('u5', 'Priya Nair', 'priya@arwign.com', 'propose', 'Account Executive', 'Asia/Kolkata', 5, 330, 'active', '3h ago', 31, 3),
-    M('u6', 'Tom Becker', 'tom@arwign.com', 'view', 'Finance', 'America/New_York', -5, 260, 'active', 'yesterday', 7, 22),
-    M('u7', 'Sara Kimani', 'sara@arwign.com', 'propose', 'Marketing Lead', 'Africa/Nairobi', 3, 15, 'invited', 'pending', 0, 0),
+    M('u1', 'Emma Carter', 'emma@arwign.com', 'owner', 'Founder & CEO', 'America/New_York', -5, 28, 'active', 'now', 19, 11),
+    M('u2', 'James Bennett', 'james@arwign.com', 'manage', 'Head of Ops', 'America/New_York', -5, 205, 'active', '4m ago', 24, 6),
+    M('u3', 'Olivia Hughes', 'olivia@arwign.com', 'edit', 'Product Designer', 'Europe/London', 0, 145, 'active', '1h ago', 14, 18),
+    M('u4', 'Liam Walsh', 'liam@arwign.com', 'edit', 'Engineer', 'America/Chicago', -6, 95, 'active', '2h ago', 9, 26),
+    M('u5', 'Sophia Reed', 'sophia@arwign.com', 'propose', 'Account Executive', 'America/Los_Angeles', -8, 330, 'active', '3h ago', 31, 3),
+    M('u6', 'Noah Foster', 'noah@arwign.com', 'view', 'Finance', 'Europe/London', 0, 260, 'active', 'yesterday', 7, 22),
+    M('u7', 'Ava Mitchell', 'ava@arwign.com', 'propose', 'Marketing Lead', 'America/Denver', -7, 15, 'invited', 'pending', 0, 0),
   ]
 
   const calendars: SharedCalendar[] = [
@@ -204,9 +205,9 @@ export function sampleWorkspace(): TeamWorkspace {
   ]
 
   const resources: Resource[] = [
-    { id: 'r1', name: 'Nairobi · Boardroom', type: 'room', capacity: 12, location: 'HQ, 4th floor', requires_approval: true, colour: 'brass', amenities: ['4K display', 'Video bar', 'Whiteboard'] },
-    { id: 'r2', name: 'Nairobi · Focus Pod A', type: 'room', capacity: 3, location: 'HQ, 4th floor', requires_approval: false, colour: 'sage', amenities: ['Monitor', 'Quiet'] },
-    { id: 'r3', name: 'Berlin · Meeting Room', type: 'room', capacity: 6, location: 'Berlin office', requires_approval: false, colour: 'ocean', amenities: ['Display', 'Video bar'] },
+    { id: 'r1', name: 'New York · Boardroom', type: 'room', capacity: 12, location: 'New York HQ, 4th floor', requires_approval: true, colour: 'brass', amenities: ['4K display', 'Video bar', 'Whiteboard'] },
+    { id: 'r2', name: 'New York · Focus Pod A', type: 'room', capacity: 3, location: 'New York HQ, 4th floor', requires_approval: false, colour: 'sage', amenities: ['Monitor', 'Quiet'] },
+    { id: 'r3', name: 'London · Meeting Room', type: 'room', capacity: 6, location: 'London office', requires_approval: false, colour: 'ocean', amenities: ['Display', 'Video bar'] },
     { id: 'r4', name: 'Demo Laptop + Clicker', type: 'equipment', capacity: 1, location: 'HQ store', requires_approval: false, colour: 'honey', amenities: ['Loaner'] },
     { id: 'r5', name: 'Hot Desk Bank', type: 'desk', capacity: 8, location: 'HQ, 3rd floor', requires_approval: false, colour: 'forest', amenities: ['Dual monitor'] },
     { id: 'r6', name: 'Company Van', type: 'vehicle', capacity: 5, location: 'Basement parking', requires_approval: true, colour: 'clay', amenities: ['Fuel card'] },
@@ -229,7 +230,7 @@ export function sampleWorkspace(): TeamWorkspace {
   ]
 
   const audit: AuditEntry[] = [
-    { id: 'a1', actor_id: 'u2', action: 'approved room request', target: 'Nairobi · Boardroom — All-hands', scope: 'resource', at: `${today}T08:42:00` },
+    { id: 'a1', actor_id: 'u2', action: 'approved room request', target: 'New York · Boardroom — All-hands', scope: 'resource', at: `${today}T08:42:00` },
     { id: 'a2', actor_id: 'u1', action: 'changed role', target: 'Priya Nair → Contributor', scope: 'member', at: `${today}T08:15:00` },
     { id: 'a3', actor_id: 'u3', action: 'edited shared event', target: 'Product & Eng — Sprint review', scope: 'calendar', at: `2026-09-04T16:30:00` },
     { id: 'a4', actor_id: 'u2', action: 'invited member', target: 'sara@arwign.com', scope: 'member', at: `2026-09-04T14:02:00` },
@@ -246,29 +247,147 @@ export function sampleWorkspace(): TeamWorkspace {
   const team: Team = {
     id: 'team-sample', name: 'Arwign', plan: 'teams',
     seats_used: members.filter((m) => m.status === 'active').length, seats_total: 10,
-    timezone: 'Africa/Nairobi', billing_email: 'billing@arwign.com',
+    timezone: 'America/New_York', billing_email: 'billing@arwign.com',
     renews_on: '2026-10-05', created_at: '2026-06-01',
   }
 
-  return { live: false, team, members, calendars, resources, resourceBookings, pages, audit, delegations }
-}
-
-// ── Resilient loader ──────────────────────────────────────────
-// Attempts the real tables; on any missing-relation / empty result, falls back
-// to the sample workspace so the UI always renders. `supabase` is intentionally
-// loosely typed (the project uses `createClient() as any`).
-export async function loadTeamWorkspace(supabase: any): Promise<TeamWorkspace> {
-  try {
-    const { data: teams, error } = await supabase.from('teams').select('*').limit(1)
-    if (error || !teams || teams.length === 0) return sampleWorkspace()
-    // Real data path would hydrate here once teams exist. Until a team is
-    // provisioned we still show the sample so the interface is never empty.
-    return sampleWorkspace()
-  } catch {
-    return sampleWorkspace()
-  }
+  return { live: false, currentMemberId: 'u1', team, members, calendars, resources, resourceBookings, pages, audit, delegations }
 }
 
 // Convenience lookups shared by sections.
 export const byId = <T extends { id: string }>(list: T[], id: string) => list.find((x) => x.id === id)
 export const memberName = (members: Member[], id: string) => byId(members, id)?.name ?? 'Unknown'
+
+const hueFrom = (seed: string) => { let h = 0; for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) | 0; return Math.abs(h) % 360 }
+
+function mapMember(r: any): Member {
+  return {
+    id: r.id, name: r.name || (r.email?.split('@')[0] ?? 'Member'), email: r.email,
+    role: r.role, title: r.title || '', timezone: r.timezone || 'America/New_York',
+    tz_offset: r.tz_offset ?? 3, hue: r.hue ?? hueFrom(r.email || r.id),
+    status: r.status, last_active: r.status === 'invited' ? 'pending' : '—',
+    meetings_week: 0, focus_hours: 0,
+  }
+}
+
+// ── Real loader with sample fallback ──────────────────────────
+// Hydrates the caller's team from the live 020 tables. Falls back to the sample
+// workspace (live:false) when the user has no team yet or the tables are absent.
+export async function loadTeamWorkspace(supabase: any): Promise<TeamWorkspace> {
+  try {
+    const { data: auth } = await supabase.auth.getUser()
+    const uid = auth?.user?.id
+    if (!uid) return sampleWorkspace()
+
+    const { data: mine, error: mErr } = await supabase
+      .from('team_members').select('team_id').eq('user_id', uid).eq('status', 'active').limit(1)
+    if (mErr || !mine || mine.length === 0) return sampleWorkspace()
+    const teamId = mine[0].team_id
+
+    const [teamRes, membersRes, calsRes, resRes, bookRes, pagesRes, delRes, auditRes] = await Promise.all([
+      supabase.from('teams').select('*').eq('id', teamId).single(),
+      supabase.from('team_members').select('*').eq('team_id', teamId).order('created_at', { ascending: true }),
+      supabase.from('shared_calendars').select('*').eq('team_id', teamId),
+      supabase.from('team_resources').select('*').eq('team_id', teamId),
+      supabase.from('resource_bookings').select('*').eq('team_id', teamId).order('start_at', { ascending: true }),
+      supabase.from('team_booking_pages').select('*').eq('team_id', teamId),
+      supabase.from('team_delegations').select('*').eq('team_id', teamId),
+      supabase.from('team_audit_log').select('*').eq('team_id', teamId).order('at', { ascending: false }).limit(50),
+    ])
+    const t = teamRes.data
+    if (!t) return sampleWorkspace()
+
+    const members: Member[] = (membersRes.data ?? []).map(mapMember)
+    const me = (membersRes.data ?? []).find((r: any) => r.user_id === uid)
+    const activeCount = members.filter((m) => m.status === 'active').length
+
+    const team: Team = {
+      id: t.id, name: t.name, plan: t.plan ?? 'teams',
+      seats_used: activeCount, seats_total: t.seats_total ?? 5,
+      timezone: t.timezone ?? 'America/New_York', billing_email: t.billing_email ?? '',
+      renews_on: t.renews_on ?? '', created_at: t.created_at ?? '',
+    }
+    const calendars: SharedCalendar[] = (calsRes.data ?? []).map((c: any) => ({
+      id: c.id, name: c.name, colour: c.colour ?? 'brass', visibility: c.visibility ?? 'full',
+      member_ids: c.member_ids ?? [], events_week: 0, description: c.description ?? '',
+    }))
+    const resources: Resource[] = (resRes.data ?? []).map((r: any) => ({
+      id: r.id, name: r.name, type: r.type, capacity: r.capacity ?? 1, location: r.location ?? '',
+      requires_approval: !!r.requires_approval, colour: r.colour ?? 'sage', amenities: r.amenities ?? [],
+    }))
+    const resourceBookings: ResourceBooking[] = (bookRes.data ?? []).map((b: any) => ({
+      id: b.id, resource_id: b.resource_id, title: b.title, requester_id: b.requester_id,
+      start_at: b.start_at, end_at: b.end_at, status: b.status,
+    }))
+    const pages: TeamBookingPage[] = (pagesRes.data ?? []).map((p: any) => ({
+      id: p.id, name: p.name, slug: p.slug, type: p.type, member_ids: p.member_ids ?? [],
+      duration_min: p.duration_min ?? 30, bookings_30d: 0, active: !!p.active, description: p.description ?? '',
+    }))
+    const delegations: Delegation[] = (delRes.data ?? []).map((d: any) => ({
+      id: d.id, grantor_id: d.grantor_id, grantee_id: d.grantee_id, scope: d.scope ?? '', since: d.since ?? '',
+    }))
+    const audit: AuditEntry[] = (auditRes.data ?? []).map((a: any) => ({
+      id: a.id, actor_id: a.actor_id, action: a.action, target: a.target ?? '', scope: a.scope, at: a.at,
+    }))
+
+    return { live: true, currentMemberId: me?.id ?? '', team, members, calendars, resources, resourceBookings, pages, audit, delegations }
+  } catch {
+    return sampleWorkspace()
+  }
+}
+
+// ── Provisioning (client-side, under RLS) ─────────────────────
+// Creates a real, minimal team owned by the caller. Idempotent: if the user is
+// already an active member of a team, returns that team's id without seeding.
+export async function provisionTeam(
+  supabase: any,
+  opts: { teamName?: string; ownerName?: string; ownerEmail: string; timezone?: string; tzOffset?: number },
+): Promise<{ ok: boolean; teamId?: string; error?: string }> {
+  try {
+    const { data: auth } = await supabase.auth.getUser()
+    const uid = auth?.user?.id
+    if (!uid) return { ok: false, error: 'Not signed in' }
+
+    const existing = await supabase.from('team_members').select('team_id').eq('user_id', uid).eq('status', 'active').limit(1)
+    if (existing.data && existing.data.length) return { ok: true, teamId: existing.data[0].team_id }
+
+    const tz = opts.timezone || 'America/New_York'
+    const ownerName = opts.ownerName || opts.ownerEmail.split('@')[0]
+    const teamName = opts.teamName || `${ownerName}'s Team`
+
+    const teamIns = await supabase.from('teams')
+      .insert({ name: teamName, owner_id: uid, seats_total: 5, timezone: tz, billing_email: opts.ownerEmail })
+      .select('id').single()
+    if (teamIns.error || !teamIns.data) return { ok: false, error: teamIns.error?.message || 'Could not create team' }
+    const teamId = teamIns.data.id
+
+    const ownerIns = await supabase.from('team_members')
+      .insert({ team_id: teamId, user_id: uid, name: ownerName, email: opts.ownerEmail, role: 'owner', status: 'active', title: 'Owner', timezone: tz, tz_offset: opts.tzOffset ?? -5, hue: hueFrom(opts.ownerEmail) })
+      .select('id').single()
+    if (ownerIns.error || !ownerIns.data) return { ok: false, error: ownerIns.error?.message || 'Could not add you as owner' }
+    const ownerMemberId = ownerIns.data.id
+
+    // Starter data (best-effort; individual failures are non-fatal).
+    await supabase.from('shared_calendars').insert({ team_id: teamId, name: 'General', colour: 'brass', visibility: 'full', member_ids: [ownerMemberId], description: 'Shared team calendar.' })
+    await supabase.from('team_resources').insert([
+      { team_id: teamId, name: 'Meeting Room', type: 'room', capacity: 8, location: 'Office', requires_approval: true, colour: 'brass', amenities: ['Display', 'Whiteboard'] },
+      { team_id: teamId, name: 'Hot Desk', type: 'desk', capacity: 4, location: 'Office', requires_approval: false, colour: 'forest', amenities: ['Monitor'] },
+    ])
+    await supabase.from('team_booking_pages').insert({ team_id: teamId, name: 'Intro call', slug: `intro-${teamId.slice(0, 8)}`, type: 'round-robin', member_ids: [ownerMemberId], duration_min: 30, active: false, description: 'Public scheduling link for the team.' })
+    await supabase.from('team_audit_log').insert({ team_id: teamId, actor_id: ownerMemberId, action: 'created the team', target: teamName, scope: 'member' })
+
+    return { ok: true, teamId }
+  } catch (e: any) {
+    return { ok: false, error: e?.message || 'Provisioning failed' }
+  }
+}
+
+// Append an audit entry (RLS lets editors+ insert on team_audit_log). Best-effort.
+export async function logTeamAction(
+  supabase: any, teamId: string, actorMemberId: string,
+  action: string, target: string, scope: AuditEntry['scope'],
+): Promise<void> {
+  try {
+    await supabase.from('team_audit_log').insert({ team_id: teamId, actor_id: actorMemberId || null, action, target, scope })
+  } catch { /* non-fatal */ }
+}

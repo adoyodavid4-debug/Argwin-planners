@@ -199,7 +199,7 @@ export default function PersonalizedClient() {
                 {/* Name / initials */}
                 <div>
                   <label htmlFor="cover-name" className="text-sm font-semibold uppercase tracking-wide block mb-3" style={{ color: 'var(--text-primary)', letterSpacing: '0.06em' }}>Name or initials <span style={{ color: 'var(--text-muted)', fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(optional)</span></label>
-                  <input id="cover-name" value={name} onChange={(e) => setName(e.target.value)} maxLength={24} placeholder="e.g. Amara O."
+                  <input id="cover-name" value={name} onChange={(e) => setName(e.target.value)} maxLength={24} placeholder="e.g. Ava M."
                     className="w-full max-w-xs rounded-xl border px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[var(--gold)]" style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }} />
                 </div>
               </div>

@@ -1,8 +1,10 @@
 'use client'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
+import toast from 'react-hot-toast'
 import { UserPlus, Check, Mail, X, Clock } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
 import TeamShell, { SectionCard, Avatar } from '../TeamShell'
-import { type TeamWorkspace, type Member, type Role, ROLES, ROLE_ORDER, fmtOffset } from '@/lib/calendar/team'
+import { type TeamWorkspace, type Member, type Role, ROLES, ROLE_ORDER, fmtOffset, byId, logTeamAction } from '@/lib/calendar/team'
 
 export default function MembersClient({ ws }: { ws: TeamWorkspace }) {
   const [members, setMembers] = useState<Member[]>(ws.members)
@@ -10,18 +12,36 @@ export default function MembersClient({ ws }: { ws: TeamWorkspace }) {
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteRole, setInviteRole] = useState<Role>('propose')
 
-  const setRole = (id: string, role: Role) =>
-    setMembers((ms) => ms.map((m) => (m.id === id ? { ...m, role } : m)))
-  const remove = (id: string) => setMembers((ms) => ms.filter((m) => m.id !== id))
+  const supabase = useMemo(() => createClient() as any, [])
 
-  const sendInvite = () => {
+  const setRole = (id: string, role: Role) => {
+    const prev = byId(members, id)?.name ?? 'Member'
+    setMembers((ms) => ms.map((m) => (m.id === id ? { ...m, role } : m)))
+    if (ws.live) {
+      supabase.from('team_members').update({ role }).eq('id', id).then(({ error }: any) => { if (error) toast.error(error.message) })
+      logTeamAction(supabase, ws.team.id, ws.currentMemberId, 'changed role', `${prev} → ${ROLES[role].label}`, 'member')
+    }
+  }
+  const remove = (id: string) => {
+    setMembers((ms) => ms.filter((m) => m.id !== id))
+    if (ws.live) supabase.from('team_members').delete().eq('id', id).then(({ error }: any) => { if (error) toast.error(error.message) })
+  }
+
+  const sendInvite = async () => {
     const email = inviteEmail.trim()
     if (!email) return
-    setMembers((ms) => [...ms, {
-      id: `inv-${Date.now()}`, name: email.split('@')[0], email, role: inviteRole,
-      title: 'Invited', timezone: ws.team.timezone, tz_offset: 3, hue: (ms.length * 47) % 360,
-      status: 'invited', last_active: 'pending', meetings_week: 0, focus_hours: 0,
-    }])
+    const name = email.split('@')[0]
+    if (ws.live) {
+      const { data, error } = await supabase.from('team_members')
+        .insert({ team_id: ws.team.id, email, name, role: inviteRole, status: 'invited', timezone: ws.team.timezone, tz_offset: -5, hue: (members.length * 47) % 360 })
+        .select('id').single()
+      if (error || !data) { toast.error(error?.message ?? 'Could not send invite'); return }
+      setMembers((ms) => [...ms, { id: data.id, name, email, role: inviteRole, title: 'Invited', timezone: ws.team.timezone, tz_offset: -5, hue: (ms.length * 47) % 360, status: 'invited', last_active: 'pending', meetings_week: 0, focus_hours: 0 }])
+      logTeamAction(supabase, ws.team.id, ws.currentMemberId, 'invited member', email, 'member')
+      toast.success('Invite sent')
+    } else {
+      setMembers((ms) => [...ms, { id: `inv-${Date.now()}`, name, email, role: inviteRole, title: 'Invited', timezone: ws.team.timezone, tz_offset: -5, hue: (ms.length * 47) % 360, status: 'invited', last_active: 'pending', meetings_week: 0, focus_hours: 0 }])
+    }
     setInviteEmail(''); setInvite(false)
   }
 
@@ -29,7 +49,7 @@ export default function MembersClient({ ws }: { ws: TeamWorkspace }) {
   const invited = members.filter((m) => m.status === 'invited')
 
   return (
-    <TeamShell workspace={ws} currentRole="owner" title="Members & roles"
+    <TeamShell workspace={ws} title="Members & roles"
       subtitle="Invite people and set exactly what each person can do."
       actions={<button onClick={() => setInvite((v) => !v)} className="btn-primary px-3.5 py-2 text-sm"><UserPlus size={15} /> Invite</button>}>
 

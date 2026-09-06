@@ -214,7 +214,7 @@ export default function BookingClient({ page }: { page: PublicPage }) {
                   <div className="space-y-3.5">
                     <div>
                       <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Your name *</label>
-                      <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full rounded-xl border px-3.5 py-2.5 text-sm" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)', color: 'var(--text-primary)' }} placeholder="Amara Njeri" />
+                      <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full rounded-xl border px-3.5 py-2.5 text-sm" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)', color: 'var(--text-primary)' }} placeholder="Jordan Miller" />
                     </div>
                     <div>
                       <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Email *</label>
