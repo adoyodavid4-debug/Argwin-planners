@@ -1,9 +1,11 @@
 'use client'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Check, Sparkles, Users, ArrowRight, Lock } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
+import { getPlanInfo, PLAN_RANK, type CalendarPlan, type PlanInfo } from '@/lib/calendar/plan'
+import { X, Check, Sparkles, Users, ArrowRight, Lock, CalendarDays } from 'lucide-react'
 
-// What the free calendar actually includes.
 const FREE_FEATURES = [
   'Full calendar: unlimited events, all views, recurrence',
   '⌘K natural-language quick-add',
@@ -11,8 +13,6 @@ const FREE_FEATURES = [
   'Standard reminders incl. the 30-min pre-event push',
   'Email + push Daily Briefing (no SMS)',
 ]
-
-// Paid upgrades — shown as locked so it is clear they are not part of Free.
 const PLUS_FEATURES = [
   'SMS Daily Outlook Briefing + an evening preview of tomorrow',
   'Full AI: time-blocking, smart reschedule, email→event & prep briefs',
@@ -21,7 +21,6 @@ const PLUS_FEATURES = [
   'Calendar-health analytics & a weekly review digest',
   'Focus protection, boundary rules and smart travel buffers',
 ]
-
 const TEAMS_FEATURES = [
   'Shared team calendars with granular roles',
   'Rooms & resources with approval workflows',
@@ -29,79 +28,75 @@ const TEAMS_FEATURES = [
   'Round-robin & collective booking pages',
 ]
 
+type CardState = 'active' | 'included' | 'upgrade'
+const TIERS: { tier: CalendarPlan; name: string; price: string; icon: typeof Sparkles; features: string[]; href: string; cta: string; accent: boolean }[] = [
+  { tier: 'free',  name: 'Arwign Free',  price: 'Free',     icon: CalendarDays, features: FREE_FEATURES,  href: '',                          cta: '',                 accent: false },
+  { tier: 'plus',  name: 'Arwign Plus',  price: '$9.99/mo', icon: Sparkles,     features: PLUS_FEATURES,  href: '/calendar/subscribe/plus',  cta: 'Upgrade to Plus',  accent: true  },
+  { tier: 'teams', name: 'Arwign Teams', price: '$23.99/mo',icon: Users,        features: TEAMS_FEATURES, href: '/calendar/subscribe/teams', cta: 'See Arwign Teams', accent: false },
+]
+
+function TierCard({ t, state }: { t: typeof TIERS[number]; state: CardState }) {
+  const owned = state === 'active' || state === 'included'
+  return (
+    <section className="rounded-2xl border p-5"
+      style={t.accent && state === 'upgrade'
+        ? { borderColor: 'rgba(var(--gold-rgb),0.4)', background: 'rgba(var(--gold-rgb),0.06)' }
+        : { borderColor: 'var(--border)', background: 'var(--bg-card)' }}>
+      <div className="mb-1 flex items-center gap-2">
+        <t.icon size={16} style={{ color: 'var(--gold)' }} />
+        <h3 className="font-display text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>{t.name}</h3>
+        {state === 'active' && (
+          <span className="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white" style={{ background: 'var(--gold)', letterSpacing: '0.06em' }}>Active</span>
+        )}
+        {state === 'included' && (
+          <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase" style={{ background: 'rgba(var(--gold-rgb),0.14)', color: 'var(--gold-dark)' }}>Included</span>
+        )}
+        {state === 'upgrade' && (
+          <span className="ml-auto text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{t.price}</span>
+        )}
+      </div>
+      {t.tier === 'free' && state === 'active' && <p className="mb-3 text-xs" style={{ color: 'var(--text-muted)' }}>Your current plan · free forever</p>}
+      <ul className="mb-4 space-y-2.5">
+        {t.features.map((f) => (
+          <li key={f} className="flex items-start gap-2.5 text-sm" style={{ color: 'var(--text-secondary)' }}>
+            {owned
+              ? <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full" style={{ background: 'rgba(var(--gold-rgb),0.14)' }}><Check size={12} style={{ color: 'var(--gold)' }} /></span>
+              : <Lock size={13} className="mt-0.5 flex-shrink-0" style={{ color: t.accent ? 'var(--gold-dark)' : 'var(--text-muted)' }} />}
+            {f}
+          </li>
+        ))}
+      </ul>
+      {state === 'upgrade' && (
+        <Link href={t.href} className={`${t.accent ? 'btn-primary' : 'btn-outline'} w-full justify-center py-2.5`}>
+          {t.cta} <ArrowRight size={15} />
+        </Link>
+      )}
+    </section>
+  )
+}
+
 function PlanContent({ onClose }: { onClose?: () => void }) {
+  const [info, setInfo] = useState<PlanInfo | null>(null)
+  useEffect(() => {
+    let alive = true
+    ;(async () => { const i = await getPlanInfo(createClient() as any); if (alive) setInfo(i) })()
+    return () => { alive = false }
+  }, [])
+  const plan: CalendarPlan = info?.plan ?? 'free'
+  const rank = PLAN_RANK[plan]
+  const stateFor = (tier: CalendarPlan): CardState =>
+    rank === PLAN_RANK[tier] ? 'active' : rank > PLAN_RANK[tier] ? 'included' : 'upgrade'
+
   return (
     <div className="flex min-h-full flex-col">
-      {/* Header */}
       <div className="sticky top-0 z-10 flex items-center gap-3 border-b px-4 py-3" style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)' }}>
         <span className="font-display text-base font-semibold" style={{ color: 'var(--text-primary)' }}>Your plan</span>
+        {info?.isAdmin && <span className="rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase" style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}>admin</span>}
         {onClose && <button onClick={onClose} className="btn-ghost ml-auto" aria-label="Close"><X size={18} /></button>}
       </div>
 
       <div className="space-y-5 px-4 py-5">
-        {/* ── Free (current plan) ── */}
-        <section className="rounded-2xl border p-5" style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}>
-          <div className="mb-3 flex items-center justify-between">
-            <div>
-              <h3 className="font-display text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Arwign Free</h3>
-              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Your current plan · free forever</p>
-            </div>
-            <span className="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white" style={{ background: 'var(--gold)', letterSpacing: '0.06em' }}>Active</span>
-          </div>
-          <ul className="space-y-2.5">
-            {FREE_FEATURES.map((f) => (
-              <li key={f} className="flex items-start gap-2.5 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full" style={{ background: 'rgba(var(--gold-rgb),0.14)' }}>
-                  <Check size={12} style={{ color: 'var(--gold)' }} />
-                </span>
-                {f}
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        {/* ── Plus (upgrade) ── */}
-        <section className="rounded-2xl border p-5" style={{ borderColor: 'rgba(var(--gold-rgb),0.4)', background: 'rgba(var(--gold-rgb),0.06)' }}>
-          <div className="mb-1 flex items-center gap-2">
-            <Sparkles size={16} style={{ color: 'var(--gold)' }} />
-            <h3 className="font-display text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Arwign Plus</h3>
-            <span className="ml-auto text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>$9.99<span className="text-xs font-normal" style={{ color: 'var(--text-muted)' }}>/mo</span></span>
-          </div>
-          <p className="mb-3 text-xs" style={{ color: 'var(--text-muted)' }}>Everything in Free, plus:</p>
-          <ul className="mb-4 space-y-2.5">
-            {PLUS_FEATURES.map((f) => (
-              <li key={f} className="flex items-start gap-2.5 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                <Lock size={13} className="mt-0.5 flex-shrink-0" style={{ color: 'var(--gold-dark)' }} />
-                {f}
-              </li>
-            ))}
-          </ul>
-          <Link href="/calendar/subscribe/plus" className="btn-primary w-full justify-center py-2.5">
-            Upgrade to Plus <ArrowRight size={15} />
-          </Link>
-        </section>
-
-        {/* ── Teams (upgrade) ── */}
-        <section className="rounded-2xl border p-5" style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}>
-          <div className="mb-1 flex items-center gap-2">
-            <Users size={16} style={{ color: 'var(--gold)' }} />
-            <h3 className="font-display text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Arwign Teams</h3>
-            <span className="ml-auto text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>$23.99<span className="text-xs font-normal" style={{ color: 'var(--text-muted)' }}>/mo</span></span>
-          </div>
-          <p className="mb-3 text-xs" style={{ color: 'var(--text-muted)' }}>Everything in Plus, for your whole team:</p>
-          <ul className="mb-4 space-y-2.5">
-            {TEAMS_FEATURES.map((f) => (
-              <li key={f} className="flex items-start gap-2.5 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                <Lock size={13} className="mt-0.5 flex-shrink-0" style={{ color: 'var(--text-muted)' }} />
-                {f}
-              </li>
-            ))}
-          </ul>
-          <Link href="/calendar/subscribe/teams" className="btn-outline w-full justify-center py-2.5">
-            See Arwign Teams <ArrowRight size={15} />
-          </Link>
-        </section>
-
+        {TIERS.map((t) => <TierCard key={t.tier} t={t} state={stateFor(t.tier)} />)}
         <p className="px-1 text-center text-[11px]" style={{ color: 'var(--text-muted)' }}>
           Your free calendar keeps working forever. Upgrade or cancel anytime.
         </p>

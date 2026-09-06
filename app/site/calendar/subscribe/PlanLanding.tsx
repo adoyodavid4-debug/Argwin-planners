@@ -393,10 +393,10 @@ export default function PlanLanding({ plan }: { plan: Plan }) {
                 </div>
               </div>
               <p className="text-sm font-medium mb-4" style={{ color: 'var(--text-primary)' }}>
-                4 meetings, 2h focus protected, 1 conflict to resolve. Leave by 08:40 for your 09:00 in Westlands.
+                4 meetings, 2h focus protected, 1 conflict to resolve. Leave by 08:40 for your 09:00 in Midtown.
               </p>
               {[
-                { time: '09:00', title: 'Client kickoff — Westlands', flag: 'Leave 08:40' },
+                { time: '09:00', title: 'Client kickoff — Midtown', flag: 'Leave 08:40' },
                 { time: '11:30', title: 'Design review', flag: 'Join link' },
                 { time: '14:00', title: 'Focus block — protected', flag: null },
                 { time: '15:00', title: 'Team sync', flag: '⚠ Clash' },
@@ -543,10 +543,18 @@ function SubscribeCard({ plan, name, price, period }: { plan: Plan; name: string
     if (!email.trim() || !password) { setError('Email and password are required.'); return }
     setSubmitting(true); setError(null)
     const supabase = createClient()
+    // Activate the paid plan for the now-authenticated user. (Server-side hook;
+    // gated by a real payment check once billing is live.)
+    const activate = () =>
+      fetch('/api/calendar/activate-plan', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan }),
+      }).catch(() => {})
     try {
       if (mode === 'signin') {
         const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
         if (error) throw error
+        await activate()
         toast.success(`Welcome back! Setting up ${name}…`)
         router.push(dest); router.refresh()
       } else {
@@ -558,7 +566,7 @@ function SubscribeCard({ plan, name, price, period }: { plan: Plan; name: string
           },
         })
         if (error) throw error
-        if (data.session) { toast.success(`Account created! Setting up ${name}…`); router.push(dest); router.refresh() }
+        if (data.session) { await activate(); toast.success(`Account created! Setting up ${name}…`); router.push(dest); router.refresh() }
         else setCheckEmail(true)
       }
     } catch (err: any) {
