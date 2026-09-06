@@ -3,8 +3,10 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
-import { getPlanInfo, PLAN_RANK, type CalendarPlan, type PlanInfo } from '@/lib/calendar/plan'
+import { getPlanInfo, PLAN_RANK, PLAN_LABEL, type CalendarPlan, type PlanInfo } from '@/lib/calendar/plan'
 import { X, Check, Sparkles, Users, ArrowRight, Lock, CalendarDays } from 'lucide-react'
+
+const fmtDate = (iso: string) => new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(iso))
 
 const FREE_FEATURES = [
   'Full calendar: unlimited events, all views, recurrence',
@@ -96,6 +98,17 @@ function PlanContent({ onClose }: { onClose?: () => void }) {
       </div>
 
       <div className="space-y-5 px-4 py-5">
+        {plan !== 'free' && info?.expiresAt && !info.isAdmin && (
+          <div className="rounded-xl border p-4" style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}>
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+              Your <strong style={{ color: 'var(--text-primary)' }}>{PLAN_LABEL[plan]}</strong> is active until{' '}
+              <strong style={{ color: 'var(--text-primary)' }}>{fmtDate(info.expiresAt)}</strong>.
+            </p>
+            <Link href={`/calendar/subscribe/${plan}`} className="btn-outline mt-3 w-full justify-center py-2 text-sm">
+              Renew for another month <ArrowRight size={14} />
+            </Link>
+          </div>
+        )}
         {TIERS.map((t) => <TierCard key={t.tier} t={t} state={stateFor(t.tier)} />)}
         <p className="px-1 text-center text-[11px]" style={{ color: 'var(--text-muted)' }}>
           Your free calendar keeps working forever. Upgrade or cancel anytime.
