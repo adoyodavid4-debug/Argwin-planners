@@ -247,28 +247,12 @@ const FAQS = [
     a: 'Yes. Two-way sync with Google Calendar and Microsoft 365 / Outlook is core, with Apple Calendar via CalDAV and standard ICS import/export. Your existing calendar keeps working — Arwign just makes it smarter.',
   },
   {
-    q: 'Does the AI do things without asking?',
-    a: 'Never. Every AI action is a proposal you can accept, edit or dismiss. Arwign Calendar never silently moves, deletes or books anything, and every suggestion is logged and reversible.',
-  },
-  {
-    q: 'What’s the Daily Outlook Briefing?',
-    a: 'A proactive, AI-composed summary of your day delivered to your inbox and phone before you open anything — your timeline, what needs action, leave-by times and a gentle nudge if the day is overloaded.',
-  },
-  {
     q: 'Will there be a free plan?',
     a: 'Yes. Arwign Free gives you the full calendar, all views, recurrence, quick-add and one connected account — free forever. Advanced automation, unlimited accounts and SMS briefings live on Plus and Teams.',
   },
   {
-    q: 'Will there be booking pages and payments?',
-    a: 'Yes — public booking pages (one-off, round-robin, collective and group), Doodle-style meeting polls, and paid bookings via Stripe, Paystack and M-Pesa with automatic invoicing and refunds on cancellation.',
-  },
-  {
     q: 'Does it work offline?',
     a: 'Yes. Arwign Calendar is local-first — it works fully offline and reconciles cleanly when you reconnect. It installs as a PWA today, with native iOS and Android apps to follow.',
-  },
-  {
-    q: 'How do you protect my privacy?',
-    a: 'Least-privilege scopes, encrypted tokens and privacy modes: share “Busy” only, keep events private, or opt into end-to-end encryption. Every AI suggestion is logged and reversible, with a full audit trail for shared and delegated actions.',
   },
 ]
 
@@ -376,46 +360,6 @@ export default function CalendarClient() {
         </div>
       </section>
 
-      {/* ── Pillars ──────────────────────────────────────── */}
-      <section className="container-site py-16">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <h2 className="font-display font-semibold mb-3" style={{ fontSize: 'clamp(2rem, 4vw, 2.75rem)', color: 'var(--text-primary)' }}>
-            Everything a calendar should have done all along
-          </h2>
-          <p style={{ color: 'var(--text-secondary)' }}>
-            Not a wall you hang your obligations on — an assistant that manages your time.
-          </p>
-        </div>
-        <div className="grid md:grid-cols-2 gap-6">
-          {PILLARS.map((pillar, i) => (
-            <motion.div
-              key={pillar.title}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: i * 0.06 }}
-              className="rounded-2xl border p-7"
-              style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
-            >
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: 'rgba(var(--gold-rgb),0.12)' }}>
-                  <pillar.icon size={19} style={{ color: 'var(--gold)' }} />
-                </div>
-                <h3 className="font-semibold text-lg" style={{ color: 'var(--text-primary)' }}>{pillar.title}</h3>
-              </div>
-              <ul className="space-y-2.5">
-                {pillar.points.map((pt) => (
-                  <li key={pt} className="flex items-start gap-2.5 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                    <Check size={16} className="flex-shrink-0 mt-0.5" style={{ color: 'var(--gold)' }} />
-                    {pt}
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
       {/* ── Flagship: Daily Outlook Briefing ─────────────── */}
       <section className="py-16" style={{ background: 'var(--bg-card)' }}>
         <div className="container-site grid lg:grid-cols-2 gap-12 items-center">
@@ -482,57 +426,6 @@ export default function CalendarClient() {
               </div>
             ))}
           </motion.div>
-        </div>
-      </section>
-
-      {/* ── Differentiators ──────────────────────────────── */}
-      <section className="container-site py-16">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <h2 className="font-display font-semibold mb-3" style={{ fontSize: 'clamp(2rem, 4vw, 2.75rem)', color: 'var(--text-primary)' }}>
-            The pain points we eliminate
-          </h2>
-          <p style={{ color: 'var(--text-secondary)' }}>Every ordinary-calendar frustration, answered by a concrete feature.</p>
-        </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {DIFFERENTIATORS.map((d, i) => (
-            <motion.div
-              key={d.pain}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.35, delay: (i % 3) * 0.06 }}
-              className="rounded-2xl border p-6"
-              style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
-            >
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4" style={{ background: 'rgba(var(--gold-rgb),0.12)' }}>
-                <d.icon size={18} style={{ color: 'var(--gold)' }} />
-              </div>
-              <p className="text-sm line-through decoration-1 mb-2 opacity-70" style={{ color: 'var(--text-muted)' }}>{d.pain}</p>
-              <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{d.fix}</p>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── More, by design ──────────────────────────────── */}
-      <section className="py-16" style={{ background: 'var(--bg-card)' }}>
-        <div className="container-site">
-          <div className="text-center max-w-2xl mx-auto mb-10">
-            <h2 className="font-display font-semibold mb-3" style={{ fontSize: 'clamp(2rem, 4vw, 2.75rem)', color: 'var(--text-primary)' }}>
-              And everything else, by design
-            </h2>
-            <p style={{ color: 'var(--text-secondary)' }}>
-              The whole toolkit — scheduling, payments, privacy and platform reach — built to the same calm standard.
-            </p>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 max-w-4xl mx-auto">
-            {MORE.map((m) => (
-              <div key={m} className="flex items-start gap-2.5 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                <Check size={16} className="flex-shrink-0 mt-0.5" style={{ color: 'var(--gold)' }} />
-                {m}
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
