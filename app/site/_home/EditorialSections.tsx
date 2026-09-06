@@ -13,7 +13,7 @@ export function WhyArwign() {
   const reveal = useReveal()
   const items = [
     { icon: Link2,      title: 'Hyperlinked navigation', body: 'Tap any tab to jump between views instantly.' },
-    { icon: Ruler,      title: 'Three sizes',            body: 'A4, US Letter and A5 in every download.' },
+    { icon: Ruler,      title: 'A4 ready',            body: 'Print-ready A4 in every download.' },
     { icon: Type,       title: 'Lora + Poppins',         body: 'Editorial type, crafted detail by detail.' },
     { icon: Tablet,     title: 'Works in your apps',     body: 'GoodNotes, Notability, Xodo and print.' },
     { icon: Zap,        title: 'Instant delivery',       body: 'Files land in your inbox at checkout.' },

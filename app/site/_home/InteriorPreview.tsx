@@ -27,7 +27,7 @@ export default function InteriorPreview() {
         <div>
           <p className="text-xs uppercase tracking-widest font-semibold mb-2" style={{ color: 'var(--gold)', letterSpacing: '0.12em' }}>See inside</p>
           <h2 className="font-display mb-4" style={{ fontSize: 'clamp(1.9rem,3.5vw,2.8rem)', color: 'var(--text-primary)', lineHeight: 1.1 }}>Designed to be a joy to use</h2>
-          <p className="text-sm leading-relaxed mb-7 max-w-md" style={{ color: 'var(--text-secondary)' }}>Tap between hyperlinked tabs, choose dotted, lined or blank pages, and plan across three sizes — every spread crafted with care.</p>
+          <p className="text-sm leading-relaxed mb-7 max-w-md" style={{ color: 'var(--text-secondary)' }}>Tap between hyperlinked tabs, choose dotted, lined or blank pages, and plan with ease — every spread crafted with care.</p>
           <div className="flex flex-col gap-3 mb-8">
             {[{ icon: Link2, t: 'Hyperlinked tabs', d: 'Jump between sections in a single tap.' }, { icon: Layers, t: 'Template variety', d: 'Dotted, lined and blank layouts included.' }, { icon: RefreshCcw, t: 'Undated & reusable', d: 'Start any day, reuse year after year.' }].map(({ icon: Icon, t, d }) => (
               <div key={t} className="flex items-start gap-3">

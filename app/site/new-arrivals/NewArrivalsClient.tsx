@@ -15,7 +15,7 @@ import type { Product, Category } from '@/types/database'
 const FALLBACK_IMG = 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=600&q=80'
 const PER_PAGE = 12
 const FORMAT_OPTIONS = ['PDF', 'GoodNotes', 'Notability', 'Xodo']
-const SIZE_KEYS: { k: string; l: string }[] = [{ k: 'a4', l: 'A4' }, { k: 'us_letter', l: 'US Letter' }, { k: 'a5', l: 'A5' }]
+const SIZE_KEYS: { k: string; l: string }[] = [{ k: 'a4', l: 'A4' }]
 const SORT_OPTIONS = [
   { value: 'newest',     label: 'Just Dropped' },
   { value: 'popular',    label: 'Most Downloaded' },

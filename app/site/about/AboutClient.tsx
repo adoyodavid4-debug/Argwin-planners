@@ -27,7 +27,7 @@ const VALUES = [
 
 const CRAFT = [
   { icon: Link2,  title: 'Hyperlinked navigation', body: 'Tap any tab to jump between views instantly.' },
-  { icon: Ruler,  title: 'Three sizes',            body: 'A4, US Letter and A5 in every download.' },
+  { icon: Ruler,  title: 'A4 ready',            body: 'Print-ready A4 in every download.' },
   { icon: Palette,title: 'A warm, calm palette',    body: 'Cream, peach, sage, golden and terracotta.' },
   { icon: Type,   title: 'Lora + Poppins',          body: 'Editorial serif headings, clean modern body.' },
   { icon: Tablet, title: 'App compatible',          body: 'GoodNotes, Notability, Xodo and any PDF app.' },
@@ -35,9 +35,9 @@ const CRAFT = [
 ]
 
 const TESTIMONIALS = [
-  { quote: 'I have tried every planner app out there. Arwign is the first that actually stayed on my iPad for more than a week.', name: 'Amara N.', role: 'Teacher, Nairobi', grad: 'linear-gradient(135deg,#B8A9D4,#7B6FAE)' },
+  { quote: 'I have tried every planner app out there. Arwign is the first that actually stayed on my iPad for more than a week.', name: 'Amara N.', role: 'Teacher, Chicago', grad: 'linear-gradient(135deg,#B8A9D4,#7B6FAE)' },
   { quote: 'The budget planner genuinely changed my savings habits. Six months in and I have hit every target I set.', name: 'James K.', role: 'Accountant, London', grad: 'linear-gradient(135deg,#A0830E,#C4A538)' },
-  { quote: 'I ordered the complete bundle and have not touched another planner since. The quality is unreal.', name: 'Sofia R.', role: 'Designer, Melbourne', grad: 'linear-gradient(135deg,#E8C5C0,#C9847C)' },
+  { quote: 'I ordered the complete bundle and have not touched another planner since. The quality is unreal.', name: 'Sofia R.', role: 'Designer, Manchester', grad: 'linear-gradient(135deg,#E8C5C0,#C9847C)' },
 ]
 
 const JOURNEY = [

@@ -13,8 +13,6 @@ export const COLOURWAYS: Colourway[] = [
 export interface SizeOpt { id: string; label: string; dim: string }
 export const SIZES: SizeOpt[] = [
   { id: 'a4', label: 'A4',         dim: '210 × 297 mm' },
-  { id: 'us', label: 'US Letter',  dim: '8.5 × 11 in' },
-  { id: 'a5', label: 'A5',         dim: '148 × 210 mm' },
 ]
 
 // TODO(spreads): replace with real interior renders when available.
@@ -31,7 +29,7 @@ export interface Feature { icon: string; title: string; body: string }
 export const FEATURES: Feature[] = [
   { icon: 'link',     title: 'Hyperlinked Navigation', body: 'Tap any tab to jump between sections instantly — no scrolling.' },
   { icon: 'layers',   title: '200+ Pages of Depth',    body: 'Room to plan a whole year without ever running out of space.' },
-  { icon: 'ruler',    title: 'Three Sizes',            body: 'A4, US Letter and A5 — sized for your device or printer.' },
+  { icon: 'ruler',    title: 'A4 Size',               body: 'Print-ready A4 — sized for your device or printer.' },
   { icon: 'type',     title: 'Lora + Poppins',         body: 'Editorial serif headings paired with clean, modern body type.' },
   { icon: 'tablet',   title: 'App Compatible',         body: 'GoodNotes, Notability, Xodo and any PDF annotation app.' },
   { icon: 'zap',      title: 'Instant Download',       body: 'Files land in your inbox the moment you check out — start today.' },
@@ -59,7 +57,7 @@ export const REVIEW_COUNT = 214
 
 export interface Faq { q: string; a: string }
 export const FAQS: Faq[] = [
-  { q: 'What file formats will I receive?', a: 'A high-resolution hyperlinked PDF that works in GoodNotes, Notability, Xodo and any PDF app — plus print-ready sizing in A4, US Letter and A5.' },
+  { q: 'What file formats will I receive?', a: 'A high-resolution hyperlinked PDF that works in GoodNotes, Notability, Xodo and any PDF app — print-ready in A4.' },
   { q: 'How fast is delivery?', a: 'Instant. A secure download link is emailed to you the moment payment clears, and it stays in your account for re-download any time.' },
   { q: 'How do I import it into GoodNotes or Notability?', a: 'Open the PDF on your device and choose “Open in GoodNotes / Notability”, or import from Files — the tabs and links carry across automatically.' },
   { q: 'What is your refund policy?', a: 'Because these are instant digital downloads we generally cannot offer refunds, but if anything is wrong with your file our team will make it right within 30 days.' },

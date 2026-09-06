@@ -14,8 +14,6 @@ export const COLOURWAYS: Colourway[] = [
 export interface SizeOpt { id: string; label: string; dim: string }
 export const SIZES: SizeOpt[] = [
   { id: 'a4', label: 'A4',         dim: '210 × 297 mm' },
-  { id: 'us', label: 'US Letter',  dim: '8.5 × 11 in' },
-  { id: 'a5', label: 'A5',         dim: '148 × 210 mm' },
 ]
 
 export interface MotifOpt { id: string; label: string; icon: string; desc: string }
@@ -56,7 +54,7 @@ export interface Feature { icon: string; title: string; body: string }
 export const FEATURES: Feature[] = [
   { icon: 'link',       title: 'Hyperlinked Navigation', body: 'Tap any tab to jump between sections instantly — no scrolling.' },
   { icon: 'layers',     title: '200+ Pages of Depth',    body: 'Room to plan a whole year without ever running out of space.' },
-  { icon: 'ruler',      title: 'Three Sizes',            body: 'A4, US Letter and A5 — sized for your device or printer.' },
+  { icon: 'ruler',      title: 'A4 Size',               body: 'Print-ready A4 — sized for your device or printer.' },
   { icon: 'type',       title: 'Lora + Poppins',         body: 'Editorial serif headings paired with clean, modern body type.' },
   { icon: 'tablet',     title: 'App Compatible',         body: 'GoodNotes, Notability, Xodo and any PDF annotation app.' },
   { icon: 'sparkles',   title: 'Made to Order',          body: 'Hand-finished around your brief — never a generic template.' },

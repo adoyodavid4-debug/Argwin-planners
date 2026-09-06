@@ -13,7 +13,7 @@ import type { Category } from '@/types/database'
 // ── Slug → presentation meta ──────────────────────────────────
 const CAT_META: Record<string, { icon: React.ElementType; accent: string; blurb: string }> = {
   'digital-planners':   { icon: Tablet,         accent: '#7B6FAE', blurb: 'Hyperlinked, GoodNotes-ready planners for iPad & tablet.' },
-  'printable-planners': { icon: Printer,         accent: '#C9847C', blurb: 'Print-at-home pages in A4 & A5, ready to bind.' },
+  'printable-planners': { icon: Printer,         accent: '#C9847C', blurb: 'Print-at-home pages in A4, ready to bind.' },
   'budget-planners':    { icon: Wallet,          accent: '#A0830E', blurb: 'Track spending, crush debt and grow your savings.' },
   'student-planners':   { icon: BookOpen,        accent: '#6E7E66', blurb: 'Assignments, exams and study schedules, organised.' },
   'wellness-planners':  { icon: HeartPulse,      accent: '#E8A0A0', blurb: 'Mood, sleep, gratitude and self-care rituals.' },

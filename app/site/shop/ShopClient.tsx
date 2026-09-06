@@ -16,7 +16,7 @@ import type { Product, Category } from '@/types/database'
 const FALLBACK_IMG = 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=600&q=80'
 const PER_PAGE = 16
 const FORMAT_OPTIONS = ['PDF', 'GoodNotes', 'Notability', 'Xodo']
-const SIZE_KEYS: { k: string; l: string }[] = [{ k: 'a4', l: 'A4' }, { k: 'us_letter', l: 'US Letter' }, { k: 'a5', l: 'A5' }]
+const SIZE_KEYS: { k: string; l: string }[] = [{ k: 'a4', l: 'A4' }]
 const PRICE_BUCKETS = [
   { v: 'under-10', l: 'Under $10', test: (p: Product) => p.price < 10 },
   { v: '10-20', l: '$10 – $20', test: (p: Product) => p.price >= 10 && p.price <= 20 },

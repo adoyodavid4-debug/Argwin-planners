@@ -273,7 +273,7 @@ export default function NotebooksClient({ notebooks, faqs }: { notebooks: Notebo
             {[
               { icon: Layers, title: 'Hyperlinked Tabs', body: 'Jump between sections, indexes and pages with a single tap — no scrolling.' },
               { icon: Download, title: 'Every File Format', body: 'High-resolution PDF plus GoodNotes & Notability ready files in one download.' },
-              { icon: Notebook, title: 'A4 · US Letter · A5', body: 'Three sizes included so it fits your tablet or printer perfectly.' },
+              { icon: Notebook, title: 'A4 size', body: 'Print-ready A4 so it fits your tablet or printer perfectly.' },
               { icon: Palette, title: 'Designer Templates', body: 'Dot-grid, lined, blank and structured layouts in elegant, calm themes.' },
               { icon: RefreshCcw, title: 'Reusable Forever', body: 'Duplicate pages infinitely in your app — never run out of space.' },
               { icon: BadgeCheck, title: 'Free Updates', body: 'Buy once and re-download improved versions from your account, free.' },

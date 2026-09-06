@@ -12,7 +12,7 @@ const CAN_PERSONALISE = [
   'Cover motif & artwork',
   'Name or initials',
   'Colourway',
-  'Size (A4 / US Letter / A5)',
+  'Size (A4)',
   'Page templates',
   'Section tabs',
 ]

@@ -17,8 +17,6 @@ export interface NotebookSize {
 
 export const SIZES: NotebookSize[] = [
   { id: 'a4',      label: 'A4',        note: 'Roomy spreads for iPad Pro', price: 14 },
-  { id: 'letter',  label: 'US Letter', note: 'Standard US page ratio',     price: 14 },
-  { id: 'a5',      label: 'A5',        note: 'Compact, great on the go',    price: 12 },
 ]
 
 // ─── Cover colourways / motifs (Ready-Made variant axis) ────────
@@ -93,7 +91,7 @@ export const FEATURES: Feature[] = [
   { icon: 'Layers',     title: '200+ pages',                    desc: 'A generous page count so you never run out of room.' },
   { icon: 'LayoutGrid', title: 'Dotted, lined & blank',         desc: 'Mix template styles to suit how you think and write.' },
   { icon: 'Type',       title: 'Lora + Poppins typography',     desc: 'A warm serif paired with a clean sans for easy reading.' },
-  { icon: 'Maximize',   title: 'Three sizes',                   desc: 'A4, US Letter and A5 — pick what fits your device.' },
+  { icon: 'Maximize',   title: 'A4 size',                       desc: 'Print-ready A4 — pick what fits your device.' },
 ]
 
 // ─── Hyperlinked-tabs demo sections ─────────────────────────────
@@ -116,7 +114,7 @@ export const FAQS: Faq[] = [
   },
   {
     q: 'Which sizes are included?',
-    a: 'You choose your size at checkout — A4, US Letter or A5. Each is laid out for that exact page ratio so nothing is cropped or stretched.',
+    a: 'Your notebook is laid out in A4 for that exact page ratio, so nothing is cropped or stretched.',
   },
   {
     q: 'What is your refund policy?',
@@ -136,7 +134,7 @@ export interface Review {
 export const REVIEWS_PLACEHOLDER: Review[] = [
   { name: 'Naomi A.',  rating: 5, text: 'The hyperlinked tabs make my iPad notebook feel like a proper app. Beautiful and so easy to navigate.' },
   { name: 'Daniel O.', rating: 5, text: 'Imported into GoodNotes in seconds. The dotted spreads are perfect for bullet journaling.' },
-  { name: 'Priya S.',  rating: 4, text: 'Lovely warm design and great page count. I went back and ordered the A5 size too.' },
+  { name: 'Priya S.',  rating: 4, text: 'Lovely warm design and great page count. I went back and ordered another too.' },
 ]
 
 export const RATING_AVG = 4.8

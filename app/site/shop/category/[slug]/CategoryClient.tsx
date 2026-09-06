@@ -44,18 +44,18 @@ const CATEGORY_META: Record<string, {
   },
   'printable-planners': {
     headline: 'Printable Planners',
-    subheadline: 'Print at Home · A4 & A5 Ready',
+    subheadline: 'Print at Home · A4 Ready',
     description: 'Beautiful printable planner pages designed to look stunning on paper. Print at home, bind yourself, and enjoy a tactile planning experience.',
     accentColor: 'var(--blush)',
     bgGradient: 'linear-gradient(135deg, rgba(232,197,192,0.20) 0%, rgba(247,242,232,0.60) 100%)',
     features: [
       { icon: Download,    label: 'Instant PDF Download' },
       { icon: RefreshCcw,  label: 'Print Unlimited Copies' },
-      { icon: Smartphone,  label: 'A4 & A5 Sizes Included' },
+      { icon: Smartphone,  label: 'A4 Size Included' },
       { icon: Zap,         label: 'Ring-Binder & Disc Ready' },
     ],
     seoTitle: 'Why Our Printable Planners Stand Out',
-    seoBody: 'Each printable planner is meticulously designed with print-safe margins, bleed lines, and colour profiles optimised for home inkjet and laser printers. Sized in both A4 and A5 so they fit standard ring binders. Download once, print as many times as you need — for yourself, gifts, or your whole team.',
+    seoBody: 'Each printable planner is meticulously designed with print-safe margins, bleed lines, and colour profiles optimised for home inkjet and laser printers. Sized in A4 so it fits standard ring binders. Download once, print as many times as you need — for yourself, gifts, or your whole team.',
   },
   'budget-planners': {
     headline: 'Budget Planners',
@@ -1272,7 +1272,7 @@ function WhatsInside({ accent, bgGradient }: { accent: string; bgGradient: strin
     { icon: Calendar, title: '12 Months · 52 Weeks',     body: 'Complete monthly spreads, weekly layouts and daily pages for a full year of planning.' },
     { icon: Palette,  title: 'Beautiful Themes',          body: 'Curated colour palettes and elegant typography designed to make you want to plan.' },
     { icon: RefreshCcw, title: 'Undated & Reusable',      body: 'Start any day, any month. Never waste a page and reuse it year after year.' },
-    { icon: Layers,   title: 'Every File Format',         body: 'PDF, GoodNotes, Notability and print-ready A4 & A5 sizes included in every purchase.' },
+    { icon: Layers,   title: 'Every File Format',         body: 'PDF, GoodNotes, Notability and print-ready A4 included in every purchase.' },
     { icon: BadgeCheck, title: 'Free Lifetime Updates',   body: 'Buy once and re-download improved versions from your account, forever.' },
   ]
   return (
