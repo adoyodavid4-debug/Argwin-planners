@@ -46,7 +46,7 @@ const CONTENT: Record<Plan, TierContent> = {
   plus: {
     plan: 'plus',
     name: 'Arwign Plus',
-    price: '$9.99',
+    price: '$19.99',
     period: 'per month',
     tagline: 'The individual power user',
     popular: true,
@@ -114,7 +114,7 @@ const CONTENT: Record<Plan, TierContent> = {
     more: [
       'Personal booking pages — one-off & group',
       'Meeting polls — propose times, invitees vote, auto-books the winner',
-      'Paid bookings via Stripe, Paystack & M-Pesa — invoices & auto-refunds',
+      'Paid bookings by credit & debit card — invoices & auto-refunds',
       'Holiday & multi-country calendars, birthdays & weather on outdoor events',
       'Home-screen & lock-screen widgets; Apple Watch & Wear OS complications',
       'Snooze, undo & bulk-edit on every event action',
@@ -140,7 +140,7 @@ const CONTENT: Record<Plan, TierContent> = {
   teams: {
     plan: 'teams',
     name: 'Arwign Teams',
-    price: '$23.99',
+    price: '$49.99',
     period: 'per month',
     tagline: 'For teams',
     intro:
@@ -214,7 +214,7 @@ const CONTENT: Record<Plan, TierContent> = {
     more: [
       'Public booking pages — one-off, round-robin, collective & group',
       'Meeting polls — propose times, invitees vote, auto-books the winner',
-      'Paid bookings via Stripe, Paystack & M-Pesa — invoices & auto-refunds',
+      'Paid bookings by credit & debit card — invoices & auto-refunds',
       'Delegation with a full audit trail for shared actions',
       'Privacy modes — “Busy”-only sharing, private & end-to-end-encrypted events',
       'Admin console — roles, provisioning & centralised billing',

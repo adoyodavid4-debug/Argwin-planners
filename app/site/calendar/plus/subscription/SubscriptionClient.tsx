@@ -59,7 +59,7 @@ export default function SubscriptionClient({ ws }: { ws: PlusWorkspace }) {
           <div className="rounded-2xl border p-5" style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}>
             <Users size={18} style={{ color: 'var(--gold)' }} />
             <p className="mt-2 text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Working with a team?</p>
-            <p className="mt-1 text-xs" style={{ color: 'var(--text-muted)' }}>Arwign Teams adds shared calendars, roles, resource booking and an admin console — $23.99/mo.</p>
+            <p className="mt-1 text-xs" style={{ color: 'var(--text-muted)' }}>Arwign Teams adds shared calendars, roles, resource booking and an admin console — $49.99/mo.</p>
             <Link href="/calendar/team" className="btn-outline mt-3 w-full justify-center py-2 text-sm">Explore Teams <ArrowRight size={14} /></Link>
           </div>
 

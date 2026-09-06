@@ -31,8 +31,8 @@ const TEAMS_FEATURES = [
 type CardState = 'active' | 'included' | 'upgrade'
 const TIERS: { tier: CalendarPlan; name: string; price: string; icon: typeof Sparkles; features: string[]; href: string; cta: string; accent: boolean }[] = [
   { tier: 'free',  name: 'Arwign Free',  price: 'Free',     icon: CalendarDays, features: FREE_FEATURES,  href: '',                          cta: '',                 accent: false },
-  { tier: 'plus',  name: 'Arwign Plus',  price: '$9.99/mo', icon: Sparkles,     features: PLUS_FEATURES,  href: '/calendar/subscribe/plus',  cta: 'Upgrade to Plus',  accent: true  },
-  { tier: 'teams', name: 'Arwign Teams', price: '$23.99/mo',icon: Users,        features: TEAMS_FEATURES, href: '/calendar/subscribe/teams', cta: 'See Arwign Teams', accent: false },
+  { tier: 'plus',  name: 'Arwign Plus',  price: '$19.99/mo', icon: Sparkles,     features: PLUS_FEATURES,  href: '/calendar/subscribe/plus',  cta: 'Upgrade to Plus',  accent: true  },
+  { tier: 'teams', name: 'Arwign Teams', price: '$49.99/mo',icon: Users,        features: TEAMS_FEATURES, href: '/calendar/subscribe/teams', cta: 'See Arwign Teams', accent: false },
 ]
 
 function TierCard({ t, state }: { t: typeof TIERS[number]; state: CardState }) {

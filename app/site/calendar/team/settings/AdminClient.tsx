@@ -5,7 +5,7 @@ import { Building2, CreditCard, ShieldCheck, KeyRound, Minus, Plus, AlertTriangl
 import TeamShell, { SectionCard } from '../TeamShell'
 import { type TeamWorkspace } from '@/lib/calendar/team'
 
-const TIMEZONES = ['Africa/Nairobi', 'Europe/Berlin', 'Europe/London', 'America/New_York', 'Asia/Kolkata', 'Asia/Singapore']
+const TIMEZONES = ['America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles', 'Europe/London']
 const fmtDate = (iso: string) => new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(iso))
 
 export default function AdminClient({ ws }: { ws: TeamWorkspace }) {
@@ -17,7 +17,7 @@ export default function AdminClient({ ws }: { ws: TeamWorkspace }) {
   const save = () => toast.success('Team settings saved')
 
   return (
-    <TeamShell workspace={ws} currentRole="owner" title="Admin console"
+    <TeamShell workspace={ws} title="Admin console"
       subtitle="Team profile, roles, provisioning and centralised billing — all in one place."
       actions={<button onClick={save} className="btn-primary px-3.5 py-2 text-sm"><Check size={15} /> Save changes</button>}>
 
@@ -43,7 +43,7 @@ export default function AdminClient({ ws }: { ws: TeamWorkspace }) {
           <div className="mb-4 flex items-center justify-between rounded-xl border p-3.5" style={{ borderColor: 'rgba(var(--gold-rgb),0.35)', background: 'rgba(var(--gold-rgb),0.06)' }}>
             <div>
               <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Arwign Teams</p>
-              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>$23.99 / month · renews {fmtDate(ws.team.renews_on)}</p>
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>$49.99 / month · renews {fmtDate(ws.team.renews_on)}</p>
             </div>
             <CreditCard size={20} style={{ color: 'var(--gold)' }} />
           </div>

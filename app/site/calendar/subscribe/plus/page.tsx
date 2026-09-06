@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import PlanLanding from '../PlanLanding'
 
 export const metadata: Metadata = {
-  title: 'Subscribe to Arwign Plus — $9.99/month | Arwign Calendar',
-  description: 'Arwign Plus: unlimited connected calendars, full AI scheduling, SMS Daily Briefing, personal booking pages, meeting polls and calendar-health analytics. $9.99 per month.',
+  title: 'Subscribe to Arwign Plus — $19.99/month | Arwign Calendar',
+  description: 'Arwign Plus: unlimited connected calendars, full AI scheduling, SMS Daily Briefing, personal booking pages, meeting polls and calendar-health analytics. $19.99 per month.',
   robots: { index: true, follow: true },
 }
 

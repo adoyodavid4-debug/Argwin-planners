@@ -174,7 +174,7 @@ const DIFFERENTIATORS = [
 const MORE = [
   'Public booking pages — one-off, round-robin, collective & group',
   'Meeting polls — propose times, invitees vote, auto-books the winner',
-  'Paid bookings via Stripe, Paystack & M-Pesa — invoices & auto-refunds',
+  'Paid bookings by credit & debit card — invoices & auto-refunds',
   'Holiday & multi-country calendars, birthdays & weather on outdoor events',
   'Home-screen & lock-screen widgets; Apple Watch & Wear OS complications',
   'Snooze, undo & bulk-edit on every event action',
@@ -204,7 +204,7 @@ const TIERS = [
   {
     name: 'Arwign Plus',
     tagline: 'The individual power user',
-    price: '$9.99',
+    price: '$19.99',
     period: '/month',
     cta: 'Subscribe to Arwign Plus',
     href: '/calendar/subscribe/plus',
@@ -221,7 +221,7 @@ const TIERS = [
   {
     name: 'Arwign Teams',
     tagline: 'For teams',
-    price: '$23.99',
+    price: '$49.99',
     period: '/month',
     cta: 'Subscribe to Arwign Teams',
     href: '/calendar/subscribe/teams',
@@ -409,10 +409,10 @@ export default function CalendarClient() {
               </div>
             </div>
             <p className="text-sm font-medium mb-4" style={{ color: 'var(--text-primary)' }}>
-              4 meetings, 2h focus protected, 1 conflict to resolve. Leave by 08:40 for your 09:00 in Westlands.
+              4 meetings, 2h focus protected, 1 conflict to resolve. Leave by 08:40 for your 09:00 in Midtown.
             </p>
             {[
-              { time: '09:00', title: 'Client kickoff — Westlands', flag: 'Leave 08:40' },
+              { time: '09:00', title: 'Client kickoff — Midtown', flag: 'Leave 08:40' },
               { time: '11:30', title: 'Design review', flag: 'Join link' },
               { time: '14:00', title: 'Focus block — protected', flag: null },
               { time: '15:00', title: 'Team sync', flag: '⚠ Clash' },

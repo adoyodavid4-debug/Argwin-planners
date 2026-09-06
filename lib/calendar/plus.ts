@@ -94,6 +94,7 @@ export interface PlusAnalytics {
 
 export interface PlusWorkspace {
   live: boolean
+  featuresRaw: Record<string, boolean> // persisted feature/rule/connection state (calendar_settings.features)
   profile: PlusProfile
   briefing: BriefingConfig
   integrations: Integration[]
@@ -104,6 +105,11 @@ export interface PlusWorkspace {
   polls: Poll[]
   analytics: PlusAnalytics
 }
+
+// Namespaced keys under calendar_settings.features that persist Plus state.
+export const intKey = (id: string) => `plus.int.${id}`
+export const focusKey = (id: string) => `plus.focus.${id}`
+export const autoKey = (id: string) => `plus.auto.${id}`
 
 // ── Colour tokens (mirror the calendar palette) ───────────────
 export const PLUS_COLOURS: Record<string, { dot: string; soft: string }> = {
@@ -123,15 +129,15 @@ export const byId = <T extends { id: string }>(list: T[], id: string) => list.fi
 // ── Sample workspace ──────────────────────────────────────────
 export function sampleWorkspace(): PlusWorkspace {
   const profile: PlusProfile = {
-    name: 'Amara Odhiambo', email: 'amara@arwign.com', phone: '+254712345678',
-    timezone: 'Africa/Nairobi', plan: 'plus', price: '$9.99', renews_on: '2026-10-05',
+    name: 'Emma Carter', email: 'emma@arwign.com', phone: '+1 202 555 0134',
+    timezone: 'America/New_York', plan: 'plus', price: '$19.99', renews_on: '2026-10-05',
   }
 
   const briefing: BriefingConfig = { email: true, sms: true, evening: true, hour: 7, quiet_start: 21, quiet_end: 7 }
 
   const integrations: Integration[] = [
-    { id: 'i1', name: 'Google Calendar', category: 'calendar', status: 'connected', account: 'amara@gmail.com', hue: 8, note: 'Two-way sync' },
-    { id: 'i2', name: 'Microsoft 365 / Outlook', category: 'calendar', status: 'connected', account: 'amara@work.com', hue: 205, note: 'Two-way sync' },
+    { id: 'i1', name: 'Google Calendar', category: 'calendar', status: 'connected', account: 'emma@gmail.com', hue: 8, note: 'Two-way sync' },
+    { id: 'i2', name: 'Microsoft 365 / Outlook', category: 'calendar', status: 'connected', account: 'emma@work.com', hue: 205, note: 'Two-way sync' },
     { id: 'i3', name: 'Apple Calendar (CalDAV)', category: 'calendar', status: 'available', hue: 220, note: 'ICS import / export' },
     { id: 'i4', name: 'Google Meet', category: 'conferencing', status: 'connected', hue: 130, note: 'Auto-attached links' },
     { id: 'i5', name: 'Zoom', category: 'conferencing', status: 'available', hue: 210, note: 'Auto-attached links' },
@@ -142,7 +148,7 @@ export function sampleWorkspace(): PlusWorkspace {
 
   const suggestions: AiSuggestion[] = [
     { id: 's1', type: 'reschedule', title: 'Resolve a clash at 15:00', detail: 'Move “Team sync” to 16:30 — the least-disruptive shift, everyone still free.', when: 'Today' },
-    { id: 's2', type: 'email-event', title: 'Event found in your inbox', detail: '“Dentist, Thu 10:30” detected in an email from Westlands Dental. Add it?', when: 'Thu 10:30' },
+    { id: 's2', type: 'email-event', title: 'Event found in your inbox', detail: '“Dentist, Thu 10:30” detected in an email from Midtown Dental. Add it?', when: 'Thu 10:30' },
     { id: 's3', type: 'time-block', title: 'Protect 2h for the Q4 deck', detail: 'A deadline task from Todoist — slot it Wed 09:00–11:00 as a defended block.', when: 'Wed 09:00' },
     { id: 's4', type: 'prep', title: 'Prep brief ready: Client kickoff', detail: 'Assembled from the agenda, attendee history and last meeting’s notes.', when: '09:00' },
     { id: 's5', type: 'rescue', title: 'This week is overbooked', detail: 'Rescue mode: 2 to decline, 1 to shorten, 1 to delegate — reclaim 3h.', when: 'This week' },
@@ -194,18 +200,52 @@ export function sampleWorkspace(): PlusWorkspace {
     ],
   }
 
-  return { live: false, profile, briefing, integrations, suggestions, focusRules, automationRules, bookingPages, polls, analytics }
+  return { live: false, featuresRaw: {}, profile, briefing, integrations, suggestions, focusRules, automationRules, bookingPages, polls, analytics }
 }
 
-// ── Resilient loader ──────────────────────────────────────────
-// Attempts real settings; always falls back to the sample so the UI renders.
+// ── Real loader with sample fallback ──────────────────────────
+// Hydrates from the caller's calendar_settings row: briefing + phone from
+// columns, and each rule/integration's on/connected state from the `features`
+// JSONB (namespaced keys). The feature *catalog* (labels/details) is app-defined
+// via sampleWorkspace(); only the user's *state* persists. Booking pages, polls
+// and analytics remain sample-derived (read-only insights, not user state).
 export async function loadPlusWorkspace(supabase: any): Promise<PlusWorkspace> {
   try {
-    const { data, error } = await supabase.from('calendar_settings').select('phone,features').limit(1)
-    if (error || !data || data.length === 0) return sampleWorkspace()
-    // Real hydration (map settings.features + connected accounts) lands here;
-    // until then we present the sample so nothing looks empty.
-    return sampleWorkspace()
+    const { data: auth } = await supabase.auth.getUser()
+    const user = auth?.user
+    const { data: s } = await supabase.from('calendar_settings').select('*').maybeSingle()
+    if (!s) return sampleWorkspace()
+
+    const base = sampleWorkspace()
+    const featuresRaw: Record<string, boolean> = (s.features && typeof s.features === 'object') ? s.features : {}
+
+    const profile: PlusProfile = {
+      ...base.profile,
+      name: (user?.user_metadata?.full_name as string) || (user?.email?.split('@')[0] ?? base.profile.name),
+      email: user?.email ?? base.profile.email,
+      phone: s.phone ?? '',
+      timezone: s.timezone ?? base.profile.timezone,
+    }
+    const briefing: BriefingConfig = {
+      email: s.briefing_email ?? true,
+      sms: s.briefing_sms ?? false,
+      evening: s.evening_preview ?? false,
+      hour: s.briefing_hour ?? 7,
+      quiet_start: s.quiet_start ?? 21,
+      quiet_end: s.quiet_end ?? 7,
+    }
+    // Catalog + persisted state. Integrations default to available (no fake accounts).
+    const integrations: Integration[] = base.integrations.map((i) => ({
+      ...i, account: undefined, status: featuresRaw[intKey(i.id)] ? 'connected' : 'available',
+    }))
+    const focusRules: FocusRule[] = base.focusRules.map((r) => ({ ...r, on: featuresRaw[focusKey(r.id)] ?? r.on }))
+    const automationRules: AutomationRule[] = base.automationRules.map((r) => ({ ...r, on: featuresRaw[autoKey(r.id)] ?? r.on }))
+
+    return {
+      live: true, featuresRaw, profile, briefing, integrations,
+      suggestions: base.suggestions, focusRules, automationRules,
+      bookingPages: base.bookingPages, polls: base.polls, analytics: base.analytics,
+    }
   } catch {
     return sampleWorkspace()
   }
