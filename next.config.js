@@ -3,6 +3,13 @@ const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
 
+  // @react-pdf/renderer ships a yoga/wasm layout engine + font data that can't
+  // be webpack-bundled — load it from node_modules at runtime, or PDF receipt
+  // generation 500s on Vercel serverless.
+  experimental: {
+    serverComponentsExternalPackages: ['@react-pdf/renderer'],
+  },
+
   // Image optimization
   images: {
     // Vercel Hobby has a monthly image-optimization quota; once exhausted the
