@@ -21,7 +21,8 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
     pdf = await renderReceiptPdf(receipt)
   } catch (err) {
     console.error('[receipt/pdf] render failed', err)
-    return NextResponse.json({ error: 'Could not generate receipt' }, { status: 500 })
+    const detail = err instanceof Error ? (err.stack || err.message) : String(err)
+    return NextResponse.json({ error: 'Could not generate receipt', detail: detail.slice(0, 1200) }, { status: 500 })
   }
 
   return new NextResponse(new Uint8Array(pdf), {
