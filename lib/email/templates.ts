@@ -8,12 +8,27 @@ interface TemplateOutput {
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.arwignplanners.com'
 
-function wrap(locale: Locale, subject: string, body: string): TemplateOutput {
-  const footer = locale === 'fr'
-    ? `<p style="font-size:12px;color:#888;margin-top:32px">Vous recevez cet email car vous vous êtes inscrit(e) sur Arwign Planners. <a href="{{unsubscribe_url}}">Se désabonner</a></p>`
-    : `<p style="font-size:12px;color:#888;margin-top:32px">You received this because you signed up at Arwign Planners. <a href="{{unsubscribe_url}}">Unsubscribe</a></p>`
+// Shared branded header (logo) + footer used across all emails. Change these two
+// helpers to re-brand every email at once.
+export function brandHeader(): string {
+  return `<div style="background:#fff;text-align:center;padding:28px 24px;border-bottom:1px solid #E8E4DB">
+    <img src="${BASE_URL}/logo.png" alt="Arwign Planners" style="height:40px;width:auto;max-width:200px" />
+  </div>`
+}
 
-  const html = `<!DOCTYPE html><html lang="${locale}"><head><meta charset="UTF-8"><style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#FAF8F4;color:#1A1820;margin:0;padding:0}a{color:#C9A84C}.container{max-width:560px;margin:40px auto;background:#fff;border-radius:12px;padding:40px;border:1px solid #E8E4DB}</style></head><body><div class="container">${body}${footer}</div></body></html>`
+export function brandFooter(locale: Locale): string {
+  const year = new Date().getFullYear()
+  const line = locale === 'fr'
+    ? `Vous recevez cet email car vous êtes inscrit(e) sur Arwign Planners. <a href="{{unsubscribe_url}}" style="color:#888">Se désabonner</a>`
+    : `You received this because you signed up at Arwign Planners. <a href="{{unsubscribe_url}}" style="color:#888">Unsubscribe</a>`
+  return `<div style="padding:22px 40px;border-top:1px solid #E8E4DB;background:#FAF8F4">
+    <p style="font-size:12px;color:#999;margin:0 0 6px">${line}</p>
+    <p style="font-size:12px;color:#aaa;margin:0"><a href="${BASE_URL}" style="color:#C9A84C;text-decoration:none">arwignplanners.com</a> · © ${year} Arwign Planners</p>
+  </div>`
+}
+
+function wrap(locale: Locale, subject: string, body: string): TemplateOutput {
+  const html = `<!DOCTYPE html><html lang="${locale}"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#FAF8F4;color:#1A1820;margin:0;padding:0}a{color:#C9A84C}.wrapper{padding:32px 16px}.container{max-width:560px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;border:1px solid #E8E4DB}.content{padding:36px 40px}</style></head><body><div class="wrapper"><div class="container"><div style="height:4px;background:#C9A84C"></div>${brandHeader()}<div class="content">${body}</div>${brandFooter(locale)}</div></div></body></html>`
   const text = subject
 
   return { subject, html, text }
@@ -198,8 +213,7 @@ const templates: Record<string, (locale: Locale, data: Record<string, unknown>) 
       </tr>`).join('')
 
     const subject = `Your Arwign Planners order ${invoiceNumber} — receipt & downloads`
-    const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#FAF8F4;color:#1A1820;margin:0;padding:0}a{color:#C9A84C}.container{max-width:560px;margin:40px auto;background:#fff;border-radius:12px;padding:40px;border:1px solid #E8E4DB}</style></head><body><div class="container">
-      <p style="font-size:20px;font-weight:700;letter-spacing:2px;color:#C9A84C;margin:0 0 4px">ARWIGN PLANNERS</p>
+    const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#FAF8F4;color:#1A1820;margin:0;padding:0}a{color:#C9A84C}.wrapper{padding:32px 16px}.container{max-width:560px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;border:1px solid #E8E4DB}.content{padding:36px 40px}</style></head><body><div class="wrapper"><div class="container"><div style="height:4px;background:#C9A84C"></div>${brandHeader()}<div class="content">
       <h2 style="color:#1A1820;margin:0 0 24px">Thank you for your order 💛</h2>
       <p style="margin:0 0 24px">Your payment has been received and your planners are ready to download below.</p>
 
@@ -232,7 +246,7 @@ const templates: Record<string, (locale: Locale, data: Record<string, unknown>) 
 
       <p style="margin-top:32px">Need a hand? Just reply to this email or write to <a href="mailto:${supportEmail}">${supportEmail}</a> — we're happy to help.</p>
       <p style="margin:24px 0 0">Happy planning!<br>— The Arwign Planners Team</p>
-    </div></body></html>`
+    </div><div style="padding:20px 40px;border-top:1px solid #E8E4DB;background:#FAF8F4"><p style="font-size:12px;color:#aaa;margin:0"><a href="${BASE_URL}" style="color:#C9A84C;text-decoration:none">arwignplanners.com</a> · © ${new Date().getFullYear()} Arwign Planners</p></div></div></div></body></html>`
 
     const text = [
       `Thank you for your order — Arwign Planners`,
