@@ -79,7 +79,7 @@ export default async function ReceiptPage({ params }: { params: { id: string } }
       <style>{`@media print { body { background:#fff !important; } .no-print { display:none !important; } @page { margin: 16mm; } }`}</style>
 
       <div style={{ maxWidth: 640, margin: '0 auto', padding: '40px 20px' }}>
-        <ReceiptActions downloadHref={`/checkout/success?order=${o.id}`} pdfHref={`/receipt/${o.id}/pdf`} />
+        <ReceiptActions downloadHref={`/checkout/success?order=${o.id}`} />
 
         {/* Receipt document */}
         <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: '40px', boxShadow: '0 8px 30px rgba(44,42,53,0.06)' }}>

@@ -4,8 +4,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { addDays, format } from 'date-fns'
 import { getEmailProvider } from '@/lib/email'
-import { getReceipt } from '@/lib/receipt'
-import { renderReceiptPdf } from '@/lib/receipt-pdf'
 
 const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL
@@ -96,26 +94,12 @@ export async function fulfilDigitalOrder(supabase: SupabaseClient, orderId: stri
   // ── 2. Confirmation email (once per order) ──────────────────────
   const metadata = (order.metadata as Record<string, unknown> | null) ?? {}
   if (!metadata.order_confirmation_sent && order.email) {
-    // Best-effort PDF receipt attachment — never block the email on it.
-    let attachments: { filename: string; content: Buffer }[] | undefined
-    try {
-      const receipt = await getReceipt(supabase, orderId)
-      if (receipt) {
-        const pdf = await renderReceiptPdf(receipt)
-        const inv = receipt.order.invoice_number ?? orderId.slice(0, 8).toUpperCase()
-        attachments = [{ filename: `Arwign-Receipt-${inv}.pdf`, content: pdf }]
-      }
-    } catch (err) {
-      console.error('[orders] fulfil: receipt PDF failed (email will send without it)', orderId, err)
-    }
-
     try {
       await getEmailProvider().sendTransactional({
         to:             order.email,
         locale:         'en',
         templateKey:    'order.confirmation',
         idempotencyKey: `order-confirmation-${orderId}`,
-        attachments,
         data: {
           invoice_number: order.invoice_number ?? orderId.slice(0, 8).toUpperCase(),
           order_date:     format(new Date(order.created_at), 'd MMMM yyyy'),

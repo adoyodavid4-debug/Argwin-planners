@@ -6,16 +6,6 @@ const nextConfig = {
   // @react-pdf/renderer ships a yoga/wasm layout engine + font data that can't
   // be webpack-bundled — load it from node_modules at runtime, or PDF receipt
   // generation 500s on Vercel serverless.
-  experimental: {
-    serverComponentsExternalPackages: ['@react-pdf/renderer'],
-    // pdfkit (used by react-pdf) loads its AFM font-metric files via dynamic
-    // require(), which the tracer can't follow — force them into the function
-    // bundles or PDF generation 500s with "Cannot find module …Helvetica.cjs".
-    outputFileTracingIncludes: {
-      '/**/*': ['./node_modules/pdfkit/js/standard-fonts/**', './node_modules/pdfkit/js/data/**'],
-      '/receipt/[id]/pdf': ['./node_modules/pdfkit/js/standard-fonts/**', './node_modules/pdfkit/js/data/**'],
-    },
-  },
 
   // Image optimization
   images: {
