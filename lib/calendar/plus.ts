@@ -46,12 +46,22 @@ export interface Integration {
 }
 
 export type SuggestionType = 'reschedule' | 'email-event' | 'time-block' | 'prep' | 'rescue'
+
+// A concrete, enactable change attached to an actionable suggestion. Advisory
+// suggestions (rescue, back-to-back) omit it and stay informational. Applied by
+// POST /api/calendar/plus/suggestions/apply, which re-derives against live data
+// before mutating — it never trusts a stale precomputed target.
+export type SuggestionAction =
+  | { kind: 'reschedule'; eventId: string; recurring: boolean; occurrenceISO: string }
+  | { kind: 'prep'; startISO: string; endISO: string; title: string }
+
 export interface AiSuggestion {
   id: string
   type: SuggestionType
   title: string
   detail: string
   when?: string
+  action?: SuggestionAction
 }
 
 export type RuleKind = 'focus' | 'boundary' | 'buffer'
@@ -254,13 +264,23 @@ export function sampleWorkspace(): PlusWorkspace {
 const DAY_MS = 24 * 3600_000
 const ANALYTICS_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'] // Sat/Sun fold into after-hours
 
-interface CalEventRow {
+export interface CalEventRow {
+  id: string
   title: string; description?: string | null
   start_at: string; end_at: string; all_day?: boolean | null
   rrule?: string | null; exdates?: string[] | null
+  recurrence_parent_id?: string | null
   tags?: string[] | null; event_type?: string | null; colour?: string | null
 }
-interface Occurrence { start: Date; end: Date; title: string; description: string; focus: boolean }
+export interface Occurrence {
+  start: Date; end: Date; title: string; description: string; focus: boolean
+  eventId: string; recurring: boolean
+}
+
+// Columns loadCalendarInsights + the apply route both select. Shared so the two
+// expansion callers stay in lockstep.
+export const CAL_EVENT_COLUMNS =
+  'id, title, description, start_at, end_at, all_day, rrule, exdates, recurrence_parent_id, tags, event_type, colour'
 
 const isFocusEvent = (e: CalEventRow): boolean => {
   const t = String(e.title ?? '').toLowerCase()
@@ -297,14 +317,17 @@ function currentWeekWindow(tz: string, now: Date): { start: Date; end: Date } {
 }
 
 // Expand events (incl. recurrence) into concrete timed occurrences in [from, to).
-function expandRange(events: CalEventRow[], from: Date, to: Date): Occurrence[] {
+export function expandRange(events: CalEventRow[], from: Date, to: Date): Occurrence[] {
   const out: Occurrence[] = []
   for (const e of events) {
     if (e.all_day) continue
     const s = new Date(e.start_at)
     const durMs = new Date(e.end_at).getTime() - s.getTime()
     if (Number.isNaN(s.getTime()) || durMs <= 0) continue
-    const meta = { title: e.title || 'Untitled', description: String(e.description ?? ''), focus: isFocusEvent(e) }
+    const meta = {
+      title: e.title || 'Untitled', description: String(e.description ?? ''),
+      focus: isFocusEvent(e), eventId: e.id, recurring: !!e.rrule,
+    }
     if (e.rrule) {
       const rule = parseRRule(e.rrule)
       if (!rule) continue
@@ -317,6 +340,25 @@ function expandRange(events: CalEventRow[], from: Date, to: Date): Occurrence[] 
     }
   }
   return out
+}
+
+export interface BusyInterval { start: Date; end: Date }
+
+// Earliest window of length `durMs` that starts at or after `from` and clears
+// every `busy` interval, searched up to `horizon`. null if none fits.
+// Deterministic — shared by suggestion previews and the apply route's enactment.
+export function earliestFreeAfter(busy: BusyInterval[], from: Date, durMs: number, horizon: Date): BusyInterval | null {
+  const sorted = busy
+    .filter((b) => b.end.getTime() > from.getTime())
+    .sort((a, b) => a.start.getTime() - b.start.getTime())
+  let cand = from.getTime()
+  for (const b of sorted) {
+    if (cand + durMs <= b.start.getTime()) break // fits in the gap before this block
+    if (b.end.getTime() > cand) cand = b.end.getTime() // pushed past an overlap
+    if (cand >= horizon.getTime()) return null
+  }
+  if (cand + durMs > horizon.getTime()) return null
+  return { start: new Date(cand), end: new Date(cand + durMs) }
 }
 
 const hoursOf = (o: Occurrence) => (o.end.getTime() - o.start.getTime()) / 3.6e6
@@ -354,32 +396,44 @@ function buildAnalytics(occ: Occurrence[], tz: string): PlusAnalytics {
   }
 }
 
-// Deterministic scheduling assistant: real, actionable suggestions read straight
-// off the next 7 days of the user's calendar. No fabricated cards — if the
-// calendar is clean, the section honestly shows "inbox zero".
+// Deterministic scheduling assistant: real suggestions read straight off the
+// next 7 days of the user's calendar. Actionable ones (clash → reschedule, prep
+// → block) carry an `action` the apply route enacts; advisory ones (rescue,
+// back-to-back) don't. Clean calendar → the section honestly shows "inbox zero".
 function buildSuggestions(occ: Occurrence[], tz: string, now: Date): AiSuggestion[] {
   const out: AiSuggestion[] = []
   const when = (d: Date) => fmtDateTime(d.toISOString(), tz)
+  const horizon = new Date(now.getTime() + 7 * DAY_MS)
   const meetings = occ.filter((o) => !o.focus && o.end.getTime() > now.getTime())
     .sort((a, b) => a.start.getTime() - b.start.getTime())
 
-  // 1 — Clashes: overlapping meetings the user must resolve.
+  // 1 — Clashes: move the later meeting to the earliest free slot after the
+  //     earlier one ends. Preview the target here; the route re-derives on apply.
   let clashes = 0
   for (let i = 0; i < meetings.length && clashes < 2; i++) {
     for (let j = i + 1; j < meetings.length; j++) {
-      if (meetings[j].start.getTime() >= meetings[i].end.getTime()) break
+      const later = meetings[j], earlier = meetings[i]
+      if (later.start.getTime() >= earlier.end.getTime()) break
+      const durMs = later.end.getTime() - later.start.getTime()
+      const busy = occ
+        .filter((o) => !(o.eventId === later.eventId && o.start.getTime() === later.start.getTime()))
+        .map((o) => ({ start: o.start, end: o.end }))
+      const slot = earliestFreeAfter(busy, earlier.end, durMs, horizon)
       out.push({
         id: `clash-${i}-${j}`, type: 'reschedule',
-        title: `Resolve a clash: “${meetings[j].title}”`,
-        detail: `It overlaps “${meetings[i].title}”. Move it to the nearest free slot — the least-disruptive shift.`,
-        when: when(meetings[j].start),
+        title: `Resolve a clash: “${later.title}”`,
+        detail: slot
+          ? `It overlaps “${earlier.title}”. Apply to move it to ${when(slot.start)} — the nearest free slot.`
+          : `It overlaps “${earlier.title}”. No free slot in the next 7 days — shorten or decline one.`,
+        when: slot ? when(slot.start) : when(later.start),
+        action: slot ? { kind: 'reschedule', eventId: later.eventId, recurring: later.recurring, occurrenceISO: later.start.toISOString() } : undefined,
       })
       clashes++
       break
     }
   }
 
-  // 2 — Rescue mode: an overbooked week.
+  // 2 — Rescue mode: an overbooked week (advisory — a human call).
   const meetingHours = meetings.reduce((a, o) => a + hoursOf(o), 0)
   if (meetingHours >= 20) {
     out.push({
@@ -389,7 +443,8 @@ function buildSuggestions(occ: Occurrence[], tz: string, now: Date): AiSuggestio
     })
   }
 
-  // 3 — Back-to-back run with no breathing room.
+  // 3 — Back-to-back run with no breathing room (advisory — auto-inserting a
+  //     buffer would cascade-shift the following meetings).
   for (let i = 0; i + 2 < meetings.length; i++) {
     const gap1 = (meetings[i + 1].start.getTime() - meetings[i].end.getTime()) / 60000
     const gap2 = (meetings[i + 2].start.getTime() - meetings[i + 1].end.getTime()) / 60000
@@ -404,13 +459,21 @@ function buildSuggestions(occ: Occurrence[], tz: string, now: Date): AiSuggestio
     }
   }
 
-  // 4 — Prep brief for the next meeting that has notes/agenda.
+  // 4 — Prep brief: block 25 min before the next meeting that has notes, but
+  //     only if that window is free and still in the future.
   const prep = meetings.find((o) => o.description.trim().length > 0)
   if (prep) {
+    const prepEnd = prep.start
+    const prepStart = new Date(prepEnd.getTime() - 25 * 60000)
+    const free = prepStart.getTime() > now.getTime() &&
+      !occ.some((o) => o.start.getTime() < prepEnd.getTime() && o.end.getTime() > prepStart.getTime())
     out.push({
       id: 'prep-next', type: 'prep', title: `Prep brief ready: “${prep.title}”`,
-      detail: 'Assembled from the event notes and your history — a two-minute read before it starts.',
+      detail: free
+        ? `Apply to block 25 min at ${when(prepStart)} to review notes before it starts.`
+        : 'Assembled from the event notes — a two-minute read before it starts.',
       when: when(prep.start),
+      action: free ? { kind: 'prep', startISO: prepStart.toISOString(), endISO: prepEnd.toISOString(), title: `Prep: ${prep.title}` } : undefined,
     })
   }
 
@@ -483,9 +546,7 @@ async function loadCalendarInsights(
   }
   try {
     // RLS scopes calendar_events to the signed-in user.
-    const { data: events } = await supabase
-      .from('calendar_events')
-      .select('title, description, start_at, end_at, all_day, rrule, exdates, tags, event_type, colour')
+    const { data: events } = await supabase.from('calendar_events').select(CAL_EVENT_COLUMNS)
     const rows: CalEventRow[] = events ?? []
 
     const wk = currentWeekWindow(tz, now)
