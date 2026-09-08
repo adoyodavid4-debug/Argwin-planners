@@ -123,10 +123,16 @@ export async function middleware(req: NextRequest) {
     const origin = req.headers.get('origin')
     const host   = req.headers.get('host')
 
-    if (origin && host && !origin.includes(host.split(':')[0])) {
-      // Allow Stripe webhooks
-      if (!pathname.startsWith('/api/webhooks/')) {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    if (origin && host) {
+      // Strict hostname match — a substring check would pass
+      // "https://ourhost.evil.com". Unparseable origins are rejected.
+      let originHost: string | null = null
+      try { originHost = new URL(origin).hostname } catch {}
+      if (originHost !== host.split(':')[0]) {
+        // Allow Stripe webhooks
+        if (!pathname.startsWith('/api/webhooks/')) {
+          return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+        }
       }
     }
   }
