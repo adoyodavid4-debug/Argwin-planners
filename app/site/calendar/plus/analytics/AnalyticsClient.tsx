@@ -7,7 +7,10 @@ export default function AnalyticsClient({ ws }: { ws: PlusWorkspace }) {
   const a = ws.analytics
   const maxDay = Math.max(1, ...a.week.map((d) => d.meetings + d.focus))
   const totalMeetings = a.week.reduce((s, d) => s + d.meetings, 0)
-  const maxSink = Math.max(...a.top_sinks.map((s) => s.hours))
+  const maxSink = Math.max(1, ...a.top_sinks.map((s) => s.hours))
+  const busiest = a.week.reduce((m, d) => (d.meetings > m.meetings ? d : m), a.week[0])
+  const bestFocus = a.week.reduce((m, d) => (d.focus > m.focus ? d : m), a.week[0])
+  const hasData = totalMeetings > 0 || a.week.some((d) => d.focus > 0)
 
   return (
     <PlusShell workspace={ws} title="Calendar health"
@@ -67,11 +70,16 @@ export default function AnalyticsClient({ ws }: { ws: PlusWorkspace }) {
               <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: 'var(--gold-dark)', letterSpacing: '0.08em' }}>Weekly review</span>
             </div>
             <p className="text-sm" style={{ color: 'var(--text-primary)' }}>
-              Focus held at {a.focus_ratio}% and you reclaimed {a.reclaimed_hours}h. Wednesday was your heaviest day — consider moving one recurring sync to protect a morning block.
+              {hasData ? (
+                <>Focus held at {a.focus_ratio}% and you protected {a.reclaimed_hours}h this week.{' '}
+                {busiest.meetings > 0 ? <>{busiest.day} was your heaviest day — consider moving one recurring sync to protect a morning block.</> : <>No day stood out as overloaded — nicely balanced.</>}</>
+              ) : (
+                <>No timed events this week yet. As your calendar fills up, your weekly review and time-sink breakdown appear here.</>
+              )}
             </p>
             <ul className="mt-3 space-y-1.5 text-xs" style={{ color: 'var(--text-secondary)' }}>
-              <li className="flex items-center gap-2"><Clock size={13} style={{ color: 'var(--gold)' }} /> Best focus day: Friday ({a.week.find((d) => d.day === 'Fri')?.focus}h)</li>
-              <li className="flex items-center gap-2"><Moon size={13} style={{ color: 'var(--gold)' }} /> After-hours creep down to {a.after_hours}h</li>
+              <li className="flex items-center gap-2"><Clock size={13} style={{ color: 'var(--gold)' }} /> Best focus day: {bestFocus.focus > 0 ? <>{bestFocus.day} ({bestFocus.focus}h)</> : '—'}</li>
+              <li className="flex items-center gap-2"><Moon size={13} style={{ color: 'var(--gold)' }} /> After-hours this week: {a.after_hours}h</li>
             </ul>
           </div>
         </div>

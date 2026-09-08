@@ -11,7 +11,8 @@ export default function BookingClient({ ws }: { ws: PlusWorkspace }) {
 
   const toggle = (id: string) => setPages((ps) => ps.map((p) => (p.id === id ? { ...p, active: !p.active } : p)))
   const copy = (slug: string) => {
-    navigator.clipboard?.writeText(`https://arwign.com/${slug}`).catch(() => {})
+    const origin = typeof window !== 'undefined' ? window.location.origin : ''
+    navigator.clipboard?.writeText(`${origin}/calendar/book/${slug}`).catch(() => {})
     setCopied(slug); setTimeout(() => setCopied(null), 1500)
   }
 
@@ -47,7 +48,7 @@ export default function BookingClient({ ws }: { ws: PlusWorkspace }) {
                     </span>
                   </div>
                   <button onClick={() => copy(p.slug)} className="mt-1 inline-flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-muted)' }}>
-                    arwign.com/{p.slug} {copied === p.slug ? <Check size={12} style={{ color: 'var(--gold)' }} /> : <Copy size={12} />}
+                    /calendar/book/{p.slug} {copied === p.slug ? <Check size={12} style={{ color: 'var(--gold)' }} /> : <Copy size={12} />}
                   </button>
                   <p className="mt-1 text-xs" style={{ color: 'var(--text-muted)' }}>{p.duration_min} min · {p.bookings_30d} bookings / 30d</p>
                 </div>
