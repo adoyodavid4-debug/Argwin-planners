@@ -3,8 +3,10 @@ import type { Metadata, Viewport } from 'next'
 import { Cormorant_Garamond, DM_Serif_Display, Jost, Playfair_Display } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 import { Toaster } from 'react-hot-toast'
-import { GoogleAnalytics } from '@next/third-parties/google'
 import { OrganizationSchema } from '@/components/seo/JsonLd'
+import { ConsentProvider } from '@/components/consent/ConsentProvider'
+import ConsentedAnalytics from '@/components/consent/ConsentedAnalytics'
+import CookieBanner from '@/components/consent/CookieBanner'
 import './globals.css'
 
 // Self-hosted via next/font — no render-blocking Google Fonts CSS request on
@@ -131,28 +133,30 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <OrganizationSchema />
       </head>
       <body className="grain">
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} themes={['light', 'dark', 'warm']} disableTransitionOnChange={false}>
-          {children}
-          <Toaster
-            position="top-center"
-            toastOptions={{
-              duration: 3500,
-              style: {
-                background: 'var(--bg-card)',
-                color: 'var(--text-primary)',
-                border: '1px solid var(--border)',
-                borderRadius: '12px',
-                fontFamily: 'var(--font-jost)',
-                fontSize: '0.875rem',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-              },
-              success: { iconTheme: { primary: '#A0830E', secondary: 'white' } },
-            }}
-          />
-        </ThemeProvider>
-        {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
-          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
-        )}
+        <ConsentProvider>
+          <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} themes={['light', 'dark', 'warm']} disableTransitionOnChange={false}>
+            {children}
+            <Toaster
+              position="top-center"
+              toastOptions={{
+                duration: 3500,
+                style: {
+                  background: 'var(--bg-card)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--border)',
+                  borderRadius: '12px',
+                  fontFamily: 'var(--font-jost)',
+                  fontSize: '0.875rem',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+                },
+                success: { iconTheme: { primary: '#A0830E', secondary: 'white' } },
+              }}
+            />
+            <CookieBanner />
+          </ThemeProvider>
+          {/* GA4 + Meta Pixel load only after the matching consent is granted. */}
+          <ConsentedAnalytics />
+        </ConsentProvider>
       </body>
     </html>
   )

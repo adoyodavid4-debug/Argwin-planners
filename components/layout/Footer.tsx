@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Instagram, Youtube, Gift, FileText, Lightbulb, Percent, Rocket, Sparkles } from 'lucide-react'
 import NewsletterForm from '@/components/home/NewsletterForm'
+import CookieSettingsButton from '@/components/consent/CookieSettingsButton'
 
 export interface FooterLink { label: string; href: string }
 
@@ -255,6 +256,8 @@ export default function Footer({
         <div className="container-site py-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-center md:text-left" style={{ color: 'var(--text-muted)' }}>
             © {year} {brand}. All rights reserved. Premium Digital & Printable Planner & Notebook Shop.
+            <span aria-hidden className="mx-2">·</span>
+            <CookieSettingsButton className="underline transition-colors hover:text-gold" style={{ color: 'var(--text-muted)' }} />
           </p>
           <div className="flex items-center gap-2.5" aria-label="Accepted payment methods">
             <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
