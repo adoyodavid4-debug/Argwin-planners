@@ -7,6 +7,7 @@ import { createServiceRoleClient } from '@/lib/supabase/server'
 import { getFulfillmentProvider } from '@/lib/fulfillment'
 import type { Address } from '@/lib/fulfillment/types'
 import { z } from 'zod'
+import { requireAdmin } from '@/lib/supabase/admin-guard'
 
 const schema = z.discriminatedUnion('action', [
   z.object({ action: z.literal('approve') }),
@@ -15,6 +16,8 @@ const schema = z.discriminatedUnion('action', [
 ])
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+  const denied = await requireAdmin()
+  if (denied) return denied
   const body   = await req.json().catch(() => null)
   const parsed = schema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })

@@ -97,7 +97,7 @@ function resolveColour(ev: { colour?: string | null; tags?: string[] | null; eve
   const seed = (ev.tags && ev.tags[0]) || ev.event_type || ev.title || 'brass'
   return COLOUR_KEYS[hashStr(String(seed)) % COLOUR_KEYS.length]
 }
-const localTZ = typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'Africa/Nairobi'
+const localTZ = typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'America/New_York'
 
 // ── Date helpers (browser-local) ──────────────────────────────
 const pad = (n: number) => String(n).padStart(2, '0')

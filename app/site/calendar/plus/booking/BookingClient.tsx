@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
-import { Plus, Link2, Copy, Check, Power, Vote } from 'lucide-react'
+import Link from 'next/link'
+import { Plus, Link2, Copy, Check, Power, Vote, ArrowRight } from 'lucide-react'
 import PlusShell, { StatCard, SectionCard } from '../PlusShell'
 import { type PlusWorkspace, type PersonalBookingPage } from '@/lib/calendar/plus'
 
@@ -19,7 +20,7 @@ export default function BookingClient({ ws }: { ws: PlusWorkspace }) {
   return (
     <PlusShell workspace={ws} title="Booking & polls"
       subtitle="Personal scheduling links and meeting polls — no separate Calendly or Doodle."
-      actions={<button className="btn-primary px-3.5 py-2 text-sm"><Plus size={15} /> New page</button>}>
+      actions={<Link href="/calendar/booking-pages?new=1" className="btn-primary px-3.5 py-2 text-sm"><Plus size={15} /> New page</Link>}>
 
       <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Booking pages" value={pages.length} hint={`${pages.filter((p) => p.active).length} active`} />
@@ -74,7 +75,8 @@ export default function BookingClient({ ws }: { ws: PlusWorkspace }) {
               </div>
             ))}
           </div>
-          <button className="btn-outline mt-3 w-full justify-center py-2 text-sm"><Plus size={14} /> New poll</button>
+          <Link href="/calendar/polls?new=1" className="btn-outline mt-3 w-full justify-center py-2 text-sm"><Plus size={14} /> New poll</Link>
+          <Link href="/calendar/polls" className="mt-2 inline-flex w-full items-center justify-center gap-1 text-xs font-medium" style={{ color: 'var(--gold-dark)' }}>All polls <ArrowRight size={12} /></Link>
         </SectionCard>
       </div>
     </PlusShell>

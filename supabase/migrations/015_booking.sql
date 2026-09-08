@@ -17,7 +17,7 @@ create table if not exists booking_pages (
   buffer_min       integer not null default 0  check (buffer_min between 0 and 240),
   min_notice_hours integer not null default 4  check (min_notice_hours between 0 and 720),
   advance_days     integer not null default 30 check (advance_days between 1 and 365),
-  timezone         text    not null default 'Africa/Nairobi',
+  timezone         text    not null default 'America/New_York',
   -- Weekly availability windows keyed by ISO weekday (1=Mon … 7=Sun),
   -- each an array of [start,end] wall-clock strings, e.g. {"1":[["09:00","17:00"]]}.
   working_hours    jsonb   not null default '{"1":[["09:00","17:00"]],"2":[["09:00","17:00"]],"3":[["09:00","17:00"]],"4":[["09:00","17:00"]],"5":[["09:00","17:00"]]}'::jsonb,

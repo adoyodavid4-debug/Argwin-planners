@@ -8,7 +8,7 @@ export const maxDuration = 300
 // Vercel Cron. Syncs every connected Google/Microsoft account. Invoked via GET
 // with an auto-injected Bearer CRON_SECRET header.
 async function run(req: NextRequest) {
-  if (req.headers.get('authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!process.env.CRON_SECRET || req.headers.get('authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const supabase = createServiceRoleClient()

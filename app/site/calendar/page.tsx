@@ -10,7 +10,7 @@ const CALENDAR_FAQS = [
   { q: 'Does the AI do things without asking?', a: 'Never. Every AI action is a proposal you can accept, edit or dismiss. Arwign Calendar never silently moves, deletes or books anything, and every suggestion is logged and reversible.' },
   { q: 'What’s the Daily Outlook Briefing?', a: 'A proactive, AI-composed summary of your day delivered to your inbox and phone before you open anything — your timeline, what needs action, leave-by times and a gentle nudge if the day is overloaded.' },
   { q: 'Will there be a free plan?', a: 'Yes. Arwign Free gives you the full calendar, all views, recurrence, quick-add and one connected account — free forever.' },
-  { q: 'Will there be booking pages and payments?', a: 'Yes — public booking pages (one-off, round-robin, collective and group), Doodle-style meeting polls, and paid bookings via Stripe, Paystack and M-Pesa with automatic invoicing and refunds on cancellation.' },
+  { q: 'Will there be booking pages and payments?', a: 'Yes — public booking pages (one-off, round-robin, collective and group), Doodle-style meeting polls, and paid bookings by credit & debit card with automatic invoicing and refunds on cancellation.' },
   { q: 'Does it work offline?', a: 'Yes. Arwign Calendar is local-first — it works fully offline and reconciles cleanly when you reconnect. It installs as a PWA today, with native iOS and Android apps to follow.' },
   { q: 'How do you protect my privacy?', a: 'Least-privilege scopes, encrypted tokens and privacy modes: share “Busy” only, keep events private, or opt into end-to-end encryption. Every AI suggestion is logged and reversible, with a full audit trail for shared and delegated actions.' },
 ]

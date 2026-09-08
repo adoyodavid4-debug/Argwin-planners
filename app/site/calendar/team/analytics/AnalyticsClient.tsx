@@ -15,7 +15,7 @@ export default function AnalyticsClient({ ws }: { ws: TeamWorkspace }) {
   const overloaded = active.filter((m) => m.meetings_week >= 20)
 
   return (
-    <TeamShell workspace={ws} currentRole="owner" title="Team analytics"
+    <TeamShell workspace={ws} title="Team analytics"
       subtitle="Where the team’s time actually goes — meeting load, focus and after-hours creep."
       actions={<span className="text-xs" style={{ color: 'var(--text-muted)' }}>This week</span>}>
 

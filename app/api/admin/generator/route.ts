@@ -3,10 +3,13 @@
 
 import { NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/server'
+import { requireAdmin } from '@/lib/supabase/admin-guard'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
+  const denied = await requireAdmin()
+  if (denied) return denied
   const supabase = createServiceRoleClient()
 
   const { data, error } = await supabase

@@ -37,9 +37,9 @@ export const DEFAULT_WORKING_HOURS: WorkingHours = {
 }
 
 export function defaultSettings(): CalendarSettings {
-  const tz = typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'Africa/Nairobi'
+  const tz = typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'America/New_York'
   return {
-    timezone: tz || 'Africa/Nairobi',
+    timezone: tz || 'America/New_York',
     week_start: 1,
     working_hours: DEFAULT_WORKING_HOURS,
     theme: 'warm',

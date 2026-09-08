@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS teams (
   plan          TEXT NOT NULL DEFAULT 'teams' CHECK (plan IN ('teams','enterprise')),
   owner_id      UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   seats_total   INTEGER NOT NULL DEFAULT 10,
-  timezone      TEXT NOT NULL DEFAULT 'Africa/Nairobi',
+  timezone      TEXT NOT NULL DEFAULT 'America/New_York',
   billing_email TEXT,
   renews_on     DATE,
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS team_members (
   email         TEXT NOT NULL,
   role          TEXT NOT NULL DEFAULT 'view' CHECK (role IN ('view','propose','edit','manage','owner')),
   title         TEXT DEFAULT '',
-  timezone      TEXT DEFAULT 'Africa/Nairobi',
+  timezone      TEXT DEFAULT 'America/New_York',
   tz_offset     INTEGER DEFAULT 3,
   hue           INTEGER DEFAULT 200,
   status        TEXT NOT NULL DEFAULT 'invited' CHECK (status IN ('active','invited')),

@@ -3,17 +3,17 @@ import Link from 'next/link'
 import { Users, DoorOpen, CalendarDays, Link2, ArrowRight, Clock, ShieldCheck, Sparkles } from 'lucide-react'
 import TeamShell, { StatCard, SectionCard, Avatar } from './TeamShell'
 import { type TeamWorkspace, memberName, byId, ROLES } from '@/lib/calendar/team'
-
-const fmtTime = (iso: string) => new Intl.DateTimeFormat('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true }).format(new Date(iso)).replace(':00', '')
-const fmtWhen = (iso: string) => new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', hour12: true }).format(new Date(iso))
+import { fmtTime as fmtTimeSafe, fmtDateTime as fmtWhenSafe } from '@/lib/calendar/fmt'
 
 export default function OverviewClient({ ws }: { ws: TeamWorkspace }) {
+  const fmtTime = (iso: string) => fmtTimeSafe(iso, ws.team.timezone).replace(':00', '')
+  const fmtWhen = (iso: string) => fmtWhenSafe(iso, ws.team.timezone)
   const pending = ws.resourceBookings.filter((b) => b.status === 'pending')
   const activeMembers = ws.members.filter((m) => m.status === 'active')
   const bookings30d = ws.pages.reduce((s, p) => s + p.bookings_30d, 0)
 
   return (
-    <TeamShell workspace={ws} currentRole="owner" title="Team Overview"
+    <TeamShell workspace={ws} title="Team Overview"
       subtitle={`${ws.team.name} · ${activeMembers.length} people across ${new Set(ws.members.map((m) => m.timezone)).size} time zones`}
       actions={<Link href="/calendar/team/members" className="btn-primary px-3.5 py-2 text-sm"><Users size={15} /> Invite people</Link>}>
 

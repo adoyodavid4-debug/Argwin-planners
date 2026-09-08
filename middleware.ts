@@ -3,7 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 import { type NextRequest, NextResponse } from 'next/server'
 
 const ADMIN_ROUTES   = ['/admin']
-const AUTH_ROUTES    = ['/customer/dashboard', '/customer/notebooks']
+const AUTH_ROUTES    = ['/customer/notebooks']
 const PUBLIC_AUTH    = ['/auth/login', '/auth/register', '/auth/forgot-password']
 
 // Cap every Supabase network call. A paused/unreachable backend must NOT be
@@ -110,8 +110,10 @@ export async function middleware(req: NextRequest) {
   }
 
   // ── Redirect logged-in users from auth pages ──────────────
+  // Send them home. (There is no /customer/dashboard page — pointing here
+  // previously produced a 404.)
   if (isPublicAuth && session) {
-    return NextResponse.redirect(new URL('/customer/dashboard', req.url))
+    return NextResponse.redirect(new URL('/', req.url))
   }
 
   // ── Security headers added in next.config.js ─────────────

@@ -11,7 +11,7 @@ interface Poll {
   options?: Option[]; votes?: { option_id: string; voter_name: string }[]
 }
 
-const localTZ = typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'Africa/Nairobi'
+const localTZ = typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'America/New_York'
 const slugify = () => Math.random().toString(36).slice(2, 8)
 const fmt = (iso: string, tz: string) =>
   new Intl.DateTimeFormat('en-GB', { timeZone: tz, weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', hour12: true }).format(new Date(iso))
@@ -39,6 +39,11 @@ export default function PollsClient() {
     setPolls(polls); setLoading(false)
   }, [supabase])
   useEffect(() => { load() }, [load])
+  // Deep-link support: /calendar/polls?new=1 opens the create dialog directly
+  // (used by the "New poll" buttons in the Plus/Teams workspaces).
+  useEffect(() => {
+    if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('new') === '1') setCreating(true)
+  }, [])
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>

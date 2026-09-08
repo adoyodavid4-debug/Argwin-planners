@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/server'
+import { requireAdmin } from '@/lib/supabase/admin-guard'
 
 const VALID_STATUSES = ['pending', 'processing', 'completed', 'refunded', 'cancelled']
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+  const denied = await requireAdmin()
+  if (denied) return denied
   const body = await req.json()
   const { status } = body
 

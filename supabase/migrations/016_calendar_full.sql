@@ -39,7 +39,7 @@ create index if not exists calendar_events_type_idx   on calendar_events (user_i
 -- ════════════════════════════════════════════════════════════════
 create table if not exists calendar_settings (
   user_id           uuid primary key default auth.uid() references auth.users(id) on delete cascade,
-  timezone          text    not null default 'Africa/Nairobi',
+  timezone          text    not null default 'America/New_York',
   week_start        smallint not null default 1 check (week_start between 0 and 6),
   working_hours     jsonb   not null default '{"1":[["09:00","17:00"]],"2":[["09:00","17:00"]],"3":[["09:00","17:00"]],"4":[["09:00","17:00"]],"5":[["09:00","17:00"]]}'::jsonb,
   theme             text    not null default 'warm'   check (theme in ('light','dark','warm','system')),
@@ -99,7 +99,7 @@ create table if not exists meeting_polls (
   description    text,
   location       text,
   duration_min   integer not null default 30 check (duration_min between 5 and 480),
-  timezone       text not null default 'Africa/Nairobi',
+  timezone       text not null default 'America/New_York',
   status         text not null default 'open' check (status in ('open','closed')),
   final_start_at timestamptz,
   event_id       uuid references calendar_events(id) on delete set null,

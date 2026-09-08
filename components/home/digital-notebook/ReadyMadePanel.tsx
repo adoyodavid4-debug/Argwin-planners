@@ -170,7 +170,7 @@ export default function ReadyMadePanel({ size, colour, onSizeChange, onColourCha
 
       <p className="text-xs mt-3 flex items-center gap-1.5" style={{ color: 'var(--text-muted)' }}>
         <Zap size={12} style={{ color: 'var(--gold)' }} />
-        Download instantly after checkout · secure payment via Stripe &amp; Paystack
+        Download instantly after checkout · secure card payment
       </p>
     </div>
   )

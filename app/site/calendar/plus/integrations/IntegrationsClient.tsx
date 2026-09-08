@@ -1,9 +1,11 @@
 'use client'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import toast from 'react-hot-toast'
 import { CalendarDays, Video, CheckSquare, Building2, Check, Plug } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
+import { saveSettings } from '@/lib/calendar/settings'
 import PlusShell, { StatCard, SectionCard } from '../PlusShell'
-import { type PlusWorkspace, type Integration, type IntegrationCategory } from '@/lib/calendar/plus'
+import { type PlusWorkspace, type Integration, type IntegrationCategory, intKey } from '@/lib/calendar/plus'
 
 const CAT: Record<IntegrationCategory, { icon: typeof CalendarDays; label: string }> = {
   calendar:     { icon: CalendarDays, label: 'Calendars' },
@@ -13,13 +15,20 @@ const CAT: Record<IntegrationCategory, { icon: typeof CalendarDays; label: strin
 }
 
 export default function IntegrationsClient({ ws }: { ws: PlusWorkspace }) {
+  const supabase = useMemo(() => createClient() as any, [])
   const [items, setItems] = useState<Integration[]>(ws.integrations)
-  const toggle = (id: string) => setItems((xs) => xs.map((i) => {
-    if (i.id !== id) return i
-    const next = i.status === 'connected' ? 'available' : 'connected'
-    toast[next === 'connected' ? 'success' : 'error'](`${i.name} ${next === 'connected' ? 'connected' : 'disconnected'}`)
-    return { ...i, status: next as Integration['status'] }
-  }))
+  const [features, setFeatures] = useState<Record<string, boolean>>(ws.featuresRaw)
+  const toggle = (id: string) => {
+    const cur = items.find((i) => i.id === id)
+    const connected = cur?.status !== 'connected'
+    setItems((xs) => xs.map((i) => (i.id === id ? { ...i, status: connected ? 'connected' : 'available' } : i)))
+    toast[connected ? 'success' : 'error'](`${cur?.name ?? 'Integration'} ${connected ? 'connected' : 'disconnected'}`)
+    if (ws.live) {
+      const next = { ...features, [intKey(id)]: connected }
+      setFeatures(next)
+      saveSettings(supabase, { features: next })
+    }
+  }
 
   const connected = items.filter((i) => i.status === 'connected').length
   const cats: IntegrationCategory[] = ['calendar', 'conferencing', 'tasks', 'crm']

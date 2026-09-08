@@ -15,7 +15,7 @@ create table if not exists calendar_events (
   start_at    timestamptz not null,
   end_at      timestamptz not null,
   all_day     boolean not null default false,
-  start_tz    text not null default 'Africa/Nairobi',
+  start_tz    text not null default 'America/New_York',
   colour      text not null default 'brass',
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now(),

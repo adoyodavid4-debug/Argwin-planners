@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { z } from 'zod'
+import { requireAdmin } from '@/lib/supabase/admin-guard'
 
 const schema = z.object({
   slug:               z.string().min(1),
@@ -15,6 +16,8 @@ const schema = z.object({
 })
 
 export async function GET() {
+  const denied = await requireAdmin()
+  if (denied) return denied
   const supabase = createServiceRoleClient()
   const { data, error } = await supabase
     .from('lead_magnets')
@@ -25,6 +28,8 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const denied = await requireAdmin()
+  if (denied) return denied
   const body = await req.json().catch(() => null)
   const parsed = schema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })

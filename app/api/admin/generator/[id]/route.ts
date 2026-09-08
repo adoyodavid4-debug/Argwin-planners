@@ -12,6 +12,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { generatePlannerDetailed, TEMPLATE_FEATURES } from '@/lib/planner-generator'
 import { generateCoverPng } from '@/lib/planner-generator/cover-image'
+import { requireAdmin } from '@/lib/supabase/admin-guard'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -36,6 +37,8 @@ function buildDescription(templateDescription: string | null, templateKey: strin
 }
 
 export async function POST(_req: NextRequest, { params }: { params: { id: string } }) {
+  const denied = await requireAdmin()
+  if (denied) return denied
   const supabase = createServiceRoleClient()
 
   try {
@@ -200,6 +203,8 @@ export async function POST(_req: NextRequest, { params }: { params: { id: string
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+  const denied = await requireAdmin()
+  if (denied) return denied
   const supabase = createServiceRoleClient()
 
   try {

@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic'
 const LOOKBACK_MS = 6 * 60 * 1000
 
 async function run(req: NextRequest) {
-  if (req.headers.get('authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!process.env.CRON_SECRET || req.headers.get('authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const supabase = createServiceRoleClient()

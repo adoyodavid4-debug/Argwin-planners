@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdmin } from '@/lib/supabase/admin-guard'
 
 function getClient() {
   return createClient(
@@ -9,6 +10,8 @@ function getClient() {
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+  const denied = await requireAdmin()
+  if (denied) return denied
   const supabase = getClient()
   const contentType = req.headers.get('content-type') ?? ''
 
@@ -63,6 +66,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+  const denied = await requireAdmin()
+  if (denied) return denied
   const supabase = getClient()
 
   // Guard: refuse to delete a category that still has products

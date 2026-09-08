@@ -31,11 +31,11 @@ export default function AvailabilityClient({ ws }: { ws: TeamWorkspace }) {
   })
   const best = overlap.filter((o) => chosen.length > 0 && o.count === chosen.length).map((o) => o.utc)
 
-  // Base timezone = team timezone (Nairobi, +3) for the header row label.
-  const baseOffset = 3
+  // Base timezone = team timezone (New York, -5) for the header row label.
+  const baseOffset = -5
 
   return (
-    <TeamShell workspace={ws} currentRole="owner" title="Availability finder"
+    <TeamShell workspace={ws} title="Availability finder"
       subtitle="Find the hour that works for everyone — across every time zone, without the mental math."
       actions={<button className="btn-primary px-3.5 py-2 text-sm" disabled={best.length === 0}><CalendarPlus size={15} /> Schedule best time</button>}>
 

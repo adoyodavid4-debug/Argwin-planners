@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { z } from 'zod'
+import { requireAdmin } from '@/lib/supabase/admin-guard'
 
 const stepSchema = z.object({
   id:             z.string().uuid().optional(),
@@ -21,6 +22,8 @@ const updateSchema = z.object({
 })
 
 export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
+  const denied = await requireAdmin()
+  if (denied) return denied
   const supabase = createServiceRoleClient()
   const { data, error } = await supabase
     .from('email_sequences')
@@ -32,6 +35,8 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+  const denied = await requireAdmin()
+  if (denied) return denied
   const body = await req.json().catch(() => null)
   const parsed = updateSchema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
@@ -63,6 +68,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+  const denied = await requireAdmin()
+  if (denied) return denied
   const supabase = createServiceRoleClient()
   const { error } = await supabase.from('email_sequences').delete().eq('id', params.id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

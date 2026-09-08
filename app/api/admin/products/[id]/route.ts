@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdmin } from '@/lib/supabase/admin-guard'
 
 function getClient() {
   return createClient(
@@ -13,6 +14,8 @@ function slugify(s: string) {
 }
 
 export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
+  const denied = await requireAdmin()
+  if (denied) return denied
   const supabase = getClient()
   const { data, error } = await supabase
     .from('products')
@@ -32,6 +35,8 @@ const JSON_ALLOWED = [
 ]
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+  const denied = await requireAdmin()
+  if (denied) return denied
   const supabase = getClient()
   const contentType = req.headers.get('content-type') ?? ''
 
@@ -194,6 +199,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+  const denied = await requireAdmin()
+  if (denied) return denied
   const supabase = getClient()
   const { error } = await supabase.from('products').delete().eq('id', params.id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

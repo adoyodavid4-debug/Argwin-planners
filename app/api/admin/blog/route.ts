@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdmin } from '@/lib/supabase/admin-guard'
 
 function getClient() {
   return createClient(
@@ -13,6 +14,8 @@ function slugify(s: string) {
 }
 
 export async function GET(req: NextRequest) {
+  const denied = await requireAdmin()
+  if (denied) return denied
   const supabase = getClient()
   const { searchParams } = new URL(req.url)
   const status = searchParams.get('status')
@@ -33,6 +36,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const denied = await requireAdmin()
+  if (denied) return denied
   const supabase = getClient()
 
   try {

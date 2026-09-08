@@ -94,7 +94,7 @@ export interface PlusAnalytics {
 
 export interface PlusWorkspace {
   live: boolean
-  featuresRaw: Record<string, boolean> // persisted feature/rule/connection state (calendar_settings.features)
+  featuresRaw: Record<string, any> // persisted feature/rule/connection state + custom rule arrays (calendar_settings.features)
   profile: PlusProfile
   briefing: BriefingConfig
   integrations: Integration[]
@@ -110,6 +110,43 @@ export interface PlusWorkspace {
 export const intKey = (id: string) => `plus.int.${id}`
 export const focusKey = (id: string) => `plus.focus.${id}`
 export const autoKey = (id: string) => `plus.auto.${id}`
+
+// User-created rules persist as JSON arrays under these dedicated keys (same
+// JSONB column; the on/off state of each custom rule still uses autoKey/focusKey
+// so custom rules toggle exactly like built-ins).
+export const customAutoRulesKey = 'custom_automation_rules'
+export const customFocusRulesKey = 'custom_focus_rules'
+
+const AUTO_KINDS: AutomationKind[] = ['colour', 'template', 'reminder', 'tag']
+const FOCUS_KINDS: RuleKind[] = ['focus', 'boundary', 'buffer']
+
+export function readCustomAutomationRules(features: Record<string, any>): AutomationRule[] {
+  const raw = features?.[customAutoRulesKey]
+  if (!Array.isArray(raw)) return []
+  return raw
+    .filter((r: any) => r && typeof r.id === 'string' && typeof r.label === 'string')
+    .map((r: any) => ({
+      id: r.id,
+      label: r.label,
+      detail: typeof r.detail === 'string' ? r.detail : '',
+      kind: AUTO_KINDS.includes(r.kind) ? (r.kind as AutomationKind) : 'template',
+      on: typeof r.on === 'boolean' ? r.on : true,
+    }))
+}
+
+export function readCustomFocusRules(features: Record<string, any>): FocusRule[] {
+  const raw = features?.[customFocusRulesKey]
+  if (!Array.isArray(raw)) return []
+  return raw
+    .filter((r: any) => r && typeof r.id === 'string' && typeof r.label === 'string')
+    .map((r: any) => ({
+      id: r.id,
+      label: r.label,
+      detail: typeof r.detail === 'string' ? r.detail : '',
+      kind: FOCUS_KINDS.includes(r.kind) ? (r.kind as RuleKind) : 'focus',
+      on: typeof r.on === 'boolean' ? r.on : true,
+    }))
+}
 
 // ── Colour tokens (mirror the calendar palette) ───────────────
 export const PLUS_COLOURS: Record<string, { dot: string; soft: string }> = {
@@ -217,7 +254,7 @@ export async function loadPlusWorkspace(supabase: any): Promise<PlusWorkspace> {
     if (!s) return sampleWorkspace()
 
     const base = sampleWorkspace()
-    const featuresRaw: Record<string, boolean> = (s.features && typeof s.features === 'object') ? s.features : {}
+    const featuresRaw: Record<string, any> = (s.features && typeof s.features === 'object') ? s.features : {}
 
     const profile: PlusProfile = {
       ...base.profile,
@@ -238,8 +275,11 @@ export async function loadPlusWorkspace(supabase: any): Promise<PlusWorkspace> {
     const integrations: Integration[] = base.integrations.map((i) => ({
       ...i, account: undefined, status: featuresRaw[intKey(i.id)] ? 'connected' : 'available',
     }))
-    const focusRules: FocusRule[] = base.focusRules.map((r) => ({ ...r, on: featuresRaw[focusKey(r.id)] ?? r.on }))
-    const automationRules: AutomationRule[] = base.automationRules.map((r) => ({ ...r, on: featuresRaw[autoKey(r.id)] ?? r.on }))
+    // Built-in catalog + user-created rules, each hydrated from its toggle key.
+    const focusRules: FocusRule[] = [...base.focusRules, ...readCustomFocusRules(featuresRaw)]
+      .map((r) => ({ ...r, on: featuresRaw[focusKey(r.id)] ?? r.on }))
+    const automationRules: AutomationRule[] = [...base.automationRules, ...readCustomAutomationRules(featuresRaw)]
+      .map((r) => ({ ...r, on: featuresRaw[autoKey(r.id)] ?? r.on }))
 
     return {
       live: true, featuresRaw, profile, briefing, integrations,

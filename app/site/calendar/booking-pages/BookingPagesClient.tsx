@@ -1,5 +1,5 @@
 'use client'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
@@ -20,7 +20,7 @@ const fmt = (iso: string, tz: string) => new Intl.DateTimeFormat('en-GB', { time
 
 const blankForm = {
   id: '' as string, title: '', slug: '', description: '', duration_min: 30, buffer_min: 0,
-  min_notice_hours: 4, advance_days: 30, timezone: 'Africa/Nairobi', location: '',
+  min_notice_hours: 4, advance_days: 30, timezone: 'America/New_York', location: '',
   days: new Set(['1', '2', '3', '4', '5']), start: '09:00', end: '17:00', is_active: true,
   requires_payment: false, price: 0, currency: 'USD',
 }
@@ -33,6 +33,12 @@ export default function BookingPagesClient({ initialPages, bookings }: { initial
   const origin = typeof window !== 'undefined' ? window.location.origin : ''
 
   const openNew = () => setForm({ ...blankForm, days: new Set(['1', '2', '3', '4', '5']) })
+  // Deep-link support: /calendar/booking-pages?new=1 opens the create dialog
+  // (used by the "New page" buttons in the Plus/Teams workspaces).
+  useEffect(() => {
+    if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('new') === '1') openNew()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const openEdit = (p: Page) => {
     const firstDay = Object.entries(p.working_hours || {})[0]?.[1]?.[0]
     setForm({
@@ -56,7 +62,7 @@ export default function BookingPagesClient({ initialPages, bookings }: { initial
     const payload = {
       title, slug, description: form.description.trim() || null, duration_min: Number(form.duration_min),
       buffer_min: Number(form.buffer_min), min_notice_hours: Number(form.min_notice_hours),
-      advance_days: Number(form.advance_days), timezone: form.timezone.trim() || 'Africa/Nairobi',
+      advance_days: Number(form.advance_days), timezone: form.timezone.trim() || 'America/New_York',
       location: form.location.trim() || null, working_hours, is_active: form.is_active,
       requires_payment: !!form.requires_payment,
       price_cents: form.requires_payment ? Math.max(0, Math.round(Number(form.price) * 100)) : 0,
@@ -188,7 +194,7 @@ export default function BookingPagesClient({ initialPages, bookings }: { initial
                   <Field label="Day ends"><input type="time" value={form.end} onChange={(e) => setForm({ ...form, end: e.target.value })} className={inp} style={inpStyle}/></Field>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <Field label="Timezone (IANA)"><input value={form.timezone} onChange={(e) => setForm({ ...form, timezone: e.target.value })} className={inp} style={inpStyle}placeholder="Africa/Nairobi" /></Field>
+                  <Field label="Timezone (IANA)"><input value={form.timezone} onChange={(e) => setForm({ ...form, timezone: e.target.value })} className={inp} style={inpStyle}placeholder="America/New_York" /></Field>
                   <Field label="Location / link"><input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} className={inp} style={inpStyle}placeholder="Google Meet" /></Field>
                 </div>
                 <div className="rounded-xl border p-3" style={{ borderColor: 'var(--border)' }}>

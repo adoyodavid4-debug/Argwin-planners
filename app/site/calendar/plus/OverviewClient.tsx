@@ -37,11 +37,11 @@ export default function OverviewClient({ ws }: { ws: PlusWorkspace }) {
             </div>
             <div className="p-5">
               <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-                4 meetings, 2h focus protected, 1 conflict to resolve. Leave by 08:40 for your 09:00 in Westlands.
+                4 meetings, 2h focus protected, 1 conflict to resolve. Leave by 08:40 for your 09:00 in Midtown.
               </p>
               <div className="mt-4 space-y-0">
                 {[
-                  { time: '09:00', title: 'Client kickoff — Westlands', flag: 'Leave 08:40' },
+                  { time: '09:00', title: 'Client kickoff — Midtown', flag: 'Leave 08:40' },
                   { time: '11:30', title: 'Design review', flag: 'Join link' },
                   { time: '14:00', title: 'Focus block — protected', flag: null },
                   { time: '15:00', title: 'Team sync', flag: '⚠ Clash' },
@@ -104,7 +104,7 @@ export default function OverviewClient({ ws }: { ws: PlusWorkspace }) {
             <Sparkles size={18} style={{ color: 'var(--gold)' }} />
             <p className="mt-2 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>You’re on Arwign Plus</p>
             <p className="mt-1 text-xs" style={{ color: 'var(--text-muted)' }}>
-              {ws.profile.price}/mo · renews {new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(ws.profile.renews_on))}
+              {ws.profile.price}/mo · full billing details under Subscription
             </p>
             <Link href="/calendar/plus/subscription" className="btn-outline mt-3 w-full justify-center py-2 text-sm">Manage subscription</Link>
           </div>

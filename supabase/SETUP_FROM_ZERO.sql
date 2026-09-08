@@ -1719,7 +1719,7 @@ INSERT INTO testimonials (name, role, quote, rating, product_label, gradient, is
   ('Daniel K.', 'Verified buyer · GoodNotes user',  'Downloaded it in seconds and had it set up before my coffee was ready. Worth every penny.', 5, 'Budget Planner', 'linear-gradient(135deg,#C9A84C,#E2C97E)', FALSE, 1),
   ('Priya S.',  'Verified buyer · Manchester',      'I have bought planners I never opened. This one I actually look forward to — the design just makes you want to plan.', 5, 'Wellness Journal', 'linear-gradient(135deg,#E8C5C0,#C9847C)', FALSE, 2),
   ('Tomas R.',  'Verified buyer · Notability user', 'The layouts are gorgeous and the tabs just work. Easily my favourite purchase this year.', 5, 'Academic Planner', 'linear-gradient(135deg,#A8B5A0,#6E7E66)', FALSE, 3),
-  ('Lena M.',   'Verified buyer · Berlin',          'A game-changer for my study system — everything finally lives in one tidy, hyperlinked notebook.', 5, '66-Day Habit Tracker', 'linear-gradient(135deg,#C97B5A,#AE6244)', FALSE, 4),
+  ('Lena M.',   'Verified buyer · Austin',          'A game-changer for my study system — everything finally lives in one tidy, hyperlinked notebook.', 5, '66-Day Habit Tracker', 'linear-gradient(135deg,#C97B5A,#AE6244)', FALSE, 4),
   ('Sophie L.', 'Verified buyer · Etsy',            'Changed how I plan my entire week. I keep recommending it to everyone at work.', 5, 'Student Planner', 'linear-gradient(135deg,#B8A9D4,#7B6FAE)', FALSE, 5),
   ('Nadia B.',  'Verified buyer · Gumroad',         'Beautiful, calm and genuinely useful. Printed the A5 size too and it looks just as lovely on paper.', 5, 'Digital Notebook', 'linear-gradient(135deg,#C9A84C,#C28E1C)', FALSE, 6)
 ON CONFLICT DO NOTHING;

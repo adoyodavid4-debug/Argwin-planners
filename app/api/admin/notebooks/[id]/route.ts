@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdmin } from '@/lib/supabase/admin-guard'
 
 function getClient() {
   return createClient(
@@ -11,6 +12,8 @@ function getClient() {
 const ALLOWED_FIELDS = ['name', 'type', 'description', 'cover_color', 'status', 'visibility']
 
 export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
+  const denied = await requireAdmin()
+  if (denied) return denied
   const supabase = getClient()
   const { data, error } = await supabase
     .from('notebooks')
@@ -30,6 +33,8 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+  const denied = await requireAdmin()
+  if (denied) return denied
   const supabase = getClient()
   const body = await req.json().catch(() => null)
   if (!body) return NextResponse.json({ error: 'Invalid body' }, { status: 400 })
@@ -56,6 +61,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+  const denied = await requireAdmin()
+  if (denied) return denied
   const supabase = getClient()
   const { error } = await supabase.from('notebooks').delete().eq('id', params.id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

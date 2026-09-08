@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { z } from 'zod'
+import { requireAdmin } from '@/lib/supabase/admin-guard'
 
 const updateSchema = z.object({
   status: z.enum(['new', 'reviewing', 'accepted', 'declined']),
 })
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+  const denied = await requireAdmin()
+  if (denied) return denied
   const body = await req.json().catch(() => null)
   const parsed = updateSchema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })

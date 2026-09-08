@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/server'
+import { requireAdmin } from '@/lib/supabase/admin-guard'
 
 export async function GET(req: NextRequest) {
+  const denied = await requireAdmin()
+  if (denied) return denied
   const { searchParams } = req.nextUrl
   const page     = Math.max(1, parseInt(searchParams.get('page') ?? '1'))
   const pageSize = Math.min(100, parseInt(searchParams.get('pageSize') ?? '50'))

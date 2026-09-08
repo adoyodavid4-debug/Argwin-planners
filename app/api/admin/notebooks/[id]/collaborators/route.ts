@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdmin } from '@/lib/supabase/admin-guard'
 
 function getClient() {
   return createClient(
@@ -9,6 +10,8 @@ function getClient() {
 }
 
 export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
+  const denied = await requireAdmin()
+  if (denied) return denied
   const supabase = getClient()
   const { data, error } = await supabase
     .from('notebook_collaborators')
@@ -24,6 +27,8 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
 }
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+  const denied = await requireAdmin()
+  if (denied) return denied
   const supabase = getClient()
   const body = await req.json().catch(() => null)
   if (!body?.email) return NextResponse.json({ error: 'Email is required' }, { status: 400 })
@@ -70,6 +75,8 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+  const denied = await requireAdmin()
+  if (denied) return denied
   const supabase = getClient()
   const body = await req.json().catch(() => null)
   if (!body?.collaborator_id) return NextResponse.json({ error: 'collaborator_id required' }, { status: 400 })

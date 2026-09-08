@@ -12,12 +12,12 @@ export const dynamic = 'force-dynamic'
 // per local day (guarded by last_briefing_on).
 //
 // NOTE: the Vercel Hobby plan only permits DAILY crons, so this is scheduled
-// once at 04:00 UTC (= 07:00 in the Africa/Nairobi default tz, matching the
-// default briefing hour). To honour each user's own `briefing_hour`, upgrade to
+// once at 12:00 UTC (= 07:00 US Eastern / 12:00 UK — a morning-ish batch for the
+// US & UK audience). To honour each user's own `briefing_hour`, upgrade to
 // Vercel Pro, switch the schedule in vercel.json to hourly ("0 * * * *"), and
 // re-add an `if (localHour !== st.briefing_hour) continue` gate below.
 async function run(req: NextRequest) {
-  if (req.headers.get('authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!process.env.CRON_SECRET || req.headers.get('authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const supabase = createServiceRoleClient()
@@ -33,7 +33,7 @@ async function run(req: NextRequest) {
     .or('briefing_email.eq.true,briefing_sms.eq.true')
 
   for (const st of (settingsRows ?? []) as any[]) {
-    const tz = st.timezone || 'Africa/Nairobi'
+    const tz = st.timezone || 'America/New_York'
     let localDate: string
     try {
       localDate = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(nowInstant)
@@ -77,7 +77,21 @@ async function run(req: NextRequest) {
     const email = u?.user?.email as string | undefined
 
     const wantEmail = st.briefing_email && !!email
-    const wantSms   = st.briefing_sms && !!st.phone && smsConfigured()
+
+    // SMS briefings are a Plus feature. The free-tier UI can't enable the flag,
+    // but the column is writable by the user's own client, so enforce the plan
+    // here before paying for a Twilio send.
+    let wantSms = false
+    if (st.briefing_sms && !!st.phone && smsConfigured()) {
+      const { data: prof } = await supabase
+        .from('profiles')
+        .select('calendar_plan, plan_expires_at, role')
+        .eq('id', st.user_id)
+        .single()
+      const planActive = ['plus', 'teams'].includes(prof?.calendar_plan ?? '') &&
+        (!prof?.plan_expires_at || new Date(prof.plan_expires_at) > nowInstant)
+      wantSms = planActive || ['admin', 'super_admin'].includes(prof?.role ?? '')
+    }
     if (!wantEmail && !wantSms) continue
 
     let delivered = false

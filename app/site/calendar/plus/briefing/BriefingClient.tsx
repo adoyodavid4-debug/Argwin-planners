@@ -1,27 +1,41 @@
 'use client'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import toast from 'react-hot-toast'
 import { Mail, MessageSquare, Clock, Phone, Check, CalendarDays, Moon } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
+import { saveSettings } from '@/lib/calendar/settings'
 import PlusShell, { SectionCard, Switch } from '../PlusShell'
 import { type PlusWorkspace, type BriefingConfig, phoneValid } from '@/lib/calendar/plus'
 
 export default function BriefingClient({ ws }: { ws: PlusWorkspace }) {
+  const supabase = useMemo(() => createClient() as any, [])
   const [cfg, setCfg] = useState<BriefingConfig>(ws.briefing)
   const [phone, setPhone] = useState(ws.profile.phone)
+  const [saving, setSaving] = useState(false)
   const patch = (p: Partial<BriefingConfig>) => setCfg((c) => ({ ...c, ...p }))
   const phoneOk = !phone || phoneValid(phone)
   const canSMS = phoneValid(phone)
 
-  const save = () => {
-    if (phone && !phoneValid(phone)) { toast.error('Enter a valid phone, e.g. +254712345678'); return }
-    toast.success('Briefing preferences saved')
+  const save = async () => {
+    if (phone && !phoneValid(phone)) { toast.error('Enter a valid phone, e.g. +1 202 555 0134'); return }
+    if (!ws.live) { toast.success('Briefing preferences saved'); return }
+    setSaving(true)
+    try {
+      await saveSettings(supabase, {
+        briefing_email: cfg.email, briefing_sms: canSMS && cfg.sms, briefing_hour: cfg.hour,
+        evening_preview: cfg.evening, quiet_start: cfg.quiet_start, quiet_end: cfg.quiet_end,
+        phone: phone ? phone.replace(/[\s()-]/g, '') : null,
+      })
+      toast.success('Briefing preferences saved')
+    } catch { toast.error('Could not save — please try again.') }
+    finally { setSaving(false) }
   }
   const channels = [cfg.email && 'Email', canSMS && cfg.sms && 'SMS', cfg.evening && 'Evening preview'].filter(Boolean)
 
   return (
     <PlusShell workspace={ws} title="Daily Outlook Briefing"
       subtitle="A proactive summary of your day, delivered before you open anything."
-      actions={<button onClick={save} className="btn-primary px-3.5 py-2 text-sm"><Check size={15} /> Save</button>}>
+      actions={<button onClick={save} disabled={saving} className="btn-primary px-3.5 py-2 text-sm disabled:opacity-60"><Check size={15} /> {saving ? 'Saving…' : 'Save'}</button>}>
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Config */}
@@ -39,11 +53,11 @@ export default function BriefingClient({ ws }: { ws: PlusWorkspace }) {
             <label className="mb-1 block text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>Number with country code</label>
             <div className="flex items-center gap-2 rounded-xl border px-3 py-2.5" style={{ borderColor: phoneOk ? 'var(--border)' : '#dc2626', background: 'var(--bg-primary)' }}>
               <Phone size={15} style={{ color: 'var(--text-muted)' }} />
-              <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+254712345678" inputMode="tel"
+              <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+1 202 555 0134" inputMode="tel"
                 className="w-full bg-transparent text-sm outline-none" style={{ color: 'var(--text-primary)' }} />
               {canSMS && <Check size={15} style={{ color: 'var(--gold)' }} />}
             </div>
-            {!phoneOk && <p className="mt-1 text-xs" style={{ color: '#dc2626' }}>Use international format, e.g. +254 712 345 678.</p>}
+            {!phoneOk && <p className="mt-1 text-xs" style={{ color: '#dc2626' }}>Use international format, e.g. +1 202 555 0134 (US) or +44 7700 900123 (UK).</p>}
             <p className="mt-2 text-[11px]" style={{ color: 'var(--text-muted)' }}>Stored only for briefings and reminders — standard message rates may apply.</p>
           </SectionCard>
 
@@ -81,10 +95,10 @@ export default function BriefingClient({ ws }: { ws: PlusWorkspace }) {
                 </div>
               </div>
               <p className="mb-4 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-                4 meetings, 2h focus protected, 1 conflict to resolve. Leave by 08:40 for your 09:00 in Westlands.
+                4 meetings, 2h focus protected, 1 conflict to resolve. Leave by 08:40 for your 09:00 in Midtown.
               </p>
               {[
-                { time: '09:00', title: 'Client kickoff — Westlands', flag: 'Leave 08:40' },
+                { time: '09:00', title: 'Client kickoff — Midtown', flag: 'Leave 08:40' },
                 { time: '11:30', title: 'Design review', flag: 'Join link' },
                 { time: '14:00', title: 'Focus block — protected', flag: null },
                 { time: '15:00', title: 'Team sync', flag: '⚠ Clash' },

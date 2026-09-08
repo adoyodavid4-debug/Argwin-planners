@@ -1,20 +1,63 @@
 'use client'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import toast from 'react-hot-toast'
-import { Building2, CreditCard, ShieldCheck, KeyRound, Minus, Plus, AlertTriangle, Check } from 'lucide-react'
+import { Building2, CreditCard, ShieldCheck, KeyRound, Minus, Plus, AlertTriangle, Check, X } from 'lucide-react'
 import TeamShell, { SectionCard } from '../TeamShell'
-import { type TeamWorkspace } from '@/lib/calendar/team'
+import { type TeamWorkspace, byId, logTeamAction } from '@/lib/calendar/team'
+import { fmtDateLong } from '@/lib/calendar/fmt'
+import { createClient } from '@/lib/supabase/client'
 
 const TIMEZONES = ['America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles', 'Europe/London']
-const fmtDate = (iso: string) => new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(iso))
 
 export default function AdminClient({ ws }: { ws: TeamWorkspace }) {
+  const supabase = useMemo(() => createClient() as any, [])
   const [name, setName] = useState(ws.team.name)
   const [timezone, setTimezone] = useState(ws.team.timezone)
   const [billingEmail, setBillingEmail] = useState(ws.team.billing_email)
   const [seats, setSeats] = useState(ws.team.seats_total)
 
-  const save = () => toast.success('Team settings saved')
+  const candidates = ws.members.filter((m) => m.status === 'active' && m.id !== ws.currentMemberId)
+  const [transferTo, setTransferTo] = useState<string | null>(null) // null = closed; member id when open
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [deleteName, setDeleteName] = useState('')
+
+  const save = async () => {
+    if (ws.live) {
+      const { error } = await supabase.from('teams')
+        .update({ name: name.trim() || ws.team.name, timezone, billing_email: billingEmail.trim(), seats_total: seats })
+        .eq('id', ws.team.id)
+      if (error) { toast.error(error.message); return }
+    }
+    toast.success('Team settings saved')
+  }
+
+  const doTransfer = async () => {
+    const target = byId(ws.members, transferTo ?? '')
+    if (!target) { toast.error('Pick a member to hand the team to.'); return }
+    if (ws.live) {
+      const { data: row, error: uErr } = await supabase.from('team_members').select('user_id').eq('id', target.id).single()
+      if (uErr || !row?.user_id) { toast.error('That member hasn’t activated their account yet.'); return }
+      // RLS on `teams` may reject handing owner_id to another user — attempt it and fall back gracefully.
+      const { error } = await supabase.from('teams').update({ owner_id: row.user_id }).eq('id', ws.team.id)
+      if (error) { toast.error('Ownership transfer is blocked for security — contact support to complete it.'); return }
+      // 'admin' isn't a valid role in 020_teams.sql; Manager ('manage') is the closest demotion.
+      const r1 = await supabase.from('team_members').update({ role: 'owner' }).eq('id', target.id)
+      if (r1.error) { toast.error(r1.error.message); return }
+      const r2 = await supabase.from('team_members').update({ role: 'manage' }).eq('id', ws.currentMemberId)
+      if (r2.error) toast.error(r2.error.message)
+      logTeamAction(supabase, ws.team.id, ws.currentMemberId, 'transferred ownership', `${ws.team.name} → ${target.name}`, 'member')
+    }
+    toast.success(`Ownership transferred to ${target.name}`)
+    setTransferTo(null)
+  }
+
+  const doDelete = async () => {
+    if (deleteName.trim() !== ws.team.name) { toast.error('Type the team name exactly to confirm.'); return }
+    if (!ws.live) { toast.success('Sample workspace — nothing was deleted.'); setDeleteOpen(false); setDeleteName(''); return }
+    const { error } = await supabase.from('teams').delete().eq('id', ws.team.id)
+    if (error) { toast.error(error.message); return }
+    window.location.href = '/calendar/app'
+  }
 
   return (
     <TeamShell workspace={ws} title="Admin console"
@@ -43,7 +86,7 @@ export default function AdminClient({ ws }: { ws: TeamWorkspace }) {
           <div className="mb-4 flex items-center justify-between rounded-xl border p-3.5" style={{ borderColor: 'rgba(var(--gold-rgb),0.35)', background: 'rgba(var(--gold-rgb),0.06)' }}>
             <div>
               <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Arwign Teams</p>
-              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>$49.99 / month · renews {fmtDate(ws.team.renews_on)}</p>
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>$49.99 / month{ws.team.renews_on ? ` · renews ${fmtDateLong(ws.team.renews_on, ws.team.timezone)}` : ''}</p>
             </div>
             <CreditCard size={20} style={{ color: 'var(--gold)' }} />
           </div>
@@ -83,18 +126,72 @@ export default function AdminClient({ ws }: { ws: TeamWorkspace }) {
                 <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Transfer ownership</p>
                 <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Hand the team to another owner.</p>
               </div>
-              <button className="btn-outline px-3 py-1.5 text-xs">Transfer</button>
+              <button onClick={() => { if (candidates.length === 0) { toast.error('No other active members to transfer to.'); return } setTransferTo(candidates[0].id) }} className="btn-outline px-3 py-1.5 text-xs">Transfer</button>
             </div>
             <div className="flex items-center justify-between rounded-xl border p-3.5" style={{ borderColor: 'rgba(180,102,74,0.4)', background: 'rgba(180,102,74,0.05)' }}>
               <div>
                 <p className="flex items-center gap-1.5 text-sm font-medium" style={{ color: '#B4664A' }}><AlertTriangle size={14} /> Delete team</p>
                 <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Permanently remove the team and all shared data.</p>
               </div>
-              <button onClick={() => toast.error('Deletion requires confirmation')} className="rounded-lg border px-3 py-1.5 text-xs font-medium" style={{ borderColor: 'rgba(180,102,74,0.5)', color: '#B4664A' }}>Delete</button>
+              <button onClick={() => { setDeleteName(''); setDeleteOpen(true) }} className="rounded-lg border px-3 py-1.5 text-xs font-medium" style={{ borderColor: 'rgba(180,102,74,0.5)', color: '#B4664A' }}>Delete</button>
             </div>
           </div>
         </SectionCard>
       </div>
+
+      {/* Transfer dialog */}
+      {transferTo !== null && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-6" style={{ background: 'rgba(0,0,0,0.45)' }} onClick={() => setTransferTo(null)}>
+          <div className="max-h-[92vh] w-full overflow-y-auto rounded-t-3xl border p-6 sm:max-w-md sm:rounded-3xl" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }} onClick={(e) => e.stopPropagation()}>
+            <div className="mb-5 flex items-center justify-between">
+              <h2 className="font-display text-xl" style={{ color: 'var(--text-primary)' }}>Transfer ownership</h2>
+              <button onClick={() => setTransferTo(null)} className="btn-ghost" aria-label="Close"><X size={18} /></button>
+            </div>
+            <div className="space-y-4">
+              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>The new owner gains full control — billing, members and the team itself. You become a Manager.</p>
+              <div>
+                <label className="mb-1.5 block text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>New owner</label>
+                <select value={transferTo} onChange={(e) => setTransferTo(e.target.value)}
+                  className="w-full rounded-xl border px-3 py-2.5 text-sm outline-none" style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
+                  {candidates.map((m) => <option key={m.id} value={m.id}>{m.name} · {m.email}</option>)}
+                </select>
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button onClick={doTransfer} className="btn-primary flex-1 justify-center py-2 text-sm"><Check size={15} /> Transfer ownership</button>
+                <button onClick={() => setTransferTo(null)} className="btn-outline justify-center py-2 text-sm">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete confirmation */}
+      {deleteOpen && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-6" style={{ background: 'rgba(0,0,0,0.45)' }} onClick={() => setDeleteOpen(false)}>
+          <div className="max-h-[92vh] w-full overflow-y-auto rounded-t-3xl border p-6 sm:max-w-md sm:rounded-3xl" style={{ background: 'var(--bg-card)', borderColor: 'rgba(180,102,74,0.4)' }} onClick={(e) => e.stopPropagation()}>
+            <div className="mb-5 flex items-center justify-between">
+              <h2 className="flex items-center gap-2 font-display text-xl" style={{ color: '#B4664A' }}><AlertTriangle size={18} /> Delete this team?</h2>
+              <button onClick={() => setDeleteOpen(false)} className="btn-ghost" aria-label="Close"><X size={18} /></button>
+            </div>
+            <div className="space-y-4">
+              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                This permanently removes <strong style={{ color: 'var(--text-primary)' }}>{ws.team.name}</strong> — members, shared calendars, resources, booking pages and the audit trail. It cannot be undone.
+              </p>
+              <div>
+                <label className="mb-1.5 block text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>Type <strong style={{ color: 'var(--text-primary)' }}>{ws.team.name}</strong> to confirm</label>
+                <input value={deleteName} onChange={(e) => setDeleteName(e.target.value)} placeholder={ws.team.name}
+                  className="w-full rounded-xl border px-3.5 py-2.5 text-sm outline-none" style={{ borderColor: 'rgba(180,102,74,0.4)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }} />
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button onClick={doDelete} disabled={deleteName.trim() !== ws.team.name}
+                  className="flex-1 justify-center rounded-lg border px-3 py-2 text-sm font-medium disabled:opacity-50"
+                  style={{ borderColor: 'rgba(180,102,74,0.5)', color: '#B4664A' }}>Delete team forever</button>
+                <button onClick={() => setDeleteOpen(false)} className="btn-outline justify-center py-2 text-sm">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </TeamShell>
   )
 }

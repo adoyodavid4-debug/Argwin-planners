@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdmin } from '@/lib/supabase/admin-guard'
 
 function serviceClient() {
   return createClient(
@@ -28,6 +29,8 @@ async function getAdminUserId(): Promise<string | null> {
 }
 
 export async function GET(req: NextRequest) {
+  const denied = await requireAdmin()
+  if (denied) return denied
   const supabase = serviceClient()
   const { searchParams } = new URL(req.url)
   const status = searchParams.get('status')
@@ -62,6 +65,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const denied = await requireAdmin()
+  if (denied) return denied
   const supabase   = serviceClient()
   const owner_id   = await getAdminUserId()
   const body       = await req.json().catch(() => null)

@@ -2,8 +2,8 @@
 // Supports FREQ=DAILY|WEEKLY|MONTHLY|YEARLY, INTERVAL, COUNT, UNTIL and BYDAY
 // (weekly). Occurrences are expanded from the master event's UTC start; the app
 // layer merges detached exceptions (rows with recurrence_parent_id) and applies
-// EXDATEs. Africa/Nairobi has no DST, so UTC stepping is exact there; for DST
-// zones weekly/monthly stepping is within an hour — acceptable for display.
+// EXDATEs. Fixed-offset zones step exactly in UTC; for DST zones (e.g. US &
+// UK) weekly/monthly stepping is within an hour — acceptable for display.
 
 import { addDays, addWeeks, addMonths, addYears } from 'date-fns'
 
