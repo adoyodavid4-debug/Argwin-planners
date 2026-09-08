@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Loader2, Mail, Lock, User, Eye, EyeOff, ArrowRight, Shield, Sparkles, Star } from 'lucide-react'
+import { Loader2, Mail, User, Eye, EyeOff, ArrowRight, Shield, Sparkles, Star } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 
@@ -153,13 +153,14 @@ export default function LoginClient() {
                 <div>
                   {label('Full Name')}
                   <div className="relative">
-                    <User size={15} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
+                    <User size={15} className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
                     <input
                       type="text"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       placeholder="Jane Doe"
-                      className="input-field pl-11"
+                      className="input-field"
+                      style={{ paddingRight: '2.75rem' }}
                       autoComplete="name"
                     />
                   </div>
@@ -169,13 +170,14 @@ export default function LoginClient() {
               <div>
                 {label('Email')}
                 <div className="relative">
-                  <Mail size={15} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
+                  <Mail size={15} className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
-                    className="input-field pl-11"
+                    className="input-field"
+                    style={{ paddingRight: '2.75rem' }}
                     autoComplete="email"
                     required
                   />
@@ -183,15 +185,26 @@ export default function LoginClient() {
               </div>
 
               <div>
-                {label('Password')}
+                <div className="flex items-center justify-between mb-1.5">
+                  <p className="text-[11px] font-semibold uppercase"
+                    style={{ color: 'var(--text-muted)', letterSpacing: '0.12em', fontFamily: 'var(--font-jost)' }}>
+                    Password
+                  </p>
+                  {mode === 'signin' && (
+                    <Link href="/auth/forgot-password" className="text-[11px] font-semibold hover:underline"
+                      style={{ color: 'var(--gold-dark)', fontFamily: 'var(--font-jost)' }}>
+                      Forgot password?
+                    </Link>
+                  )}
+                </div>
                 <div className="relative">
-                  <Lock size={15} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
                   <input
                     type={showPass ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder={mode === 'signup' ? 'At least 6 characters' : '••••••••'}
-                    className="input-field pl-11 pr-11"
+                    className="input-field"
+                    style={{ paddingRight: '2.75rem' }}
                     autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
                     minLength={6}
                     required
