@@ -8,6 +8,25 @@ function ConfirmedContent() {
   const sp = useSearchParams()
   const downloadUrl = sp.get('download') ? decodeURIComponent(sp.get('download')!) : null
   const resend = sp.get('resend')
+  const error = sp.get('error')
+
+  if (error) {
+    return (
+      <main className="min-h-screen bg-[var(--bg-primary,#FAF8F4)] flex flex-col items-center justify-center px-4 py-16 text-center">
+        <div className="text-6xl mb-6">⏳</div>
+        <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-4">
+          {error === 'expired' ? 'This confirmation link has expired' : 'This confirmation link isn\'t valid'}
+        </h1>
+        <p className="text-[var(--text-muted)] mb-8 max-w-sm">
+          No worries — just sign up again and we&apos;ll send you a fresh link right away.
+        </p>
+        <p className="text-sm text-[var(--text-muted)]">
+          Or browse our full collection →{' '}
+          <Link href="/shop" className="text-[#A0830E] hover:underline">Arwign Shop</Link>
+        </p>
+      </main>
+    )
+  }
 
   return (
     <main className="min-h-screen bg-[var(--bg-primary,#FAF8F4)] flex flex-col items-center justify-center px-4 py-16 text-center">

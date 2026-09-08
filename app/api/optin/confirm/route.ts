@@ -7,7 +7,7 @@ const FREEBIE_EXPIRY_HOURS = 72
 export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get('token')
   if (!token) {
-    return NextResponse.redirect(new URL('/free?error=invalid', req.url))
+    return NextResponse.redirect(new URL('/free/confirmed?error=invalid', req.url))
   }
 
   const supabase = createServiceRoleClient()
@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
     .single()
 
   if (error || !sub) {
-    return NextResponse.redirect(new URL('/free?error=invalid', req.url))
+    return NextResponse.redirect(new URL('/free/confirmed?error=invalid', req.url))
   }
 
   if (sub.status === 'confirmed') {
@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
   }
 
   if (sub.optin_token_expires_at && new Date(sub.optin_token_expires_at) < new Date()) {
-    return NextResponse.redirect(new URL('/free?error=expired', req.url))
+    return NextResponse.redirect(new URL('/free/confirmed?error=expired', req.url))
   }
 
   // Mark confirmed, clear token

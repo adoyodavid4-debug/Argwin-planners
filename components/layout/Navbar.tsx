@@ -21,7 +21,7 @@ const navLinks: NavItem[] = [
   { label: 'Shop', href: '/shop' },
   {
     label: 'Digital Planners',
-    href: '/categories',
+    href: '/shop/category',
     children: [
       { label: 'Digital Planners',   href: '/shop/category/digital-planners' },
       { label: 'Printable Planners', href: '/shop/category/printable-planners' },

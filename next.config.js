@@ -95,6 +95,9 @@ const nextConfig = {
       { source: '/terms',           destination: '/site/terms',           permanent: false },
       { source: '/refund',          destination: '/site/refund',          permanent: false },
 
+      // Lead magnets (opt-in confirmation emails link to /free/*)
+      { source: '/free/:path*',     destination: '/site/free/:path*',     permanent: false },
+
       // Notebooks
       { source: '/notebooks',       destination: '/site/notebooks',       permanent: false },
       { source: '/notebooks/:path*',destination: '/site/notebooks/:path*',permanent: false },

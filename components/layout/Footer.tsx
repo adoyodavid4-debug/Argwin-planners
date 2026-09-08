@@ -33,15 +33,14 @@ const footerLinks = {
     { label: 'Best Sellers',       href: '/best-sellers' },
     { label: 'New Arrivals',       href: '/new-arrivals' },
     { label: 'Contact Us',         href: '/contact' },
-    { label: 'Affiliate Program',  href: '/affiliates' },
   ],
   support: [
     { label: 'FAQ',                href: '/faq' },
     { label: 'How to Download',    href: '/blog/how-to-use-digital-planner' },
-    { label: 'Customer Dashboard', href: '/customer/dashboard' },
-    { label: 'Privacy Policy',     href: '/privacy-policy' },
-    { label: 'Terms of Service',   href: '/terms-of-service' },
-    { label: 'Refund Policy',      href: '/refund-policy' },
+    { label: 'My Notebooks',       href: '/customer/notebooks' },
+    { label: 'Privacy Policy',     href: '/privacy' },
+    { label: 'Terms of Service',   href: '/terms' },
+    { label: 'Refund Policy',      href: '/refund' },
   ],
 }
 
