@@ -129,7 +129,7 @@ export default async function ProductPage({ params }: Props) {
     <>
       <ProductSchema name={p.title} description={descriptionExcerpt(p.description, 5000)} images={(p.images as string[] | null) ?? []}
         price={p.price} currency={p.currency ?? 'USD'} url={productUrl} sku={p.id}
-        ratingValue={p.rating_avg ?? undefined} reviewCount={p.rating_count ?? undefined} />
+        ratingValue={p.rating_count ? p.rating_avg ?? undefined : undefined} reviewCount={p.rating_count || undefined} />
       <BreadcrumbSchema items={[
         { name: 'Home', url: BASE },
         { name: 'Shop', url: `${BASE}/shop` },

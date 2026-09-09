@@ -180,10 +180,14 @@ export default function CheckoutClient() {
     )
   }
 
+  // Paystack is only offered when its keys are configured (set
+  // NEXT_PUBLIC_PAYSTACK_ENABLED=true once PAYSTACK_* are added to the env),
+  // otherwise selecting it would fail at the hosted-page step.
+  const paystackEnabled = process.env.NEXT_PUBLIC_PAYSTACK_ENABLED === 'true'
   const methods: { key: Method; label: string; icon?: string; iconAlt: string }[] = [
     { key: 'pesapal',  label: 'Card',     icon: '/images/payments/visa-mastercard.jpg', iconAlt: 'Visa and Mastercard' },
     { key: 'paypal',   label: 'PayPal',   icon: '/images/payments/paypal.jpg',          iconAlt: 'PayPal' },
-    { key: 'paystack', label: 'Paystack',                                               iconAlt: 'Paystack' },
+    ...(paystackEnabled ? [{ key: 'paystack' as Method, label: 'Paystack', iconAlt: 'Paystack' }] : []),
   ]
 
   return (
@@ -228,7 +232,7 @@ export default function CheckoutClient() {
               Payment method
             </p>
 
-            <div className="grid grid-cols-3 gap-2 mb-6">
+            <div className="grid gap-2 mb-6" style={{ gridTemplateColumns: `repeat(${methods.length}, minmax(0, 1fr))` }}>
               {methods.map((m) => (
                 <button
                   key={m.key}

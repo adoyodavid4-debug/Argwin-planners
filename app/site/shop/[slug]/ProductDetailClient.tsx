@@ -28,13 +28,6 @@ interface Rel { id: string; title: string; slug: string; thumbnail: string | nul
 interface Rev { id: string; reviewer_name: string; rating: number; title: string | null; body: string | null; verified: boolean; created_at: string }
 interface Bundle { id: string; title: string; slug: string; thumbnail: string | null; price: number; currency: string | null }
 
-// TODO(reviews): shown only when a product has no approved rows in the reviews table.
-const PLACEHOLDER_REVIEWS: Rev[] = [
-  { id: 'ph1', reviewer_name: 'Amara N.', rating: 5, title: 'Beautiful and so easy to use', body: 'The hyperlinks make navigating effortless and it looks gorgeous on my iPad. I actually look forward to planning now.', verified: true, created_at: '2026-05-02' },
-  { id: 'ph2', reviewer_name: 'Daniel K.', rating: 5, title: 'Set up in minutes', body: 'Downloaded it in seconds and had it in GoodNotes before my coffee was ready. Worth every penny.', verified: true, created_at: '2026-04-20' },
-  { id: 'ph3', reviewer_name: 'Priya S.', rating: 4, title: 'Lovely design', body: 'Gorgeous templates and the sage colourway is my favourite. Printed it at home too — just as lovely on paper.', verified: true, created_at: '2026-04-05' },
-]
-
 const money = (n: number, c?: string | null) => new Intl.NumberFormat('en-GB', { style: 'currency', currency: c ?? 'USD' }).format(n)
 const initials = (name: string) => name.trim().split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase()
 
@@ -131,10 +124,14 @@ export default function ProductDetailClient({ product: p, related, reviews, bund
             <h1 className="font-display mb-2" style={{ fontSize: 'clamp(1.9rem,3.5vw,2.8rem)', lineHeight: 1.1, color: 'var(--text-primary)' }}>{p.title}</h1>
             {tagline && <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>{tagline}</p>}
 
-            <a href="#reviews" className="inline-flex items-center gap-2 mb-5 group">
-              <Stars value={p.rating_avg || 4.9} />
-              <span className="text-sm group-hover:text-gold transition-colors" style={{ color: 'var(--text-secondary)' }}>{(p.rating_avg || 4.9).toFixed(1)} · {p.rating_count || PLACEHOLDER_REVIEWS.length} reviews</span>
-            </a>
+            {p.rating_count > 0 ? (
+              <a href="#reviews" className="inline-flex items-center gap-2 mb-5 group">
+                <Stars value={p.rating_avg} />
+                <span className="text-sm group-hover:text-gold transition-colors" style={{ color: 'var(--text-secondary)' }}>{p.rating_avg.toFixed(1)} · {p.rating_count} review{p.rating_count === 1 ? '' : 's'}</span>
+              </a>
+            ) : (
+              <p className="text-sm mb-5" style={{ color: 'var(--text-muted)' }}>No reviews yet</p>
+            )}
 
             <div className="flex items-baseline gap-3 mb-6">
               <span className="font-display text-3xl font-semibold" style={{ color: 'var(--text-primary)' }}>{money(p.price, p.currency)}</span>
@@ -254,8 +251,7 @@ export default function ProductDetailClient({ product: p, related, reviews, bund
         </motion.section>
 
         {/* Reviews */}
-        <ReviewsSection reviews={reviews.length ? reviews : PLACEHOLDER_REVIEWS} isPlaceholder={reviews.length === 0}
-          avg={p.rating_count > 0 ? p.rating_avg : 4.9} count={p.rating_count > 0 ? p.rating_count : PLACEHOLDER_REVIEWS.length} reveal={reveal} />
+        <ReviewsSection reviews={reviews} avg={p.rating_avg} count={p.rating_count} reveal={reveal} />
 
         {/* FAQ */}
         <motion.section {...reveal()} className="mt-16 max-w-3xl">
@@ -278,7 +274,7 @@ export default function ProductDetailClient({ product: p, related, reviews, bund
                   </div>
                   <div className="p-4">
                     <p className="text-sm font-semibold line-clamp-2 transition-colors group-hover:text-gold mb-1.5" style={{ color: 'var(--text-primary)' }}>{r.title}</p>
-                    <div className="flex items-center gap-1.5 mb-1"><Stars value={r.rating_avg || 5} size={11} /></div>
+                    {r.rating_count > 0 && <div className="flex items-center gap-1.5 mb-1"><Stars value={r.rating_avg} size={11} /></div>}
                     <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{money(r.price, r.currency)}</p>
                   </div>
                 </Link>
@@ -359,13 +355,24 @@ function Lightbox({ imgs, active, setActive, onClose, title, reduce }: { imgs: s
   )
 }
 
-function ReviewsSection({ reviews, isPlaceholder, avg, count, reveal }: { reviews: Rev[]; isPlaceholder: boolean; avg: number; count: number; reveal: (d?: number) => any }) {
+function ReviewsSection({ reviews, avg, count, reveal }: { reviews: Rev[]; avg: number; count: number; reveal: (d?: number) => any }) {
   const dist = useMemo(() => {
     const d = [0, 0, 0, 0, 0]
     reviews.forEach((r) => { const s = Math.round(r.rating); if (s >= 1 && s <= 5) d[s - 1]++ })
     const total = reviews.length || 1
     return d.map((n) => Math.round((n / total) * 100))
   }, [reviews])
+  if (count === 0 || reviews.length === 0) {
+    return (
+      <motion.section {...reveal()} id="reviews" className="mt-16 scroll-mt-24">
+        <h2 className="font-display text-2xl mb-6" style={{ color: 'var(--text-primary)' }}>Reviews</h2>
+        <div className="rounded-2xl border p-8 text-center" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+          <p className="font-semibold text-sm mb-1" style={{ color: 'var(--text-primary)' }}>No reviews yet</p>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Be the first to share your thoughts on this planner.</p>
+        </div>
+      </motion.section>
+    )
+  }
   return (
     <motion.section {...reveal()} id="reviews" className="mt-16 scroll-mt-24">
       <h2 className="font-display text-2xl mb-6" style={{ color: 'var(--text-primary)' }}>Reviews</h2>
@@ -387,7 +394,6 @@ function ReviewsSection({ reviews, isPlaceholder, avg, count, reveal }: { review
         </div>
         {/* list */}
         <div>
-          {isPlaceholder && <p className="text-[11px] mb-4 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full" style={{ background: 'var(--bg-secondary)', color: 'var(--text-muted)' }}>Sample reviews — real reviews appear here once submitted</p>}
           <div className="grid sm:grid-cols-2 gap-4">
             {reviews.map((r) => (
               <figure key={r.id} className="p-5 rounded-2xl border flex flex-col" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
