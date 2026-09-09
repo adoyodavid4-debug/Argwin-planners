@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { getEmailProvider } from '@/lib/email'
 import { parseRRule, expandOccurrences } from '@/lib/calendar/recurrence'
+import { fmtWhen } from '@/lib/calendar/fmt'
 import { sendPush } from '@/lib/calendar/push'
 
 export const dynamic = 'force-dynamic'
@@ -21,7 +22,7 @@ async function run(req: NextRequest) {
   // Events that could still have upcoming reminders (end in future, or recurring).
   const { data: events } = await supabase
     .from('calendar_events')
-    .select('id, user_id, title, location, conferencing, start_at, end_at, all_day, rrule, exdates, reminders')
+    .select('id, user_id, title, location, conferencing, start_at, end_at, start_tz, all_day, rrule, exdates, reminders')
     .gte('end_at', new Date(now.getTime() - 24 * 3600_000).toISOString())
 
   const emailCache = new Map<string, string | null>()
@@ -62,7 +63,7 @@ async function run(req: NextRequest) {
         const { data: exists } = await supabase.from('notification_log').select('id').eq('idempotency_key', key).maybeSingle()
         if (exists) continue
 
-        const whenStr = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', hour12: true }).format(start)
+        const whenStr = fmtWhen(start, ev.start_tz)
         let ok = false
         try {
           if (r.channel === 'email') {

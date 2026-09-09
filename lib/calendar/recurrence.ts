@@ -6,6 +6,7 @@
 // UK) weekly/monthly stepping is within an hour — acceptable for display.
 
 import { addDays, addWeeks, addMonths, addYears } from 'date-fns'
+import { fmtDate } from './fmt'
 
 export type Freq = 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY'
 export const WEEKDAYS = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'] as const
@@ -137,7 +138,7 @@ export function parseICSDate(v: string): Date | null {
 }
 
 // Human summary for the UI, e.g. "Every 2 weeks on Mon, Wed".
-export function describeRRule(rule: RRule | null): string {
+export function describeRRule(rule: RRule | null, tz?: string): string {
   if (!rule) return 'Does not repeat'
   const n = rule.interval
   const names: Record<Weekday, string> = { SU: 'Sun', MO: 'Mon', TU: 'Tue', WE: 'Wed', TH: 'Thu', FR: 'Fri', SA: 'Sat' }
@@ -147,6 +148,6 @@ export function describeRRule(rule: RRule | null): string {
     : rule.freq === 'MONTHLY' ? (n === 1 ? 'Every month' : `Every ${n} months`)
     : (n === 1 ? 'Every year' : `Every ${n} years`)
   const on = rule.byday?.length ? ` on ${rule.byday.map((d) => names[d]).join(', ')}` : ''
-  const end = rule.count ? `, ${rule.count} times` : rule.until ? `, until ${rule.until.toLocaleDateString('en-GB')}` : ''
+  const end = rule.count ? `, ${rule.count} times` : rule.until ? `, until ${fmtDate(rule.until, tz)}` : ''
   return `${base}${on}${end}`
 }

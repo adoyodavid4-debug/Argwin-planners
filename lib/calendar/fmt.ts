@@ -13,9 +13,13 @@
 
 const DEFAULT_TZ = 'America/New_York'
 
-function safeFormat(iso: string | null | undefined, opts: Intl.DateTimeFormatOptions, tz?: string): string {
-  if (!iso) return '—'
-  const d = new Date(iso)
+// Accepts Dates as well as ISO strings: callers holding a Date must not round-trip
+// via .toISOString(), which itself throws RangeError on an Invalid Date.
+type DateInput = string | Date | null | undefined
+
+function safeFormat(input: DateInput, opts: Intl.DateTimeFormatOptions, tz?: string): string {
+  if (!input) return '—'
+  const d = input instanceof Date ? input : new Date(input)
   if (Number.isNaN(d.getTime())) return '—'
   try {
     return new Intl.DateTimeFormat('en-GB', { ...opts, timeZone: tz || DEFAULT_TZ }).format(d)
@@ -26,17 +30,37 @@ function safeFormat(iso: string | null | undefined, opts: Intl.DateTimeFormatOpt
 }
 
 /** "8 Sept 2026" — for date-only values (renewal dates, since-dates). */
-export const fmtDate = (iso: string | null | undefined, tz?: string) =>
+export const fmtDate = (iso: DateInput, tz?: string) =>
   safeFormat(iso, { day: 'numeric', month: 'short', year: 'numeric' }, tz)
 
 /** "8 Sept, 11:56 am" — for timestamps (audit log, bookings). */
-export const fmtDateTime = (iso: string | null | undefined, tz?: string) =>
+export const fmtDateTime = (iso: DateInput, tz?: string) =>
   safeFormat(iso, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', hour12: true }, tz)
 
 /** "8 September 2026" — long form for billing/renewal copy. */
-export const fmtDateLong = (iso: string | null | undefined, tz?: string) =>
+export const fmtDateLong = (iso: DateInput, tz?: string) =>
   safeFormat(iso, { day: 'numeric', month: 'long', year: 'numeric' }, tz)
 
 /** "11:56 am" — time only. */
-export const fmtTime = (iso: string | null | undefined, tz?: string) =>
+export const fmtTime = (iso: DateInput, tz?: string) =>
   safeFormat(iso, { hour: 'numeric', minute: '2-digit', hour12: true }, tz)
+
+/** "Tue, 8 Sept 2026, 11:56 am" — full timestamp for emails/notifications. */
+export const fmtWhen = (iso: DateInput, tz?: string) =>
+  safeFormat(iso, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }, tz)
+
+/** "Tuesday" — weekday name (agenda group headers). */
+export const fmtWeekday = (iso: DateInput, tz?: string) =>
+  safeFormat(iso, { weekday: 'long' }, tz)
+
+/** "Tuesday 8 September" — day-view / Today-rail headings. */
+export const fmtDayTitle = (iso: DateInput, tz?: string) =>
+  safeFormat(iso, { weekday: 'long', day: 'numeric', month: 'long' }, tz)
+
+/** "23:56" — 24-hour clock (world-clock rail). */
+export const fmtClock = (iso: DateInput, tz?: string) =>
+  safeFormat(iso, { hour: '2-digit', minute: '2-digit' }, tz)
+
+/** "11:56 am" / "9 am" — fmtTime with a bare ":00" dropped, for dense grids. */
+export const fmtTimeShort = (iso: DateInput, tz?: string) =>
+  fmtTime(iso, tz).replace(':00', '')

@@ -15,6 +15,7 @@ import {
 import { eventsToICS, parseICS } from '@/lib/calendar/ics'
 import { parseNaturalLanguage } from '@/lib/calendar/nl'
 import { loadSettings, saveSettings, type CalendarSettings, defaultSettings } from '@/lib/calendar/settings'
+import { fmtTimeShort, fmtDayTitle, fmtWeekday, fmtClock } from '@/lib/calendar/fmt'
 import { REMINDER_PRESETS, CHANNEL_LABELS, describeReminder } from '@/lib/calendar/reminders'
 import type { Reminder, ReminderChannel } from '@/lib/calendar/settings'
 import PlusPanel from './PlusPanel'
@@ -113,7 +114,7 @@ const isToday = (d: Date) => sameDay(d, new Date())
 const fromISO = (s: string) => new Date(s)
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-const fmtTime = (d: Date) => new Intl.DateTimeFormat('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true }).format(d).replace(':00', '')
+const fmtTime = (d: Date) => fmtTimeShort(d, localTZ)
 
 function dowLabels(weekStart: number): string[] {
   const base = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -457,7 +458,7 @@ export default function CalendarApp({ userEmail }: { userEmail: string }) {
   const title =
     view === 'month' ? `${MONTHS[cursor.getMonth()]} ${cursor.getFullYear()}`
     : view === 'year' ? `${cursor.getFullYear()}`
-    : view === 'day' ? new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }).format(cursor)
+    : view === 'day' ? fmtDayTitle(cursor, localTZ)
     : view === 'week' ? (() => { const s = startOfWeek(cursor, weekStart), e = addDays(s, 6); return `${s.getDate()} ${MONTHS[s.getMonth()].slice(0, 3)} – ${e.getDate()} ${MONTHS[e.getMonth()].slice(0, 3)} ${e.getFullYear()}` })()
     : 'Agenda · next 30 days'
 
@@ -759,7 +760,7 @@ function AgendaView({ cursor, occs, onOpen, onNew }: { cursor: Date; occs: Occ[]
           <div key={key} className="rounded-2xl border p-4" style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}>
             <div className="mb-3 flex items-baseline gap-2">
               <span className="font-display text-lg font-semibold" style={{ color: isToday(d) ? 'var(--gold)' : 'var(--text-primary)' }}>{d.getDate()} {MONTHS[d.getMonth()].slice(0, 3)}</span>
-              <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{new Intl.DateTimeFormat('en-GB', { weekday: 'long' }).format(d)}{isToday(d) ? ' · Today' : ''}</span>
+              <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{fmtWeekday(d, localTZ)}{isToday(d) ? ' · Today' : ''}</span>
             </div>
             <div className="space-y-1.5">
               {list.map((o) => (
@@ -831,7 +832,7 @@ function SideLink({ href, icon, label }: { href: string; icon: React.ReactNode; 
 // Right-hand "Today" rail: a live Daily Outlook Briefing + agenda for today.
 function TodayRail({ occs, onOpen, onOpenPlus }: { occs: Occ[]; onOpen: (o: Occ) => void; onOpenPlus: () => void }) {
   const now = new Date()
-  const dateLabel = new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }).format(now)
+  const dateLabel = fmtDayTitle(now, localTZ)
   const timed = occs.filter((o) => !o.ev.all_day)
   const allDay = occs.filter((o) => o.ev.all_day)
   const next = timed.find((o) => o.end >= now)
@@ -931,9 +932,8 @@ function WorldClocks({ zones }: { zones: string[] }) {
       <p className="mb-2 flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}><Globe2 size={12} /> World clock</p>
       <div className="space-y-1">
         {zones.map((z) => {
-          let label = z.split('/').pop()?.replace(/_/g, ' ') ?? z
-          let time = ''
-          try { time = new Intl.DateTimeFormat('en-GB', { timeZone: z, hour: '2-digit', minute: '2-digit' }).format(now) } catch { time = '—' }
+          const label = z.split('/').pop()?.replace(/_/g, ' ') ?? z
+          const time = fmtClock(now, z)
           return (
             <div key={z} className="flex items-center justify-between text-xs" style={{ color: 'var(--text-secondary)' }}>
               <span className="truncate">{label}</span>
@@ -1158,7 +1158,7 @@ function EventModal({ draft, settings, onChange, onClose, onSave, onDelete }: {
               </div>
             </div>
           )}
-          {rule && <p className="mt-1 text-[11px]" style={{ color: 'var(--text-muted)' }}>{describeRRule(rule)}</p>}
+          {rule && <p className="mt-1 text-[11px]" style={{ color: 'var(--text-muted)' }}>{describeRRule(rule, localTZ)}</p>}
         </div>
 
         {/* Reminders */}

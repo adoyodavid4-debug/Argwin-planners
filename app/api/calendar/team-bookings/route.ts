@@ -16,6 +16,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { generateSlots, wallTimeToUtc, type BookingPageConfig, type Interval, type Slot } from '@/lib/calendar/slots'
+import { fmtWhen } from '@/lib/calendar/fmt'
 import { getEmailProvider } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
@@ -172,11 +173,7 @@ function availableSlots(ctx: Ctx, dateStr: string, byHost: Map<string, Interval[
 }
 
 function whenLabel(iso: string, tz: string): string {
-  const s = new Intl.DateTimeFormat('en-GB', {
-    timeZone: tz, weekday: 'short', day: 'numeric', month: 'short', year: 'numeric',
-    hour: 'numeric', minute: '2-digit', hour12: true,
-  }).format(new Date(iso))
-  return `${s} (${tz})`
+  return `${fmtWhen(iso, tz)} (${tz})`
 }
 
 // Best-effort confirmation emails: guest + each host. Never throws.

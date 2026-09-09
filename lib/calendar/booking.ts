@@ -3,6 +3,7 @@
 // (/api/calendar/bookings) and the paid path (Stripe webhook after payment).
 
 import type { EmailProvider } from '@/lib/email'
+import { fmtWhen } from './fmt'
 
 interface PageLike {
   id: string; owner_id: string; title: string; timezone: string; location: string | null; colour: string | null
@@ -35,11 +36,7 @@ export async function sendBookingEmails(
   supabase: any, provider: EmailProvider, page: PageLike,
   b: { id: string; name: string; email: string; start: Date },
 ): Promise<void> {
-  const whenStr = new Intl.DateTimeFormat('en-GB', {
-    timeZone: page.timezone, weekday: 'short', day: 'numeric', month: 'short', year: 'numeric',
-    hour: 'numeric', minute: '2-digit', hour12: true,
-  }).format(b.start)
-  const when = `${whenStr} (${page.timezone})`
+  const when = `${fmtWhen(b.start, page.timezone)} (${page.timezone})`
 
   await provider.sendTransactional({
     to: b.email, locale: 'en', templateKey: 'calendar.booking',

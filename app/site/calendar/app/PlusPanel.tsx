@@ -6,8 +6,10 @@ import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import { getPlanInfo, PLAN_RANK, PLAN_LABEL, type CalendarPlan, type PlanInfo } from '@/lib/calendar/plan'
 import { X, Check, Sparkles, Users, ArrowRight, Lock, CalendarDays } from 'lucide-react'
+import { fmtDateLong } from '@/lib/calendar/fmt'
 
-const fmtDate = (iso: string) => new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(iso))
+const localTZ = typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'America/New_York'
+const fmtDate = (iso: string) => fmtDateLong(iso, localTZ)
 
 const FREE_FEATURES = [
   'Full calendar: unlimited events, all views, recurrence',

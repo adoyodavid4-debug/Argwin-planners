@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { CalendarDays, Check, Loader2 } from 'lucide-react'
+import { fmtDayTitle, fmtTime } from '@/lib/calendar/fmt'
 
 interface Option { id: string; start_at: string; end_at: string }
 interface Poll {
@@ -16,8 +17,7 @@ export default function PollVoteClient({ poll, options }: { poll: Poll; options:
   const [err, setErr] = useState('')
 
   const viewerTZ = typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : poll.timezone
-  const fmt = (iso: string) =>
-    new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'long', hour: 'numeric', minute: '2-digit', hour12: true }).format(new Date(iso))
+  const fmt = (iso: string) => `${fmtDayTitle(iso, viewerTZ)}, ${fmtTime(iso, viewerTZ)}`
 
   const toggle = (id: string) => setPicked((p) => p.includes(id) ? p.filter((x) => x !== id) : [...p, id])
 
