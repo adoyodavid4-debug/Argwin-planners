@@ -6,6 +6,14 @@
 // `needsSetup` fallback. `loadTeamWorkspace()` tries the real tables and, if
 // they don't exist yet (or are empty), returns rich SAMPLE data plus
 // `live: false` so the interface is always alive and honest about its state.
+//
+// Derived analytics counts (meetings/focus per member, events per shared
+// calendar, bookings·30d per page) are hydrated from real data via migration
+// 024: the `team_calendar_cells` RPC (content-free per-member scheduling) and
+// the `team_bookings` table. See hydrateCounts() below.
+
+import { wallTimeToUtc } from './slots'
+import { expandRange, type CalEventRow } from './plus'
 
 // ── Roles ─────────────────────────────────────────────────────
 // Ordered least → most privileged. `rank` gates who can change whom.
@@ -110,6 +118,9 @@ export interface ResourceBooking {
 }
 
 export type PageType = 'round-robin' | 'collective' | 'group'
+// Weekly availability windows keyed by ISO weekday (1=Mon … 7=Sun), each an
+// array of [start,end] wall-clock strings — mirrors booking_pages (migration 015).
+export type WorkingHours = Record<string, [string, string][]>
 export interface TeamBookingPage {
   id: string
   name: string
@@ -120,6 +131,18 @@ export interface TeamBookingPage {
   bookings_30d: number
   active: boolean
   description: string
+  // Per-page availability config (migration 025).
+  timezone: string
+  working_hours: WorkingHours
+  buffer_min: number
+  min_notice_hours: number
+  advance_days: number
+  capacity: number // attendees per slot for "group" pages
+}
+
+export const DEFAULT_WORKING_HOURS: WorkingHours = {
+  '1': [['09:00', '17:00']], '2': [['09:00', '17:00']], '3': [['09:00', '17:00']],
+  '4': [['09:00', '17:00']], '5': [['09:00', '17:00']],
 }
 
 export interface AuditEntry {
@@ -222,11 +245,12 @@ export function sampleWorkspace(): TeamWorkspace {
     { id: 'rb5', resource_id: 'r1', title: 'Vendor pitch', requester_id: 'u5', start_at: `2026-09-06T14:00:00`, end_at: `2026-09-06T15:00:00`, status: 'declined' },
   ]
 
+  const pageDefaults = { timezone: 'America/New_York', working_hours: DEFAULT_WORKING_HOURS, buffer_min: 0, min_notice_hours: 4, advance_days: 30, capacity: 1 }
   const pages: TeamBookingPage[] = [
-    { id: 'p1', name: 'Talk to Sales', slug: 'sales', type: 'round-robin', member_ids: ['u2', 'u5'], duration_min: 30, bookings_30d: 47, active: true, description: 'Distributes demos evenly across the sales team.' },
-    { id: 'p2', name: 'Product Interview', slug: 'interview', type: 'collective', member_ids: ['u1', 'u3'], duration_min: 45, bookings_30d: 12, active: true, description: 'Books only when everyone is free.' },
-    { id: 'p3', name: 'Design Office Hours', slug: 'design-oh', type: 'group', member_ids: ['u3', 'u4'], duration_min: 60, bookings_30d: 8, active: true, description: 'Many attendees, one slot.' },
-    { id: 'p4', name: 'Support Triage', slug: 'support', type: 'round-robin', member_ids: ['u4', 'u6'], duration_min: 20, bookings_30d: 0, active: false, description: 'Paused during the release freeze.' },
+    { id: 'p1', name: 'Talk to Sales', slug: 'sales', type: 'round-robin', member_ids: ['u2', 'u5'], duration_min: 30, bookings_30d: 47, active: true, description: 'Distributes demos evenly across the sales team.', ...pageDefaults },
+    { id: 'p2', name: 'Product Interview', slug: 'interview', type: 'collective', member_ids: ['u1', 'u3'], duration_min: 45, bookings_30d: 12, active: true, description: 'Books only when everyone is free.', ...pageDefaults },
+    { id: 'p3', name: 'Design Office Hours', slug: 'design-oh', type: 'group', member_ids: ['u3', 'u4'], duration_min: 60, bookings_30d: 8, active: true, description: 'Many attendees, one slot.', ...pageDefaults, capacity: 20 },
+    { id: 'p4', name: 'Support Triage', slug: 'support', type: 'round-robin', member_ids: ['u4', 'u6'], duration_min: 20, bookings_30d: 0, active: false, description: 'Paused during the release freeze.', ...pageDefaults },
   ]
 
   const audit: AuditEntry[] = [
@@ -268,6 +292,78 @@ function mapMember(r: any): Member {
     status: r.status, last_active: r.status === 'invited' ? 'pending' : '—',
     meetings_week: 0, focus_hours: 0,
   }
+}
+
+// [Monday 00:00, next Monday 00:00) of the week containing `now`, in `tz`.
+// Mirrors plus.ts' week window so Teams and Plus count the same "this week".
+function weekWindow(tz: string, now: Date): { start: Date; end: Date } {
+  const ymd = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(now)
+  const [y, m, d] = ymd.split('-').map(Number)
+  const dow = new Date(Date.UTC(y, m - 1, d)).getUTCDay() // 0=Sun…6=Sat
+  const sinceMonday = (dow + 6) % 7
+  return {
+    start: wallTimeToUtc(y, m, d - sinceMonday, 0, 0, tz),
+    end: wallTimeToUtc(y, m, d - sinceMonday + 7, 0, 0, tz),
+  }
+}
+
+// ── Real derived counts (migration 024) ───────────────────────
+// Fills meetings_week/focus_hours per member, events_week per shared calendar,
+// and bookings_30d per page from live data. Mutates the passed arrays in place.
+// Fully best-effort: if the RPC/table isn't there yet, the zeros already set by
+// the mappers stay, so an un-migrated DB simply shows no counts (never crashes).
+async function hydrateCounts(
+  supabase: any, teamId: string, tz: string,
+  members: Member[], calendars: SharedCalendar[], pages: TeamBookingPage[],
+): Promise<void> {
+  // Per-member weekly meetings & focus, and per-member event volume for calendars.
+  try {
+    const { start, end } = weekWindow(tz, new Date())
+    const { data: cells } = await supabase.rpc('team_calendar_cells', { p_team: teamId })
+    if (Array.isArray(cells)) {
+      const byMember = new Map<string, CalEventRow[]>()
+      for (const c of cells) {
+        const row: CalEventRow = {
+          id: c.event_id, title: '', description: '',
+          start_at: c.start_at, end_at: c.end_at, all_day: c.all_day,
+          rrule: c.rrule, exdates: c.exdates, tags: c.tags,
+          event_type: c.event_type, colour: c.colour,
+        }
+        const arr = byMember.get(c.member_id) ?? []
+        arr.push(row); byMember.set(c.member_id, arr)
+      }
+      const counts = new Map<string, { meetings: number; focus: number; events: number }>()
+      for (const [mid, rows] of Array.from(byMember.entries())) {
+        let meetings = 0, focusHrs = 0
+        const occ = expandRange(rows, start, end)
+        for (const o of occ) {
+          if (o.focus) focusHrs += (o.end.getTime() - o.start.getTime()) / 3.6e6
+          else meetings += 1
+        }
+        counts.set(mid, { meetings, focus: Math.round(focusHrs), events: occ.length })
+      }
+      for (const m of members) {
+        const c = counts.get(m.id)
+        if (c) { m.meetings_week = c.meetings; m.focus_hours = c.focus }
+      }
+      for (const cal of calendars) {
+        cal.events_week = (cal.member_ids ?? []).reduce((s, id) => s + (counts.get(id)?.events ?? 0), 0)
+      }
+    }
+  } catch { /* leave zeros — un-migrated DB or RPC error */ }
+
+  // Bookings made through each team booking page in the last 30 days.
+  try {
+    const since = new Date(Date.now() - 30 * 86400000).toISOString()
+    const { data: tb } = await supabase
+      .from('team_bookings').select('page_id')
+      .eq('team_id', teamId).eq('status', 'confirmed').gte('created_at', since)
+    if (Array.isArray(tb)) {
+      const tally = new Map<string, number>()
+      for (const b of tb) tally.set(b.page_id, (tally.get(b.page_id) ?? 0) + 1)
+      for (const p of pages) p.bookings_30d = tally.get(p.id) ?? 0
+    }
+  } catch { /* leave zeros — team_bookings not present yet */ }
 }
 
 // ── Real loader with sample fallback ──────────────────────────
@@ -322,6 +418,10 @@ export async function loadTeamWorkspace(supabase: any): Promise<TeamWorkspace> {
     const pages: TeamBookingPage[] = (pagesRes.data ?? []).map((p: any) => ({
       id: p.id, name: p.name, slug: p.slug, type: p.type, member_ids: p.member_ids ?? [],
       duration_min: p.duration_min ?? 30, bookings_30d: 0, active: !!p.active, description: p.description ?? '',
+      timezone: p.timezone ?? t.timezone ?? 'America/New_York',
+      working_hours: p.working_hours ?? DEFAULT_WORKING_HOURS,
+      buffer_min: p.buffer_min ?? 0, min_notice_hours: p.min_notice_hours ?? 4,
+      advance_days: p.advance_days ?? 30, capacity: p.capacity ?? 1,
     }))
     const delegations: Delegation[] = (delRes.data ?? []).map((d: any) => ({
       id: d.id, grantor_id: d.grantor_id, grantee_id: d.grantee_id, scope: d.scope ?? '', since: d.since ?? '',
@@ -329,6 +429,8 @@ export async function loadTeamWorkspace(supabase: any): Promise<TeamWorkspace> {
     const audit: AuditEntry[] = (auditRes.data ?? []).map((a: any) => ({
       id: a.id, actor_id: a.actor_id, action: a.action, target: a.target ?? '', scope: a.scope, at: a.at,
     }))
+
+    await hydrateCounts(supabase, teamId, team.timezone, members, calendars, pages)
 
     return { live: true, currentMemberId: me?.id ?? '', team, members, calendars, resources, resourceBookings, pages, audit, delegations }
   } catch {
