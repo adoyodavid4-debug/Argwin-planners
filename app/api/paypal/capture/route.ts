@@ -5,13 +5,23 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { capturePayPalOrder } from '@/lib/paypal'
 import { fulfilDigitalOrder } from '@/lib/orders'
+import { makeRateLimiter, clientIp } from '@/lib/rate-limit'
+import { captureError } from '@/lib/error-tracking'
 import { z } from 'zod'
 
 const schema = z.object({
   orderID: z.string().min(1),   // PayPal order id (from the JS SDK onApprove)
 })
 
+// Cap capture attempts per IP (15 / minute) — legit users may double-click, but
+// this blocks brute-forcing order ids.
+const isRateLimited = makeRateLimiter(15, 60_000)
+
 export async function POST(req: NextRequest) {
+  if (isRateLimited(clientIp(req))) {
+    return NextResponse.json({ error: 'Too many requests. Please slow down.' }, { status: 429 })
+  }
+
   const body   = await req.json().catch(() => null)
   const parsed = schema.safeParse(body)
   if (!parsed.success) {
@@ -60,7 +70,11 @@ export async function POST(req: NextRequest) {
   // Verify the captured amount matches what we charged for
   const capturedValue = (capture as any)?.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.value
   if (capturedValue != null && Math.abs(parseFloat(capturedValue) - order.amount_total) > 0.01) {
-    console.error('[paypal/capture] amount mismatch:', capturedValue, 'vs', order.amount_total, orderID)
+    await captureError('PayPal captured amount does not match order total', {
+      source: 'api/paypal/capture',
+      extra: { orderId: order.id, paypalOrderId: orderID, captured: capturedValue, expected: order.amount_total },
+      alwaysAlert: true,
+    })
     return NextResponse.json({ error: 'Payment amount mismatch — please contact support.' }, { status: 409 })
   }
 
@@ -79,7 +93,11 @@ export async function POST(req: NextRequest) {
     .eq('id', order.id)
 
   if (updateErr) {
-    console.error('[paypal/capture] order update failed:', updateErr)
+    await captureError('Payment captured but order update failed — customer charged, fulfilment blocked', {
+      source: 'api/paypal/capture',
+      extra: { orderId: order.id, paypalOrderId: orderID, captureId, dbError: updateErr.message },
+      alwaysAlert: true,
+    })
     return NextResponse.json({ error: 'Payment captured but order update failed — contact support.' }, { status: 500 })
   }
 

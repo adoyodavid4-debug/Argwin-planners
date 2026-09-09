@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createCheckoutSession, toCents } from '@/lib/stripe'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { makeRateLimiter, clientIp } from '@/lib/rate-limit'
 import { z } from 'zod'
 
 const schema = z.object({
@@ -15,7 +16,15 @@ const schema = z.object({
   email:       z.string().email().optional(),
 })
 
+// Cap checkout-session creation per IP (10 / minute) so the endpoint — and the
+// Stripe API behind it — can't be spammed.
+const isRateLimited = makeRateLimiter(10, 60_000)
+
 export async function POST(req: NextRequest) {
+  if (isRateLimited(clientIp(req))) {
+    return NextResponse.json({ error: 'Too many requests. Please slow down.' }, { status: 429 })
+  }
+
   const body   = await req.json().catch(() => null)
   const parsed = schema.safeParse(body)
   if (!parsed.success) {

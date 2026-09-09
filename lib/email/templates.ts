@@ -357,6 +357,20 @@ const templates: Record<string, (locale: Locale, data: Record<string, unknown>) 
     </div></body></html>`
     return { subject, html, text: subject }
   },
+
+  // Internal alert when a production error is captured (lib/error-tracking.ts).
+  'system.error': (locale, data) => {
+    const subject = `⚠️ Arwign error in ${data.source}: ${String(data.message).slice(0, 80)}`
+    const mono = 'font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;white-space:pre-wrap;word-break:break-word;background:#1A1820;color:#E8E4DB;border-radius:8px;padding:16px;overflow:auto'
+    const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#FAF8F4;color:#1A1820;margin:0;padding:0}.container{max-width:640px;margin:40px auto;background:#fff;border-radius:12px;padding:40px;border:1px solid #E8E4DB}</style></head><body><div class="container">
+      <h2 style="color:#B4664A">Production error captured</h2>
+      <p><strong>Source:</strong> ${data.source}</p>
+      <p><strong>Message:</strong> ${data.message}</p>
+      ${data.context && data.context !== '{}' ? `<p><strong>Context:</strong></p><div style="${mono}">${data.context}</div>` : ''}
+      ${data.stack ? `<p style="margin-top:16px"><strong>Stack:</strong></p><div style="${mono}">${data.stack}</div>` : ''}
+    </div></body></html>`
+    return { subject, html, text: subject }
+  },
 }
 
 export function resolveTemplate(

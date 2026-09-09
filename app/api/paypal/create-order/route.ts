@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient, createServiceRoleClient } from '@/lib/supabase/server'
 import { createPayPalOrder } from '@/lib/paypal'
+import { makeRateLimiter, clientIp } from '@/lib/rate-limit'
 import { z } from 'zod'
 
 const schema = z.object({
@@ -16,7 +17,15 @@ const schema = z.object({
   email: z.string().email(),
 })
 
+// Cap PayPal order creation per IP (10 / minute) — each call writes a pending
+// orders row and hits the PayPal API.
+const isRateLimited = makeRateLimiter(10, 60_000)
+
 export async function POST(req: NextRequest) {
+  if (isRateLimited(clientIp(req))) {
+    return NextResponse.json({ error: 'Too many requests. Please slow down.' }, { status: 429 })
+  }
+
   const body   = await req.json().catch(() => null)
   const parsed = schema.safeParse(body)
   if (!parsed.success) {

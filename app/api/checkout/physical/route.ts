@@ -11,6 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { stripe, toCents } from '@/lib/stripe'
+import { makeRateLimiter, clientIp } from '@/lib/rate-limit'
 import { z } from 'zod'
 
 const addressSchema = z.object({
@@ -33,7 +34,15 @@ const schema = z.object({
   shippingCost:    z.number().int().min(0),   // quoted cost in minor units — we re-verify
 })
 
+// Cap physical-checkout intents per IP (10 / minute) — each creates a Stripe
+// PaymentIntent.
+const isRateLimited = makeRateLimiter(10, 60_000)
+
 export async function POST(req: NextRequest) {
+  if (isRateLimited(clientIp(req))) {
+    return NextResponse.json({ error: 'Too many requests. Please slow down.' }, { status: 429 })
+  }
+
   const body   = await req.json().catch(() => null)
   const parsed = schema.safeParse(body)
   if (!parsed.success) {
