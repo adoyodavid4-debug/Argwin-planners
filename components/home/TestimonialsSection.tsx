@@ -2,12 +2,7 @@
 // Self-contained premium testimonials section for the homepage.
 // (Replaces the previous re-export; HomeComponents.tsx is left untouched.)
 import { motion, useReducedMotion } from 'framer-motion'
-import { Star, Quote, BadgeCheck, Sparkles } from 'lucide-react'
-
-// ── Aggregate proof (fallbacks when settings are absent) ─────
-const RATING = '4.9'
-const REVIEWS = '2,400+'
-const CUSTOMERS = '50,000+'
+import { Star, Quote } from 'lucide-react'
 
 interface Testimonial { name: string; role: string; text: string; rating: number; product?: string; grad: string }
 
@@ -24,24 +19,18 @@ export interface TestimonialInput {
 
 export interface TestimonialsSectionProps {
   testimonials?: TestimonialInput[]
-  rating?: string
-  reviews?: string
-  customers?: string
 }
 
+// Hardcoded fallback while real reviews accrue: kept deliberately small (1
+// featured + 1 supporting) and free of verification claims or invented stats.
 const FEATURED: Testimonial = {
-  name: 'Amara N.', role: 'Verified buyer · London', rating: 5, product: 'Ultimate Digital Planner',
+  name: 'Amara N.', role: 'iPad planner', rating: 5, product: 'Ultimate Digital Planner',
   grad: 'linear-gradient(135deg,#B8A9D4,#7B6FAE)',
-  text: 'Genuinely the most beautiful planner I have ever used. The hyperlinks make it so fast to navigate that I have finally stuck to a routine — and it looks gorgeous on my iPad every single morning.',
+  text: 'The hyperlinks make it so fast to navigate that I have finally stuck to a routine — and it looks lovely on my iPad every morning.',
 }
 
 const TESTIMONIALS: Testimonial[] = [
-  { name: 'Daniel K.', role: 'Verified buyer · GoodNotes user', rating: 5, product: 'Budget Planner', grad: 'linear-gradient(135deg,#A0830E,#C4A538)', text: 'Downloaded it in seconds and had it set up before my coffee was ready. Worth every penny.' },
-  { name: 'Priya S.', role: 'Verified buyer · Manchester', rating: 5, product: 'Wellness Journal', grad: 'linear-gradient(135deg,#E8C5C0,#C9847C)', text: 'I have bought planners I never opened. This one I actually look forward to — the design just makes you want to plan.' },
-  { name: 'Tomas R.', role: 'Verified buyer · Notability user', rating: 5, product: 'Academic Planner', grad: 'linear-gradient(135deg,#A8B5A0,#6E7E66)', text: 'The layouts are gorgeous and the tabs just work. Easily my favourite purchase this year.' },
-  { name: 'Lena M.', role: 'Verified buyer · Austin', rating: 5, product: '66-Day Habit Tracker', grad: 'linear-gradient(135deg,#C97B5A,#AE6244)', text: 'A game-changer for my study system — everything finally lives in one tidy, hyperlinked notebook.' },
-  { name: 'Sophie L.', role: 'Verified buyer · Etsy', rating: 5, product: 'Student Planner', grad: 'linear-gradient(135deg,#B8A9D4,#7B6FAE)', text: 'Changed how I plan my entire week. I keep recommending it to everyone at work.' },
-  { name: 'Nadia B.', role: 'Verified buyer · Gumroad', rating: 5, product: 'Digital Notebook', grad: 'linear-gradient(135deg,#A0830E,#C28E1C)', text: 'Beautiful, calm and genuinely useful. Printed it at home too and it looks just as lovely on paper.' },
+  { name: 'Daniel K.', role: 'GoodNotes user', rating: 5, product: 'Budget Planner', grad: 'linear-gradient(135deg,#A0830E,#C4A538)', text: 'Downloaded it in seconds and had it set up in GoodNotes before my coffee was ready.' },
 ]
 
 function Stars({ value, size = 14 }: { value: number; size?: number }) {
@@ -62,12 +51,7 @@ function Avatar({ name, grad, size = 40 }: { name: string; grad: string; size?: 
 
 const DEFAULT_GRAD = 'linear-gradient(135deg,#A0830E,#C4A538)'
 
-export default function TestimonialsSection({
-  testimonials,
-  rating = RATING,
-  reviews = REVIEWS,
-  customers = CUSTOMERS,
-}: TestimonialsSectionProps = {}) {
+export default function TestimonialsSection({ testimonials }: TestimonialsSectionProps = {}) {
   const reduce = useReducedMotion()
 
   // DB testimonials win; hardcoded content is the fallback when the table is
@@ -98,43 +82,27 @@ export default function TestimonialsSection({
         <div className="text-center mb-8 max-w-2xl mx-auto">
           <motion.p {...reveal()} className="text-xs uppercase tracking-widest font-semibold mb-3" style={{ color: 'var(--gold)', letterSpacing: '0.12em' }}>What Our Planners Say</motion.p>
           <motion.h2 {...reveal(0.05)} id="testimonials-heading" className="font-display text-display-md mb-4" style={{ color: 'var(--text-primary)' }}>
-            Loved by 50,000+ Planners
+            Words from Our Planners
           </motion.h2>
           <motion.p {...reveal(0.1)} className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-            Real words from people who plan with Arwign every day — join a community that has made organising a joy.
+            Real words from people who plan with Arwign every day.
           </motion.p>
         </div>
 
-        {/* Aggregate trust bar */}
-        <motion.div {...reveal(0.12)} className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 mb-14 pb-10 border-b" style={{ borderColor: 'var(--border)' }}>
-          <span className="inline-flex items-center gap-2">
-            <Stars value={5} size={16} />
-            <span className="font-display text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>{rating}</span>
-            <span className="text-sm" style={{ color: 'var(--text-muted)' }}>average</span>
-          </span>
-          <span className="w-px h-5 hidden sm:block" style={{ background: 'var(--border)' }} />
-          <span className="text-sm" style={{ color: 'var(--text-secondary)' }}><b style={{ color: 'var(--text-primary)' }}>{reviews}</b> verified reviews</span>
-          <span className="w-px h-5 hidden sm:block" style={{ background: 'var(--border)' }} />
-          <span className="text-sm" style={{ color: 'var(--text-secondary)' }}><b style={{ color: 'var(--text-primary)' }}>{customers}</b> happy customers</span>
-          <span className="w-px h-5 hidden sm:block" style={{ background: 'var(--border)' }} />
-          <span className="inline-flex items-center gap-1.5 text-sm" style={{ color: 'var(--text-secondary)' }}><Sparkles size={13} style={{ color: 'var(--gold)' }} /> Loved on Etsy &amp; Gumroad</span>
-        </motion.div>
-
         {/* Featured testimonial */}
         <motion.figure {...reveal(0.05)} className="relative rounded-3xl border p-8 lg:p-11 mb-6 overflow-hidden"
-          style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', boxShadow: '0 18px 50px rgba(44,42,53,0.08)' }}
-          itemScope itemType="https://schema.org/Review">
+          style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', boxShadow: '0 18px 50px rgba(44,42,53,0.08)' }}>
           <Quote size={44} aria-hidden className="absolute top-6 right-7" style={{ color: 'var(--gold)', opacity: 0.14 }} />
           <div className="relative max-w-3xl">
             <Stars value={featured.rating} size={17} />
-            <blockquote className="font-display mt-4 mb-7" style={{ fontSize: 'clamp(1.4rem, 2.6vw, 2rem)', lineHeight: 1.35, color: 'var(--text-primary)' }} itemProp="reviewBody">
+            <blockquote className="font-display mt-4 mb-7" style={{ fontSize: 'clamp(1.4rem, 2.6vw, 2rem)', lineHeight: 1.35, color: 'var(--text-primary)' }}>
               &ldquo;{featured.text}&rdquo;
             </blockquote>
             <figcaption className="flex items-center gap-3.5">
               <Avatar name={featured.name} grad={featured.grad} size={52} />
               <div>
-                <p className="font-semibold" style={{ color: 'var(--text-primary)' }} itemProp="author">{featured.name}</p>
-                <p className="text-xs inline-flex items-center gap-1.5" style={{ color: 'var(--sage)' }}><BadgeCheck size={12} /> {featured.role}</p>
+                <p className="font-semibold" style={{ color: 'var(--text-primary)' }}>{featured.name}</p>
+                <p className="text-xs" style={{ color: 'var(--sage)' }}>{featured.role}</p>
               </div>
               {featured.product && <span className="badge badge-gold text-[10px] ml-auto hidden sm:inline-flex">{featured.product}</span>}
             </figcaption>
@@ -146,20 +114,19 @@ export default function TestimonialsSection({
           {supporting.map((t, i) => (
             <motion.figure key={t.name} {...reveal(0.05 + (i % 3) * 0.08)}
               className="flex flex-col rounded-2xl border p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-product"
-              style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
-              itemScope itemType="https://schema.org/Review">
+              style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
               <div className="flex items-center justify-between mb-3">
                 <Stars value={t.rating} />
                 <Quote size={18} aria-hidden style={{ color: 'var(--gold)', opacity: 0.3 }} />
               </div>
-              <blockquote className="text-[0.95rem] leading-relaxed mb-6 flex-1" style={{ color: 'var(--text-secondary)' }} itemProp="reviewBody">
+              <blockquote className="text-[0.95rem] leading-relaxed mb-6 flex-1" style={{ color: 'var(--text-secondary)' }}>
                 &ldquo;{t.text}&rdquo;
               </blockquote>
               <figcaption className="flex items-center gap-3 pt-4 border-t" style={{ borderColor: 'var(--border)' }}>
                 <Avatar name={t.name} grad={t.grad} />
                 <div className="min-w-0">
-                  <p className="font-semibold text-sm truncate" style={{ color: 'var(--text-primary)' }} itemProp="author">{t.name}</p>
-                  <p className="text-[11px] inline-flex items-center gap-1" style={{ color: 'var(--sage)' }}><BadgeCheck size={11} /> {t.role}</p>
+                  <p className="font-semibold text-sm truncate" style={{ color: 'var(--text-primary)' }}>{t.name}</p>
+                  <p className="text-[11px]" style={{ color: 'var(--sage)' }}>{t.role}</p>
                 </div>
               </figcaption>
             </motion.figure>

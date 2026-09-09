@@ -99,7 +99,7 @@ function BestSellerCard({ covers, index }: { covers: HeroCover[]; index: number 
             <HeroTitle>{"Arwigners' Favourite"}</HeroTitle>
             <HeroMeta>
               <Star size={12} style={{ fill: 'var(--gold)', stroke: 'var(--gold)' }} />
-              4.9 <span style={{ color: 'var(--text-muted)' }}>· 12k+ happy planners</span>
+              <span style={{ color: 'var(--text-muted)' }}>Our most-loved planner</span>
             </HeroMeta>
           </span>
         </Link>
@@ -227,12 +227,7 @@ export default function HomeHero({
 
           {/* Trust strip */}
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2.5">
-            <span className="inline-flex items-center gap-1.5 text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-              <span className="inline-flex">{[1, 2, 3, 4, 5].map((i) => <Star key={i} size={14} style={{ fill: 'var(--gold)', stroke: 'var(--gold)' }} />)}</span>
-              4.9 <span className="font-normal" style={{ color: 'var(--text-muted)' }}>· 12k+ happy planners</span>
-            </span>
-            <span className="w-px h-4 hidden sm:block" style={{ background: 'var(--border)' }} />
-            {[{ icon: Zap, l: 'Instant download' }, { icon: Shield, l: 'Secure checkout' }].map(({ icon: Icon, l }) => (
+            {[{ icon: Star, l: 'Hyperlinked PDFs' }, { icon: Zap, l: 'Instant download' }, { icon: Shield, l: 'Secure checkout' }].map(({ icon: Icon, l }) => (
               <span key={l} className="inline-flex items-center gap-1.5 text-xs font-medium" style={{ color: 'var(--text-secondary)' }}><Icon size={13} style={{ color: 'var(--gold)' }} /> {l}</span>
             ))}
           </div>

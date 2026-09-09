@@ -260,7 +260,7 @@ export default function TestimonialsClient({ initialTestimonials }: { initialTes
                 <div>
                   <FieldLabel>Role / Location</FieldLabel>
                   <input type="text" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}
-                    placeholder="Verified buyer · London" className="input-field" />
+                    placeholder="GoodNotes user · London" className="input-field" />
                 </div>
               </div>
               <div>

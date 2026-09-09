@@ -265,7 +265,7 @@ export default function CategoryClient({ category, products, relatedCategories }
   // ── Aggregate stats ─────────────────────────────────────────
   const stats = useMemo(() => {
     const rated = products.filter((p) => p.rating_avg > 0)
-    const avg = rated.length ? rated.reduce((s, p) => s + p.rating_avg, 0) / rated.length : 4.9
+    const avg = rated.length ? rated.reduce((s, p) => s + p.rating_avg, 0) / rated.length : 0
     const downloads = products.reduce((s, p) => s + (p.download_count ?? 0), 0)
     return { count: products.length, avg, downloads, formats: allFormats.length }
   }, [products, allFormats])
@@ -1031,10 +1031,12 @@ function ProductTile({ product, index, priority, inCompare, onCompare, onQuickVi
           <p className="text-sm font-semibold leading-snug line-clamp-2 transition-colors group-hover:text-gold mb-1.5" style={{ color: 'var(--text-primary)' }}>
             {product.title}
           </p>
-          <div className="flex items-center gap-1.5 mb-1.5">
-            <Stars value={product.rating_avg || 5} size={11} />
-            {product.rating_count > 0 && <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>({product.rating_count})</span>}
-          </div>
+          {product.rating_count > 0 && (
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <Stars value={product.rating_avg} size={11} />
+              <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>({product.rating_count})</span>
+            </div>
+          )}
           <div className="flex items-baseline gap-1.5">
             <span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{price$(product.price)}</span>
             {sale && <span className="text-xs line-through" style={{ color: 'var(--text-muted)' }}>{price$(product.compare_price!)}</span>}
@@ -1063,7 +1065,7 @@ function ProductRow({ product, index, inCompare, onCompare, onQuickView }: CardP
             <Heart size={16} style={{ fill: isWished ? 'var(--blush)' : 'transparent', stroke: isWished ? '#C9847C' : 'var(--text-muted)' }} />
           </button>
         </div>
-        <div className="flex items-center gap-1.5 mt-1"><Stars value={product.rating_avg || 5} size={12} />{product.rating_count > 0 && <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>({product.rating_count})</span>}</div>
+        {product.rating_count > 0 && <div className="flex items-center gap-1.5 mt-1"><Stars value={product.rating_avg} size={12} /><span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>({product.rating_count})</span></div>}
         {product.description && <p className="text-xs mt-1.5 line-clamp-2 hidden sm:block" style={{ color: 'var(--text-secondary)' }}>{stripHtml(product.description)}</p>}
         <div className="flex flex-wrap gap-1 mt-2">
           {(product.file_formats ?? []).slice(0, 4).map((f) => (
@@ -1153,7 +1155,7 @@ function CompareModal({ products, onClose }: { products: Product[]; onClose: () 
   const addItem = useCartStore((s) => s.addItem)
   const rows: { label: string; render: (p: Product) => React.ReactNode }[] = [
     { label: 'Price', render: (p) => <span className="font-bold" style={{ color: 'var(--text-primary)' }}>{price$(p.price)}</span> },
-    { label: 'Rating', render: (p) => <span className="inline-flex items-center gap-1"><Stars value={p.rating_avg || 5} size={12} /><span className="text-xs" style={{ color: 'var(--text-muted)' }}>{(p.rating_avg || 5).toFixed(1)}</span></span> },
+    { label: 'Rating', render: (p) => p.rating_count > 0 ? <span className="inline-flex items-center gap-1"><Stars value={p.rating_avg} size={12} /><span className="text-xs" style={{ color: 'var(--text-muted)' }}>{p.rating_avg.toFixed(1)}</span></span> : <span className="text-xs" style={{ color: 'var(--text-muted)' }}>No reviews yet</span> },
     { label: 'Formats', render: (p) => (p.file_formats ?? []).join(', ') || '—' },
     { label: 'Pages', render: (p) => p.page_count ?? '—' },
     { label: 'Type', render: (p) => <span className="capitalize">{p.delivery_type}</span> },
@@ -1257,7 +1259,7 @@ function Spotlight({ category, products, meta, accent }: { category: Category; p
           <motion.div initial={{ opacity: 0, scale: 0.6 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.5 }}
             className="absolute bottom-4 right-2 sm:right-8 z-10 flex items-center gap-2.5 px-4 py-3 rounded-2xl shadow-xl" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
             <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(160,131,14,0.14)' }}><Star size={16} style={{ fill: 'var(--gold)', stroke: 'var(--gold)' }} /></div>
-            <div><p className="text-sm font-bold leading-none" style={{ color: 'var(--text-primary)' }}>4.9 / 5</p><p className="text-[10px] mt-1" style={{ color: 'var(--text-muted)' }}>Loved by planners</p></div>
+            <div><p className="text-sm font-bold leading-none" style={{ color: 'var(--text-primary)' }}>Hyperlinked</p><p className="text-[10px] mt-1" style={{ color: 'var(--text-muted)' }}>GoodNotes ready</p></div>
           </motion.div>
         </motion.div>
       </div>
@@ -1361,8 +1363,8 @@ function DeviceShowcase({ categoryName }: { categoryName: string }) {
         <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.1 }}
           className="grid grid-cols-2 gap-4">
           {[
-            { n: '50k+', l: 'Downloads' },
-            { n: '4.9★', l: 'Avg Rating' },
+            { n: 'PDF', l: 'Fully Hyperlinked' },
+            { n: 'A4·A5', l: 'Print Ready' },
             { n: '100%', l: 'Instant Access' },
             { n: '30-Day', l: 'Happiness Promise' },
           ].map((s) => (
@@ -1380,21 +1382,22 @@ function DeviceShowcase({ categoryName }: { categoryName: string }) {
 // ── Testimonials ──────────────────────────────────────────────
 function Testimonials({ categoryName, rating }: { categoryName: string; rating: number }) {
   const reviews = [
-    { name: 'Amara N.',    grad: 'linear-gradient(135deg,#B8A9D4,#7B6FAE)', text: `Genuinely the most beautiful planner I've ever used. The hyperlinks make it so fast to navigate — I've finally stuck to a routine.` },
-    { name: 'Daniel K.',   grad: 'linear-gradient(135deg,#A0830E,#C4A538)', text: `Downloaded it in seconds and had it in GoodNotes before my coffee was ready. Worth every cent and then some.` },
-    { name: 'Priya S.',    grad: 'linear-gradient(135deg,#E8C5C0,#C9847C)', text: `I've bought planners before that I never opened. This one I actually look forward to. The design just makes you want to plan.` },
+    { name: 'Amara N.',    grad: 'linear-gradient(135deg,#B8A9D4,#7B6FAE)', text: `The hyperlinks make it so fast to navigate — I've finally stuck to a routine.` },
+    { name: 'Daniel K.',   grad: 'linear-gradient(135deg,#A0830E,#C4A538)', text: `Downloaded it in seconds and had it in GoodNotes before my coffee was ready.` },
   ]
   return (
     <section className="border-t py-16" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
       <div className="container-site">
         <div className="text-center mb-12">
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <Stars value={rating || 5} size={18} />
-            <span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{(rating || 4.9).toFixed(1)} out of 5</span>
-          </div>
-          <h2 className="font-display text-display-sm" style={{ color: 'var(--text-primary)' }}>Loved by Thousands of Planners</h2>
+          {rating > 0 && (
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <Stars value={rating} size={18} />
+              <span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{rating.toFixed(1)} out of 5</span>
+            </div>
+          )}
+          <h2 className="font-display text-display-sm" style={{ color: 'var(--text-primary)' }}>What Planners Say</h2>
         </div>
-        <div className="grid md:grid-cols-3 gap-5">
+        <div className="grid md:grid-cols-2 gap-5 max-w-3xl mx-auto">
           {reviews.map((r, i) => (
             <motion.div key={r.name} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45, delay: i * 0.1 }}
               className="p-6 rounded-2xl border flex flex-col" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
@@ -1405,7 +1408,6 @@ function Testimonials({ categoryName, rating }: { categoryName: string; rating: 
                 <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: r.grad }}>{r.name.charAt(0)}</div>
                 <div>
                   <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{r.name}</p>
-                  <p className="text-[11px] inline-flex items-center gap-1" style={{ color: 'var(--sage)' }}><BadgeCheck size={11} /> Verified Purchase</p>
                 </div>
               </div>
             </motion.div>

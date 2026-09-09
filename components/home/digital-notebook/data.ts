@@ -134,11 +134,7 @@ export interface Review {
 export const REVIEWS_PLACEHOLDER: Review[] = [
   { name: 'Naomi A.',  rating: 5, text: 'The hyperlinked tabs make my iPad notebook feel like a proper app. Beautiful and so easy to navigate.' },
   { name: 'Daniel O.', rating: 5, text: 'Imported into GoodNotes in seconds. The dotted spreads are perfect for bullet journaling.' },
-  { name: 'Priya S.',  rating: 4, text: 'Lovely warm design and great page count. I went back and ordered another too.' },
 ]
-
-export const RATING_AVG = 4.8
-export const RATING_COUNT = 312 // TODO(reviews): wire to real review count.
 
 // ─── Helpers ────────────────────────────────────────────────────
 export const formatPrice = (usd: number) =>

@@ -4,14 +4,14 @@ import Link from 'next/link'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import {
   ArrowRight, Check, ChevronDown, ChevronRight, Tablet,
-  Star, Quote, BadgeCheck, Link2, Layers, Ruler, Type, Sparkles, Palette, Clock,
+  Star, Quote, Link2, Layers, Ruler, Type, Sparkles, Palette, Clock,
 } from 'lucide-react'
 import CoverMockup from './CoverMockup'
 import InteriorCarousel from './InteriorCarousel'
 import RequestModal from './RequestModal'
 import {
   COLOURWAYS, SIZES, MOTIFS, TEMPLATES, TABS_OPTIONS, SPREADS, FEATURES, STEPS,
-  TURNAROUND, REVIEWS, RATING, REVIEW_COUNT, FAQS,
+  TURNAROUND, REVIEWS, FAQS,
 } from './data'
 
 const FEAT_ICON: Record<string, React.ElementType> = { link: Link2, layers: Layers, ruler: Ruler, type: Type, tablet: Tablet, sparkles: Sparkles }
@@ -291,10 +291,9 @@ export default function PersonalizedClient() {
       <section className="border-t py-16" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
         <div className="container-site">
           <motion.div {...reveal()} className="text-center mb-10">
-            <div className="flex items-center justify-center gap-2 mb-3"><Stars value={RATING} size={18} /><span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{RATING} from {REVIEW_COUNT}+ happy customers</span></div>
             <h2 className="font-display text-display-sm" style={{ color: 'var(--text-primary)' }}>Made for Them. Made for You.</h2>
           </motion.div>
-          <div className="grid md:grid-cols-3 gap-5">
+          <div className="grid md:grid-cols-2 gap-5 max-w-3xl mx-auto">
             {REVIEWS.map((r, i) => (
               <motion.div key={r.name} {...reveal(i * 0.08)} className="p-6 rounded-2xl border flex flex-col" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
                 <Quote size={24} style={{ color: 'var(--gold)', opacity: 0.4 }} className="mb-3" />
@@ -302,7 +301,7 @@ export default function PersonalizedClient() {
                 <p className="text-sm leading-relaxed my-4 flex-1" style={{ color: 'var(--text-secondary)' }}>&ldquo;{r.text}&rdquo;</p>
                 <div className="flex items-center gap-3 pt-3 border-t" style={{ borderColor: 'var(--border)' }}>
                   <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, var(--gold), var(--gold-light))' }}>{r.name.charAt(0)}</div>
-                  <div><p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{r.name}</p><p className="text-[11px] inline-flex items-center gap-1" style={{ color: 'var(--sage)' }}><BadgeCheck size={11} /> Verified Purchase</p></div>
+                  <div><p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{r.name}</p></div>
                 </div>
               </motion.div>
             ))}

@@ -28,7 +28,7 @@ export async function POST() {
       file_formats: ['PDF', 'GoodNotes', 'Notability'], page_count: 365, file_size_mb: 18.5,
       is_featured: true, is_bestseller: true, is_new: false, is_bundle: false,
       tags: ['2025', 'digital', 'goodnotes', 'ipad'],
-      download_count: 4823, rating_avg: 4.92, rating_count: 312, published_at: new Date().toISOString(),
+      download_count: 0, rating_avg: 0, rating_count: 0, published_at: new Date().toISOString(),
     },
     {
       title: 'Minimalist Digital Planner — Undated', slug: 'minimalist-digital-planner-undated',
@@ -40,7 +40,7 @@ export async function POST() {
       file_formats: ['PDF', 'GoodNotes'], page_count: 240, file_size_mb: 9.2,
       is_featured: false, is_bestseller: false, is_new: true, is_bundle: false,
       tags: ['undated', 'minimalist', 'digital'],
-      download_count: 1203, rating_avg: 4.75, rating_count: 89, published_at: new Date().toISOString(),
+      download_count: 0, rating_avg: 0, rating_count: 0, published_at: new Date().toISOString(),
     },
     {
       title: 'Dark Mode Digital Planner 2025', slug: 'dark-mode-digital-planner-2025',
@@ -52,7 +52,7 @@ export async function POST() {
       file_formats: ['PDF', 'GoodNotes', 'Notability', 'Xodo'], page_count: 300, file_size_mb: 14.0,
       is_featured: false, is_bestseller: true, is_new: false, is_bundle: false,
       tags: ['dark mode', 'digital', '2025'],
-      download_count: 2941, rating_avg: 4.88, rating_count: 201, published_at: new Date().toISOString(),
+      download_count: 0, rating_avg: 0, rating_count: 0, published_at: new Date().toISOString(),
     },
     {
       title: 'A5 Printable Weekly Planner Pack', slug: 'a5-printable-weekly-planner-pack',
@@ -64,7 +64,7 @@ export async function POST() {
       file_formats: ['PDF'], page_count: 120, file_size_mb: 4.5,
       is_featured: false, is_bestseller: false, is_new: false, is_bundle: false,
       tags: ['printable', 'A5', 'weekly'],
-      download_count: 870, rating_avg: 4.60, rating_count: 54, published_at: new Date().toISOString(),
+      download_count: 0, rating_avg: 0, rating_count: 0, published_at: new Date().toISOString(),
     },
     {
       title: 'Botanical Printable Planner Set', slug: 'botanical-printable-planner-set',
@@ -76,7 +76,7 @@ export async function POST() {
       file_formats: ['PDF'], page_count: 85, file_size_mb: 6.2,
       is_featured: true, is_bestseller: false, is_new: true, is_bundle: false,
       tags: ['printable', 'botanical', 'floral'],
-      download_count: 640, rating_avg: 4.82, rating_count: 47, published_at: new Date().toISOString(),
+      download_count: 0, rating_avg: 0, rating_count: 0, published_at: new Date().toISOString(),
     },
     {
       title: 'Monthly Budget Planner & Finance Tracker', slug: 'monthly-budget-planner-finance-tracker',
@@ -88,7 +88,7 @@ export async function POST() {
       file_formats: ['PDF', 'GoodNotes'], page_count: 180, file_size_mb: 8.0,
       is_featured: true, is_bestseller: true, is_new: false, is_bundle: false,
       tags: ['budget', 'finance', 'savings'],
-      download_count: 3102, rating_avg: 4.95, rating_count: 278, published_at: new Date().toISOString(),
+      download_count: 0, rating_avg: 0, rating_count: 0, published_at: new Date().toISOString(),
     },
     {
       title: 'Academic Digital Planner 2025–2026', slug: 'academic-digital-planner-2025-2026',
@@ -100,7 +100,7 @@ export async function POST() {
       file_formats: ['PDF', 'GoodNotes', 'Notability'], page_count: 280, file_size_mb: 11.0,
       is_featured: false, is_bestseller: true, is_new: true, is_bundle: false,
       tags: ['student', 'academic', 'school'],
-      download_count: 1876, rating_avg: 4.89, rating_count: 143, published_at: new Date().toISOString(),
+      download_count: 0, rating_avg: 0, rating_count: 0, published_at: new Date().toISOString(),
     },
     {
       title: 'Self-Care & Wellness Journal', slug: 'self-care-wellness-journal',
@@ -112,7 +112,7 @@ export async function POST() {
       file_formats: ['PDF', 'GoodNotes'], page_count: 200, file_size_mb: 7.5,
       is_featured: true, is_bestseller: false, is_new: false, is_bundle: false,
       tags: ['wellness', 'self-care', 'gratitude'],
-      download_count: 2345, rating_avg: 4.91, rating_count: 188, published_at: new Date().toISOString(),
+      download_count: 0, rating_avg: 0, rating_count: 0, published_at: new Date().toISOString(),
     },
     {
       title: 'Fitness & Nutrition Tracker', slug: 'fitness-nutrition-tracker',
@@ -124,7 +124,7 @@ export async function POST() {
       file_formats: ['PDF', 'GoodNotes', 'Notability'], page_count: 150, file_size_mb: 6.0,
       is_featured: false, is_bestseller: false, is_new: true, is_bundle: false,
       tags: ['fitness', 'nutrition', 'workout'],
-      download_count: 987, rating_avg: 4.78, rating_count: 76, published_at: new Date().toISOString(),
+      download_count: 0, rating_avg: 0, rating_count: 0, published_at: new Date().toISOString(),
     },
     {
       title: '66-Day Habit Tracker — Printable', slug: '66-day-habit-tracker-printable',
@@ -136,7 +136,7 @@ export async function POST() {
       file_formats: ['PDF'], page_count: 40, file_size_mb: 2.5,
       is_featured: false, is_bestseller: true, is_new: false, is_bundle: false,
       tags: ['habit tracker', '66 days', 'printable'],
-      download_count: 5612, rating_avg: 4.97, rating_count: 421, published_at: new Date().toISOString(),
+      download_count: 0, rating_avg: 0, rating_count: 0, published_at: new Date().toISOString(),
     },
     {
       title: 'Monthly Habit & Mood Tracker — Digital', slug: 'monthly-habit-mood-tracker-digital',
@@ -148,7 +148,7 @@ export async function POST() {
       file_formats: ['PDF', 'GoodNotes', 'Notability'], page_count: 24, file_size_mb: 3.2,
       is_featured: false, is_bestseller: false, is_new: false, is_bundle: false,
       tags: ['habit tracker', 'mood tracker', 'monthly'],
-      download_count: 1432, rating_avg: 4.83, rating_count: 112, published_at: new Date().toISOString(),
+      download_count: 0, rating_avg: 0, rating_count: 0, published_at: new Date().toISOString(),
     },
     {
       title: 'The Complete Planner Bundle — 8 Planners', slug: 'complete-planner-bundle',
@@ -160,7 +160,7 @@ export async function POST() {
       file_formats: ['PDF', 'GoodNotes', 'Notability'], page_count: null, file_size_mb: 85.0,
       is_featured: true, is_bestseller: true, is_new: false, is_bundle: true,
       tags: ['bundle', 'value', 'best value'],
-      download_count: 2109, rating_avg: 4.96, rating_count: 234, published_at: new Date().toISOString(),
+      download_count: 0, rating_avg: 0, rating_count: 0, published_at: new Date().toISOString(),
     },
     {
       title: 'Student Life Bundle — 3 Planners', slug: 'student-life-bundle',
@@ -172,7 +172,7 @@ export async function POST() {
       file_formats: ['PDF', 'GoodNotes', 'Notability'], page_count: null, file_size_mb: 22.0,
       is_featured: false, is_bestseller: false, is_new: true, is_bundle: true,
       tags: ['student bundle', 'academic', 'value'],
-      download_count: 678, rating_avg: 4.85, rating_count: 58, published_at: new Date().toISOString(),
+      download_count: 0, rating_avg: 0, rating_count: 0, published_at: new Date().toISOString(),
     },
   ]
 

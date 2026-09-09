@@ -74,10 +74,7 @@ export interface Review { name: string; text: string }
 export const REVIEWS: Review[] = [
   { name: 'Amara N.',  text: 'Exactly the layout I sketched, made beautiful. The sage cover is gorgeous.' },
   { name: 'Daniel K.', text: 'The team nailed my brief on the first try — it genuinely feels made for me.' },
-  { name: 'Priya S.',  text: 'Imported into GoodNotes in seconds and the hyperlinks just work.' },
 ]
-export const RATING = 4.9
-export const REVIEW_COUNT = 128
 
 export interface Faq { q: string; a: string }
 export const FAQS: Faq[] = [

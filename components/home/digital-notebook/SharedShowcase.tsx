@@ -4,7 +4,7 @@
 import { motion } from 'framer-motion'
 import { Link2, Layers, LayoutGrid, Type, Maximize, Star, Check } from 'lucide-react'
 import {
-  COMPATIBILITY, FEATURES, REVIEWS_PLACEHOLDER, RATING_AVG, RATING_COUNT, type Feature,
+  COMPATIBILITY, FEATURES, REVIEWS_PLACEHOLDER, type Feature,
 } from './data'
 
 const ICONS: Record<Feature['icon'], typeof Link2> = {
@@ -83,16 +83,7 @@ function Stars({ value }: { value: number }) {
 export function SocialProof() {
   return (
     <div>
-      <div className="flex items-center gap-3 mb-5">
-        <Stars value={RATING_AVG} />
-        <span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-          {RATING_AVG.toFixed(1)} out of 5
-        </span>
-        <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-          ({RATING_COUNT.toLocaleString()} reviews)
-        </span>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {REVIEWS_PLACEHOLDER.map((r) => (
           <figure
             key={r.name}

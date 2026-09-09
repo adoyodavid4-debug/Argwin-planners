@@ -172,7 +172,7 @@ export default function CategoriesClient({ categories, counts, totalProducts }: 
               {[
                 { icon: Layers, label: `${categories.length} Collections` },
                 { icon: Zap,    label: 'Instant Download' },
-                { icon: Star,   label: '4.9 Avg Rating' },
+                { icon: Star,   label: 'Hyperlinked PDFs' },
                 { icon: Shield, label: 'Secure Checkout' },
               ].map(({ icon: Icon, label }) => (
                 <span key={label} className="inline-flex items-center gap-2 text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
@@ -292,7 +292,7 @@ export default function CategoriesClient({ categories, counts, totalProducts }: 
           {[
             { icon: Zap,    title: 'Instant Delivery',  body: 'Files land in your inbox the moment you check out.' },
             { icon: Layers, title: 'Every Format',      body: 'PDF, GoodNotes, Notability & print-ready sizes.' },
-            { icon: Star,   title: 'Loved Worldwide',   body: 'Rated 4.9/5 by thousands of happy planners.' },
+            { icon: Star,   title: 'Hand-Crafted',      body: 'Every margin, tab and typeface considered before release.' },
             { icon: Shield, title: 'Secure & Trusted',  body: 'Encrypted checkout with global payment options.' },
           ].map(({ icon: Icon, title, body }) => (
             <div key={title} className="flex flex-col gap-2">

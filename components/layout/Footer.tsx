@@ -111,7 +111,7 @@ export default function Footer({
               <div>
                 <p className="inline-flex items-center gap-2 text-xs uppercase tracking-widest mb-4 font-semibold px-3 py-1.5 rounded-full"
                   style={{ color: 'var(--gold-dark)', background: 'rgba(var(--gold-rgb),0.14)', letterSpacing: '0.12em' }}>
-                  <Gift size={12} /> Join 50,000+ organised people
+                  <Gift size={12} /> Join our community of organised people
                 </p>
                 <h2 className="font-display text-3xl md:text-4xl mb-3" style={{ color: 'var(--text-primary)', lineHeight: 1.1 }}>
                   Get free planning resources

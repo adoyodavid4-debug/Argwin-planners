@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   TrendingUp, Star, Download, Award, Crown, ChevronRight, ShoppingCart, Check,
-  Shield, Zap, RefreshCcw, Quote, BadgeCheck, Flame, ArrowRight, Heart, Smartphone,
+  Shield, Zap, RefreshCcw, Quote, Flame, ArrowRight, Heart, Smartphone,
   CreditCard, Plus,
 } from 'lucide-react'
 import ProductCard from '@/components/shop/ProductCard'
@@ -56,7 +56,6 @@ function PodiumCard({ p, rank }: { p: Product; rank: number }) {
   const isWished   = useWishlistStore((s) => s.has(p.id))
   const medal = MEDALS[rank - 1]
   const featured = rank === 1
-  const weekly = Math.max(12, Math.round((p.download_count ?? 240) / 14)) // deterministic "this week"
   const add = (e: React.MouseEvent) => {
     e.preventDefault()
     if (inCart) return
@@ -80,16 +79,17 @@ function PodiumCard({ p, rank }: { p: Product; rank: number }) {
         </button>
         <Link href={`/shop/${p.slug}`} className="block relative overflow-hidden group" style={{ aspectRatio: featured ? '4/3' : '3/2', background: 'var(--bg-secondary)' }}>
           <Image src={p.thumbnail || FALLBACK_IMG} alt={p.title} fill sizes="(max-width:1024px) 100vw, 33vw" className="object-cover transition-transform duration-500 group-hover:scale-105" priority={featured} />
-          {/* hot this week */}
-          <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold" style={{ background: 'rgba(0,0,0,0.6)', color: '#fff', backdropFilter: 'blur(4px)' }}>
-            <Flame size={11} style={{ color: 'var(--gold-light)' }} /> {weekly} bought this week
-          </span>
+          {(p.download_count ?? 0) > 0 && (
+            <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold" style={{ background: 'rgba(0,0,0,0.6)', color: '#fff', backdropFilter: 'blur(4px)' }}>
+              <Flame size={11} style={{ color: 'var(--gold-light)' }} /> {compact(p.download_count)} downloads
+            </span>
+          )}
         </Link>
         <div className="p-5">
           {p.category && <p className="text-[11px] uppercase tracking-widest mb-1.5" style={{ color: 'var(--text-muted)', letterSpacing: '0.1em' }}>{(p.category as any).name}</p>}
           <Link href={`/shop/${p.slug}`}><h3 className={`font-display ${featured ? 'text-2xl' : 'text-xl'} mb-2 leading-tight transition-colors hover:text-gold`} style={{ color: 'var(--text-primary)' }}>{p.title}</h3></Link>
           <div className="flex items-center gap-3 mb-3 flex-wrap">
-            <span className="inline-flex items-center gap-1"><Stars value={p.rating_avg || 5} size={13} /><span className="text-xs" style={{ color: 'var(--text-muted)' }}>{(p.rating_avg || 5).toFixed(1)}</span></span>
+            {p.rating_count > 0 && <span className="inline-flex items-center gap-1"><Stars value={p.rating_avg} size={13} /><span className="text-xs" style={{ color: 'var(--text-muted)' }}>{p.rating_avg.toFixed(1)}</span></span>}
             {(p.download_count ?? 0) > 0 && <span className="inline-flex items-center gap-1 text-xs" style={{ color: 'var(--text-muted)' }}><Download size={12} /> {compact(p.download_count)}</span>}
           </div>
           <div className="flex items-center justify-between gap-3">
@@ -129,11 +129,12 @@ export default function BestSellersClient({ products, totalDownloads, totalRevie
   }
   const top3Total = products.slice(0, 3).reduce((s, p) => s + p.price, 0)
 
+  // Real numbers only — no invented multipliers when data is sparse.
   const stats = [
-    { icon: Download, value: <CountUp to={totalDownloads || products.length * 1200} suffix="+" />, label: 'Downloads' },
-    { icon: Star,     value: <span className="inline-flex items-center gap-1"><Star size={20} style={{ fill: 'var(--gold)', stroke: 'var(--gold)' }} />{avgRating.toFixed(1)}</span>, label: 'Avg Rating' },
     { icon: Award,    value: <CountUp to={products.length} />, label: 'Best Sellers' },
-    { icon: Heart,    value: <CountUp to={totalReviews || products.length * 60} suffix="+" />, label: 'Happy Reviews' },
+    { icon: Download, value: <span>Instant</span>, label: 'Download' },
+    { icon: Star,     value: <span>PDF</span>, label: 'Fully Hyperlinked' },
+    { icon: Heart,    value: <span>GoodNotes</span>, label: '& Notability Ready' },
   ]
 
   return (
@@ -174,7 +175,7 @@ export default function BestSellersClient({ products, totalDownloads, totalRevie
             </motion.div>
           </div>
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.3 }} className="flex flex-wrap items-center gap-2.5 mt-8">
-            {[{ icon: Star, l: '4.9/5 rated' }, { icon: Zap, l: 'Instant download' }, { icon: Smartphone, l: 'GoodNotes ready' }, { icon: Shield, l: '30-day guarantee' }].map(({ icon: Icon, l }) => (
+            {[{ icon: Star, l: 'Hyperlinked PDFs' }, { icon: Zap, l: 'Instant download' }, { icon: Smartphone, l: 'GoodNotes ready' }, { icon: Shield, l: 'Secure checkout' }].map(({ icon: Icon, l }) => (
               <span key={l} className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-secondary)' }}>
                 <Icon size={12} style={{ color: 'var(--gold)' }} /> {l}
               </span>
@@ -284,13 +285,12 @@ export default function BestSellersClient({ products, totalDownloads, totalRevie
       <section className="border-t py-14" style={{ borderColor: 'var(--border)' }}>
         <div className="container-site">
           <div className="text-center mb-10">
-            <div className="flex items-center justify-center gap-2 mb-3"><Stars value={avgRating || 5} size={18} /><span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{avgRating.toFixed(1)} from {compact(totalReviews || products.length * 60)}+ reviews</span></div>
+            {totalReviews > 0 && <div className="flex items-center justify-center gap-2 mb-3"><Stars value={avgRating} size={18} /><span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{avgRating.toFixed(1)} from {compact(totalReviews)} review{totalReviews === 1 ? '' : 's'}</span></div>}
             <h2 className="font-display text-display-sm" style={{ color: 'var(--text-primary)' }}>What Buyers Are Saying</h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-5">
+          <div className="grid md:grid-cols-2 gap-5 max-w-3xl mx-auto">
             {[
               { name: 'Sophie L.', grad: 'linear-gradient(135deg,#B8A9D4,#7B6FAE)', text: 'Changed how I plan my entire week. I keep recommending it to everyone at work.' },
-              { name: 'Marcus T.', grad: 'linear-gradient(135deg,#A0830E,#C4A538)', text: 'Bought three so far. The quality and detail is unmatched for the price.' },
               { name: 'Nadia K.', grad: 'linear-gradient(135deg,#E8C5C0,#C9847C)', text: 'Downloaded instantly, set up in GoodNotes in minutes. Absolutely beautiful.' },
             ].map((r, i) => (
               <motion.div key={r.name} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45, delay: i * 0.1 }}
@@ -300,7 +300,7 @@ export default function BestSellersClient({ products, totalDownloads, totalRevie
                 <p className="text-sm leading-relaxed my-4 flex-1" style={{ color: 'var(--text-secondary)' }}>&ldquo;{r.text}&rdquo;</p>
                 <div className="flex items-center gap-3 pt-3 border-t" style={{ borderColor: 'var(--border)' }}>
                   <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: r.grad }}>{r.name.charAt(0)}</div>
-                  <div><p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{r.name}</p><p className="text-[11px] inline-flex items-center gap-1" style={{ color: 'var(--sage)' }}><BadgeCheck size={11} /> Verified Purchase</p></div>
+                  <div><p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{r.name}</p></div>
                 </div>
               </motion.div>
             ))}

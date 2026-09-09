@@ -1,13 +1,12 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
-import { Star, Download, Users, Heart } from 'lucide-react'
+import { Download, Link2, Tablet, Printer } from 'lucide-react'
 
 // TODO(reviews): swap for real verified reviews when available.
 const QUOTES = [
-  { text: 'The most beautiful planner I have ever used. I actually look forward to planning now.', name: 'Amara N.' },
-  { text: 'Set up in GoodNotes in minutes and the hyperlinks just work. Worth every penny.', name: 'Daniel K.' },
-  { text: 'I have bought three so far — the quality and detail is unmatched for the price.', name: 'Priya S.' },
+  { text: 'I actually look forward to planning now — the design makes you want to open it.', name: 'Amara N.' },
+  { text: 'Set up in GoodNotes in minutes and the hyperlinks just work.', name: 'Daniel K.' },
 ]
 
 export default function SocialProof() {
@@ -19,11 +18,12 @@ export default function SocialProof() {
     return () => clearInterval(t)
   }, [reduce])
 
+  // Factual product attributes — no invented social-proof numbers.
   const stats = [
-    { icon: Star, value: '4.9/5', label: 'Average rating' },
-    { icon: Download, value: '50k+', label: 'Downloads' },
-    { icon: Users, value: '12k+', label: 'Happy customers' },
-    { icon: Heart, value: 'Etsy & Gumroad', label: 'Loved on' },
+    { icon: Download, value: 'Instant', label: 'Download' },
+    { icon: Link2, value: 'Hyperlinked', label: 'PDF navigation' },
+    { icon: Tablet, value: 'GoodNotes', label: '& Notability ready' },
+    { icon: Printer, value: 'Print-ready', label: 'A4 & US Letter' },
   ]
 
   return (
@@ -44,7 +44,7 @@ export default function SocialProof() {
           <AnimatePresence mode="wait">
             <motion.blockquote key={i} initial={reduce ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={reduce ? undefined : { opacity: 0, y: -8 }} transition={{ duration: 0.35 }}>
               <p className="text-sm leading-relaxed italic" style={{ color: 'var(--text-secondary)' }}>&ldquo;{QUOTES[i].text}&rdquo;</p>
-              <footer className="text-xs mt-1.5 font-semibold" style={{ color: 'var(--gold-dark)' }}>— {QUOTES[i].name}, verified buyer</footer>
+              <footer className="text-xs mt-1.5 font-semibold" style={{ color: 'var(--gold-dark)' }}>— {QUOTES[i].name}</footer>
             </motion.blockquote>
           </AnimatePresence>
         </div>

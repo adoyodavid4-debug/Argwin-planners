@@ -329,7 +329,7 @@ function NewCard({ product, index, onQuickView, fmt }: { product: Product; index
         <div className="px-3.5 pt-3 pb-4 flex flex-col flex-1">
           {product.category && <p className="text-[10px] uppercase tracking-widest mb-1" style={{ color: 'var(--text-muted)', letterSpacing: '0.08em' }}>{(product.category as any).name}</p>}
           <Link href={`/shop/${product.slug}`}><h3 className="text-sm font-semibold leading-snug line-clamp-2 transition-colors group-hover:text-gold mb-1.5" style={{ color: 'var(--text-primary)' }}>{product.title}</h3></Link>
-          <div className="flex items-center gap-1.5 mb-2"><Stars value={product.rating_avg || 5} size={11} />{product.rating_count > 0 && <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>({product.rating_count})</span>}</div>
+          {product.rating_count > 0 && <div className="flex items-center gap-1.5 mb-2"><Stars value={product.rating_avg} size={11} /><span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>({product.rating_count})</span></div>}
           {/* format / size tags */}
           {(psizes.length > 0 || (product.file_formats?.length ?? 0) > 0) && (
             <div className="flex flex-wrap gap-1 mb-2.5">

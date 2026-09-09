@@ -564,7 +564,7 @@ function ShopCard({ p, index, onQuickView }: { p: Product; index: number; onQuic
         <div className="px-3.5 pt-3 pb-4 flex flex-col flex-1">
           {p.category && <p className="text-[10px] uppercase tracking-widest mb-1" style={{ color: 'var(--text-muted)', letterSpacing: '0.08em' }}>{(p.category as any).name}</p>}
           <Link href={`/shop/${p.slug}`}><h3 className="text-sm font-semibold leading-snug line-clamp-2 transition-colors group-hover:text-gold mb-1.5" style={{ color: 'var(--text-primary)' }}>{p.title}</h3></Link>
-          <div className="flex items-center gap-1.5 mb-2"><Stars value={p.rating_avg || 5} size={11} />{p.rating_count > 0 && <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>({p.rating_count})</span>}</div>
+          {p.rating_count > 0 && <div className="flex items-center gap-1.5 mb-2"><Stars value={p.rating_avg} size={11} /><span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>({p.rating_count})</span></div>}
           <Tags p={p} />
           <div className="flex items-baseline gap-1.5 mt-auto"><span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{money(p.price, p.currency)}</span>{sale && <span className="text-xs line-through" style={{ color: 'var(--text-muted)' }}>{money(p.compare_price!, p.currency)}</span>}</div>
         </div>
@@ -591,7 +591,7 @@ function ShopRow({ p, index, onQuickView }: { p: Product; index: number; onQuick
           </div>
           <button onClick={wish} aria-label="Wishlist" className="flex-shrink-0"><Heart size={16} style={{ fill: isWished ? 'var(--blush)' : 'transparent', stroke: isWished ? '#C9847C' : 'var(--text-muted)' }} /></button>
         </div>
-        <div className="flex items-center gap-1.5 mt-1"><Stars value={p.rating_avg || 5} size={12} />{p.rating_count > 0 && <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>({p.rating_count})</span>}</div>
+        {p.rating_count > 0 && <div className="flex items-center gap-1.5 mt-1"><Stars value={p.rating_avg} size={12} /><span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>({p.rating_count})</span></div>}
         {p.description && <p className="text-xs mt-1.5 line-clamp-2 hidden sm:block" style={{ color: 'var(--text-secondary)' }}>{stripHtml(p.description)}</p>}
         <div className="mt-2"><Tags p={p} /></div>
         <div className="flex items-center gap-3 mt-auto pt-2">

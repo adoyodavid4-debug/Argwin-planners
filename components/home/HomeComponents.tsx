@@ -112,7 +112,7 @@ export function TestimonialsSection() {
         <div className="text-center mb-14">
           <p className="text-xs uppercase tracking-widest font-semibold mb-3" style={{ color: 'var(--gold)', letterSpacing: '0.12em' }}>What Our Planners Say</p>
           <h2 id="testimonials-heading" className="font-display text-display-md mb-4" style={{ color: 'var(--text-primary)' }}>
-            Loved by 50,000+ Planners
+            Words from Our Planners
           </h2>
           <div className="divider-gold" />
         </div>
@@ -159,7 +159,7 @@ import { Lock, RotateCcw, Award, HeartHandshake } from 'lucide-react'
 
 const trustItems = [
   { icon: Lock,         title: 'Secure Checkout',       desc: '256-bit SSL encryption on every purchase' },
-  { icon: RotateCcw,    title: '30-Day Money Back',     desc: 'Not satisfied? Full refund, no questions asked' },
+  { icon: RotateCcw,    title: '30-Day Happiness Promise', desc: 'Something wrong with your file? We will make it right' },
   { icon: Award,        title: 'Premium Quality',       desc: 'Every template is professionally designed' },
   { icon: HeartHandshake, title: 'Instant Delivery',   desc: 'Access your files immediately after payment' },
 ]

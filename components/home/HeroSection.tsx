@@ -6,9 +6,9 @@ import { motion, useScroll, useTransform } from 'framer-motion'
 import { ArrowRight, Download, Sparkles } from 'lucide-react'
 
 const stats = [
-  { value: '50K+', label: 'Happy Planners' },
+  { value: '50+', label: 'Planner Designs' },
   { value: '200+', label: 'Premium Templates' },
-  { value: '4.9★', label: 'Average Rating' },
+  { value: '∞', label: 'Undated & Reusable' },
   { value: '100%', label: 'Instant Download' },
 ]
 

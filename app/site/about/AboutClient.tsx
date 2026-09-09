@@ -4,18 +4,18 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion, useReducedMotion, useScroll, useTransform, useSpring } from 'framer-motion'
 import {
-  Heart, Star, Download, Users, Globe, ArrowRight, ChevronRight, Sparkles,
-  Palette, PenTool, Tablet, Ruler, Link2, Type, Check, Quote, BadgeCheck, Leaf, Award,
+  Heart, Star, Download, Users, Globe, ArrowRight, ChevronRight,
+  Palette, PenTool, Tablet, Ruler, Link2, Type, Check, Quote, Leaf, Award,
 } from 'lucide-react'
 
 const BRAND_GREEN = '#2E4A38' // forest-green brand mark
 
 // ── Data ──────────────────────────────────────────────────────
 const STATS = [
-  { icon: Download, value: '15k+', label: 'Planners downloaded' },
-  { icon: Star,     value: '4.9★', label: 'Average rating' },
-  { icon: Users,    value: '12k+', label: 'Happy customers' },
-  { icon: Globe,    value: '30+',  label: 'Countries served' },
+  { icon: Download, value: '50+',  label: 'Planner designs' },
+  { icon: Star,     value: '200+', label: 'Hand-crafted templates' },
+  { icon: Users,    value: '9',    label: 'Collections' },
+  { icon: Globe,    value: '2022', label: 'Crafting since' },
 ]
 
 const VALUES = [
@@ -34,16 +34,16 @@ const CRAFT = [
   { icon: Leaf,   title: 'Undated & reusable',      body: 'Start any day; reuse year after year.' },
 ]
 
+// TODO(reviews): swap for real verified reviews when available.
 const TESTIMONIALS = [
-  { quote: 'I have tried every planner app out there. Arwign is the first that actually stayed on my iPad for more than a week.', name: 'Amara N.', role: 'Teacher, Chicago', grad: 'linear-gradient(135deg,#B8A9D4,#7B6FAE)' },
-  { quote: 'The budget planner genuinely changed my savings habits. Six months in and I have hit every target I set.', name: 'James K.', role: 'Accountant, London', grad: 'linear-gradient(135deg,#A0830E,#C4A538)' },
-  { quote: 'I ordered the complete bundle and have not touched another planner since. The quality is unreal.', name: 'Sofia R.', role: 'Designer, Manchester', grad: 'linear-gradient(135deg,#E8C5C0,#C9847C)' },
+  { quote: 'Arwign is the first planner that actually stayed on my iPad for more than a week.', name: 'Amara N.', role: 'Teacher, Chicago', grad: 'linear-gradient(135deg,#B8A9D4,#7B6FAE)' },
+  { quote: 'The budget planner genuinely helped my savings habits — I finally stick to my targets.', name: 'James K.', role: 'Accountant, London', grad: 'linear-gradient(135deg,#A0830E,#C4A538)' },
 ]
 
 const JOURNEY = [
   { year: '2022', title: 'A blank notebook', body: 'Frustrated with every planner on the market, we designed our own.' },
   { year: '2023', title: 'Word got around', body: 'Friends, then strangers, wanted a copy — and Arwign was born.' },
-  { year: 'Today', title: 'A growing collection', body: '50+ products across 9 categories, loved in 30+ countries.' },
+  { year: 'Today', title: 'A growing collection', body: '50+ products across 9 categories, with more on the way.' },
 ]
 
 function Stars({ value = 5, size = 13 }: { value?: number; size?: number }) {
@@ -213,14 +213,10 @@ export default function AboutClient() {
       {/* ══ 6. SOCIAL PROOF ════════════════════════════════════ */}
       <section className="py-20 border-b" style={{ borderColor: 'var(--border)' }}>
         <div className="container-site">
-          <motion.div {...reveal()} className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 mb-14 text-center">
-            <span className="inline-flex items-center gap-2"><Stars size={16} /><span className="font-display text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>4.9</span><span className="text-sm" style={{ color: 'var(--text-muted)' }}>average</span></span>
-            <span className="w-px h-5 hidden sm:block" style={{ background: 'var(--border)' }} />
-            <span className="text-sm" style={{ color: 'var(--text-secondary)' }}><b style={{ color: 'var(--text-primary)' }}>12,000+</b> happy customers</span>
-            <span className="w-px h-5 hidden sm:block" style={{ background: 'var(--border)' }} />
-            <span className="inline-flex items-center gap-1.5 text-sm" style={{ color: 'var(--text-secondary)' }}><Sparkles size={13} style={{ color: 'var(--gold)' }} /> Loved on Etsy &amp; Gumroad</span>
+          <motion.div {...reveal()} className="text-center mb-14">
+            <h2 className="font-display text-4xl" style={{ color: 'var(--text-primary)' }}>Words from our planners</h2>
           </motion.div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-3xl mx-auto">
             {TESTIMONIALS.map((t, i) => (
               <motion.figure key={t.name} {...reveal(i * 0.08)} className="p-6 rounded-2xl border flex flex-col" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
                 <Quote size={22} style={{ color: 'var(--gold)', opacity: 0.4 }} className="mb-3" />
@@ -228,7 +224,7 @@ export default function AboutClient() {
                 <p className="text-sm leading-relaxed my-4 flex-1" style={{ color: 'var(--text-secondary)' }}>&ldquo;{t.quote}&rdquo;</p>
                 <figcaption className="flex items-center gap-3 pt-3 border-t" style={{ borderColor: 'var(--border)' }}>
                   <span className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: t.grad }}>{t.name.charAt(0)}</span>
-                  <div><p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{t.name}</p><p className="text-[11px] inline-flex items-center gap-1" style={{ color: 'var(--sage)' }}><BadgeCheck size={11} /> {t.role}</p></div>
+                  <div><p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{t.name}</p><p className="text-[11px]" style={{ color: 'var(--sage)' }}>{t.role}</p></div>
                 </figcaption>
               </motion.figure>
             ))}
@@ -267,7 +263,7 @@ export default function AboutClient() {
               <Link href="/best-sellers" className="btn-outline">See best sellers</Link>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-12 text-xs" style={{ color: 'var(--text-muted)' }}>
-              {[{ icon: Download, l: 'Instant download' }, { icon: Star, l: '4.9 average' }, { icon: Leaf, l: 'Undated & reusable' }, { icon: Heart, l: 'Loved worldwide' }].map(({ icon: Icon, l }) => (
+              {[{ icon: Download, l: 'Instant download' }, { icon: Star, l: 'Hyperlinked PDFs' }, { icon: Leaf, l: 'Undated & reusable' }, { icon: Heart, l: 'Made with care' }].map(({ icon: Icon, l }) => (
                 <span key={l} className="inline-flex items-center gap-1.5"><Icon size={12} style={{ color: 'var(--gold)' }} /> {l}</span>
               ))}
             </div>

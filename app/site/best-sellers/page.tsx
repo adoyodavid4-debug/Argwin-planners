@@ -5,7 +5,7 @@ import BestSellersClient from './BestSellersClient'
 export const revalidate = 300
 
 export const metadata: Metadata = {
-  title: 'Best Selling Planners — Most Loved by 50,000+ Customers | Arwign',
+  title: 'Best Selling Planners — Our Most-Loved Designs | Arwign',
   description: 'Shop our best selling digital and printable planners. Customer favourites, highest rated, most downloaded — all in one place. Instant download.',
   alternates: { canonical: 'https://www.arwignplanners.com/best-sellers' },
   openGraph: {
@@ -30,7 +30,7 @@ export default async function BestSellersPage() {
   const totalDownloads = items.reduce((s, p) => s + (p.download_count ?? 0), 0)
   const totalReviews = items.reduce((s, p) => s + (p.rating_count ?? 0), 0)
   const rated = items.filter((p) => p.rating_avg > 0)
-  const avgRating = rated.length ? (rated.reduce((s, p) => s + p.rating_avg, 0) / rated.length) : 4.9
+  const avgRating = rated.length ? (rated.reduce((s, p) => s + p.rating_avg, 0) / rated.length) : 0
 
   return (
     <BestSellersClient

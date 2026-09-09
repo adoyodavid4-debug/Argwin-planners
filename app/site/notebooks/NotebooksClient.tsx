@@ -358,7 +358,7 @@ export default function NotebooksClient({ notebooks, faqs }: { notebooks: Notebo
             </div>
           </motion.div>
           <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.1 }} className="grid grid-cols-2 gap-4">
-            {[{ n: '3', l: 'Sizes Included' }, { n: '4.9★', l: 'Avg Rating' }, { n: '100%', l: 'Instant Access' }, { n: '∞', l: 'Reusable Pages' }].map((s) => (
+            {[{ n: '3', l: 'Sizes Included' }, { n: 'PDF', l: 'Fully Hyperlinked' }, { n: '100%', l: 'Instant Access' }, { n: '∞', l: 'Reusable Pages' }].map((s) => (
               <div key={s.l} className="text-center py-7 rounded-2xl" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
                 <p className="font-display text-3xl font-semibold mb-1" style={{ color: 'var(--gold-light)' }}>{s.n}</p>
                 <p className="text-xs uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.55)', letterSpacing: '0.08em' }}>{s.l}</p>
@@ -372,16 +372,11 @@ export default function NotebooksClient({ notebooks, faqs }: { notebooks: Notebo
       <section className="border-t py-16" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
         <div className="container-site">
           <div className="text-center mb-12">
-            <div className="flex items-center justify-center gap-2 mb-3">
-              {[1, 2, 3, 4, 5].map((i) => <Star key={i} size={18} style={{ fill: 'var(--gold)', stroke: 'var(--gold)' }} />)}
-              <span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>4.9 out of 5</span>
-            </div>
-            <h2 className="font-display text-display-sm" style={{ color: 'var(--text-primary)' }}>Loved by Note-Takers Everywhere</h2>
+            <h2 className="font-display text-display-sm" style={{ color: 'var(--text-primary)' }}>Loved by Note-Takers</h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-5">
+          <div className="grid md:grid-cols-2 gap-5 max-w-3xl mx-auto">
             {[
               { name: 'Lena M.', grad: 'linear-gradient(135deg,#B8A9D4,#7B6FAE)', text: 'The hyperlinks are a game-changer — my whole study system finally lives in one tidy notebook.' },
-              { name: 'Tomas R.', grad: 'linear-gradient(135deg,#A0830E,#C4A538)', text: 'Imported into GoodNotes in seconds and the layouts are gorgeous. Easily my favourite purchase this year.' },
               { name: 'Aisha B.', grad: 'linear-gradient(135deg,#E8C5C0,#C9847C)', text: 'I asked for a custom journal and they nailed it. It feels like it was made just for me — because it was.' },
             ].map((r, i) => (
               <motion.div key={r.name} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45, delay: i * 0.1 }}
@@ -391,7 +386,7 @@ export default function NotebooksClient({ notebooks, faqs }: { notebooks: Notebo
                 <p className="text-sm leading-relaxed mb-4 flex-1" style={{ color: 'var(--text-secondary)' }}>&ldquo;{r.text}&rdquo;</p>
                 <div className="flex items-center gap-3 pt-3 border-t" style={{ borderColor: 'var(--border)' }}>
                   <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: r.grad }}>{r.name.charAt(0)}</div>
-                  <div><p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{r.name}</p><p className="text-[11px] inline-flex items-center gap-1" style={{ color: 'var(--sage)' }}><BadgeCheck size={11} /> Verified Purchase</p></div>
+                  <div><p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{r.name}</p></div>
                 </div>
               </motion.div>
             ))}

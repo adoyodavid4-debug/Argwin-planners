@@ -50,10 +50,7 @@ export interface Review { name: string; text: string }
 export const REVIEWS: Review[] = [
   { name: 'Lena M.',  text: 'The hyperlinks are a game-changer — my whole system finally lives in one tidy notebook.' },
   { name: 'Daniel K.', text: 'Downloaded it in seconds and set it up in GoodNotes before my coffee was ready.' },
-  { name: 'Priya S.', text: 'Beautiful templates and the sage colourway is gorgeous. Exactly what I wanted.' },
 ]
-export const RATING = 4.9
-export const REVIEW_COUNT = 214
 
 export interface Faq { q: string; a: string }
 export const FAQS: Faq[] = [

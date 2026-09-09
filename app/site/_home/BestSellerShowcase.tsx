@@ -46,7 +46,7 @@ function Card({ p, index, onQuickView }: { p: Product; index: number; onQuickVie
         </div>
         <Link href={`/shop/${p.slug}`} className="block px-3.5 pt-3 pb-4">
           <h3 className="text-sm font-semibold leading-snug line-clamp-2 transition-colors group-hover:text-gold mb-1.5" style={{ color: 'var(--text-primary)' }}>{p.title}</h3>
-          <div className="flex items-center gap-1.5 mb-1.5"><Stars value={p.rating_avg || 5} />{p.rating_count > 0 && <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>({p.rating_count})</span>}</div>
+          {p.rating_count > 0 && <div className="flex items-center gap-1.5 mb-1.5"><Stars value={p.rating_avg} /><span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>({p.rating_count})</span></div>}
           <span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{fmt(p.price, p.currency)}</span>
         </Link>
       </div>
