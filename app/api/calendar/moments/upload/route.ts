@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { randomUUID } from 'crypto'
-import { createServerSupabaseClient, createServiceRoleClient } from '@/lib/supabase/server'
+import { createClient } from '@supabase/supabase-js'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,7 +27,10 @@ export async function POST(req: NextRequest) {
   const path = `${user.id}/${randomUUID()}.${ext}`
   const buffer = Buffer.from(await file.arrayBuffer())
 
-  const admin = createServiceRoleClient()
+  // Pure service-role client (NOT the cookie-bound @supabase/ssr one — that would
+  // attach the signed-in user's token to the storage request and hit RLS, since
+  // moment-media only grants public READ, not authenticated INSERT).
+  const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
   const { error } = await admin.storage.from('moment-media').upload(path, buffer, { contentType: file.type, upsert: false })
   if (error) {
     console.error('[moments] upload', error)
