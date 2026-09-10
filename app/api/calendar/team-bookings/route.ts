@@ -16,6 +16,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { generateSlots, wallTimeToUtc, type BookingPageConfig, type Interval, type Slot } from '@/lib/calendar/slots'
+import { busyIntervalsForUsers } from '@/lib/calendar/busy'
 import { fmtWhen } from '@/lib/calendar/fmt'
 import { getEmailProvider } from '@/lib/email'
 
@@ -93,18 +94,9 @@ async function busyByHost(supabase: any, ctx: Ctx, dateStr: string): Promise<Map
   for (const h of ctx.hosts) byHost.set(h.member_id, [])
 
   const userIds = ctx.hosts.map((h) => h.user_id)
-  const { data: events } = await supabase
-    .from('calendar_events')
-    .select('user_id, start_at, end_at')
-    .in('user_id', userIds)
-    .lt('start_at', dayEnd.toISOString())
-    .gt('end_at', dayStart.toISOString())
-  const byUser = new Map<string, Interval[]>()
-  for (const e of events ?? []) {
-    const arr = byUser.get(e.user_id) ?? []
-    arr.push({ start: new Date(e.start_at), end: new Date(e.end_at) })
-    byUser.set(e.user_id, arr)
-  }
+  // Expands recurring events per-occurrence (see lib/calendar/busy) so a host's
+  // weekly meeting blocks its slot on every week, not just the first.
+  const byUser = await busyIntervalsForUsers(supabase, userIds, dayStart, dayEnd)
   for (const h of ctx.hosts) byHost.set(h.member_id, byUser.get(h.user_id) ?? [])
 
   const { data: booked } = await supabase

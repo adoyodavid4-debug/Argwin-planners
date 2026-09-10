@@ -4,6 +4,7 @@ import { generateSlots, wallTimeToUtc, type BookingPageConfig } from '@/lib/cale
 import { getEmailProvider } from '@/lib/email'
 import { createCheckoutSession } from '@/lib/stripe'
 import { createBookingEvent, sendBookingEmails } from '@/lib/calendar/booking'
+import { busyIntervalsForUser } from '@/lib/calendar/busy'
 
 export const dynamic = 'force-dynamic'
 
@@ -74,13 +75,7 @@ export async function POST(req: NextRequest) {
   const [y, m, d] = date.split('-').map(Number)
   const dayStart = wallTimeToUtc(y, m, d, 0, 0, page.timezone)
   const dayEnd = wallTimeToUtc(y, m, d + 1, 0, 0, page.timezone)
-  const { data: events } = await supabase
-    .from('calendar_events')
-    .select('start_at, end_at')
-    .eq('user_id', page.owner_id)
-    .lt('start_at', dayEnd.toISOString())
-    .gt('end_at', dayStart.toISOString())
-  const busy = (events ?? []).map((e) => ({ start: new Date(e.start_at), end: new Date(e.end_at) }))
+  const busy = await busyIntervalsForUser(supabase, page.owner_id, dayStart, dayEnd)
   const ok = generateSlots(page as unknown as BookingPageConfig, date, busy).some((s) => s.startISO === start.toISOString())
   if (!ok) return NextResponse.json({ error: 'Sorry — that time is no longer available. Please pick another.' }, { status: 409 })
 

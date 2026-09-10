@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { generateSlots, wallTimeToUtc, type BookingPageConfig } from '@/lib/calendar/slots'
+import { busyIntervalsForUser } from '@/lib/calendar/busy'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,18 +25,12 @@ export async function GET(req: NextRequest) {
   if (!page) return NextResponse.json({ error: 'Booking page not found' }, { status: 404 })
 
   // Busy = the owner's calendar events overlapping this local day (bookings also
-  // land here as events, so this is the single source of truth).
+  // land here as events, so this is the single source of truth). Recurring
+  // events are expanded per-occurrence so every instance blocks its slot.
   const [y, m, d] = date.split('-').map(Number)
   const dayStart = wallTimeToUtc(y, m, d, 0, 0, page.timezone)
   const dayEnd = wallTimeToUtc(y, m, d + 1, 0, 0, page.timezone)
-  const { data: events } = await supabase
-    .from('calendar_events')
-    .select('start_at, end_at')
-    .eq('user_id', page.owner_id)
-    .lt('start_at', dayEnd.toISOString())
-    .gt('end_at', dayStart.toISOString())
-
-  const busy = (events ?? []).map((e) => ({ start: new Date(e.start_at), end: new Date(e.end_at) }))
+  const busy = await busyIntervalsForUser(supabase, page.owner_id, dayStart, dayEnd)
   const slots = generateSlots(page as unknown as BookingPageConfig, date, busy)
 
   return NextResponse.json({
