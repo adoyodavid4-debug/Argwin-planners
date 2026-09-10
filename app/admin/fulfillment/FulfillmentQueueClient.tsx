@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import toast from 'react-hot-toast'
+import { fmtDate, fmtDateTime } from '@/lib/calendar/fmt'
 import type { FulfillmentOrder } from './page'
 
 const STATUS_COLORS: Record<string, string> = {
@@ -77,7 +78,7 @@ export default function FulfillmentQueueClient({ orders: initial }: { orders: Fu
                       {order.fulfillment_status.replace('_', ' ')}
                     </span>
                     <span className="text-xs text-[var(--text-muted)]">{order.provider}</span>
-                    <span className="text-xs text-[var(--text-muted)] ml-auto">{new Date(order.created_at).toLocaleDateString()}</span>
+                    <span className="text-xs text-[var(--text-muted)] ml-auto">{fmtDate(order.created_at)}</span>
                   </div>
                   <p className="text-sm font-medium truncate">{order.orders?.email ?? '—'}</p>
                   <p className="text-xs text-[var(--text-muted)] mt-0.5">
@@ -126,7 +127,7 @@ export default function FulfillmentQueueClient({ orders: initial }: { orders: Fu
                       <ol className="space-y-1">
                         {[...(order.fulfillment_events ?? [])].reverse().map((ev, i) => (
                           <li key={i} className="text-xs flex gap-2 text-[var(--text-muted)]">
-                            <span>{new Date(ev.created_at).toLocaleString()}</span>
+                            <span>{fmtDateTime(ev.created_at)}</span>
                             <span className="font-medium text-[var(--text-primary)]">{ev.status.replace('_',' ')}</span>
                             <span>via {ev.source}</span>
                           </li>

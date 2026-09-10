@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { DollarSign, ShoppingBag, Package, Users, Plus } from 'lucide-react'
+import { fmtDate } from '@/lib/calendar/fmt'
 
 interface Stats {
   totalOrders:      number
@@ -140,7 +141,7 @@ export default function AdminDashboardClient({ stats }: { stats: Stats }) {
                         <td className="py-3 text-xs" style={{ color: 'var(--text-primary)' }}>{order.email}</td>
                         <td className="py-3 text-xs font-bold" style={{ color: 'var(--gold)' }}>${order.amount_total?.toFixed(2)}</td>
                         <td className="py-3"><span className="badge badge-popular">{order.status}</span></td>
-                        <td className="py-3 text-xs" style={{ color: 'var(--text-muted)' }}>{new Date(order.created_at).toLocaleDateString()}</td>
+                        <td className="py-3 text-xs" style={{ color: 'var(--text-muted)' }}>{fmtDate(order.created_at)}</td>
                       </tr>
                     ))
                   )}

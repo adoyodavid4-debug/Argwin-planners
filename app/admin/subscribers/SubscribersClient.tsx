@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import toast from 'react-hot-toast'
+import { fmtDate } from '@/lib/calendar/fmt'
 
 type Subscriber = {
   id: string; email: string; status: string; locale: string;
@@ -91,7 +92,7 @@ export default function SubscribersClient({ initialData, totalCount }: { initial
                   {s.lead_magnets?.title_i18n?.en ?? 'Direct'}
                 </td>
                 <td className="px-4 py-3 text-xs text-[var(--text-muted)]">
-                  {new Date(s.created_at).toLocaleDateString()}
+                  {fmtDate(s.created_at)}
                 </td>
                 <td className="px-4 py-3">
                   {s.status !== 'unsubscribed' && (

@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
+import { fmtDate } from '@/lib/calendar/fmt'
 import { Plus, Globe, Lock, Share2, Edit2, Trash2, Users, X, BookOpen, NotebookPen } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -61,7 +62,7 @@ function timeAgo(date: string) {
   if (hrs < 24)    return `${hrs}h ago`
   const days = Math.floor(hrs / 24)
   if (days < 30)   return `${days}d ago`
-  return new Date(date).toLocaleDateString()
+  return fmtDate(date)
 }
 
 type CreateModal = { type: 'general' | 'custom' | null }

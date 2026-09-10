@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { Plus, Edit2, Trash2, Users, X, Globe, Lock, Share2, NotebookPen, BookOpen } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { fmtDate } from '@/lib/calendar/fmt'
 
 interface Owner {
   id: string
@@ -311,7 +312,7 @@ export default function NotebooksClient({ notebooks: initial }: { notebooks: Not
 
                     {/* Created */}
                     <td className="px-4 py-3 text-xs" style={{ color: 'var(--text-muted)' }}>
-                      {new Date(nb.created_at).toLocaleDateString()}
+                      {fmtDate(nb.created_at)}
                     </td>
 
                     {/* Status */}

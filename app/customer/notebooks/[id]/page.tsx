@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { fmtDate } from '@/lib/calendar/fmt'
 import Link from 'next/link'
 import { ArrowLeft, Globe, Lock, Share2, Edit2, Check, X, Users, Clock } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -37,7 +38,7 @@ function timeAgo(date: string) {
   if (mins < 60) return `${mins}m ago`
   const hrs = Math.floor(mins / 60)
   if (hrs < 24)  return `${hrs}h ago`
-  return new Date(date).toLocaleDateString()
+  return fmtDate(date)
 }
 
 function initials(name: string) {

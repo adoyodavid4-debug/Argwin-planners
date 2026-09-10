@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import toast from 'react-hot-toast'
+import { fmtDateTime } from '@/lib/calendar/fmt'
 
 type NotebookRequest = {
   id: string; name: string; email: string; idea: string
@@ -84,7 +85,7 @@ export default function NotebookRequestsClient({ initialData, totalCount }: { in
             </div>
             <p className="text-sm text-[var(--text-secondary)] whitespace-pre-wrap mb-2">{r.idea}</p>
             <p className="text-xs text-[var(--text-muted)]">
-              {r.locale.toUpperCase()} · {new Date(r.created_at).toLocaleString()}
+              {r.locale.toUpperCase()} · {fmtDateTime(r.created_at)}
             </p>
           </div>
         ))}
