@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
+import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import {
   ChevronLeft, ChevronRight, Plus, X, Trash2, MapPin, AlignLeft, Clock,
@@ -328,37 +329,50 @@ export default function CalendarApp({ userEmail }: { userEmail: string }) {
 
     // New event
     if (!draft.id) {
-      await supabase.from('calendar_events').insert(payload)
+      const { error } = await supabase.from('calendar_events').insert(payload)
+      if (error) { toast.error(error.message || 'Could not create the event.'); return }
       setDraft(null); load(); return
     }
     // Existing, non-recurring → simple update
     if (!draft.isRecurring) {
-      await supabase.from('calendar_events').update(payload).eq('id', draft.id)
+      const { error } = await supabase.from('calendar_events').update(payload).eq('id', draft.id)
+      if (error) { toast.error(error.message || 'Could not save the event.'); return }
       setDraft(null); load(); return
     }
     // Recurring: ask scope
     const commit = async (scope: 'this' | 'all') => {
       if (scope === 'all') {
-        // Update the master's fields (keep master's own start date, apply new time/duration)
-        await supabase.from('calendar_events').update({
+        // Update the master's content fields. Never overwrite the series rrule
+        // from a detached occurrence (its rrule is null) — that would collapse
+        // the whole series to a single event. Only the master itself may change
+        // the recurrence rule.
+        const master = allEvents.find((e) => e.id === draft.masterId)
+        const { error } = await supabase.from('calendar_events').update({
           title: payload.title, description: payload.description, location: payload.location,
           conferencing: payload.conferencing, colour: payload.colour, tags: payload.tags,
-          reminders: payload.reminders, rrule: payload.rrule,
+          reminders: payload.reminders,
+          rrule: draft.id === draft.masterId ? payload.rrule : (master?.rrule ?? payload.rrule),
         }).eq('id', draft.masterId)
+        if (error) { toast.error(error.message || 'Could not update the series.'); return }
       } else {
         // This occurrence → detached exception + exdate on master
         if (draft.origDate && draft.id === draft.masterId) {
-          const master = allEvents.find((e) => e.id === draft.masterId)
-          const exdates = [...(master?.exdates ?? []), draft.origDate.toISOString()]
-          await supabase.from('calendar_events').update({ exdates }).eq('id', draft.masterId)
-          await supabase.from('calendar_events').insert({
+          // Insert the exception FIRST; only add the exdate once it succeeds, so
+          // a failed insert can never make the occurrence disappear.
+          const { error: insErr } = await supabase.from('calendar_events').insert({
             ...payload, rrule: null,
             recurrence_parent_id: draft.masterId,
             recurrence_date: draft.origDate.toISOString(),
           })
+          if (insErr) { toast.error(insErr.message || 'Could not save this occurrence.'); return }
+          const master = allEvents.find((e) => e.id === draft.masterId)
+          const exdates = [...(master?.exdates ?? []), draft.origDate.toISOString()]
+          const { error: exErr } = await supabase.from('calendar_events').update({ exdates }).eq('id', draft.masterId)
+          if (exErr) toast.error('Saved, but the original slot may still show — please refresh.')
         } else {
           // editing an already-detached exception row
-          await supabase.from('calendar_events').update({ ...payload, rrule: null }).eq('id', draft.id)
+          const { error } = await supabase.from('calendar_events').update({ ...payload, rrule: null }).eq('id', draft.id)
+          if (error) { toast.error(error.message || 'Could not save this occurrence.'); return }
         }
       }
       setScopeAsk(null); setDraft(null); load()
@@ -370,19 +384,25 @@ export default function CalendarApp({ userEmail }: { userEmail: string }) {
   const deleteDraft = async () => {
     if (!draft?.id) return
     if (!draft.isRecurring) {
-      await supabase.from('calendar_events').delete().eq('id', draft.id)
+      const { error } = await supabase.from('calendar_events').delete().eq('id', draft.id)
+      if (error) { toast.error(error.message || 'Could not delete the event.'); return }
       setDraft(null); load(); return
     }
     const commit = async (scope: 'this' | 'all') => {
       if (scope === 'all') {
-        await supabase.from('calendar_events').delete().eq('id', draft.masterId)
+        const { error } = await supabase.from('calendar_events').delete().eq('id', draft.masterId)
+        if (error) { toast.error(error.message || 'Could not delete the series.'); return }
       } else {
         if (draft.origDate) {
           const master = allEvents.find((e) => e.id === draft.masterId)
           const exdates = [...(master?.exdates ?? []), draft.origDate.toISOString()]
-          await supabase.from('calendar_events').update({ exdates }).eq('id', draft.masterId)
+          const { error } = await supabase.from('calendar_events').update({ exdates }).eq('id', draft.masterId)
+          if (error) { toast.error(error.message || 'Could not remove this occurrence.'); return }
         }
-        if (draft.id !== draft.masterId) await supabase.from('calendar_events').delete().eq('id', draft.id)
+        if (draft.id !== draft.masterId) {
+          const { error } = await supabase.from('calendar_events').delete().eq('id', draft.id)
+          if (error) { toast.error(error.message || 'Could not remove this occurrence.'); return }
+        }
       }
       setScopeAsk(null); setDraft(null); load()
     }
@@ -393,11 +413,12 @@ export default function CalendarApp({ userEmail }: { userEmail: string }) {
   const submitQuick = async () => {
     if (!quick.trim()) return
     const p = parseNaturalLanguage(quick, view === 'month' || view === 'year' ? new Date() : cursor)
-    await supabase.from('calendar_events').insert({
+    const { error } = await supabase.from('calendar_events').insert({
       title: p.title, start_at: p.start.toISOString(), end_at: p.end.toISOString(),
       all_day: p.allDay, start_tz: settings.timezone || localTZ, colour: 'brass',
       location: p.location, rrule: p.rrule, reminders: settings.reminder_defaults ?? [],
     })
+    if (error) { toast.error(error.message || 'Could not add the event.'); return }
     setQuick(''); load()
   }
 
@@ -421,7 +442,9 @@ export default function CalendarApp({ userEmail }: { userEmail: string }) {
       start_at: p.start_at, end_at: p.end_at, all_day: p.all_day,
       start_tz: settings.timezone || localTZ, colour: 'sage', rrule: p.rrule,
     }))
-    await supabase.from('calendar_events').insert(rows)
+    const { error } = await supabase.from('calendar_events').insert(rows)
+    if (error) { toast.error(error.message || 'Could not import the calendar file.'); return }
+    toast.success(`Imported ${rows.length} event${rows.length === 1 ? '' : 's'}.`)
     load()
   }
 

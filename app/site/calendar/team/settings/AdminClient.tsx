@@ -23,10 +23,14 @@ export default function AdminClient({ ws }: { ws: TeamWorkspace }) {
 
   const save = async () => {
     if (ws.live) {
-      const { error } = await supabase.from('teams')
+      // .select() so an RLS-blocked update (no error, zero rows) doesn't report
+      // a false success to a non-owner.
+      const { data, error } = await supabase.from('teams')
         .update({ name: name.trim() || ws.team.name, timezone, billing_email: billingEmail.trim(), seats_total: seats })
         .eq('id', ws.team.id)
+        .select('id')
       if (error) { toast.error(error.message); return }
+      if (!data?.length) { toast.error('You don’t have permission to change team settings.'); return }
     }
     toast.success('Team settings saved')
   }
@@ -37,14 +41,17 @@ export default function AdminClient({ ws }: { ws: TeamWorkspace }) {
     if (ws.live) {
       const { data: row, error: uErr } = await supabase.from('team_members').select('user_id').eq('id', target.id).single()
       if (uErr || !row?.user_id) { toast.error('That member hasn’t activated their account yet.'); return }
-      // RLS on `teams` may reject handing owner_id to another user — attempt it and fall back gracefully.
-      const { error } = await supabase.from('teams').update({ owner_id: row.user_id }).eq('id', ws.team.id)
-      if (error) { toast.error('Ownership transfer is blocked for security — contact support to complete it.'); return }
+      // RLS on `teams` may reject handing owner_id to another user. Verify rows
+      // actually changed (a blocked update returns no error + zero rows) and
+      // abort BEFORE touching roles, so a blocked transfer can't leave the team
+      // with a minted second "owner" and no real owner change.
+      const { data: owned, error } = await supabase.from('teams').update({ owner_id: row.user_id }).eq('id', ws.team.id).select('id')
+      if (error || !owned?.length) { toast.error('Ownership transfer is blocked for security — contact support to complete it.'); return }
       // 'admin' isn't a valid role in 020_teams.sql; Manager ('manage') is the closest demotion.
-      const r1 = await supabase.from('team_members').update({ role: 'owner' }).eq('id', target.id)
-      if (r1.error) { toast.error(r1.error.message); return }
-      const r2 = await supabase.from('team_members').update({ role: 'manage' }).eq('id', ws.currentMemberId)
-      if (r2.error) toast.error(r2.error.message)
+      const r1 = await supabase.from('team_members').update({ role: 'owner' }).eq('id', target.id).select('id')
+      if (r1.error || !r1.data?.length) { toast.error(r1.error?.message ?? 'Could not promote the new owner — contact support.'); return }
+      const r2 = await supabase.from('team_members').update({ role: 'manage' }).eq('id', ws.currentMemberId).select('id')
+      if (r2.error || !r2.data?.length) toast.error(r2.error?.message ?? 'New owner set, but demoting your role failed — refresh and check.')
       logTeamAction(supabase, ws.team.id, ws.currentMemberId, 'transferred ownership', `${ws.team.name} → ${target.name}`, 'member')
     }
     toast.success(`Ownership transferred to ${target.name}`)
@@ -54,8 +61,9 @@ export default function AdminClient({ ws }: { ws: TeamWorkspace }) {
   const doDelete = async () => {
     if (deleteName.trim() !== ws.team.name) { toast.error('Type the team name exactly to confirm.'); return }
     if (!ws.live) { toast.success('Sample workspace — nothing was deleted.'); setDeleteOpen(false); setDeleteName(''); return }
-    const { error } = await supabase.from('teams').delete().eq('id', ws.team.id)
+    const { data, error } = await supabase.from('teams').delete().eq('id', ws.team.id).select('id')
     if (error) { toast.error(error.message); return }
+    if (!data?.length) { toast.error('Only the team owner can delete this team.'); return }
     window.location.href = '/calendar/app'
   }
 

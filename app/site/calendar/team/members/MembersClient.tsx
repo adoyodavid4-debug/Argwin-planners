@@ -14,17 +14,34 @@ export default function MembersClient({ ws }: { ws: TeamWorkspace }) {
 
   const supabase = useMemo(() => createClient() as any, [])
 
-  const setRole = (id: string, role: Role) => {
-    const prev = byId(members, id)?.name ?? 'Member'
+  const setRole = async (id: string, role: Role) => {
+    const target = byId(members, id)
+    const prevName = target?.name ?? 'Member'
+    const prevRole = target?.role
     setMembers((ms) => ms.map((m) => (m.id === id ? { ...m, role } : m)))
-    if (ws.live) {
-      supabase.from('team_members').update({ role }).eq('id', id).then(({ error }: any) => { if (error) toast.error(error.message) })
-      logTeamAction(supabase, ws.team.id, ws.currentMemberId, 'changed role', `${prev} → ${ROLES[role].label}`, 'member')
+    if (!ws.live) return
+    // .select() so an RLS-blocked write (which returns no error but zero rows)
+    // is detected — otherwise the change silently reverts on the server while the
+    // UI (and a false audit entry) claim success.
+    const { data, error } = await supabase.from('team_members').update({ role }).eq('id', id).select('id')
+    if (error || !data?.length) {
+      setMembers((ms) => ms.map((m) => (m.id === id ? { ...m, role: (prevRole ?? m.role) as Role } : m)))
+      toast.error(error?.message ?? 'You don’t have permission to change roles.')
+      return
     }
+    logTeamAction(supabase, ws.team.id, ws.currentMemberId, 'changed role', `${prevName} → ${ROLES[role].label}`, 'member')
   }
-  const remove = (id: string) => {
+  const remove = async (id: string) => {
+    const snapshot = members
     setMembers((ms) => ms.filter((m) => m.id !== id))
-    if (ws.live) supabase.from('team_members').delete().eq('id', id).then(({ error }: any) => { if (error) toast.error(error.message) })
+    if (!ws.live) return
+    const { data, error } = await supabase.from('team_members').delete().eq('id', id).select('id')
+    if (error || !data?.length) {
+      setMembers(snapshot)
+      toast.error(error?.message ?? 'You don’t have permission to remove members.')
+      return
+    }
+    logTeamAction(supabase, ws.team.id, ws.currentMemberId, 'removed member', byId(snapshot, id)?.email ?? '', 'member')
   }
 
   const sendInvite = async () => {

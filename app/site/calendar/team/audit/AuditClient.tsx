@@ -23,9 +23,15 @@ export default function AuditClient({ ws }: { ws: TeamWorkspace }) {
   const [delegations, setDelegations] = useState<Delegation[]>(ws.delegations)
   const [scope, setScope] = useState<AuditEntry['scope'] | 'all'>('all')
 
-  const revoke = (id: string) => {
+  const revoke = async (id: string) => {
+    const snapshot = delegations
     setDelegations((ds) => ds.filter((d) => d.id !== id))
-    if (ws.live) supabase.from('team_delegations').delete().eq('id', id).then(({ error }: any) => { if (error) toast.error(error.message) })
+    if (!ws.live) return
+    const { data, error } = await supabase.from('team_delegations').delete().eq('id', id).select('id')
+    if (error || !data?.length) {
+      setDelegations(snapshot)
+      toast.error(error?.message ?? 'You don’t have permission to revoke this delegation.')
+    }
   }
   const scopes: (AuditEntry['scope'] | 'all')[] = ['all', 'calendar', 'member', 'resource', 'booking', 'billing', 'delegation']
   const log = ws.audit.filter((a) => scope === 'all' || a.scope === scope)

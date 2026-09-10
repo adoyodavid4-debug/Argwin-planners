@@ -70,14 +70,19 @@ export default function ResourcesClient({ ws }: { ws: TeamWorkspace }) {
     setBookForm(null)
   }
 
-  const decide = (id: string, status: 'approved' | 'declined') => {
+  const decide = async (id: string, status: 'approved' | 'declined') => {
     const b = byId(bookings, id)
+    const prevStatus = b?.status
     setBookings((bs) => bs.map((x) => (x.id === id ? { ...x, status } : x)))
-    if (ws.live) {
-      supabase.from('resource_bookings').update({ status }).eq('id', id).then(({ error }: any) => { if (error) toast.error(error.message) })
-      const resName = byId(allResources, b?.resource_id ?? '')?.name ?? 'Resource'
-      logTeamAction(supabase, ws.team.id, ws.currentMemberId, status === 'approved' ? 'approved room request' : 'declined room request', `${resName} — ${b?.title ?? ''}`, 'resource')
+    if (!ws.live) return
+    const { data, error } = await supabase.from('resource_bookings').update({ status }).eq('id', id).select('id')
+    if (error || !data?.length) {
+      setBookings((bs) => bs.map((x) => (x.id === id ? { ...x, status: (prevStatus ?? x.status) as ResourceBooking['status'] } : x)))
+      toast.error(error?.message ?? 'You don’t have permission to decide this request.')
+      return
     }
+    const resName = byId(allResources, b?.resource_id ?? '')?.name ?? 'Resource'
+    logTeamAction(supabase, ws.team.id, ws.currentMemberId, status === 'approved' ? 'approved room request' : 'declined room request', `${resName} — ${b?.title ?? ''}`, 'resource')
   }
 
   const pending = bookings.filter((b) => b.status === 'pending')

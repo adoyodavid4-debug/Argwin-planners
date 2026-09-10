@@ -115,10 +115,16 @@ export default function BookingClient({ ws }: { ws: TeamWorkspace }) {
     setForm(null)
   }
 
-  const toggle = (id: string) => {
-    const next = !(byId(pages, id)?.active)
+  const toggle = async (id: string) => {
+    const prev = byId(pages, id)?.active
+    const next = !prev
     setPages((ps) => ps.map((p) => (p.id === id ? { ...p, active: next } : p)))
-    if (ws.live) supabase.from('team_booking_pages').update({ active: next }).eq('id', id).then(({ error }: any) => { if (error) toast.error(error.message) })
+    if (!ws.live) return
+    const { data, error } = await supabase.from('team_booking_pages').update({ active: next }).eq('id', id).select('id')
+    if (error || !data?.length) {
+      setPages((ps) => ps.map((p) => (p.id === id ? { ...p, active: prev ?? p.active } : p)))
+      toast.error(error?.message ?? 'You don’t have permission to change this page.')
+    }
   }
 
   const bookingPath = (slug: string) => `/calendar/team-book/${ws.team.id}/${slug}`

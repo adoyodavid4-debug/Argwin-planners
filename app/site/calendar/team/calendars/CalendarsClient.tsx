@@ -35,11 +35,16 @@ export default function CalendarsClient({ ws }: { ws: TeamWorkspace }) {
     setForm(null)
   }
 
-  const toggleVisibility = (id: string) => {
+  const toggleVisibility = async (id: string) => {
     const cur = byId(cals, id)
     const next: SharedCalendar['visibility'] = cur?.visibility === 'full' ? 'busy' : 'full'
     setCals((cs) => cs.map((c) => (c.id === id ? { ...c, visibility: next } : c)))
-    if (ws.live) supabase.from('shared_calendars').update({ visibility: next }).eq('id', id).then(({ error }: any) => { if (error) toast.error(error.message) })
+    if (!ws.live) return
+    const { data, error } = await supabase.from('shared_calendars').update({ visibility: next }).eq('id', id).select('id')
+    if (error || !data?.length) {
+      setCals((cs) => cs.map((c) => (c.id === id ? { ...c, visibility: cur?.visibility ?? c.visibility } : c)))
+      toast.error(error?.message ?? 'You don’t have permission to change this calendar.')
+    }
   }
 
   const active = byId(cals, selected)
