@@ -18,7 +18,6 @@ import { fmtDateTime } from './fmt'
 export interface PlusProfile {
   name: string
   email: string
-  phone: string
   timezone: string
   plan: 'plus'
   price: string
@@ -27,7 +26,6 @@ export interface PlusProfile {
 
 export interface BriefingConfig {
   email: boolean
-  sms: boolean
   evening: boolean
   hour: number        // 0–23, morning briefing time
   quiet_start: number // 0–23
@@ -177,17 +175,16 @@ export const PLUS_COLOURS: Record<string, { dot: string; soft: string }> = {
 
 // ── Helpers ───────────────────────────────────────────────────
 export const fmtHour = (h: number) => `${String(h).padStart(2, '0')}:00`
-export const phoneValid = (p: string) => /^\+\d{8,15}$/.test((p || '').replace(/[\s()-]/g, ''))
 export const byId = <T extends { id: string }>(list: T[], id: string) => list.find((x) => x.id === id)
 
 // ── Sample workspace ──────────────────────────────────────────
 export function sampleWorkspace(): PlusWorkspace {
   const profile: PlusProfile = {
-    name: 'Emma Carter', email: 'emma@arwign.com', phone: '+1 202 555 0134',
+    name: 'Emma Carter', email: 'emma@arwign.com',
     timezone: 'America/New_York', plan: 'plus', price: '$19.99', renews_on: '2026-10-05',
   }
 
-  const briefing: BriefingConfig = { email: true, sms: true, evening: true, hour: 7, quiet_start: 21, quiet_end: 7 }
+  const briefing: BriefingConfig = { email: true, evening: true, hour: 7, quiet_start: 21, quiet_end: 7 }
 
   const integrations: Integration[] = [
     { id: 'i1', name: 'Google Calendar', category: 'calendar', status: 'connected', account: 'emma@gmail.com', hue: 8, note: 'Two-way sync' },
@@ -579,12 +576,10 @@ export async function loadPlusWorkspace(supabase: any): Promise<PlusWorkspace> {
       ...base.profile,
       name: (user?.user_metadata?.full_name as string) || (user?.email?.split('@')[0] ?? base.profile.name),
       email: user?.email ?? base.profile.email,
-      phone: settings.phone ?? '',
       timezone: settings.timezone ?? base.profile.timezone,
     }
     const briefing: BriefingConfig = {
       email: settings.briefing_email ?? true,
-      sms: settings.briefing_sms ?? false,
       evening: settings.evening_preview ?? false,
       hour: settings.briefing_hour ?? 7,
       quiet_start: settings.quiet_start ?? 21,

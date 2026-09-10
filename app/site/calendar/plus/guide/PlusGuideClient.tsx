@@ -25,11 +25,9 @@ export default function PlusGuideClient({ ws }: { ws: PlusWorkspace }) {
           <Step>Prefer manual? Use <b>ICS import/export</b> from the calendar toolbar to move calendars in and out.</Step>
         </Guide>
 
-        <Guide icon={BellRing} title="3 · Daily Outlook Briefing (email + SMS)" cta={{ href: '/calendar/settings', label: 'Briefing settings' }}>
-          <Step>Open <b>Settings</b> (or the ✦ panel) → add your <b>phone number</b> in international format (e.g. +1…).</Step>
-          <Step>Toggle <b>Email</b> and <b>SMS</b> briefings, pick the <b>send time</b>, and set an <b>evening preview</b> of tomorrow.</Step>
+        <Guide icon={BellRing} title="3 · Daily Outlook Briefing (email)" cta={{ href: '/calendar/settings', label: 'Briefing settings' }}>
+          <Step>Toggle the <b>Email</b> briefing, pick the <b>send time</b>, and set an <b>evening preview</b> of tomorrow.</Step>
           <Step>Set <b>quiet hours</b> so nothing pings you at the wrong time.</Step>
-          <Step className="opacity-80">SMS sends once an SMS provider is connected by the operator; email + push work out of the box.</Step>
         </Guide>
 
         <Guide icon={Brain} title="4 · AI scheduling" cta={{ href: '/calendar/plus/ai', label: 'AI Scheduling' }}>

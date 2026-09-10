@@ -3,13 +3,13 @@ import { createServiceRoleClient } from '@/lib/supabase/server'
 import { getEmailProvider } from '@/lib/email'
 import { parseRRule, expandOccurrences } from '@/lib/calendar/recurrence'
 import { wallTimeToUtc } from '@/lib/calendar/slots'
-import { composeBriefingHeadline, composeBriefingSms } from '@/lib/calendar/briefing'
-import { sendSms, smsConfigured } from '@/lib/sms'
+import { composeBriefingHeadline } from '@/lib/calendar/briefing'
 
 export const dynamic = 'force-dynamic'
 
-// Vercel Cron. Sends each user their morning briefing (email and/or SMS) once
-// per local day (guarded by last_briefing_on).
+// Vercel Cron. Sends each user their morning briefing by email once per local
+// day (guarded by last_briefing_on). Email is the only briefing channel — SMS
+// briefings were removed 2026-09-09.
 //
 // NOTE: the Vercel Hobby plan only permits DAILY crons, so this is scheduled
 // once at 12:00 UTC (= 07:00 US Eastern / 12:00 UK — a morning-ish batch for the
@@ -24,13 +24,12 @@ async function run(req: NextRequest) {
   const provider = getEmailProvider()
   const nowInstant = new Date()
   let sentEmail = 0
-  let sentSms = 0
 
-  // Anyone with a briefing on for either channel.
+  // Anyone with the email briefing on.
   const { data: settingsRows } = await supabase
     .from('calendar_settings')
     .select('*')
-    .or('briefing_email.eq.true,briefing_sms.eq.true')
+    .eq('briefing_email', true)
 
   for (const st of (settingsRows ?? []) as any[]) {
     const tz = st.timezone || 'America/New_York'
@@ -76,73 +75,25 @@ async function run(req: NextRequest) {
     const { data: u } = await supabase.auth.admin.getUserById(st.user_id)
     const email = u?.user?.email as string | undefined
 
-    const wantEmail = st.briefing_email && !!email
+    if (!email) continue
 
-    // SMS briefings are a Plus feature. The free-tier UI can't enable the flag,
-    // but the column is writable by the user's own client, so enforce the plan
-    // here before paying for a Twilio send.
-    let wantSms = false
-    if (st.briefing_sms && !!st.phone && smsConfigured()) {
-      const { data: prof } = await supabase
-        .from('profiles')
-        .select('calendar_plan, plan_expires_at, role')
-        .eq('id', st.user_id)
-        .single()
-      const planActive = ['plus', 'teams'].includes(prof?.calendar_plan ?? '') &&
-        (!prof?.plan_expires_at || new Date(prof.plan_expires_at) > nowInstant)
-      wantSms = planActive || ['admin', 'super_admin'].includes(prof?.role ?? '')
-    }
-    if (!wantEmail && !wantSms) continue
-
-    let delivered = false
-
-    // ── Email channel ──
-    if (wantEmail) {
-      try {
-        await provider.sendTransactional({
-          to: email!, locale: 'en', templateKey: 'calendar.briefing',
-          data: { headline, date_label: dateLabel, items: items.map((i) => ({ time: i.time, title: i.title, flag: i.flag })) },
-          idempotencyKey: `briefing:${st.user_id}:${localDate}`,
-        })
-        await supabase.from('notification_log').insert({
-          user_id: st.user_id, kind: 'briefing', channel: 'email',
-          idempotency_key: `briefing:${st.user_id}:${localDate}`, status: 'sent', meta: { count: items.length },
-        })
-        delivered = true; sentEmail++
-      } catch (e) { console.error('[briefing] email failed', st.user_id, e) }
-    }
-
-    // ── SMS channel (Twilio) ──
-    if (wantSms) {
-      const smsKey = `briefing-sms:${st.user_id}:${localDate}`
-      // Guard against a duplicate paid send if a prior run crashed after Twilio
-      // accepted the message but before last_briefing_on was written.
-      const { data: already } = await supabase
-        .from('notification_log').select('id').eq('idempotency_key', smsKey).maybeSingle()
-      if (!already) {
-        try {
-          await sendSms({
-            to: st.phone,
-            body: composeBriefingSms(dateLabel, items.map((i) => ({ time: i.time, title: i.title }))),
-          })
-          await supabase.from('notification_log').insert({
-            user_id: st.user_id, kind: 'briefing', channel: 'sms',
-            idempotency_key: smsKey, status: 'sent', meta: { count: items.length },
-          })
-          delivered = true; sentSms++
-        } catch (e) { console.error('[briefing] sms failed', st.user_id, e) }
-      } else {
-        delivered = true
-      }
-    }
-
-    // Mark the day done only once at least one channel delivered, so a transient
-    // failure retries on the next hourly run rather than being silently skipped.
-    if (delivered) {
+    // Mark the day done only once the email delivered, so a transient failure
+    // retries on the next run rather than being silently skipped.
+    try {
+      await provider.sendTransactional({
+        to: email, locale: 'en', templateKey: 'calendar.briefing',
+        data: { headline, date_label: dateLabel, items: items.map((i) => ({ time: i.time, title: i.title, flag: i.flag })) },
+        idempotencyKey: `briefing:${st.user_id}:${localDate}`,
+      })
+      await supabase.from('notification_log').insert({
+        user_id: st.user_id, kind: 'briefing', channel: 'email',
+        idempotency_key: `briefing:${st.user_id}:${localDate}`, status: 'sent', meta: { count: items.length },
+      })
+      sentEmail++
       await supabase.from('calendar_settings').update({ last_briefing_on: localDate }).eq('user_id', st.user_id)
-    }
+    } catch (e) { console.error('[briefing] email failed', st.user_id, e) }
   }
-  return NextResponse.json({ ok: true, email: sentEmail, sms: sentSms })
+  return NextResponse.json({ ok: true, email: sentEmail })
 }
 
 // Vercel Cron invokes GET with an auto-injected Bearer CRON_SECRET header.

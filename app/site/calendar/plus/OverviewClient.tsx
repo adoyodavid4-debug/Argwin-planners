@@ -12,7 +12,7 @@ const SUGGESTION_ICON = { reschedule: BellRing, 'email-event': MessageSquare, 't
 export default function OverviewClient({ ws }: { ws: PlusWorkspace }) {
   const connected = ws.integrations.filter((i) => i.status === 'connected').length
   const focusOn = ws.focusRules.filter((r) => r.on).length
-  const briefingChannels = [ws.briefing.email && 'Email', ws.briefing.sms && 'SMS', ws.briefing.evening && 'Evening'].filter(Boolean)
+  const briefingChannels = [ws.briefing.email && 'Email', ws.briefing.evening && 'Evening'].filter(Boolean)
 
   return (
     <PlusShell workspace={ws} title={`Good morning, ${ws.profile.name.split(' ')[0]}`}

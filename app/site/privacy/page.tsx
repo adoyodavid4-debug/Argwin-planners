@@ -22,7 +22,7 @@ export default function PrivacyPage() {
 
       <LSection title="2. Information we collect">
         <ul>
-          <li><strong>Information you give us</strong> — your name, email address, and (if you opt in to SMS briefings) your phone number; the contents of messages you send us; and account details if you create an account.</li>
+          <li><strong>Information you give us</strong> — your name and email address; the contents of messages you send us; and account details if you create an account.</li>
           <li><strong>Order information</strong> — the products you buy, order totals, and your billing email. <strong>We never see or store your full card number</strong> — payments are processed directly by our payment providers.</li>
           <li><strong>Automatically collected information</strong> — device and browser type, IP address, pages viewed, referring links, and similar usage data collected through cookies and analytics.</li>
         </ul>
@@ -31,13 +31,13 @@ export default function PrivacyPage() {
       <LSection title="3. How we use your information">
         <ul>
           <li>To deliver your purchase — generate your download links and email your receipt and files.</li>
-          <li>To provide the Arwign Calendar features you enable (e.g. the email/SMS Daily Briefing).</li>
+          <li>To provide the Arwign Calendar features you enable (e.g. the email Daily Briefing).</li>
           <li>To process payments, prevent fraud, and keep your account secure.</li>
           <li>To send marketing emails (new releases, tips, discounts) <strong>only where you have opted in</strong> — you can unsubscribe at any time.</li>
           <li>To respond to your enquiries and provide support.</li>
           <li>To understand and improve our site, and to meet legal and tax obligations.</li>
         </ul>
-        <p>Our lawful bases are: performance of a contract (delivering your order), your consent (marketing and SMS), our legitimate interests (securing and improving the service), and legal obligation (tax and accounting).</p>
+        <p>Our lawful bases are: performance of a contract (delivering your order), your consent (marketing), our legitimate interests (securing and improving the service), and legal obligation (tax and accounting).</p>
       </LSection>
 
       <LSection title="4. Cookies & analytics">
@@ -53,7 +53,6 @@ export default function PrivacyPage() {
           <li><strong>Email</strong> — we send transactional and (opt-in) marketing email through our email provider.</li>
           <li><strong>Hosting & database</strong> — our site and data are hosted with Vercel and Supabase.</li>
           <li><strong>Analytics</strong> — Google and Meta, as described above.</li>
-          <li><strong>SMS</strong> — Twilio, if you opt in to SMS briefings.</li>
         </ul>
         <p>We may also disclose information where required by law, or to protect our rights, users, or the public.</p>
       </LSection>

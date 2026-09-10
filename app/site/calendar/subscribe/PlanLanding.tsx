@@ -56,7 +56,7 @@ const CONTENT: Record<Plan, TierContent> = {
     builtOn: 'Everything in Arwign Free',
     heroBenefits: [
       'Unlimited connected calendar accounts, in one conflict-aware view',
-      'SMS Daily Outlook Briefing + an evening preview of tomorrow',
+      'Daily Outlook Briefing + an evening preview of tomorrow',
       'Full AI: time-blocking, smart reschedule, email→event & prep briefs',
       'Personal booking pages + Doodle-style meeting polls',
       'Calendar-health analytics & a weekly review digest',
@@ -102,7 +102,7 @@ const CONTENT: Record<Plan, TierContent> = {
     ],
     briefing: true,
     pains: [
-      { icon: BellRing, pain: 'The calendar is a passive grid — you must open it to know your day.', fix: 'The Daily Outlook Briefing pushes your day to you by email + SMS before you open anything.' },
+      { icon: BellRing, pain: 'The calendar is a passive grid — you must open it to know your day.', fix: 'The Daily Outlook Briefing pushes your day to you by email before you open anything.' },
       { icon: MapPin, pain: 'Reminders are dumb — no travel, no prep, no context.', fix: 'Smart pre-event push with join link, prep note and live “leave now” travel timing.' },
       { icon: RefreshCcw, pain: 'One change cascades and you fix the fallout by hand.', fix: 'One-tap AI reflow proposes the least-disruptive shift for every knock-on conflict.' },
       { icon: ShieldCheck, pain: 'Deep work gets eaten alive by meetings.', fix: 'Focus time that defends itself — protected blocks auto-decline or propose alternates.' },
@@ -129,7 +129,7 @@ const CONTENT: Record<Plan, TierContent> = {
     compareTo: 'Plus',
     compare: [
       { label: 'Connected calendar accounts', from: '1 account', to: 'Unlimited + unified view' },
-      { label: 'Daily Outlook Briefing', from: 'Email + push', to: '+ SMS + evening preview' },
+      { label: 'Daily Outlook Briefing', from: 'Email + push', to: '+ evening preview of tomorrow' },
       { label: 'AI scheduling (time-block, reflow, email→event, prep)', from: '—', to: 'Full AI suite' },
       { label: 'Booking pages & meeting polls', from: '—', to: 'Personal booking + polls' },
       { label: 'Calendar-health analytics', from: '—', to: 'Included + weekly review' },
@@ -358,15 +358,15 @@ export default function PlanLanding({ plan }: { plan: Plan }) {
                 The Daily Outlook Briefing
               </h2>
               <p className="text-lg leading-relaxed mb-6" style={{ color: 'var(--text-secondary)' }}>
-                A proactive, AI-composed summary of your day that reaches you on the channels you already
-                check — <strong>email and SMS on {c.name}</strong> — before you open anything. It removes the
+                A proactive, AI-composed summary of your day that reaches you by
+                <strong> email on {c.name}</strong> before you open anything. It removes the
                 “open the app to find out” step entirely.
               </p>
               <ul className="space-y-3">
                 {[
                   { icon: MessageSquare, t: 'A one-line human headline: “4 meetings, 2h focus protected, leave by 08:40.”' },
                   { icon: Clock, t: 'Your timeline, flags that need action, and leave-by times with live travel.' },
-                  { icon: Mail, t: 'Rich email in the morning, a compressed SMS, an evening preview of tomorrow.' },
+                  { icon: Mail, t: 'Rich email in the morning and an evening preview of tomorrow.' },
                 ].map((row) => (
                   <li key={row.t} className="flex items-start gap-3 text-sm" style={{ color: 'var(--text-secondary)' }}>
                     <row.icon size={18} className="flex-shrink-0 mt-0.5" style={{ color: 'var(--gold)' }} />

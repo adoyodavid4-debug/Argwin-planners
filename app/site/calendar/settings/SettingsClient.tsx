@@ -130,10 +130,6 @@ export default function SettingsClient() {
             <input type="checkbox" checked={s.evening_preview} onChange={(e) => set({ evening_preview: e.target.checked })} className="accent-[#A0830E]" />
             Evening preview of tomorrow
           </label>
-          <label className="flex items-center gap-2 text-sm opacity-70" style={{ color: 'var(--text-secondary)' }}>
-            <input type="checkbox" checked={s.briefing_sms} onChange={(e) => set({ briefing_sms: e.target.checked })} className="accent-[#A0830E]" disabled />
-            SMS briefing <span className="text-xs" style={{ color: 'var(--text-muted)' }}>(connect an SMS provider in Integrations to enable)</span>
-          </label>
         </Section>
 
         <Section title="World clock">
@@ -151,7 +147,7 @@ export default function SettingsClient() {
         </Section>
 
         <div className="mb-16 mt-4">
-          <Link href="/calendar/integrations" className="text-sm font-semibold" style={{ color: 'var(--gold)' }}>Manage integrations (Google, Outlook, AI, SMS) →</Link>
+          <Link href="/calendar/integrations" className="text-sm font-semibold" style={{ color: 'var(--gold)' }}>Manage integrations (Google, Outlook, AI) →</Link>
         </div>
       </div>
     </div>

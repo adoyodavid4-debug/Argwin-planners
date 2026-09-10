@@ -11,7 +11,7 @@ import { fmtDateLong } from '@/lib/calendar/fmt'
 
 const INCLUDED = [
   'Unlimited connected calendar accounts, unified view',
-  'Daily Outlook Briefing — email + SMS + evening preview',
+  'Daily Outlook Briefing — email + evening preview',
   'Full AI: time-blocking, smart reschedule, email→event, prep briefs',
   'Personal booking pages + meeting polls',
   'Calendar-health analytics & weekly review',
@@ -101,7 +101,6 @@ export default function SubscriptionClient({ ws, plan }: { ws: PlusWorkspace; pl
             <dl className="grid gap-3 sm:grid-cols-2 text-sm">
               <Detail label="Name" value={profile.name} />
               <Detail label="Email" value={profile.email} />
-              <Detail label="Phone (SMS)" value={profile.phone || '—'} />
               <Detail label="Time zone" value={profile.timezone.replace('_', ' ')} />
             </dl>
           </SectionCard>

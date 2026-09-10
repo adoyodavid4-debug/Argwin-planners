@@ -16,10 +16,10 @@ const FREE_FEATURES = [
   '⌘K natural-language quick-add',
   '1 connected external calendar account',
   'Standard reminders incl. the 30-min pre-event push',
-  'Email + push Daily Briefing (no SMS)',
+  'Email + push Daily Briefing',
 ]
 const PLUS_FEATURES = [
-  'SMS Daily Outlook Briefing + an evening preview of tomorrow',
+  'Daily Outlook Briefing + an evening preview of tomorrow',
   'Full AI: time-blocking, smart reschedule, email→event & prep briefs',
   'Unlimited connected accounts, in one conflict-aware view',
   'Personal booking pages + Doodle-style meeting polls',

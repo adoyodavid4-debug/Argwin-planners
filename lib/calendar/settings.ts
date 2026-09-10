@@ -20,14 +20,12 @@ export interface CalendarSettings {
   world_clocks: string[]
   reminder_defaults: Reminder[]
   briefing_email: boolean
-  briefing_sms: boolean
   briefing_hour: number
   evening_preview: boolean
   quiet_start: number | null
   quiet_end: number | null
   no_meeting_days: number[]
   focus_protect: boolean
-  phone: string | null
   features: Record<string, boolean>
 }
 
@@ -48,14 +46,12 @@ export function defaultSettings(): CalendarSettings {
     world_clocks: [],
     reminder_defaults: [{ minutes: 30, channel: 'push' }],
     briefing_email: true,
-    briefing_sms: false,
     briefing_hour: 7,
     evening_preview: false,
     quiet_start: null,
     quiet_end: null,
     no_meeting_days: [],
     focus_protect: false,
-    phone: null,
     features: {},
   }
 }

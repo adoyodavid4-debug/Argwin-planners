@@ -86,7 +86,7 @@ const DIFFERENTIATORS = [
   {
     icon: BellRing,
     pain: 'The calendar is a passive grid — you must open it to know your day.',
-    fix: 'The Daily Outlook Briefing pushes your day to you by email + SMS before you open anything.',
+    fix: 'The Daily Outlook Briefing pushes your day to you by email before you open anything.',
   },
   {
     icon: MapPin,
@@ -198,7 +198,7 @@ const TIERS = [
       '⌘K natural-language quick-add',
       '1 connected external calendar account',
       'Standard reminders incl. the 30-min pre-event push',
-      'Email + push Daily Briefing (no SMS)',
+      'Email + push Daily Briefing',
     ],
   },
   {
@@ -212,7 +212,7 @@ const TIERS = [
     features: [
       'Everything in Free, plus:',
       'Unlimited connected accounts + unified view',
-      'SMS Daily Outlook Briefing + evening preview',
+      'Daily Outlook Briefing + evening preview of tomorrow',
       'Full AI: time-blocking, reflow, email→event, prep briefs',
       'Personal booking pages + meeting polls',
       'Calendar-health analytics & weekly review',
@@ -240,7 +240,7 @@ const TIERS = [
 const FAQS = [
   {
     q: 'Is Arwign Calendar available now?',
-    a: 'Yes — the core calendar is live and free: events, recurring series, reminders, day/week/month/agenda/year views, natural-language quick-add, ⌘K, booking pages, meeting polls, a daily email briefing and ICS import/export. Google/Outlook two-way sync and SMS briefings switch on as each provider is connected.',
+    a: 'Yes — the core calendar is live and free: events, recurring series, reminders, day/week/month/agenda/year views, natural-language quick-add, ⌘K, booking pages, meeting polls, a daily email briefing and ICS import/export. Google/Outlook two-way sync switches on as each provider is connected.',
   },
   {
     q: 'Will it sync with my existing calendar?',
@@ -248,7 +248,7 @@ const FAQS = [
   },
   {
     q: 'Will there be a free plan?',
-    a: 'Yes. Arwign Free gives you the full calendar, all views, recurrence, quick-add and one connected account — free forever. Advanced automation, unlimited accounts and SMS briefings live on Plus and Teams.',
+    a: 'Yes. Arwign Free gives you the full calendar, all views, recurrence, quick-add and one connected account — free forever. Advanced automation and unlimited accounts live on Plus and Teams.',
   },
   {
     q: 'Does it work offline?',
@@ -372,15 +372,14 @@ export default function CalendarClient() {
               The Daily Outlook Briefing
             </h2>
             <p className="text-lg leading-relaxed mb-6" style={{ color: 'var(--text-secondary)' }}>
-              A proactive, AI-composed summary of your day that reaches you on the channels you already
-              check — email and SMS — before you open anything. It removes the “open the app to find out”
-              step entirely.
+              A proactive, AI-composed summary of your day that reaches you by email before you open
+              anything. It removes the “open the app to find out” step entirely.
             </p>
             <ul className="space-y-3">
               {[
                 { icon: MessageSquare, t: 'A one-line human headline: “4 meetings, 2h focus protected, leave by 08:40.”' },
                 { icon: Clock, t: 'Your timeline, flags that need action, and leave-by times with live travel.' },
-                { icon: Mail, t: 'Rich email in the morning, a compressed SMS, an evening preview of tomorrow.' },
+                { icon: Mail, t: 'Rich email in the morning and an evening preview of tomorrow.' },
               ].map((row) => (
                 <li key={row.t} className="flex items-start gap-3 text-sm" style={{ color: 'var(--text-secondary)' }}>
                   <row.icon size={18} className="flex-shrink-0 mt-0.5" style={{ color: 'var(--gold)' }} />

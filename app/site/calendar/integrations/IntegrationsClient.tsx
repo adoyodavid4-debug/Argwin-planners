@@ -5,7 +5,7 @@ import { ArrowLeft, Check, Download, Upload, RefreshCw, Loader2, Unplug } from '
 
 interface Row { provider: string; status: string; account_email: string | null }
 interface Props {
-  configured: Record<'google' | 'microsoft' | 'apple' | 'anthropic' | 'sms' | 'push', boolean>
+  configured: Record<'google' | 'microsoft' | 'apple' | 'anthropic' | 'push', boolean>
   rows: Row[]
 }
 
@@ -14,7 +14,6 @@ const PROVIDERS = [
   { key: 'microsoft', name: 'Microsoft 365 / Outlook', blurb: 'Two-way sync via Microsoft Graph.', needs: 'a Microsoft Entra app registration with Calendars scopes.' },
   { key: 'apple', name: 'Apple Calendar', blurb: 'Standards-based interop through ICS import & export.', needs: null },
   { key: 'anthropic', name: 'AI assistance (Claude)', blurb: 'Natural-language prose in briefings, smarter parsing and suggestions.', needs: 'an ANTHROPIC_API_KEY.' },
-  { key: 'sms', name: 'SMS briefings & reminders', blurb: 'Send the Daily Briefing and reminders by text.', needs: 'an Africa’s Talking or Twilio account.' },
   { key: 'push', name: 'Web push', blurb: 'Phone & desktop push notifications for reminders.', needs: 'a VAPID keypair (VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY).' },
 ] as const
 
