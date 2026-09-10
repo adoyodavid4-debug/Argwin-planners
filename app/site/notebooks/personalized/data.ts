@@ -57,14 +57,14 @@ export const FEATURES: Feature[] = [
   { icon: 'ruler',      title: 'A4 Size',               body: 'Print-ready A4 — sized for your device or printer.' },
   { icon: 'type',       title: 'Lora + Poppins',         body: 'Editorial serif headings paired with clean, modern body type.' },
   { icon: 'tablet',     title: 'App Compatible',         body: 'GoodNotes, Notability, Xodo and any PDF annotation app.' },
-  { icon: 'sparkles',   title: 'Made to Order',          body: 'Hand-finished around your brief — never a generic template.' },
+  { icon: 'sparkles',   title: 'Made to Order',          body: 'Designed around your brief — never a generic template.' },
 ]
 
 export interface Step { title: string; body: string }
 export const STEPS: Step[] = [
   { title: 'Choose',      body: 'Pick your colourway, size, motif and templates above.' },
   { title: 'Personalise', body: 'Add your name or initials and any notes for our designers.' },
-  { title: 'We build it', body: 'We hand-craft your notebook around your brief.' },
+  { title: 'We build it', body: 'We design your notebook around your brief.' },
   { title: 'Delivered',   body: 'Your finished files arrive by email, ready to import.' },
 ]
 export const TURNAROUND = '3–5 working days'

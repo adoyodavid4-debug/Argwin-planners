@@ -97,7 +97,7 @@ export default function PersonalizedClient() {
                 Your notebook,<br /><span style={{ color: 'var(--gold)' }}>designed around you.</span>
               </motion.h1>
               <motion.p {...reveal(0.1)} className="leading-relaxed max-w-md mb-7" style={{ color: 'var(--text-secondary)', fontSize: '1.05rem' }}>
-                Choose a colourway, size and motif — we hand-build a hyperlinked notebook to match, delivered in {TURNAROUND}.
+                Choose a colourway, size and motif — we design a hyperlinked notebook to match, delivered in {TURNAROUND}.
               </motion.p>
 
               {/* Trust strip */}

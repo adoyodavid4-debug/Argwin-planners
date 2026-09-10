@@ -247,7 +247,7 @@ export default function LoginClient() {
                 <Shield size={12} style={{ color: 'var(--gold)' }} /> Secure sign in
               </span>
               <span className="inline-flex items-center gap-1.5 text-[11px]" style={{ color: 'var(--text-muted)' }}>
-                <Star size={12} style={{ fill: 'var(--gold)', stroke: 'var(--gold)' }} /> Hand-crafted planners
+                <Star size={12} style={{ fill: 'var(--gold)', stroke: 'var(--gold)' }} /> Designed planners
               </span>
               <span className="inline-flex items-center gap-1.5 text-[11px]" style={{ color: 'var(--text-muted)' }}>
                 <Sparkles size={12} style={{ color: 'var(--gold)' }} /> Instant downloads

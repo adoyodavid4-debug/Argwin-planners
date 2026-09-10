@@ -1222,7 +1222,7 @@ function Spotlight({ category, products, meta, accent }: { category: Category; p
             {meta.description} Every design is crafted in-house, tested by real planners, and delivered the second you check out.
           </p>
           <div className="flex flex-wrap gap-2 mb-8">
-            {['Hand-crafted layouts', 'Instant delivery', 'Lifetime access', 'Loved worldwide'].map((c) => (
+            {['Designed layouts', 'Instant delivery', 'Lifetime access', 'Loved worldwide'].map((c) => (
               <span key={c} className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border"
                 style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)', background: 'var(--bg-primary)' }}>
                 <Check size={11} style={{ color: 'var(--gold)' }} /> {c}

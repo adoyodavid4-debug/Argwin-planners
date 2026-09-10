@@ -13,14 +13,14 @@ const BRAND_GREEN = '#2E4A38' // forest-green brand mark
 // ── Data ──────────────────────────────────────────────────────
 const STATS = [
   { icon: Download, value: '50+',  label: 'Planner designs' },
-  { icon: Star,     value: '200+', label: 'Hand-crafted templates' },
+  { icon: Star,     value: '200+', label: 'Designed templates' },
   { icon: Users,    value: '9',    label: 'Collections' },
   { icon: Globe,    value: '2022', label: 'Crafting since' },
 ]
 
 const VALUES = [
   { icon: Heart,   title: 'Warm & inclusive design', body: 'Calm, non-clinical layouts made for real, busy, wonderfully imperfect lives.' },
-  { icon: PenTool, title: 'Thoughtful craftsmanship', body: 'Every margin, tab and typeface is hand-considered and tested before release.' },
+  { icon: PenTool, title: 'Thoughtful design', body: 'Every margin, tab and typeface is carefully designed and tested before release.' },
   { icon: Tablet,  title: 'Works in your apps',        body: 'GoodNotes, Notability, Xodo or print — your planner goes wherever you do.' },
   { icon: Check,   title: 'Made to actually be used',  body: 'Beautiful, yes — but built for the desk, the iPad, and the everyday moment.' },
 ]
@@ -172,7 +172,7 @@ export default function AboutClient() {
           <motion.div {...reveal(0.05)}>
             <div className="divider-gold mb-6" />
             <h2 className="font-display text-4xl mb-4" style={{ color: 'var(--text-primary)', lineHeight: 1.1 }}>The care in every <em style={{ color: 'var(--gold)' }}>page.</em></h2>
-            <p className="text-sm leading-relaxed mb-8 max-w-md" style={{ color: 'var(--text-secondary)' }}>Nothing here is a template dropped into a shop. Every layout is hand-considered and tested across devices and print before it reaches you.</p>
+            <p className="text-sm leading-relaxed mb-8 max-w-md" style={{ color: 'var(--text-secondary)' }}>Nothing here is a template dropped into a shop. Every layout is carefully designed and tested across devices and print before it reaches you.</p>
             <div className="grid sm:grid-cols-2 gap-x-6 gap-y-5">
               {CRAFT.map(({ icon: Icon, title, body }) => (
                 <div key={title} className="flex items-start gap-3">

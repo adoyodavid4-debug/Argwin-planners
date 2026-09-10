@@ -292,7 +292,7 @@ export default function CategoriesClient({ categories, counts, totalProducts }: 
           {[
             { icon: Zap,    title: 'Instant Delivery',  body: 'Files land in your inbox the moment you check out.' },
             { icon: Layers, title: 'Every Format',      body: 'PDF, GoodNotes, Notability & print-ready sizes.' },
-            { icon: Star,   title: 'Hand-Crafted',      body: 'Every margin, tab and typeface considered before release.' },
+            { icon: Star,   title: 'Thoughtfully Designed', body: 'Every margin, tab and typeface considered before release.' },
             { icon: Shield, title: 'Secure & Trusted',  body: 'Encrypted checkout with global payment options.' },
           ].map(({ icon: Icon, title, body }) => (
             <div key={title} className="flex flex-col gap-2">
