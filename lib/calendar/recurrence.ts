@@ -37,7 +37,10 @@ export function parseRRule(str: string | null | undefined): RRule | null {
   if (parts.COUNT) rule.count = Math.max(1, parseInt(parts.COUNT, 10))
   if (parts.UNTIL) {
     const u = parseICSDate(parts.UNTIL)
-    if (u) rule.until = u
+    // A date-only UNTIL (YYYYMMDD, no time) is inclusive of that whole day per
+    // RFC 5545 §3.3.10. Without this, a same-day timed occurrence (e.g. 09:00 on
+    // the UNTIL date) is wrongly dropped because it sorts after 00:00Z.
+    if (u) rule.until = /^\d{8}$/.test(parts.UNTIL.trim()) ? new Date(u.getTime() + 86_399_999) : u
   }
   if (parts.BYDAY) {
     rule.byday = parts.BYDAY.split(',')
@@ -57,11 +60,54 @@ export function buildRRule(rule: RRule): string {
 }
 
 // ── Expansion ─────────────────────────────────────────────────
-const HARD_CAP = 1000 // safety valve against runaway rules
+// Cap on occurrences considered *from the fast-forwarded start point* — i.e.
+// within/around the requested window, not from the master's creation date. A
+// window is at most a year, so this is a generous safety valve, not a horizon.
+const HARD_CAP = 1000
+const DAY_MS = 86_400_000
+
+// The k-th occurrence, computed ABSOLUTELY from masterStart (not by stepping
+// from the previous value). This is what keeps MONTHLY on the 29th–31st from
+// drifting: addMonths(Jan 31, 2) is Mar 31, whereas stepping Jan→Feb(28)→Mar
+// would clamp to Feb 28 and then never recover to the 31st.
+function occurrenceAt(masterStart: Date, freq: Freq, steps: number): Date {
+  switch (freq) {
+    case 'DAILY':   return addDays(masterStart, steps)
+    case 'WEEKLY':  return addWeeks(masterStart, steps)
+    case 'MONTHLY': return addMonths(masterStart, steps)
+    case 'YEARLY':  return addYears(masterStart, steps)
+    default:        return new Date(masterStart)
+  }
+}
+
+// A safe lower-bound occurrence index whose start is at or just before
+// windowStart, so we can jump to the window instead of iterating every
+// occurrence since the master's creation (which made long-lived daily events
+// silently vanish once they passed ~HARD_CAP occurrences from creation).
+function fastForwardIndex(masterStart: Date, rule: RRule, windowStart: Date): number {
+  if (windowStart <= masterStart) return 0
+  const ms = windowStart.getTime() - masterStart.getTime()
+  let est = 0
+  switch (rule.freq) {
+    case 'DAILY':   est = Math.floor(ms / (DAY_MS * rule.interval)); break
+    case 'WEEKLY':  est = Math.floor(ms / (7 * DAY_MS * rule.interval)); break
+    case 'YEARLY':  est = Math.floor((windowStart.getUTCFullYear() - masterStart.getUTCFullYear()) / rule.interval); break
+    case 'MONTHLY': {
+      const months = (windowStart.getUTCFullYear() - masterStart.getUTCFullYear()) * 12
+        + (windowStart.getUTCMonth() - masterStart.getUTCMonth())
+      est = Math.floor(months / rule.interval)
+      break
+    }
+  }
+  return Math.max(0, est - 1) // -1 margin so a boundary occurrence is never skipped
+}
 
 /**
  * Occurrence START instants for a recurring master event that fall within
  * [windowStart, windowEnd). `exdates` (original occurrence starts) are skipped.
+ * NOTE: stepping is in UTC; for DST zones weekly/monthly occurrences can shift
+ * by the DST offset relative to the master's wall-clock time (documented
+ * limitation — callers render in the event's zone).
  */
 export function expandOccurrences(
   masterStart: Date,
@@ -79,45 +125,48 @@ export function expandOccurrences(
   }
 
   if (rule.freq === 'WEEKLY' && rule.byday?.length) {
-    const dayNums = rule.byday.map((d) => WEEKDAYS.indexOf(d)) // 0=SU..6=SA
-    // Start from the Sunday of the master's week, step by INTERVAL weeks.
-    let weekStart = addDays(masterStart, -masterStart.getUTCDay())
-    weekStart = new Date(Date.UTC(
-      weekStart.getUTCFullYear(), weekStart.getUTCMonth(), weekStart.getUTCDate(),
+    const dayNums = rule.byday.map((d) => WEEKDAYS.indexOf(d)).sort((a, b) => a - b) // 0=SU..6=SA
+    // Sunday of the master's week, at the master's time-of-day.
+    const sunday = addDays(masterStart, -masterStart.getUTCDay())
+    const masterSunday = new Date(Date.UTC(
+      sunday.getUTCFullYear(), sunday.getUTCMonth(), sunday.getUTCDate(),
       masterStart.getUTCHours(), masterStart.getUTCMinutes(), masterStart.getUTCSeconds(),
     ))
-    let count = 0
-    while (count < HARD_CAP) {
-      for (const dn of dayNums.slice().sort((a, b) => a - b)) {
+    // Fast-forward to the window (only when unbounded by COUNT — a COUNT rule
+    // must be counted from the first occurrence, and is inherently bounded).
+    let weekStart = masterSunday
+    if (!rule.count && windowStart > masterSunday) {
+      const weeks = Math.floor((windowStart.getTime() - masterSunday.getTime()) / (7 * DAY_MS))
+      const aligned = Math.max(0, Math.floor(weeks / rule.interval) - 1) * rule.interval
+      weekStart = addWeeks(masterSunday, aligned)
+    }
+    let seen = 0
+    while (seen < HARD_CAP) {
+      for (const dn of dayNums) {
         const occ = addDays(weekStart, dn)
         if (occ < masterStart) continue
         if (rule.until && occ > rule.until) return out
         push(occ)
-        count++
-        if (rule.count && count >= rule.count) return out
-        if (occ >= windowEnd) { /* keep going only if before window end */ }
+        seen++
+        if (rule.count && seen >= rule.count) return out
+        if (seen >= HARD_CAP) return out
       }
       weekStart = addWeeks(weekStart, rule.interval)
-      if (weekStart > windowEnd && (!rule.count)) break
-      if (count >= HARD_CAP) break
+      if (weekStart > windowEnd && !rule.count) break
     }
     return out
   }
 
-  let cur = new Date(masterStart)
-  let i = 0
-  while (i < HARD_CAP) {
+  // DAILY / WEEKLY (no byday) / MONTHLY / YEARLY.
+  // COUNT rules index from 0 (so the limit is exact); otherwise fast-forward to
+  // the window. `k` stays the absolute occurrence index either way.
+  let k = rule.count ? 0 : fastForwardIndex(masterStart, rule, windowStart)
+  for (let seen = 0; seen < HARD_CAP; k++, seen++) {
+    if (rule.count && k >= rule.count) break
+    const cur = occurrenceAt(masterStart, rule.freq, rule.interval * k)
     if (rule.until && cur > rule.until) break
-    push(cur)
-    i++
-    if (rule.count && i >= rule.count) break
-    if (cur > windowEnd && !rule.count && !rule.until) break
-    switch (rule.freq) {
-      case 'DAILY':   cur = addDays(cur, rule.interval); break
-      case 'WEEKLY':  cur = addWeeks(cur, rule.interval); break
-      case 'MONTHLY': cur = addMonths(cur, rule.interval); break
-      case 'YEARLY':  cur = addYears(cur, rule.interval); break
-    }
+    if (cur >= windowEnd) break
+    if (cur >= masterStart) push(cur)
   }
   return out
 }
