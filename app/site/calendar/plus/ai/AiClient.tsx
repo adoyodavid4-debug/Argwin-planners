@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
-import { BellRing, MessageSquare, Clock, Brain, ShieldCheck, Check, X, Sparkles, Loader2, ArrowUpRight } from 'lucide-react'
+import { BellRing, MessageSquare, Clock, Brain, ShieldCheck, Moon, Check, X, Sparkles, Loader2, ArrowUpRight } from 'lucide-react'
 import PlusShell, { StatCard, SectionCard } from '../PlusShell'
 import { type PlusWorkspace, type AiSuggestion, type SuggestionType } from '@/lib/calendar/plus'
 
@@ -12,6 +12,7 @@ const META: Record<SuggestionType, { icon: typeof Brain; label: string }> = {
   'time-block':  { icon: Clock, label: 'Time-blocking' },
   prep:          { icon: Brain, label: 'Prep brief' },
   rescue:        { icon: ShieldCheck, label: 'Rescue mode' },
+  boundary:      { icon: Moon, label: 'Boundary rules' },
 }
 
 export default function AiClient({ ws }: { ws: PlusWorkspace }) {

@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import {
   ArrowLeft, Sparkles, LayoutGrid, BellRing, Brain, ShieldCheck, PlugZap,
-  Link2, Wand2, BarChart3, CreditCard, Menu, X, Info, Loader2, BookOpen, CalendarHeart,
+  Link2, Wand2, BarChart3, CreditCard, Menu, X, Info, Loader2, BookOpen, CalendarHeart, LayoutTemplate,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { saveSettings } from '@/lib/calendar/settings'
@@ -19,6 +19,7 @@ const NAV: { href: string; label: string; icon: typeof LayoutGrid; exact?: boole
   { href: '/calendar/plus/integrations', label: 'Integrations', icon: PlugZap },
   { href: '/calendar/plus/booking', label: 'Booking & polls', icon: Link2 },
   { href: '/calendar/plus/moments', label: 'Moments & Memories', icon: CalendarHeart },
+  { href: '/calendar/plus/templates', label: 'Event Templates', icon: LayoutTemplate },
   { href: '/calendar/plus/automation', label: 'Automation & rules', icon: Wand2 },
   { href: '/calendar/plus/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/calendar/plus/subscription', label: 'Subscription', icon: CreditCard },

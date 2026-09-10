@@ -4,7 +4,7 @@ import { ShieldCheck, Moon, Route, Plus, X, Check } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { saveSettings } from '@/lib/calendar/settings'
 import PlusShell, { StatCard, SectionCard, Switch } from '../PlusShell'
-import { type PlusWorkspace, type FocusRule, type RuleKind, focusKey, customFocusRulesKey } from '@/lib/calendar/plus'
+import { type PlusWorkspace, type FocusRule, type RuleKind, type Boundaries, focusKey, customFocusRulesKey, fmtHour } from '@/lib/calendar/plus'
 
 const KIND: Record<RuleKind, { icon: typeof ShieldCheck; label: string }> = {
   focus:    { icon: ShieldCheck, label: 'Focus protection' },
@@ -13,12 +13,26 @@ const KIND: Record<RuleKind, { icon: typeof ShieldCheck; label: string }> = {
 }
 
 const blankForm = { label: '', detail: '', kind: 'focus' as RuleKind }
+const WD: { iso: number; label: string }[] = [
+  { iso: 1, label: 'Mon' }, { iso: 2, label: 'Tue' }, { iso: 3, label: 'Wed' }, { iso: 4, label: 'Thu' },
+  { iso: 5, label: 'Fri' }, { iso: 6, label: 'Sat' }, { iso: 7, label: 'Sun' },
+]
 
 export default function FocusClient({ ws }: { ws: PlusWorkspace }) {
   const supabase = useMemo(() => createClient() as any, [])
   const [rules, setRules] = useState<FocusRule[]>(ws.focusRules)
   const [features, setFeatures] = useState<Record<string, any>>(ws.featuresRaw)
   const [form, setForm] = useState<typeof blankForm | null>(null)
+  const [bnd, setBnd] = useState<Boundaries>(ws.boundaries)
+  const saveBnd = (patch: Partial<Boundaries>) => {
+    const next = { ...bnd, ...patch }
+    setBnd(next)
+    if (ws.live) saveSettings(supabase, {
+      no_meeting_days: next.noMeetingDays,
+      protect_after_hour: next.protectAfterHour,
+      protect_before_hour: next.protectBeforeHour,
+    })
+  }
   const toggle = (id: string) => {
     const on = !(rules.find((r) => r.id === id)?.on)
     setRules((rs) => rs.map((r) => (r.id === id ? { ...r, on } : r)))
@@ -60,6 +74,46 @@ export default function FocusClient({ ws }: { ws: PlusWorkspace }) {
         <StatCard label="Focus ratio" value={`${ws.analytics.focus_ratio}%`} hint="focus vs meetings" />
         <StatCard label="After-hours" value={`${ws.analytics.after_hours}h`} hint="this week" />
         <StatCard label="Reclaimed" value={`${ws.analytics.reclaimed_hours}h`} hint="by these rules" />
+      </div>
+
+      <div className="mb-6">
+        <SectionCard title="Boundary enforcement">
+          <p className="mb-4 text-xs" style={{ color: 'var(--text-secondary)' }}>
+            Meetings that land on a no-meeting day or inside a protected window are flagged in <strong style={{ color: 'var(--text-secondary)' }}>AI Scheduling</strong> — with a one-tap move to the nearest allowed slot.
+          </p>
+          <div className="space-y-4">
+            <div>
+              <label className="mb-2 block text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>No-meeting days</label>
+              <div className="flex flex-wrap gap-1.5">
+                {WD.map(({ iso, label }) => {
+                  const active = bnd.noMeetingDays.includes(iso)
+                  return (
+                    <button key={iso} type="button"
+                      onClick={() => saveBnd({ noMeetingDays: active ? bnd.noMeetingDays.filter((d) => d !== iso) : [...bnd.noMeetingDays, iso].sort((a, b) => a - b) })}
+                      className="rounded-lg border px-3 py-1.5 text-xs font-medium transition-all"
+                      style={{ borderColor: active ? 'var(--gold)' : 'var(--border)', background: active ? 'rgba(var(--gold-rgb),0.12)' : 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                      {label}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Protect evenings after">
+                <select value={bnd.protectAfterHour ?? ''} onChange={(e) => saveBnd({ protectAfterHour: e.target.value === '' ? null : Number(e.target.value) })} className={inp} style={inpStyle}>
+                  <option value="">Off</option>
+                  {[17, 18, 19, 20, 21, 22].map((h) => <option key={h} value={h}>{fmtHour(h)}</option>)}
+                </select>
+              </Field>
+              <Field label="Protect mornings before">
+                <select value={bnd.protectBeforeHour ?? ''} onChange={(e) => saveBnd({ protectBeforeHour: e.target.value === '' ? null : Number(e.target.value) })} className={inp} style={inpStyle}>
+                  <option value="">Off</option>
+                  {[6, 7, 8, 9, 10].map((h) => <option key={h} value={h}>{fmtHour(h)}</option>)}
+                </select>
+              </Field>
+            </div>
+          </div>
+        </SectionCard>
       </div>
 
       <div className="space-y-6">

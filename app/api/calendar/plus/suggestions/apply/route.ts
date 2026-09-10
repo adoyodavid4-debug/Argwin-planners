@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { fmtDateTime } from '@/lib/calendar/fmt'
 import {
-  expandRange, earliestFreeAfter, CAL_EVENT_COLUMNS,
-  type SuggestionAction, type CalEventRow,
+  expandRange, earliestFreeAfter, violatesBoundary, CAL_EVENT_COLUMNS,
+  type SuggestionAction, type CalEventRow, type Boundaries,
 } from '@/lib/calendar/plus'
 
 export const dynamic = 'force-dynamic'
@@ -95,6 +95,111 @@ export async function POST(req: NextRequest) {
         if (ins.error) throw ins.error
       }
       return NextResponse.json({ ok: true, message: `Moved to ${fmtDateTime(slot.start.toISOString(), ev.start_tz)}` })
+    }
+
+    if (action.kind === 'shorten') {
+      const { data: ev } = await supabase.from('calendar_events')
+        .select('id, title, start_at, end_at, start_tz, colour, tags, exdates, rrule')
+        .eq('id', action.eventId).maybeSingle()
+      if (!ev) return NextResponse.json({ error: 'That event no longer exists.' }, { status: 404 })
+      const occStart = new Date(action.occurrenceISO)
+      const newDurMs = Math.max(5, Math.min(1440, action.newDurationMin)) * 60000
+      const curDurMs = new Date(ev.end_at).getTime() - new Date(ev.start_at).getTime()
+      if (Number.isNaN(occStart.getTime())) return NextResponse.json({ error: 'Invalid event.' }, { status: 400 })
+      if (newDurMs >= curDurMs) return NextResponse.json({ ok: true, message: 'That meeting is already that short.' })
+
+      if (!action.recurring) {
+        const start = new Date(ev.start_at)
+        const { error } = await supabase.from('calendar_events')
+          .update({ end_at: new Date(start.getTime() + newDurMs).toISOString() }).eq('id', ev.id)
+        if (error) throw error
+      } else {
+        const exdates = [...((ev.exdates as string[] | null) ?? []), occStart.toISOString()]
+        const up = await supabase.from('calendar_events').update({ exdates }).eq('id', ev.id)
+        if (up.error) throw up.error
+        const ins = await supabase.from('calendar_events').insert({
+          user_id: user.id, title: ev.title,
+          start_at: occStart.toISOString(), end_at: new Date(occStart.getTime() + newDurMs).toISOString(),
+          start_tz: ev.start_tz, colour: ev.colour, tags: ev.tags ?? [],
+          rrule: null, recurrence_parent_id: ev.id, recurrence_date: occStart.toISOString(),
+        })
+        if (ins.error) throw ins.error
+      }
+      return NextResponse.json({ ok: true, message: `Shortened to ${action.newDurationMin} min` })
+    }
+
+    if (action.kind === 'decline') {
+      const { data: ev } = await supabase.from('calendar_events')
+        .select('id, exdates').eq('id', action.eventId).maybeSingle()
+      if (!ev) return NextResponse.json({ error: 'That event no longer exists.' }, { status: 404 })
+      if (action.recurring) {
+        const occStart = new Date(action.occurrenceISO)
+        if (Number.isNaN(occStart.getTime())) return NextResponse.json({ error: 'Invalid occurrence.' }, { status: 400 })
+        const exdates = [...((ev.exdates as string[] | null) ?? []), occStart.toISOString()]
+        const { error } = await supabase.from('calendar_events').update({ exdates }).eq('id', ev.id)
+        if (error) throw error
+      } else {
+        // Reversible: mark cancelled (excluded from busy/analytics) rather than delete.
+        const { error } = await supabase.from('calendar_events').update({ status: 'cancelled' }).eq('id', ev.id)
+        if (error) throw error
+      }
+      return NextResponse.json({ ok: true, message: 'Declined — freed on your calendar.' })
+    }
+
+    if (action.kind === 'boundary-move') {
+      const { data: ev } = await supabase.from('calendar_events')
+        .select('id, title, start_at, end_at, start_tz, colour, tags, exdates, rrule')
+        .eq('id', action.eventId).maybeSingle()
+      if (!ev) return NextResponse.json({ error: 'That event no longer exists.' }, { status: 404 })
+      const occStart = new Date(action.occurrenceISO)
+      const durMs = new Date(ev.end_at).getTime() - new Date(ev.start_at).getTime()
+      if (durMs <= 0 || Number.isNaN(occStart.getTime())) return NextResponse.json({ error: 'Invalid event.' }, { status: 400 })
+      const tz = ev.start_tz || 'America/New_York'
+
+      const { data: s } = await supabase.from('calendar_settings')
+        .select('no_meeting_days, protect_after_hour, protect_before_hour').maybeSingle()
+      const boundaries: Boundaries = {
+        noMeetingDays: Array.isArray(s?.no_meeting_days) ? s!.no_meeting_days.map(Number) : [],
+        protectAfterHour: s?.protect_after_hour ?? null,
+        protectBeforeHour: s?.protect_before_hour ?? null,
+      }
+      if (!violatesBoundary(occStart, tz, boundaries)) {
+        return NextResponse.json({ ok: true, message: 'That meeting is already inside your boundaries.' })
+      }
+
+      const horizon = new Date(occStart.getTime() + 14 * DAY_MS)
+      const busy = (await loadBusy(new Date(Date.now() - DAY_MS), horizon))
+        .filter((b) => !(b.eventId === ev.id && b.start.getTime() === occStart.getTime()))
+      const busyIv = busy.map((b) => ({ start: b.start, end: b.end }))
+
+      let from = new Date(Date.now())
+      let slot = earliestFreeAfter(busyIv, from, durMs, horizon)
+      let guard = 0
+      while (slot && violatesBoundary(slot.start, tz, boundaries) && guard++ < 700) {
+        from = new Date(slot.start.getTime() + 15 * 60000)
+        slot = earliestFreeAfter(busyIv, from, durMs, horizon)
+      }
+      if (!slot || violatesBoundary(slot.start, tz, boundaries)) {
+        return NextResponse.json({ error: 'No free slot inside your boundaries in the next 14 days.' }, { status: 409 })
+      }
+
+      if (!action.recurring) {
+        const { error } = await supabase.from('calendar_events')
+          .update({ start_at: slot.start.toISOString(), end_at: slot.end.toISOString() }).eq('id', ev.id)
+        if (error) throw error
+      } else {
+        const exdates = [...((ev.exdates as string[] | null) ?? []), occStart.toISOString()]
+        const up = await supabase.from('calendar_events').update({ exdates }).eq('id', ev.id)
+        if (up.error) throw up.error
+        const ins = await supabase.from('calendar_events').insert({
+          user_id: user.id, title: ev.title,
+          start_at: slot.start.toISOString(), end_at: slot.end.toISOString(),
+          start_tz: ev.start_tz, colour: ev.colour, tags: ev.tags ?? [],
+          rrule: null, recurrence_parent_id: ev.id, recurrence_date: occStart.toISOString(),
+        })
+        if (ins.error) throw ins.error
+      }
+      return NextResponse.json({ ok: true, message: `Moved to ${fmtDateTime(slot.start.toISOString(), tz)}` })
     }
 
     return NextResponse.json({ error: 'Unknown action.' }, { status: 400 })

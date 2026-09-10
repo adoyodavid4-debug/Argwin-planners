@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import {
   ArrowLeft, Users, LayoutGrid, CalendarDays, DoorOpen, Globe2, Link2,
-  ShieldCheck, BarChart3, Settings as SettingsIcon, Menu, X, Info, Building2, Loader2, BookOpen, CalendarHeart,
+  ShieldCheck, BarChart3, Settings as SettingsIcon, Menu, X, Info, Building2, Loader2, BookOpen, CalendarHeart, LayoutTemplate,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { ROLES, provisionTeam, byId, type TeamWorkspace, type Role } from '@/lib/calendar/team'
@@ -18,6 +18,7 @@ const NAV: { href: string; label: string; icon: typeof Users; exact?: boolean }[
   { href: '/calendar/team/availability', label: 'Availability finder', icon: Globe2 },
   { href: '/calendar/team/booking', label: 'Booking pages', icon: Link2 },
   { href: '/calendar/team/moments', label: 'Moments & Memories', icon: CalendarHeart },
+  { href: '/calendar/team/templates', label: 'Event Templates', icon: LayoutTemplate },
   { href: '/calendar/team/audit', label: 'Delegation & audit', icon: ShieldCheck },
   { href: '/calendar/team/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/calendar/team/settings', label: 'Admin console', icon: SettingsIcon },

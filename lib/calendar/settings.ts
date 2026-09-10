@@ -2,6 +2,8 @@
 // Mirrors the calendar_settings table (migration 016). Loading upserts a default
 // row on first use so the rest of the app can assume settings always exist.
 
+import { DEFAULT_TZ } from './fmt'
+
 export type Theme = 'light' | 'dark' | 'warm' | 'system'
 export type Density = 'comfortable' | 'compact'
 export type CalView = 'day' | 'week' | 'month' | 'agenda' | 'year'
@@ -25,7 +27,10 @@ export interface CalendarSettings {
   quiet_start: number | null
   quiet_end: number | null
   no_meeting_days: number[]
+  protect_after_hour: number | null
+  protect_before_hour: number | null
   focus_protect: boolean
+  last_evening_on: string | null
   features: Record<string, boolean>
 }
 
@@ -35,9 +40,11 @@ export const DEFAULT_WORKING_HOURS: WorkingHours = {
 }
 
 export function defaultSettings(): CalendarSettings {
-  const tz = typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'America/New_York'
   return {
-    timezone: tz || 'America/New_York',
+    // US/UK market default — NOT the browser's detected zone, which would persist
+    // whatever the visitor/dev machine reports (e.g. Africa/Nairobi). Users change
+    // it explicitly in Settings.
+    timezone: DEFAULT_TZ,
     week_start: 1,
     working_hours: DEFAULT_WORKING_HOURS,
     theme: 'warm',
@@ -51,7 +58,10 @@ export function defaultSettings(): CalendarSettings {
     quiet_start: null,
     quiet_end: null,
     no_meeting_days: [],
+    protect_after_hour: null,
+    protect_before_hour: null,
     focus_protect: false,
+    last_evening_on: null,
     features: {},
   }
 }

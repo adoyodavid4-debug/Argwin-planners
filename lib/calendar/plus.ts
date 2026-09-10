@@ -43,7 +43,7 @@ export interface Integration {
   note: string
 }
 
-export type SuggestionType = 'reschedule' | 'email-event' | 'time-block' | 'prep' | 'rescue'
+export type SuggestionType = 'reschedule' | 'email-event' | 'time-block' | 'prep' | 'rescue' | 'boundary'
 
 // A concrete, enactable change attached to an actionable suggestion. Advisory
 // suggestions (rescue, back-to-back) omit it and stay informational. Applied by
@@ -52,6 +52,11 @@ export type SuggestionType = 'reschedule' | 'email-event' | 'time-block' | 'prep
 export type SuggestionAction =
   | { kind: 'reschedule'; eventId: string; recurring: boolean; occurrenceISO: string }
   | { kind: 'prep'; startISO: string; endISO: string; title: string }
+  // Rescue mode — reclaim an overbooked week.
+  | { kind: 'shorten'; eventId: string; recurring: boolean; occurrenceISO: string; newDurationMin: number }
+  | { kind: 'decline'; eventId: string; recurring: boolean; occurrenceISO: string }
+  // Boundary enforcement — move a meeting out of a protected window.
+  | { kind: 'boundary-move'; eventId: string; recurring: boolean; occurrenceISO: string }
 
 export interface AiSuggestion {
   id: string
@@ -60,6 +65,13 @@ export interface AiSuggestion {
   detail: string
   when?: string
   action?: SuggestionAction
+}
+
+// Protected windows the user configures in Focus & boundaries. ISO weekdays 1–7.
+export interface Boundaries {
+  noMeetingDays: number[]
+  protectAfterHour: number | null  // evenings: meetings starting at/after this hour violate
+  protectBeforeHour: number | null // mornings: meetings starting before this hour violate
 }
 
 export type RuleKind = 'focus' | 'boundary' | 'buffer'
@@ -119,6 +131,7 @@ export interface PlusWorkspace {
   bookingPages: PersonalBookingPage[]
   polls: Poll[]
   analytics: PlusAnalytics
+  boundaries: Boundaries
 }
 
 // Namespaced keys under calendar_settings.features that persist Plus state.
@@ -176,6 +189,10 @@ export const PLUS_COLOURS: Record<string, { dot: string; soft: string }> = {
 // ── Helpers ───────────────────────────────────────────────────
 export const fmtHour = (h: number) => `${String(h).padStart(2, '0')}:00`
 export const byId = <T extends { id: string }>(list: T[], id: string) => list.find((x) => x.id === id)
+// ISO weekday (1=Mon…7=Sun) → label.
+export const WEEKDAY_LABEL: Record<number, string> = {
+  1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday', 7: 'Sunday',
+}
 
 // ── Sample workspace ──────────────────────────────────────────
 export function sampleWorkspace(): PlusWorkspace {
@@ -251,7 +268,7 @@ export function sampleWorkspace(): PlusWorkspace {
     ],
   }
 
-  return { live: false, featuresRaw: {}, profile, briefing, integrations, suggestions, focusRules, automationRules, bookingPages, polls, analytics }
+  return { live: false, featuresRaw: {}, profile, briefing, integrations, suggestions, focusRules, automationRules, bookingPages, polls, analytics, boundaries: { noMeetingDays: [], protectAfterHour: null, protectBeforeHour: null } }
 }
 
 // ── Real-data hydration helpers ───────────────────────────────
@@ -268,6 +285,7 @@ export interface CalEventRow {
   rrule?: string | null; exdates?: string[] | null
   recurrence_parent_id?: string | null
   tags?: string[] | null; event_type?: string | null; colour?: string | null
+  status?: string | null
 }
 export interface Occurrence {
   start: Date; end: Date; title: string; description: string; focus: boolean
@@ -277,7 +295,7 @@ export interface Occurrence {
 // Columns loadCalendarInsights + the apply route both select. Shared so the two
 // expansion callers stay in lockstep.
 export const CAL_EVENT_COLUMNS =
-  'id, title, description, start_at, end_at, all_day, rrule, exdates, recurrence_parent_id, tags, event_type, colour'
+  'id, title, description, start_at, end_at, all_day, rrule, exdates, recurrence_parent_id, tags, event_type, colour, status'
 
 const isFocusEvent = (e: CalEventRow): boolean => {
   const t = String(e.title ?? '').toLowerCase()
@@ -301,6 +319,17 @@ function localWeekdayHour(instant: Date, tz: string): { wd: number; hour: number
   return { wd: WD[p.weekday] ?? 0, hour: Number.isNaN(hour) ? 0 : hour }
 }
 
+// True if a meeting starting at `start` falls in a protected window (no-meeting
+// day / protected evening or early morning). Shared by the suggestion builder and
+// the apply route so preview and enactment agree.
+export function violatesBoundary(start: Date, tz: string, b: Boundaries): boolean {
+  const { wd, hour } = localWeekdayHour(start, tz) // wd: 0=Mon…6=Sun
+  const isoWd = wd + 1
+  return b.noMeetingDays.includes(isoWd)
+    || (b.protectAfterHour != null && hour >= b.protectAfterHour)
+    || (b.protectBeforeHour != null && hour < b.protectBeforeHour)
+}
+
 // [Monday 00:00, next Monday 00:00) of the week containing `now`, in the user's zone.
 function currentWeekWindow(tz: string, now: Date): { start: Date; end: Date } {
   const ymd = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(now)
@@ -318,6 +347,7 @@ export function expandRange(events: CalEventRow[], from: Date, to: Date): Occurr
   const out: Occurrence[] = []
   for (const e of events) {
     if (e.all_day) continue
+    if (String(e.status ?? '') === 'cancelled') continue // declined/removed — not busy time
     const s = new Date(e.start_at)
     const durMs = new Date(e.end_at).getTime() - s.getTime()
     if (Number.isNaN(s.getTime()) || durMs <= 0) continue
@@ -397,7 +427,7 @@ function buildAnalytics(occ: Occurrence[], tz: string): PlusAnalytics {
 // next 7 days of the user's calendar. Actionable ones (clash → reschedule, prep
 // → block) carry an `action` the apply route enacts; advisory ones (rescue,
 // back-to-back) don't. Clean calendar → the section honestly shows "inbox zero".
-function buildSuggestions(occ: Occurrence[], tz: string, now: Date): AiSuggestion[] {
+function buildSuggestions(occ: Occurrence[], tz: string, now: Date, boundaries?: Boundaries): AiSuggestion[] {
   const out: AiSuggestion[] = []
   const when = (d: Date) => fmtDateTime(d.toISOString(), tz)
   const horizon = new Date(now.getTime() + 7 * DAY_MS)
@@ -430,14 +460,42 @@ function buildSuggestions(occ: Occurrence[], tz: string, now: Date): AiSuggestio
     }
   }
 
-  // 2 — Rescue mode: an overbooked week (advisory — a human call).
+  // 2 — Rescue mode: an overbooked week → concrete, reversible reclaim actions
+  //     (shorten the longest meetings; decline just this week's recurring one).
   const meetingHours = meetings.reduce((a, o) => a + hoursOf(o), 0)
   if (meetingHours >= 20) {
     out.push({
       id: 'rescue-week', type: 'rescue', title: 'This week looks overbooked',
-      detail: `${Math.round(meetingHours)}h of meetings in the next 7 days. Rescue mode can find some to decline, shorten or delegate.`,
+      detail: `${Math.round(meetingHours)}h of meetings in the next 7 days — here's where to reclaim time.`,
       when: 'Next 7 days',
     })
+    const longest = [...meetings].sort((a, b) => hoursOf(b) - hoursOf(a))
+    let rescued = 0
+    for (const m of longest) {
+      if (rescued >= 2) break
+      const durMin = Math.round((m.end.getTime() - m.start.getTime()) / 60000)
+      if (durMin < 45) continue
+      const newDur = Math.max(30, Math.round(durMin / 2 / 15) * 15)
+      if (newDur >= durMin) continue
+      out.push({
+        id: `rescue-shorten-${m.eventId}-${m.start.getTime()}`, type: 'rescue',
+        title: `Shorten “${m.title}”`,
+        detail: `Trim it from ${durMin}m to ${newDur}m to reclaim ${durMin - newDur}m on ${when(m.start)}.`,
+        when: when(m.start),
+        action: { kind: 'shorten', eventId: m.eventId, recurring: m.recurring, occurrenceISO: m.start.toISOString(), newDurationMin: newDur },
+      })
+      rescued++
+    }
+    const declinable = longest.find((m) => m.recurring)
+    if (declinable) {
+      out.push({
+        id: `rescue-decline-${declinable.eventId}-${declinable.start.getTime()}`, type: 'rescue',
+        title: `Decline this week's “${declinable.title}”`,
+        detail: `Skip just this occurrence on ${when(declinable.start)} to free ${Math.round(hoursOf(declinable) * 60)}m — the recurring series stays.`,
+        when: when(declinable.start),
+        action: { kind: 'decline', eventId: declinable.eventId, recurring: true, occurrenceISO: declinable.start.toISOString() },
+      })
+    }
   }
 
   // 3 — Back-to-back run with no breathing room (advisory — auto-inserting a
@@ -474,7 +532,35 @@ function buildSuggestions(occ: Occurrence[], tz: string, now: Date): AiSuggestio
     })
   }
 
-  return out.slice(0, 6)
+  // 5 — Boundary enforcement: a meeting landing in a protected window (no-meeting
+  //     day / protected evening or early morning). Apply moves it to the nearest
+  //     allowed slot; the route re-checks against live boundaries.
+  const b = boundaries
+  if (b && (b.noMeetingDays.length || b.protectAfterHour != null || b.protectBeforeHour != null)) {
+    let flagged = 0
+    for (const m of meetings) {
+      if (flagged >= 2) break
+      const { wd, hour } = localWeekdayHour(m.start, tz) // wd: 0=Mon…6=Sun
+      const isoWd = wd + 1
+      const noDay = b.noMeetingDays.includes(isoWd)
+      const tooLate = b.protectAfterHour != null && hour >= b.protectAfterHour
+      const tooEarly = b.protectBeforeHour != null && hour < b.protectBeforeHour
+      if (!noDay && !tooLate && !tooEarly) continue
+      const reason = noDay ? `a no-meeting ${WEEKDAY_LABEL[isoWd]}`
+        : tooLate ? `your protected evening (after ${fmtHour(b.protectAfterHour!)})`
+        : `before your day starts (${fmtHour(b.protectBeforeHour!)})`
+      out.push({
+        id: `boundary-${m.eventId}-${m.start.getTime()}`, type: 'boundary',
+        title: `“${m.title}” breaks a boundary`,
+        detail: `It's on ${reason}. Apply to move it to the nearest slot inside your working hours.`,
+        when: when(m.start),
+        action: { kind: 'boundary-move', eventId: m.eventId, recurring: m.recurring, occurrenceISO: m.start.toISOString() },
+      })
+      flagged++
+    }
+  }
+
+  return out.slice(0, 8)
 }
 
 async function loadBookingPages(supabase: any, userId: string): Promise<PersonalBookingPage[]> {
@@ -535,7 +621,7 @@ async function loadPolls(supabase: any, userId: string): Promise<Poll[]> {
 }
 
 async function loadCalendarInsights(
-  supabase: any, tz: string, now: Date,
+  supabase: any, tz: string, now: Date, boundaries?: Boundaries,
 ): Promise<{ analytics: PlusAnalytics; suggestions: AiSuggestion[] }> {
   const empty: PlusAnalytics = {
     week: ANALYTICS_DAYS.map((day) => ({ day, meetings: 0, focus: 0 })),
@@ -549,7 +635,7 @@ async function loadCalendarInsights(
     const wk = currentWeekWindow(tz, now)
     const analytics = buildAnalytics(expandRange(rows, wk.start, wk.end), tz)
     const forward = expandRange(rows, now, new Date(now.getTime() + 7 * DAY_MS))
-    const suggestions = buildSuggestions(forward, tz, now)
+    const suggestions = buildSuggestions(forward, tz, now, boundaries)
     return { analytics, suggestions }
   } catch { return { analytics: empty, suggestions: [] } }
 }
@@ -595,18 +681,24 @@ export async function loadPlusWorkspace(supabase: any): Promise<PlusWorkspace> {
     const automationRules: AutomationRule[] = [...base.automationRules, ...readCustomAutomationRules(featuresRaw)]
       .map((r) => ({ ...r, on: featuresRaw[autoKey(r.id)] ?? r.on }))
 
+    const boundaries: Boundaries = {
+      noMeetingDays: Array.isArray(settings.no_meeting_days) ? settings.no_meeting_days.map(Number) : [],
+      protectAfterHour: settings.protect_after_hour ?? null,
+      protectBeforeHour: settings.protect_before_hour ?? null,
+    }
+
     // Real, calendar-derived sections (each degrades to its own empty state).
     const now = new Date()
     const [bookingPages, polls, insights] = await Promise.all([
       loadBookingPages(supabase, user.id),
       loadPolls(supabase, user.id),
-      loadCalendarInsights(supabase, profile.timezone, now),
+      loadCalendarInsights(supabase, profile.timezone, now, boundaries),
     ])
 
     return {
       live: true, featuresRaw, profile, briefing, integrations,
       suggestions: insights.suggestions, focusRules, automationRules,
-      bookingPages, polls, analytics: insights.analytics,
+      bookingPages, polls, analytics: insights.analytics, boundaries,
     }
   } catch {
     return sampleWorkspace()

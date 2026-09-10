@@ -11,6 +11,10 @@
     {
       "path": "/api/cron/daily-briefing",
       "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/cron/daily-briefing?slot=evening",
+      "schedule": "0 23 * * *"
     }
   ]
 }
