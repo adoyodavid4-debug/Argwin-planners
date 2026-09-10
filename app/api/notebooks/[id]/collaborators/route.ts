@@ -1,7 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 function serviceClient() {
   return createClient(
@@ -10,21 +9,12 @@ function serviceClient() {
   )
 }
 
-async function getSession() {
-  const cookieStore = cookies()
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get: (name) => cookieStore.get(name)?.value,
-        set: () => {},
-        remove: () => {},
-      },
-    }
-  )
-  const { data: { session } } = await supabase.auth.getSession()
-  return session
+// Server-verified user (getUser validates the JWT signature; getSession does
+// NOT and trusts the cookie payload — never use it to gate service-role access).
+async function getUser() {
+  const supabase = createServerSupabaseClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  return user
 }
 
 async function isOwnerOrAdmin(
@@ -43,11 +33,11 @@ async function isOwnerOrAdmin(
 
 // GET — list collaborators (owner/admin only)
 export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
-  const session = await getSession()
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const user = await getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const supabase   = serviceClient()
-  const hasAccess  = await isOwnerOrAdmin(supabase, params.id, session.user.id)
+  const hasAccess  = await isOwnerOrAdmin(supabase, params.id, user.id)
   if (!hasAccess) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const { data, error } = await supabase
@@ -65,11 +55,11 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
 
 // POST — invite a collaborator by email
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
-  const session = await getSession()
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const user = await getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const supabase   = serviceClient()
-  const hasAccess  = await isOwnerOrAdmin(supabase, params.id, session.user.id)
+  const hasAccess  = await isOwnerOrAdmin(supabase, params.id, user.id)
   if (!hasAccess) return NextResponse.json({ error: 'Only the notebook owner can invite collaborators' }, { status: 403 })
 
   const body = await req.json().catch(() => null)
@@ -100,7 +90,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         notebook_id: params.id,
         user_id:     profile.id,
         role,
-        invited_by:  session.user.id,
+        invited_by:  user.id,
         invited_at:  new Date().toISOString(),
       },
       { onConflict: 'notebook_id,user_id' }
@@ -115,7 +105,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
   await supabase.from('notebook_activity_log').insert({
     notebook_id: params.id,
-    user_id:     session.user.id,
+    user_id:     user.id,
     action:      'collaborator_invited',
     metadata:    { email: profile.email, role },
   })
@@ -125,11 +115,11 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
 // DELETE — revoke a collaborator's access
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
-  const session = await getSession()
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const user = await getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const supabase  = serviceClient()
-  const hasAccess = await isOwnerOrAdmin(supabase, params.id, session.user.id)
+  const hasAccess = await isOwnerOrAdmin(supabase, params.id, user.id)
   if (!hasAccess) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const body = await req.json().catch(() => null)
@@ -145,7 +135,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
 
   await supabase.from('notebook_activity_log').insert({
     notebook_id: params.id,
-    user_id:     session.user.id,
+    user_id:     user.id,
     action:      'collaborator_removed',
     metadata:    { collaborator_id: body.collaborator_id },
   })

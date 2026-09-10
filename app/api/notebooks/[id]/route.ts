@@ -1,7 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 function serviceClient() {
   return createClient(
@@ -10,21 +9,12 @@ function serviceClient() {
   )
 }
 
-async function getSession() {
-  const cookieStore = cookies()
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get: (name) => cookieStore.get(name)?.value,
-        set: () => {},
-        remove: () => {},
-      },
-    }
-  )
-  const { data: { session } } = await supabase.auth.getSession()
-  return session
+// Server-verified user (getUser validates the JWT signature; getSession does
+// NOT and trusts the cookie payload — never use it to gate service-role access).
+async function getUser() {
+  const supabase = createServerSupabaseClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  return user
 }
 
 // Determine the calling user's effective role on a notebook
@@ -75,11 +65,11 @@ async function getEffectiveRole(
 }
 
 export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
-  const session = await getSession()
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const user = await getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const supabase = serviceClient()
-  const role = await getEffectiveRole(supabase, params.id, session.user.id)
+  const role = await getEffectiveRole(supabase, params.id, user.id)
   if (!role) return NextResponse.json({ error: 'Not found or access denied' }, { status: 404 })
 
   const { data, error } = await supabase
@@ -101,11 +91,11 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
-  const session = await getSession()
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const user = await getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const supabase = serviceClient()
-  const role = await getEffectiveRole(supabase, params.id, session.user.id)
+  const role = await getEffectiveRole(supabase, params.id, user.id)
 
   // Viewers cannot edit
   if (!role || role === 'viewer') {
@@ -124,7 +114,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   for (const key of allowedFields) {
     if (key in body) patch[key] = body[key]
   }
-  patch.last_edited_by = session.user.id
+  patch.last_edited_by = user.id
   patch.updated_at     = new Date().toISOString()
 
   const { data, error } = await supabase
@@ -138,7 +128,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 
   await supabase.from('notebook_activity_log').insert({
     notebook_id: params.id,
-    user_id:     session.user.id,
+    user_id:     user.id,
     action:      'edited',
     metadata:    { fields: Object.keys(patch) },
   })
@@ -147,11 +137,11 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
-  const session = await getSession()
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const user = await getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const supabase = serviceClient()
-  const role = await getEffectiveRole(supabase, params.id, session.user.id)
+  const role = await getEffectiveRole(supabase, params.id, user.id)
 
   // Only owners and admins can delete
   if (role !== 'owner' && role !== 'admin') {

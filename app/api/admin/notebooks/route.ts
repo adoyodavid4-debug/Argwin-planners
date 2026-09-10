@@ -1,8 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/supabase/admin-guard'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 function serviceClient() {
   return createClient(
@@ -12,20 +11,9 @@ function serviceClient() {
 }
 
 async function getAdminUserId(): Promise<string | null> {
-  const cookieStore = cookies()
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get: (name) => cookieStore.get(name)?.value,
-        set: () => {},
-        remove: () => {},
-      },
-    }
-  )
-  const { data: { session } } = await supabase.auth.getSession()
-  return session?.user.id ?? null
+  const supabase = createServerSupabaseClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  return user?.id ?? null
 }
 
 export async function GET(req: NextRequest) {

@@ -10,11 +10,11 @@ export const metadata: Metadata = {
 
 export default async function CustomerNotebooksPage() {
   const supabase = createServerSupabaseClient()
-  const { data: { session } } = await supabase.auth.getSession()
-  if (!session) redirect('/auth/login?redirect=/customer/notebooks')
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/auth/login?redirect=/customer/notebooks')
 
   const service = createServiceRoleClient()
-  const userId  = session.user.id
+  const userId  = user.id
 
   // Owned notebooks
   const { data: owned } = await service

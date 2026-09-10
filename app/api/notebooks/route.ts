@@ -1,7 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 function serviceClient() {
   return createClient(
@@ -10,30 +9,21 @@ function serviceClient() {
   )
 }
 
-async function getSession() {
-  const cookieStore = cookies()
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get: (name) => cookieStore.get(name)?.value,
-        set: () => {},
-        remove: () => {},
-      },
-    }
-  )
-  const { data: { session } } = await supabase.auth.getSession()
-  return session
+// Server-verified user (getUser validates the JWT signature; getSession does
+// NOT and trusts the cookie payload — never use it to gate service-role access).
+async function getUser() {
+  const supabase = createServerSupabaseClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  return user
 }
 
 // GET /api/notebooks — list calling user's notebooks + shared with them
 export async function GET(req: NextRequest) {
-  const session = await getSession()
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const user = await getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const supabase = serviceClient()
-  const userId = session.user.id
+  const userId = user.id
 
   // Notebooks owned by the user
   const { data: owned, error: e1 } = await supabase
@@ -82,11 +72,11 @@ export async function GET(req: NextRequest) {
 
 // POST /api/notebooks — create a notebook
 export async function POST(req: NextRequest) {
-  const session = await getSession()
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const user = await getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const supabase  = serviceClient()
-  const userId    = session.user.id
+  const userId    = user.id
   const body      = await req.json().catch(() => null)
   if (!body) return NextResponse.json({ error: 'Invalid body' }, { status: 400 })
 
