@@ -30,7 +30,6 @@ const footerLinks = {
   ],
   company: [
     { label: 'About Arwign',       href: '/about' },
-    { label: 'Blog',               href: '/blog' },
     { label: 'Best Sellers',       href: '/best-sellers' },
     { label: 'New Arrivals',       href: '/new-arrivals' },
     { label: 'Contact Us',         href: '/contact' },
