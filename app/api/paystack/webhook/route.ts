@@ -36,6 +36,19 @@ export async function POST(req: NextRequest) {
       // Still 200 below so Paystack doesn't hammer retries on a transient error;
       // the return page + a later verify are the safety net.
     }
+  } else if (event?.event === 'refund.processed') {
+    // Refund settled — revoke the download entitlement (download route blocks
+    // status='refunded'). The refund payload keys the order by its transaction
+    // reference, which is our orders.id.
+    const refRef: string | undefined = event?.data?.transaction_reference ?? event?.data?.transaction?.reference ?? reference
+    if (refRef) {
+      try {
+        const supabase = createServiceRoleClient()
+        await supabase.from('orders').update({ status: 'refunded' }).eq('id', refRef)
+      } catch (err) {
+        console.error('[paystack/webhook] refund', err)
+      }
+    }
   }
 
   // Always acknowledge receipt

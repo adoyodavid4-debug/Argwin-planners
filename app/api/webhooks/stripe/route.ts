@@ -262,6 +262,27 @@ export async function POST(req: NextRequest) {
       break
     }
 
+    case 'charge.refunded':
+    case 'charge.dispute.created': {
+      // Refund or chargeback — revoke entitlements keyed on the payment intent.
+      // Digital orders (status→refunded blocks the download route) and paid
+      // calendar bookings (payment_status→refunded). Physical print jobs may
+      // already be in production, so those are logged for manual handling.
+      const obj = event.data.object as Stripe.Charge | Stripe.Dispute
+      const piField = (obj as { payment_intent?: string | { id: string } | null }).payment_intent
+      const pi = typeof piField === 'string' ? piField : piField?.id
+      if (pi) {
+        const { data: orders } = await supabase
+          .from('orders').update({ status: 'refunded' }).eq('stripe_payment_intent', pi).select('id')
+        await supabase.from('bookings').update({ payment_status: 'refunded' }).eq('payment_ref', pi)
+        const { data: phys } = await supabase
+          .from('physical_orders').select('id').eq('stripe_payment_intent', pi)
+        if (phys?.length) console.warn('[stripe-webhook] refund/dispute on physical order(s) — review print job', phys.map((p) => p.id), pi)
+        console.warn(`[stripe-webhook] ${event.type} processed for PI ${pi}; ${orders?.length ?? 0} order(s) refunded`)
+      }
+      break
+    }
+
     default:
       break
   }
