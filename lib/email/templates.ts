@@ -330,6 +330,86 @@ const templates: Record<string, (locale: Locale, data: Record<string, unknown>) 
     return { subject, html, text: `${dateLabel}: ${headline}` }
   },
 
+  // Celebratory anniversary / memory email — balloons + confetti. Sent yearly by
+  // the /api/cron/moment-anniversaries cron and on demand from the Moments UI.
+  'calendar.anniversary': (locale, data) => {
+    const title = String(data.title ?? 'A special day')
+    const note = data.note ? String(data.note) : ''
+    const years = Number(data.years ?? 0)
+    const occasion = String(data.occasion ?? '🎉')
+    const typeLabel = String(data.type_label ?? 'Special day')
+    const whenLabel = data.when_label ? String(data.when_label) : ''
+    const fromName = data.from_name ? String(data.from_name) : ''
+    const imageUrl = data.image_url ? String(data.image_url) : ''
+    const role = String(data.role ?? 'owner')
+    const appUrl = String(data.app_url ?? `${BASE_URL}/calendar/plus/moments`)
+
+    // ordinal ("3rd") for the years badge
+    const s = ['th', 'st', 'nd', 'rd']; const v = years % 100
+    const ordinal = `${years}${s[(v - 20) % 10] || s[v] || s[0]}`
+    const yearsLine = years > 0 ? `${ordinal} ${typeLabel.toLowerCase()}` : `It's today!`
+
+    const intro = role === 'invitee'
+      ? `${fromName || 'Someone special'} wanted to celebrate this moment with you.`
+      : `A moment worth celebrating is here again. 🥳`
+
+    const subject = years > 0
+      ? `🎈 ${title} — ${years} year${years > 1 ? 's' : ''} today! 🎉`
+      : `🎈 ${title} — celebrate today! 🎉`
+
+    // Confetti pieces: static coloured squares that also fall+spin where CSS
+    // animation is supported (Apple Mail / iOS). Gmail strips <style> keyframes
+    // but the pieces still render as a festive scatter, so it degrades cleanly.
+    const colours = ['#C9A84C', '#E86A6A', '#4C9AC9', '#7BC96F', '#E8B24C', '#B47BE8', '#E86AB0']
+    const confetti = Array.from({ length: 16 }, (_, i) => {
+      const c = colours[i % colours.length]
+      const left = Math.round((i / 16) * 96) + 2
+      const delay = ((i % 8) * 0.35).toFixed(2)
+      const dur = (2.6 + (i % 5) * 0.4).toFixed(2)
+      const size = 7 + (i % 3) * 3
+      return `<span class="cf" style="left:${left}%;width:${size}px;height:${size}px;background:${c};animation-delay:${delay}s;animation-duration:${dur}s"></span>`
+    }).join('')
+
+    const html = `<!DOCTYPE html><html lang="${locale}"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#FAF8F4;color:#1A1820;margin:0;padding:0}
+  a{color:#A0830E}
+  .container{max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;border:1px solid #E8E4DB}
+  .banner{position:relative;overflow:hidden;text-align:center;padding:40px 24px 34px;background:linear-gradient(135deg,#FBF3D9 0%,#F4E2A8 45%,#E9CE7A 100%)}
+  .balloons{font-size:40px;line-height:1;letter-spacing:6px;animation:float 3.5s ease-in-out infinite}
+  .cf{position:absolute;top:-14px;border-radius:2px;opacity:.9;animation-name:fall;animation-timing-function:linear;animation-iteration-count:infinite}
+  @keyframes fall{0%{transform:translateY(-14px) rotate(0);opacity:0}10%{opacity:1}100%{transform:translateY(230px) rotate(540deg);opacity:.15}}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+</style></head>
+<body>
+<div style="padding:28px 16px">
+  <div class="container">
+    <div class="banner">
+      ${confetti}
+      <div class="balloons">🎈🎈🎈</div>
+      <p style="margin:16px 0 4px;font-size:13px;font-weight:700;letter-spacing:3px;color:#8A6D12">ARWIGN · A MOMENT TO CELEBRATE</p>
+      <h1 style="margin:6px 0 0;font-size:26px;color:#1A1820">${occasion} ${title}</h1>
+      ${years > 0 ? `<div style="display:inline-block;margin-top:14px;padding:8px 18px;background:#fff;border-radius:999px;border:1px solid #E9CE7A;font-weight:700;color:#8A6D12;font-size:15px">${ordinal} ${typeLabel.toLowerCase()} 🎉</div>` : `<div style="display:inline-block;margin-top:14px;padding:8px 18px;background:#fff;border-radius:999px;border:1px solid #E9CE7A;font-weight:700;color:#8A6D12;font-size:15px">Today 🎉</div>`}
+    </div>
+    <div style="padding:32px 40px">
+      <p style="margin:0 0 14px;font-size:15px;color:#5A5668">${intro}</p>
+      ${whenLabel ? `<p style="margin:0 0 14px;color:#8A869A;font-size:14px">🗓️ ${whenLabel}</p>` : ''}
+      ${imageUrl ? `<img src="${imageUrl}" alt="${title}" style="width:100%;max-height:320px;object-fit:cover;border-radius:12px;border:1px solid #E8E4DB;margin:6px 0 18px" />` : ''}
+      ${note ? `<div style="background:#FAF8F4;border:1px solid #E8E4DB;border-left:3px solid #C9A84C;border-radius:10px;padding:16px 18px;margin:4px 0 8px;color:#3A3648;font-size:15px;white-space:pre-wrap">${note}</div>` : ''}
+      <p style="text-align:center;margin:28px 0 6px"><a href="${appUrl}" style="background:#C9A84C;color:#fff;padding:13px 26px;border-radius:10px;text-decoration:none;font-weight:600;display:inline-block">Open your Moments →</a></p>
+      <p style="text-align:center;margin:18px 0 0;font-size:22px">🎉✨🎊✨🎉</p>
+    </div>
+    <div style="padding:20px 40px;border-top:1px solid #E8E4DB;background:#FAF8F4">
+      <p style="font-size:12px;color:#aaa;margin:0"><a href="${BASE_URL}" style="color:#C9A84C;text-decoration:none">arwignplanners.com</a> · Sent by Arwign Calendar Moments</p>
+    </div>
+  </div>
+</div>
+</body></html>`
+
+    const text = `${title} — ${yearsLine}. ${intro}${note ? `\n\n${note}` : ''}\n\nCelebrate: ${appUrl}`
+    return { subject, html, text }
+  },
+
   // Internal admin notification — no unsubscribe footer (not a subscriber-facing email)
   'contact.admin': (locale, data) => {
     const subject = `New contact form message from ${data.name}${data.subject ? `: ${data.subject}` : ''}`

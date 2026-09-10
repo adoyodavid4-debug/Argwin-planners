@@ -4,6 +4,7 @@ import { getEmailProvider } from '@/lib/email'
 import { parseRRule, expandOccurrences } from '@/lib/calendar/recurrence'
 import { wallTimeToUtc } from '@/lib/calendar/slots'
 import { composeBriefingHeadline } from '@/lib/calendar/briefing'
+import { celebrateAnniversaries } from '@/lib/calendar/anniversaries'
 
 export const dynamic = 'force-dynamic'
 
@@ -93,7 +94,14 @@ async function run(req: NextRequest) {
       await supabase.from('calendar_settings').update({ last_briefing_on: localDate }).eq('user_id', st.user_id)
     } catch (e) { console.error('[briefing] email failed', st.user_id, e) }
   }
-  return NextResponse.json({ ok: true, email: sentEmail })
+
+  // Celebrate any Moments whose anniversary lands today (balloons & confetti).
+  // Folded in here so it runs daily without a separate Vercel cron entry.
+  let anniversaries = { celebrated: 0, sent: 0 }
+  try { anniversaries = await celebrateAnniversaries(supabase, provider, nowInstant) }
+  catch (e) { console.error('[briefing] anniversaries failed', e) }
+
+  return NextResponse.json({ ok: true, email: sentEmail, anniversaries })
 }
 
 // Vercel Cron invokes GET with an auto-injected Bearer CRON_SECRET header.
