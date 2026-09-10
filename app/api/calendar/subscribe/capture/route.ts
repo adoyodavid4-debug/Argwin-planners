@@ -25,8 +25,13 @@ export async function POST(req: NextRequest) {
     const paid = cap?.status === 'COMPLETED' || captured?.status === 'COMPLETED'
     const amount = Number(captured?.amount?.value ?? pu?.amount?.value ?? 0)
 
-    if (!paid || Math.abs(amount - PLAN_PRICE[plan]) > 0.01) {
-      console.error('[subscribe/capture] not completed / amount mismatch', cap?.status, amount)
+    // The order must have been created by subscribe/create-order for THIS user
+    // and plan (see the custom_id set there). This stops a store order — or
+    // another user's subscribe order — from being redeemed here for a plan grant.
+    const boundOk = pu?.custom_id === `sub:${user.id}:${plan}`
+
+    if (!paid || !boundOk || Math.abs(amount - PLAN_PRICE[plan]) > 0.01) {
+      console.error('[subscribe/capture] not completed / not bound / amount mismatch', cap?.status, pu?.custom_id, amount)
       return NextResponse.json({ error: 'Payment was not completed correctly.' }, { status: 402 })
     }
 

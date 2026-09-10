@@ -11,7 +11,11 @@ import { createClient } from '@/lib/supabase/client'
 export default function LoginClient() {
   const router       = useRouter()
   const searchParams = useSearchParams()
-  const redirectTo   = searchParams.get('redirect') || '/'
+  // Only allow same-origin relative paths. Reject absolute ("https://evil.com")
+  // and protocol-relative ("//evil.com", "/\evil.com") targets so a crafted
+  // ?redirect= can't bounce a freshly-authed user off-site (open-redirect).
+  const rawRedirect  = searchParams.get('redirect') || '/'
+  const redirectTo   = /^\/(?![/\\])/.test(rawRedirect) ? rawRedirect : '/'
   const isAdminArea  = redirectTo.startsWith('/admin')
 
   const [mode,       setMode]       = useState<'signin' | 'signup'>(searchParams.get('mode') === 'signup' ? 'signup' : 'signin')

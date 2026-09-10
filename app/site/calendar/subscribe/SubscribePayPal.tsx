@@ -32,8 +32,19 @@ export default function SubscribePayPal({ plan, onPaid }: { plan: 'plus' | 'team
       rendered.current = true
       window.paypal.Buttons({
         style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'subscribe', height: 44 },
-        createSubscription: (_d: unknown, actions: any) =>
-          actions.subscription.create({
+        createSubscription: async (_d: unknown, actions: any) => {
+          // custom_id binds the subscription to this account and the server
+          // now requires it, so resolve the id before creating (the initial
+          // async fetch may not have landed yet on a fast click).
+          if (!uid.current) {
+            const { data: { user } } = await createClient().auth.getUser()
+            uid.current = user?.id
+          }
+          if (!uid.current) {
+            setErr('Please sign in again before subscribing.')
+            throw new Error('not authenticated')
+          }
+          return actions.subscription.create({
             plan_id: planId,
             custom_id: uid.current,
             application_context: {
@@ -41,7 +52,8 @@ export default function SubscribePayPal({ plan, onPaid }: { plan: 'plus' | 'team
               shipping_preference: 'NO_SHIPPING',
               user_action: 'SUBSCRIBE_NOW',
             },
-          }),
+          })
+        },
         onApprove: async (data: { subscriptionID?: string }) => {
           setBusy(true)
           try {

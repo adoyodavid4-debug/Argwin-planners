@@ -22,6 +22,10 @@ export async function POST(req: NextRequest) {
   try {
     const order = await createPayPalOrder({
       referenceId: randomUUID(),
+      // Bind the order to this user + plan so only subscribe/capture (for the
+      // same user/plan) can redeem it — a store order can't be used here and
+      // vice-versa.
+      customId: `sub:${user.id}:${plan}`,
       total,
       items: [{ title: `Arwign ${plan === 'plus' ? 'Plus' : 'Teams'} — 1 month`, price: total, quantity: 1 }],
     })

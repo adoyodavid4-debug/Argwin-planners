@@ -3,7 +3,7 @@
 // order completed, generates download tokens and sends the invoice email.
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/server'
-import { capturePayPalOrder } from '@/lib/paypal'
+import { capturePayPalOrder, getPayPalOrder } from '@/lib/paypal'
 import { fulfilDigitalOrder } from '@/lib/orders'
 import { makeRateLimiter, clientIp } from '@/lib/rate-limit'
 import { captureError } from '@/lib/error-tracking'
@@ -63,8 +63,10 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     const issue = (err as Error & { issue?: string }).issue
     if (issue === 'ORDER_ALREADY_CAPTURED') {
-      // Someone captured it already — trust PayPal, complete our side
-      capture = { id: orderID, status: 'COMPLETED' }
+      // Already captured (double click / retry). Re-fetch the real order so the
+      // amount check below runs against actual captured figures rather than a
+      // synthesized payload that would skip verification.
+      capture = await getPayPalOrder(orderID)
     } else {
       console.error('[paypal/capture]', err)
       return NextResponse.json({ error: 'Payment could not be captured. You have not been charged twice — please try again.' }, { status: 502 })

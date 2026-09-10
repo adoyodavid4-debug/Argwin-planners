@@ -22,15 +22,32 @@ export async function POST(req: NextRequest) {
     const sub: any = await getSubscription(subscriptionID)
     const okStatus = sub.status === 'ACTIVE' || sub.status === 'APPROVED'
     const planMatches = sub.plan_id === planIdFor(plan)
-    const ownerOk = !sub.custom_id || sub.custom_id === user.id
+    // Strict: the subscription must carry this user's id as custom_id (set at
+    // creation, client-side). Previously a missing custom_id passed, which let
+    // one payment be recorded against many accounts by replaying the id.
+    const ownerOk = sub.custom_id === user.id
     if (!okStatus || !planMatches || !ownerOk) {
       console.error('[subscribe/record] invalid', sub.status, sub.plan_id, sub.custom_id)
       return NextResponse.json({ error: 'Subscription could not be verified.' }, { status: 402 })
     }
 
+    const service = createServiceRoleClient()
+
+    // A subscription id may only ever back one account. Reject if another
+    // profile already holds it (defence-in-depth against id replay/cloning).
+    const { data: existing } = await service
+      .from('profiles')
+      .select('id')
+      .eq('paypal_subscription_id', subscriptionID)
+      .neq('id', user.id)
+      .maybeSingle()
+    if (existing) {
+      console.error('[subscribe/record] subscription already bound to another account', subscriptionID)
+      return NextResponse.json({ error: 'This subscription is already linked to another account.' }, { status: 409 })
+    }
+
     const nbt = sub.billing_info?.next_billing_time
     const expiresAt = nbt ? new Date(nbt).toISOString() : new Date(Date.now() + 31 * 864e5).toISOString()
-    const service = createServiceRoleClient()
     const { error } = await service
       .from('profiles')
       .update({ calendar_plan: plan, paypal_subscription_id: subscriptionID, plan_expires_at: expiresAt })

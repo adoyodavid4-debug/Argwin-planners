@@ -35,14 +35,19 @@ export interface PayPalOrderResult {
 
 // Create a PayPal order for a DB-validated USD total.
 // `referenceId` is our internal orders.id so the capture can be reconciled.
+// `customId` (defaults to referenceId) is echoed back on capture and is used to
+// bind an order to the flow that created it, so one flow can't capture another's
+// order (e.g. a store order can't be redeemed by the subscription route).
 export async function createPayPalOrder({
   referenceId,
   total,
   items,
+  customId,
 }: {
   referenceId: string
   total:       number
   items:       { title: string; price: number; quantity: number }[]
+  customId?:   string
 }): Promise<PayPalOrderResult> {
   const token = await getAccessToken()
   const value = total.toFixed(2)
@@ -62,7 +67,7 @@ export async function createPayPalOrder({
       },
       purchase_units: [{
         reference_id: referenceId,
-        custom_id:    referenceId,
+        custom_id:    customId ?? referenceId,
         description:  'Arwign Planners — digital downloads',
         amount: {
           currency_code: 'USD',
@@ -86,6 +91,19 @@ export async function createPayPalOrder({
   if (!res.ok || !json?.id) {
     throw new Error(`PayPal create order failed (${res.status}): ${JSON.stringify(json)}`)
   }
+  return json as PayPalOrderResult
+}
+
+// Fetch an order's current details (status, purchase_units incl. captured
+// amount + custom_id). Used to re-verify an order PayPal reports as already
+// captured, without trusting a synthesized payload.
+export async function getPayPalOrder(paypalOrderId: string): Promise<PayPalOrderResult> {
+  const token = await getAccessToken()
+  const res = await fetch(`${PAYPAL_BASE}/v2/checkout/orders/${encodeURIComponent(paypalOrderId)}`, {
+    headers: { Authorization: `Bearer ${token}` }, cache: 'no-store',
+  })
+  const json = await res.json()
+  if (!res.ok) throw new Error(`PayPal get order failed (${res.status}): ${JSON.stringify(json)}`)
   return json as PayPalOrderResult
 }
 
