@@ -25,7 +25,8 @@ CREATE TABLE IF NOT EXISTS team_members (
   role          TEXT NOT NULL DEFAULT 'view' CHECK (role IN ('view','propose','edit','manage','owner')),
   title         TEXT DEFAULT '',
   timezone      TEXT DEFAULT 'America/New_York',
-  tz_offset     INTEGER DEFAULT 3,
+  tz_offset     INTEGER DEFAULT -5, -- US Eastern (fresh installs); migration 030 fixes existing DBs
+
   hue           INTEGER DEFAULT 200,
   status        TEXT NOT NULL DEFAULT 'invited' CHECK (status IN ('active','invited')),
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),

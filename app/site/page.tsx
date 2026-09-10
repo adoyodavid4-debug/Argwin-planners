@@ -86,6 +86,12 @@ export default async function HomePage() {
 
   return (
     <div className="container-site py-10 lg:py-14">
+      {/* Page-level H1. The homepage is catalogue-first with no hero, so this is
+          visually hidden — it still gives assistive tech and search engines the
+          single, descriptive top-level heading the page was missing. */}
+      <h1 className="sr-only">
+        Arwign Planners — premium digital &amp; printable planners, personalised notebooks, and the Arwign calendar
+      </h1>
       <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 items-start">
 
         {/* Arwign Calendar — right sidebar on desktop, on top on mobile */}

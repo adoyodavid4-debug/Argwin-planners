@@ -36,7 +36,7 @@ const footerLinks = {
   ],
   support: [
     { label: 'FAQ',                href: '/faq' },
-    { label: 'How to Download',    href: '/blog/how-to-use-digital-planner' },
+    { label: 'How to Download',    href: '/faq' },
     { label: 'My Notebooks',       href: '/customer/notebooks' },
     { label: 'Privacy Policy',     href: '/privacy' },
     { label: 'Terms of Service',   href: '/terms' },

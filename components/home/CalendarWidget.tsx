@@ -2,6 +2,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { DEFAULT_TZ } from '@/lib/calendar/fmt'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Plus, Clock, MapPin, Bell, BellRing, CalendarDays, ArrowRight, Check, Loader2, X } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -81,7 +82,7 @@ export default function CalendarWidget({ initialEvents, isLoggedIn }: { initialE
     setSaving(true)
     try {
       const { data, error } = await supabase.from('calendar_events')
-        .insert({ title: form.title.trim(), location: form.location.trim() || null, start_at: start.toISOString(), end_at: end.toISOString(), start_tz: Intl.DateTimeFormat().resolvedOptions().timeZone, colour: 'brass' })
+        .insert({ title: form.title.trim(), location: form.location.trim() || null, start_at: start.toISOString(), end_at: end.toISOString(), start_tz: DEFAULT_TZ, colour: 'brass' })
         .select('id, title, start_at, end_at, all_day, location, colour').single()
       if (error) throw error
       setEvents((ev) => [...ev, data].sort((a, b) => a.start_at.localeCompare(b.start_at)))

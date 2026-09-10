@@ -11,6 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { stripe, toCents } from '@/lib/stripe'
+import { getFulfillmentProvider, type Address } from '@/lib/fulfillment'
 import { makeRateLimiter, clientIp } from '@/lib/rate-limit'
 import { z } from 'zod'
 
@@ -31,7 +32,7 @@ const schema = z.object({
   quantity:        z.number().int().min(1).default(1),
   shippingAddress: addressSchema,
   shippingLevel:   z.string().min(1),
-  shippingCost:    z.number().int().min(0),   // quoted cost in minor units — we re-verify
+  shippingCost:    z.number().int().min(0),   // client's quoted cost (minor units) — re-verified server-side below
 })
 
 // Cap physical-checkout intents per IP (10 / minute) — each creates a Stripe
@@ -69,9 +70,37 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Product is not available' }, { status: 400 })
   }
 
+  // Re-quote shipping server-side. NEVER trust the client's shippingCost — a
+  // tampered `shippingCost: 0` would otherwise let the buyer pay retail only
+  // while we eat the real Lulu fee. We charge the provider's authoritative cost
+  // for the chosen level, and reject if the client's quote has materially
+  // drifted so the shopper re-confirms the real total.
+  let verifiedShipping: number
+  try {
+    const quotes = await getFulfillmentProvider().getShippingQuotes({
+      lineItems: [{ printProductId, quantity }],
+      shippingAddress: shippingAddress as Address,
+    })
+    const match = quotes.find((q) => q.level === shippingLevel)
+    if (!match) {
+      return NextResponse.json({ error: 'That shipping option is no longer available — please refresh and try again.' }, { status: 409 })
+    }
+    verifiedShipping = match.cost
+  } catch (e) {
+    console.error('[checkout/physical] shipping re-quote failed', e)
+    return NextResponse.json({ error: 'Could not verify shipping right now. Please try again.' }, { status: 502 })
+  }
+  // Tolerate ±1 minor unit of rounding; anything larger means the price changed.
+  if (Math.abs(verifiedShipping - shippingCost) > 1) {
+    return NextResponse.json({
+      error: 'Shipping price changed since you started checkout. Please review the updated total.',
+      shippingCost: verifiedShipping,
+    }, { status: 409 })
+  }
+
   // Margin guard: retail_price must cover base_cost + shipping floor + min margin
   const subtotal     = pp.retail_price * quantity
-  const totalCharging = subtotal + shippingCost
+  const totalCharging = subtotal + verifiedShipping
   const minRequired  = Math.ceil(pp.base_cost * quantity * (1 + pp.min_margin_pct / 100))
   if (subtotal < minRequired) {
     return NextResponse.json({
@@ -79,7 +108,7 @@ export async function POST(req: NextRequest) {
     }, { status: 422 })
   }
 
-  // Create Stripe PaymentIntent for the exact total
+  // Create Stripe PaymentIntent for the exact server-verified total
   const intent = await stripe.paymentIntents.create({
     amount:   totalCharging,
     currency: pp.currency.toLowerCase(),
@@ -89,7 +118,7 @@ export async function POST(req: NextRequest) {
       print_product_id: printProductId,
       quantity:         String(quantity),
       shipping_level:   shippingLevel,
-      shipping_cost:    String(shippingCost),
+      shipping_cost:    String(verifiedShipping),
       shipping_address: JSON.stringify(shippingAddress),
     },
     shipping: {
@@ -109,7 +138,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     clientSecret: intent.client_secret,
     subtotal,
-    shippingCost,
+    shippingCost: verifiedShipping,
     total: totalCharging,
     currency: pp.currency,
     productTitle: product?.title,

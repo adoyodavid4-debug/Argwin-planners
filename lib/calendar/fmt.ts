@@ -11,7 +11,11 @@
 // otherwise the date formatted in the given IANA zone (defaults to the US/UK
 // market default, America/New_York).
 
-const DEFAULT_TZ = 'America/New_York'
+// The single source of truth for the US/UK market default timezone. Used for
+// every persisted default and fallback so the app never silently adopts the
+// machine's local zone (e.g. a Kenya-based dev box leaking Africa/Nairobi into
+// stored settings). Users can still choose another IANA zone (e.g. Europe/London).
+export const DEFAULT_TZ = 'America/New_York'
 
 // Accepts Dates as well as ISO strings: callers holding a Date must not round-trip
 // via .toISOString(), which itself throws RangeError on an Invalid Date.

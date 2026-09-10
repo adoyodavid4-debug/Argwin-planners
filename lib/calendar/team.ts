@@ -288,7 +288,7 @@ function mapMember(r: any): Member {
   return {
     id: r.id, name: r.name || (r.email?.split('@')[0] ?? 'Member'), email: r.email,
     role: r.role, title: r.title || '', timezone: r.timezone || 'America/New_York',
-    tz_offset: r.tz_offset ?? 3, hue: r.hue ?? hueFrom(r.email || r.id),
+    tz_offset: r.tz_offset ?? -5, hue: r.hue ?? hueFrom(r.email || r.id), // -5 = US Eastern; never +3 (Nairobi)
     status: r.status, last_active: r.status === 'invited' ? 'pending' : '—',
     meetings_week: 0, focus_hours: 0,
   }
