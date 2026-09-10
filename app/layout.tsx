@@ -107,12 +107,11 @@ export const metadata: Metadata = {
 
   manifest: '/site.webmanifest',
 
-  alternates: {
-    canonical: 'https://www.arwignplanners.com',
-    languages: {
-      'en-US': 'https://www.arwignplanners.com',
-    },
-  },
+  // NOTE: intentionally no default `alternates.canonical` here. A canonical on
+  // the root layout is inherited by every page that doesn't set its own, which
+  // made indexable pages (e.g. the calendar pricing pages) canonicalize to the
+  // homepage and drop out of the index. Each page declares its own canonical;
+  // the homepage's lives in app/site/page.tsx.
 }
 
 export const viewport: Viewport = {

@@ -70,49 +70,46 @@ const nextConfig = {
     ]
   },
 
-  // Redirects for SEO + route mapping (site/* pages served at clean URLs)
+  // Clean public URLs are the canonical identity (page metadata canonicals point
+  // at them). We REWRITE them onto the internal /site/* routes so the clean URL
+  // is what's actually served (HTTP 200) — previously these were 307 redirects,
+  // which meant every canonical pointed at a redirecting URL and search engines
+  // never consolidated. beforeFiles so the rewrite wins over the filesystem for
+  // the bare "/" root.
+  async rewrites() {
+    return {
+      beforeFiles: [
+        { source: '/',                destination: '/site' },
+        { source: '/shop',            destination: '/site/shop' },
+        { source: '/shop/:path*',     destination: '/site/shop/:path*' },
+        { source: '/checkout',        destination: '/site/checkout' },
+        { source: '/checkout/:path*', destination: '/site/checkout/:path*' },
+        { source: '/best-sellers',    destination: '/site/best-sellers' },
+        { source: '/new-arrivals',    destination: '/site/new-arrivals' },
+        { source: '/about',           destination: '/site/about' },
+        { source: '/contact',         destination: '/site/contact' },
+        { source: '/blog',            destination: '/site/blog' },
+        { source: '/blog/:path*',     destination: '/site/blog/:path*' },
+        { source: '/faq',             destination: '/site/faq' },
+        { source: '/privacy',         destination: '/site/privacy' },
+        { source: '/terms',           destination: '/site/terms' },
+        { source: '/refund',          destination: '/site/refund' },
+        { source: '/free/:path*',     destination: '/site/free/:path*' },
+        { source: '/notebooks',       destination: '/site/notebooks' },
+        { source: '/notebooks/:path*',destination: '/site/notebooks/:path*' },
+        { source: '/calendar',        destination: '/site/calendar' },
+        { source: '/calendar/:path*', destination: '/site/calendar/:path*' },
+        { source: '/order/:id',       destination: '/site/order/:id' },
+      ],
+    }
+  },
+
+  // Legacy / alternate slugs → clean canonical URLs (permanent).
   async redirects() {
     return [
-      // Clean URL → site layout segment
-      { source: '/shop',            destination: '/site/shop',            permanent: false },
-      { source: '/shop/:path*',     destination: '/site/shop/:path*',     permanent: false },
-
-      // Checkout flow
-      { source: '/checkout',        destination: '/site/checkout',        permanent: false },
-      { source: '/checkout/:path*', destination: '/site/checkout/:path*', permanent: false },
-
-      // Site pages
-      { source: '/best-sellers',    destination: '/site/best-sellers',    permanent: false },
-      { source: '/new-arrivals',    destination: '/site/new-arrivals',    permanent: false },
-      { source: '/about',           destination: '/site/about',           permanent: false },
-      { source: '/contact',         destination: '/site/contact',         permanent: false },
-      { source: '/blog',            destination: '/site/blog',            permanent: false },
-      { source: '/blog/:path*',     destination: '/site/blog/:path*',     permanent: false },
-
-      // Support & legal
-      { source: '/faq',             destination: '/site/faq',             permanent: false },
-      { source: '/privacy',         destination: '/site/privacy',         permanent: false },
-      { source: '/terms',           destination: '/site/terms',           permanent: false },
-      { source: '/refund',          destination: '/site/refund',          permanent: false },
-
-      // Lead magnets (opt-in confirmation emails link to /free/*)
-      { source: '/free/:path*',     destination: '/site/free/:path*',     permanent: false },
-
-      // Notebooks
-      { source: '/notebooks',       destination: '/site/notebooks',       permanent: false },
-      { source: '/notebooks/:path*',destination: '/site/notebooks/:path*',permanent: false },
-
-      // Arwign Calendar
-      { source: '/calendar',        destination: '/site/calendar',        permanent: false },
-      { source: '/calendar/:path*', destination: '/site/calendar/:path*', permanent: false },
-
-      // Order status
-      { source: '/order/:id',       destination: '/site/order/:id',       permanent: false },
-
-      // Legacy / alternate slugs
-      { source: '/planners',        destination: '/site/shop',            permanent: true },
-      { source: '/products',        destination: '/site/shop',            permanent: true },
-      { source: '/shop/all',        destination: '/site/shop',            permanent: true },
+      { source: '/planners',  destination: '/shop', permanent: true },
+      { source: '/products',  destination: '/shop', permanent: true },
+      { source: '/shop/all',  destination: '/shop', permanent: true },
     ]
   },
 }
