@@ -7,10 +7,19 @@ import { capturePayPalOrder } from '@/lib/paypal'
 import { fulfilDigitalOrder } from '@/lib/orders'
 import { makeRateLimiter, clientIp } from '@/lib/rate-limit'
 import { captureError } from '@/lib/error-tracking'
+import { sendMetaEvent } from '@/lib/meta-capi'
 import { z } from 'zod'
 
 const schema = z.object({
   orderID: z.string().min(1),   // PayPal order id (from the JS SDK onApprove)
+  // Optional Meta attribution from the browser; only used when the visitor
+  // granted marketing consent (consent flag checked before any CAPI send).
+  analytics: z.object({
+    eventId: z.string().max(64),
+    fbp: z.string().max(128).nullable().optional(),
+    fbc: z.string().max(256).nullable().optional(),
+    consent: z.boolean(),
+  }).optional(),
 })
 
 // Cap capture attempts per IP (15 / minute) — legit users may double-click, but
@@ -28,13 +37,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
   }
 
-  const { orderID } = parsed.data
+  const { orderID, analytics } = parsed.data
   const supabase = createServiceRoleClient()
 
   // Find our pending order for this PayPal order
   const { data: order, error } = await supabase
     .from('orders')
-    .select('id, status, amount_total, metadata')
+    .select('id, status, amount_total, email, metadata')
     .eq('paypal_order_id', orderID)
     .single()
 
@@ -103,6 +112,27 @@ export async function POST(req: NextRequest) {
 
   // Download tokens + invoice email (email failures are swallowed inside)
   await fulfilDigitalOrder(supabase, order.id)
+
+  // Server-side Meta Purchase (Conversions API) — dedupes against the browser
+  // pixel via the shared eventId. Only for consented visitors; never blocks.
+  if (analytics?.consent) {
+    const { data: lines } = await supabase.from('order_items').select('product_id').eq('order_id', order.id)
+    await sendMetaEvent({
+      eventName: 'Purchase',
+      eventId: analytics.eventId,
+      eventSourceUrl: req.headers.get('referer') ?? undefined,
+      user: {
+        email: order.email,
+        fbp: analytics.fbp ?? null,
+        fbc: analytics.fbc ?? null,
+        clientIp: clientIp(req),
+        userAgent: req.headers.get('user-agent'),
+      },
+      value: order.amount_total,
+      currency: 'USD',
+      contentIds: (lines ?? []).map((l: any) => l.product_id).filter(Boolean),
+    })
+  }
 
   return NextResponse.json({ orderId: order.id })
 }

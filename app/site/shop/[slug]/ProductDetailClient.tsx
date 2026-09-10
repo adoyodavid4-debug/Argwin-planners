@@ -9,6 +9,7 @@ import {
   Twitter, Facebook, Linkedin, Link as LinkIcon, Quote, BadgeCheck, ArrowRight, Crown, FileType,
 } from 'lucide-react'
 import { useCartStore, useWishlistStore, useUIStore } from '@/lib/store'
+import { trackViewContent } from '@/lib/analytics'
 import toast from 'react-hot-toast'
 import RichTextContent from '@/components/RichTextContent'
 import { stripHtml } from '@/lib/richtext'
@@ -51,6 +52,8 @@ export default function ProductDetailClient({ product: p, related, reviews, bund
   const [lightbox, setLightbox] = useState(false)
   const [size, setSize] = useState<string | null>(availableSizes[0] ?? null)
   const [added, setAdded] = useState(false)
+
+  useEffect(() => { trackViewContent({ id: p.id, title: p.title, price: p.price }) }, [p.id, p.title, p.price])
 
   const addItem   = useCartStore((s) => s.addItem)
   const inCart    = useCartStore((s) => s.hasItem(p.id))

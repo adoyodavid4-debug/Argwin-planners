@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Loader2, Lock, Mail, ShoppingBag, Trash2, Zap } from 'lucide-react'
 import { useCartStore, type CartItem } from '@/lib/store'
+import { trackInitiateCheckout, trackPurchase, newEventId, getFbIds, hasMarketingConsent } from '@/lib/analytics'
 import PesapalCheckout from '@/components/checkout/PesapalCheckout'
 import PaystackCheckout from '@/components/checkout/PaystackCheckout'
 
@@ -76,6 +77,7 @@ export default function CheckoutClient() {
             setEmailError('Please enter a valid email address — your downloads are sent there.')
             throw new Error('invalid email')
           }
+          trackInitiateCheckout(itemsRef.current, itemsRef.current.reduce((s, i) => s + i.price, 0))
           const res = await fetch('/api/paypal/create-order', {
             method:  'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -95,13 +97,22 @@ export default function CheckoutClient() {
         onApprove: async (data: { orderID: string }) => {
           setCapturing(true)
           try {
+            // Shared event id lets Meta dedupe the browser Purchase against the
+            // server Conversions-API copy sent by the capture route.
+            const eventId = newEventId()
+            const { fbp, fbc } = getFbIds()
             const res = await fetch('/api/paypal/capture', {
               method:  'POST',
               headers: { 'Content-Type': 'application/json' },
-              body:    JSON.stringify({ orderID: data.orderID }),
+              body:    JSON.stringify({
+                orderID: data.orderID,
+                analytics: { eventId, fbp, fbc, consent: hasMarketingConsent() },
+              }),
             })
             const out = await res.json()
             if (res.ok && out.orderId) {
+              const bought = itemsRef.current
+              trackPurchase({ orderId: out.orderId, total: bought.reduce((s, i) => s + i.price, 0), items: bought, eventId })
               clearCart()
               router.push(`/checkout/success?order=${out.orderId}`)
               return

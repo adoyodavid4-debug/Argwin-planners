@@ -1,6 +1,7 @@
 // lib/store.ts — global Zustand state
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { trackAddToCart } from '@/lib/analytics'
 
 export interface CartItem {
   id: string
@@ -27,6 +28,7 @@ export const useCartStore = create<CartStore>()(
       addItem: (item) => {
         if (!get().hasItem(item.id)) {
           set((state) => ({ items: [...state.items, item] }))
+          trackAddToCart(item)
         }
       },
       removeItem: (id) => set((state) => ({ items: state.items.filter((i) => i.id !== id) })),

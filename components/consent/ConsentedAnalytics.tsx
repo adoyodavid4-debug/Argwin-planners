@@ -1,7 +1,15 @@
 'use client'
-// Gate for all non-essential tags. GA4 and the Meta Pixel are mounted only once
-// their category is granted, so no analytics/marketing cookie is set before the
-// visitor opts in (UK GDPR / PECR). ids come from build-time NEXT_PUBLIC_* env.
+// Analytics tags under UK GDPR / PECR:
+//
+// GA4 — Google Consent Mode v2. gtag.js loads for EVERY visitor, but the
+// consent defaults in app/layout.tsx start all signals "denied", so before
+// opt-in GA sets no cookies and stores no identifiers (cookieless pings only —
+// this is what keeps "data collection active" in the GA property). When the
+// visitor grants analytics/marketing consent we upgrade the signals here.
+//
+// Meta Pixel — no equivalent consent mode worth trusting, so it stays hard
+// gated: fbevents.js is only injected after marketing consent.
+import { useEffect } from 'react'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { useConsent } from './ConsentProvider'
 import MetaPixel from './MetaPixel'
@@ -14,11 +22,24 @@ const PIXEL_ID = RAW_PIXEL_ID && /^\d{6,}$/.test(RAW_PIXEL_ID) ? RAW_PIXEL_ID : 
 
 export default function ConsentedAnalytics() {
   const { ready, consent } = useConsent()
-  if (!ready) return null
+
+  // Push consent updates whenever the stored decision (re)hydrates or changes.
+  useEffect(() => {
+    if (!ready) return
+    try {
+      window.gtag?.('consent', 'update', {
+        analytics_storage: consent.analytics ? 'granted' : 'denied',
+        ad_storage: consent.marketing ? 'granted' : 'denied',
+        ad_user_data: consent.marketing ? 'granted' : 'denied',
+        ad_personalization: consent.marketing ? 'granted' : 'denied',
+      })
+    } catch { /* gtag not loaded yet — defaults stay denied */ }
+  }, [ready, consent.analytics, consent.marketing])
+
   return (
     <>
-      {consent.analytics && GA_ID && <GoogleAnalytics gaId={GA_ID} />}
-      {consent.marketing && PIXEL_ID && <MetaPixel pixelId={PIXEL_ID} />}
+      {GA_ID && <GoogleAnalytics gaId={GA_ID} />}
+      {ready && consent.marketing && PIXEL_ID && <MetaPixel pixelId={PIXEL_ID} />}
     </>
   )
 }

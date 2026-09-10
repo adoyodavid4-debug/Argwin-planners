@@ -131,6 +131,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning className={fontVars}>
       <head>
         <OrganizationSchema />
+        {/* Google Consent Mode v2 defaults — MUST run synchronously before
+            gtag.js loads. Everything starts "denied": GA sends only cookieless
+            pings (no cookies, no identifiers) until the visitor opts in, when
+            ConsentedAnalytics upgrades the signals via gtag('consent','update'). */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+gtag('consent','default',{ad_storage:'denied',analytics_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});`,
+          }}
+        />
       </head>
       <body className="grain">
         <ConsentProvider>
@@ -154,7 +164,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             />
             <CookieBanner />
           </ThemeProvider>
-          {/* GA4 + Meta Pixel load only after the matching consent is granted. */}
+          {/* GA4 runs in Consent Mode v2 (cookieless until analytics consent);
+              the Meta Pixel still loads only after marketing consent. */}
           <ConsentedAnalytics />
         </ConsentProvider>
       </body>

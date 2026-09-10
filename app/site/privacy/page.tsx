@@ -42,7 +42,7 @@ export default function PrivacyPage() {
 
       <LSection title="4. Cookies & analytics">
         <p><strong>Essential cookies</strong> run the cart, checkout, sign-in, and remember your cookie choice. They are always active because the site cannot work without them, and they do not need your consent.</p>
-        <p><strong>Analytics and marketing cookies</strong> — Google Analytics 4 (usage statistics) and the Meta/Facebook pixel (advertising measurement) — are <strong>switched off until you opt in</strong>. When you first visit we show a cookie banner where you can <em>Accept all</em>, <em>Reject all</em>, or choose per category; nothing non-essential loads unless you allow it.</p>
+        <p><strong>Analytics and marketing cookies</strong> — Google Analytics 4 (usage statistics) and the Meta/Facebook pixel (advertising measurement) — are <strong>switched off until you opt in</strong>. When you first visit we show a cookie banner where you can <em>Accept all</em>, <em>Reject all</em>, or choose per category. Until you opt in, Google Analytics runs in Google&rsquo;s cookieless &ldquo;consent mode&rdquo; (aggregate, cookie-free pings with no identifiers stored on your device) and the Meta pixel does not load at all; no analytics or marketing cookie is set unless you allow it.</p>
         <p>You can change or withdraw your choice at any time using the <strong>“Cookie settings”</strong> link in the footer — it is as easy to say no later as it was to say yes. You can also block or delete cookies in your browser settings.</p>
       </LSection>
 
