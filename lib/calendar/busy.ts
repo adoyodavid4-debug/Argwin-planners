@@ -3,7 +3,9 @@
 // exdates) into concrete occurrences within the window: a raw
 // `start_at < end AND end_at > start` filter only catches a recurring master on
 // its first occurrence's day, so without this a visitor could book over every
-// later occurrence of a weekly/daily meeting. Cancelled events never block.
+// later occurrence of a weekly/daily meeting. Only CONFIRMED events block —
+// cancelled events are freed up and tentative holds are not real commitments,
+// so neither should hide a bookable slot.
 
 import { parseRRule, expandOccurrences } from './recurrence'
 
@@ -48,7 +50,7 @@ export async function busyIntervalsForUsers(
       .select('user_id, start_at, end_at, rrule, exdates, status')
       .in('user_id', userIds)
       .is('rrule', null)
-      .neq('status', 'cancelled')
+      .eq('status', 'confirmed')
       .lt('start_at', endISO)
       .gt('end_at', startISO),
     supabase
@@ -56,7 +58,7 @@ export async function busyIntervalsForUsers(
       .select('user_id, start_at, end_at, rrule, exdates, status')
       .in('user_id', userIds)
       .not('rrule', 'is', null)
-      .neq('status', 'cancelled')
+      .eq('status', 'confirmed')
       .lt('start_at', endISO),
   ])
 
