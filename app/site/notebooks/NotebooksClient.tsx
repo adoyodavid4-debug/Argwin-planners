@@ -1,8 +1,8 @@
 'use client'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion'
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useScroll, useMotionValueEvent } from 'framer-motion'
 import {
   Notebook, NotebookPen, BookOpen, Sparkles, Zap, Smartphone, Download, RefreshCcw,
   Layers, Shield, Check, ArrowRight, ChevronRight, ChevronDown, Star, Quote, BadgeCheck,
@@ -115,6 +115,57 @@ function FullCoverPage({ hex, dark }: { hex: string; dark?: boolean }) {
   )
 }
 
+// ════════════════════════════════════════════════════════════
+//  Cover scroll deck — the six colour cover pages are the first
+//  six scrollable "pages"; the hero follows as the seventh.
+//  A tall track with a sticky viewport: scrolling advances covers.
+// ════════════════════════════════════════════════════════════
+function CoverScrollDeck() {
+  const ref = useRef<HTMLDivElement>(null)
+  const [idx, setIdx] = useState(0)
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] })
+  useMotionValueEvent(scrollYProgress, 'change', (v) => {
+    setIdx(Math.max(0, Math.min(COVERS.length - 1, Math.floor(v * COVERS.length))))
+  })
+  const c = COVERS[idx]
+
+  return (
+    <section ref={ref} aria-label="Notebook cover colours" style={{ height: `${COVERS.length * 100}vh` }} className="relative">
+      <div className="sticky top-0 flex h-screen flex-col items-center justify-center gap-6 overflow-hidden"
+        style={{ background: 'var(--bg-primary)' }}>
+        <AnimatePresence mode="wait">
+          <motion.div key={idx}
+            initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.01 }}
+            transition={{ duration: 0.3 }}>
+            <FullCoverPage hex={c.hex} dark={c.dark} />
+          </motion.div>
+        </AnimatePresence>
+
+        <div className="flex flex-col items-center gap-3">
+          <p className="text-xs uppercase tracking-widest font-semibold" style={{ color: 'var(--text-muted)', letterSpacing: '0.14em' }}>
+            {String(idx + 1).padStart(2, '0')} · {c.name}
+          </p>
+          <div className="flex items-center gap-2">
+            {COVERS.map((cv, i) => (
+              <span key={cv.name} className="h-1.5 rounded-full transition-all duration-300"
+                style={{ width: i === idx ? 20 : 6, background: i <= idx ? 'var(--gold)' : 'var(--border)' }} />
+            ))}
+          </div>
+        </div>
+
+        <div className="absolute bottom-6 flex flex-col items-center gap-2">
+          <motion.div animate={{ y: [0, 6, 0] }} transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}>
+            <ChevronDown size={18} style={{ color: 'var(--text-muted)' }} />
+          </motion.div>
+          <a href="#hero" className="text-[11px] font-medium underline-offset-2 hover:underline" style={{ color: 'var(--text-muted)' }}>
+            Skip to content
+          </a>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 // ── product card ──────────────────────────────────────────────
 function NotebookCard({ p, index }: { p: NotebookItem; index: number }) {
   const [loaded, setLoaded] = useState(false)
@@ -174,61 +225,17 @@ export default function NotebooksClient({ notebooks, faqs }: { notebooks: Notebo
   const [cover, setCover] = useState(0)
   const c = COVERS[cover]
 
-  // ── Hero intro reel: each colour's full cover page shows in turn,
-  //    then the hero content fades in. Skippable; honours reduced motion.
-  const [reel, setReel] = useState(0)
-  const [introDone, setIntroDone] = useState(false)
-  useEffect(() => {
-    if (introDone) return
-    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setIntroDone(true)
-      return
-    }
-    const t = setTimeout(() => {
-      if (reel >= COVERS.length - 1) setIntroDone(true)
-      else setReel((i) => i + 1)
-    }, 1000)
-    return () => clearTimeout(t)
-  }, [reel, introDone])
-
   return (
     <div className="w-full" style={{ background: 'var(--bg-primary)' }}>
 
-      {/* ══ HERO ══════════════════════════════════════════════ */}
-      <section className="relative w-full pt-12 pb-16 border-b overflow-hidden" style={{ borderColor: 'var(--border)' }}>
+      {/* ══ 1–6 · COVER PAGES (scroll deck) ═══════════════════ */}
+      <CoverScrollDeck />
 
-        {/* Cover reel overlay — plays once, then hands over to the content */}
-        <AnimatePresence>
-          {!introDone && (
-            <motion.button
-              type="button" aria-label="Skip intro" onClick={() => setIntroDone(true)}
-              className="absolute inset-0 z-20 flex cursor-pointer flex-col items-center justify-center gap-6"
-              style={{ background: 'var(--bg-primary)' }}
-              exit={{ opacity: 0 }} transition={{ duration: 0.6 }}>
-              <AnimatePresence mode="wait">
-                <motion.div key={reel}
-                  initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.01 }}
-                  transition={{ duration: 0.35 }}>
-                  <FullCoverPage hex={COVERS[reel].hex} dark={COVERS[reel].dark} />
-                </motion.div>
-              </AnimatePresence>
-              <div className="flex flex-col items-center gap-3">
-                <p className="text-xs uppercase tracking-widest font-semibold" style={{ color: 'var(--text-muted)', letterSpacing: '0.14em' }}>{COVERS[reel].name}</p>
-                <div className="flex items-center gap-2">
-                  {COVERS.map((cv, i) => (
-                    <span key={cv.name} className="h-1.5 rounded-full transition-all duration-300"
-                      style={{ width: i === reel ? 20 : 6, background: i <= reel ? 'var(--gold)' : 'var(--border)' }} />
-                  ))}
-                </div>
-              </div>
-            </motion.button>
-          )}
-        </AnimatePresence>
-
-        <motion.div className="container-site relative grid lg:grid-cols-2 gap-10 lg:gap-14 items-center"
-          animate={{ opacity: introDone ? 1 : 0 }} transition={{ duration: 0.6, delay: introDone ? 0.25 : 0 }}>
+      {/* ══ 7 · HERO ══════════════════════════════════════════ */}
+      <section id="hero" className="relative w-full pt-12 pb-16 border-b overflow-hidden" style={{ borderColor: 'var(--border)', scrollMarginTop: 80 }}>
+        <div className="container-site relative grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
           {/* Copy */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-60px' }} transition={{ duration: 0.5 }}>
             <nav className="flex items-center gap-1.5 mb-5 text-xs" aria-label="Breadcrumb" style={{ color: 'var(--text-muted)' }}>
               <Link href="/" className="hover:text-gold transition-colors" style={{ color: 'var(--text-muted)' }}>Home</Link>
               <ChevronRight size={12} /><span style={{ color: 'var(--text-primary)' }}>Digital Notebooks</span>
@@ -255,7 +262,7 @@ export default function NotebooksClient({ notebooks, faqs }: { notebooks: Notebo
           </motion.div>
 
           {/* Interactive cover designer */}
-          <motion.div initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.55, delay: 0.15 }} className="relative">
+          <motion.div initial={{ opacity: 0, scale: 0.94 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: '-60px' }} transition={{ duration: 0.55, delay: 0.15 }} className="relative">
             <div className="relative h-[340px] sm:h-[380px]">
               <NotebookPreview hex={c.hex} dark={c.dark} />
             </div>
@@ -272,7 +279,7 @@ export default function NotebooksClient({ notebooks, faqs }: { notebooks: Notebo
               </div>
             </div>
           </motion.div>
-        </motion.div>
+        </div>
       </section>
 
       {/* ══ TRUST STRIP ═══════════════════════════════════════ */}
