@@ -1,5 +1,5 @@
 'use client'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion'
@@ -88,6 +88,33 @@ function NotebookPreview({ hex, dark }: { hex: string; dark?: boolean }) {
   )
 }
 
+// ════════════════════════════════════════════════════════════
+//  Full cover page (flat, large) — used by the hero intro reel
+// ════════════════════════════════════════════════════════════
+function FullCoverPage({ hex, dark }: { hex: string; dark?: boolean }) {
+  const txt = dark ? '#2C2A35' : '#ffffff'
+  return (
+    <div style={{
+      position: 'relative', height: 'clamp(340px, 56vh, 470px)', aspectRatio: '3/4',
+      borderRadius: '8px 16px 16px 8px', overflow: 'hidden',
+      background: `linear-gradient(135deg, ${shade(hex, 0.18)} 0%, ${hex} 55%, ${shade(hex, -0.12)} 100%)`,
+      boxShadow: '0 30px 70px rgba(44,42,53,0.28)',
+    }}>
+      <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 20, background: shade(hex, -0.22), boxShadow: 'inset -5px 0 10px rgba(0,0,0,0.28)' }} />
+      <div style={{ position: 'absolute', inset: '26px 28px 26px 40px', border: `1.5px solid ${dark ? 'rgba(44,42,53,0.25)' : 'rgba(255,255,255,0.45)'}`, borderRadius: 9 }} />
+      <div style={{ position: 'absolute', left: 10, right: 0, top: '38%', textAlign: 'center' }}>
+        <div style={{ width: 42, height: 42, margin: '0 auto 14px', borderRadius: '50%', border: `1.5px solid ${txt}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Sparkles size={19} color={txt} />
+        </div>
+        <p style={{ fontFamily: 'var(--font-cormorant)', fontSize: 30, lineHeight: 1, color: txt, fontWeight: 600 }}>Arwign</p>
+        <p style={{ fontSize: 10, letterSpacing: '0.25em', textTransform: 'uppercase', color: txt, opacity: 0.85, marginTop: 7 }}>Notebook</p>
+      </div>
+      <div style={{ position: 'absolute', right: 36, top: -4, bottom: -4, width: 13, background: 'rgba(0,0,0,0.16)' }} />
+      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(115deg, rgba(255,255,255,0.2) 0%, transparent 38%)', pointerEvents: 'none' }} />
+    </div>
+  )
+}
+
 // ── product card ──────────────────────────────────────────────
 function NotebookCard({ p, index }: { p: NotebookItem; index: number }) {
   const [loaded, setLoaded] = useState(false)
@@ -147,17 +174,59 @@ export default function NotebooksClient({ notebooks, faqs }: { notebooks: Notebo
   const [cover, setCover] = useState(0)
   const c = COVERS[cover]
 
+  // ── Hero intro reel: each colour's full cover page shows in turn,
+  //    then the hero content fades in. Skippable; honours reduced motion.
+  const [reel, setReel] = useState(0)
+  const [introDone, setIntroDone] = useState(false)
+  useEffect(() => {
+    if (introDone) return
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setIntroDone(true)
+      return
+    }
+    const t = setTimeout(() => {
+      if (reel >= COVERS.length - 1) setIntroDone(true)
+      else setReel((i) => i + 1)
+    }, 1000)
+    return () => clearTimeout(t)
+  }, [reel, introDone])
+
   return (
     <div className="w-full" style={{ background: 'var(--bg-primary)' }}>
 
       {/* ══ HERO ══════════════════════════════════════════════ */}
-      <section className="relative w-full pt-12 pb-16 border-b overflow-hidden bg-gradient-mesh" style={{ borderColor: 'var(--border)' }}>
-        <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute rounded-full blur-3xl opacity-30 animate-float" style={{ width: 320, height: 320, top: -110, right: '4%', background: '#E5DFD5' }} />
-          <div className="absolute rounded-full blur-3xl opacity-25 animate-float-delayed" style={{ width: 240, height: 240, bottom: -80, left: '0%', background: 'var(--gold)' }} />
-        </div>
+      <section className="relative w-full pt-12 pb-16 border-b overflow-hidden" style={{ borderColor: 'var(--border)' }}>
 
-        <div className="container-site relative grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+        {/* Cover reel overlay — plays once, then hands over to the content */}
+        <AnimatePresence>
+          {!introDone && (
+            <motion.button
+              type="button" aria-label="Skip intro" onClick={() => setIntroDone(true)}
+              className="absolute inset-0 z-20 flex cursor-pointer flex-col items-center justify-center gap-6"
+              style={{ background: 'var(--bg-primary)' }}
+              exit={{ opacity: 0 }} transition={{ duration: 0.6 }}>
+              <AnimatePresence mode="wait">
+                <motion.div key={reel}
+                  initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.01 }}
+                  transition={{ duration: 0.35 }}>
+                  <FullCoverPage hex={COVERS[reel].hex} dark={COVERS[reel].dark} />
+                </motion.div>
+              </AnimatePresence>
+              <div className="flex flex-col items-center gap-3">
+                <p className="text-xs uppercase tracking-widest font-semibold" style={{ color: 'var(--text-muted)', letterSpacing: '0.14em' }}>{COVERS[reel].name}</p>
+                <div className="flex items-center gap-2">
+                  {COVERS.map((cv, i) => (
+                    <span key={cv.name} className="h-1.5 rounded-full transition-all duration-300"
+                      style={{ width: i === reel ? 20 : 6, background: i <= reel ? 'var(--gold)' : 'var(--border)' }} />
+                  ))}
+                </div>
+              </div>
+            </motion.button>
+          )}
+        </AnimatePresence>
+
+        <motion.div className="container-site relative grid lg:grid-cols-2 gap-10 lg:gap-14 items-center"
+          animate={{ opacity: introDone ? 1 : 0 }} transition={{ duration: 0.6, delay: introDone ? 0.25 : 0 }}>
           {/* Copy */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <nav className="flex items-center gap-1.5 mb-5 text-xs" aria-label="Breadcrumb" style={{ color: 'var(--text-muted)' }}>
@@ -203,7 +272,7 @@ export default function NotebooksClient({ notebooks, faqs }: { notebooks: Notebo
               </div>
             </div>
           </motion.div>
-        </div>
+        </motion.div>
       </section>
 
       {/* ══ TRUST STRIP ═══════════════════════════════════════ */}
@@ -215,34 +284,15 @@ export default function NotebooksClient({ notebooks, faqs }: { notebooks: Notebo
         </div>
       </section>
 
-      {/* ══ TWO WAYS TO GET YOURS ═════════════════════════════ */}
-      <section className="container-site py-16">
-        <div className="text-center mb-10 max-w-xl mx-auto">
-          <p className="text-xs uppercase tracking-widest font-semibold mb-2" style={{ color: 'var(--gold)', letterSpacing: '0.12em' }}>Two Ways to Get Yours</p>
-          <h2 className="font-display text-display-sm" style={{ color: 'var(--text-primary)' }}>Ready-Made or Made for You</h2>
-        </div>
-        <div className="grid md:grid-cols-2 gap-5">
-          {[
-            { href: '/notebooks/general', icon: BookOpen, title: 'Ready-Made Notebooks', body: 'Shop our curated library of beautifully designed notebooks — download and start within minutes.', cta: 'Browse the library', accent: 'var(--lavender)' },
-            { href: '/notebooks/personalized', icon: Wand2, title: 'Personalized Notebooks', body: 'Have a specific layout, theme or niche in mind? Tell us your idea and our team designs it around you.', cta: 'Request a custom design', accent: 'var(--gold)' },
-          ].map(({ href, icon: Icon, title, body, cta, accent }) => (
-            <Link key={href} href={href} className="group relative p-7 rounded-3xl border overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-product-hover" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-              <div aria-hidden className="absolute -top-12 -right-12 w-36 h-36 rounded-full blur-3xl opacity-50 transition-opacity duration-300 group-hover:opacity-80" style={{ background: accent }} />
-              <div className="relative w-14 h-14 rounded-2xl flex items-center justify-center mb-5" style={{ background: 'rgba(var(--gold-rgb),0.12)' }}><Icon size={26} style={{ color: 'var(--gold)' }} /></div>
-              <h3 className="relative font-display text-2xl mb-2" style={{ color: 'var(--text-primary)' }}>{title}</h3>
-              <p className="relative text-sm leading-relaxed mb-5" style={{ color: 'var(--text-secondary)' }}>{body}</p>
-              <span className="relative inline-flex items-center gap-1.5 text-sm font-semibold" style={{ color: 'var(--gold)' }}>{cta} <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" /></span>
-            </Link>
-          ))}
-        </div>
-      </section>
-
       {/* ══ NOTEBOOK GRID ═════════════════════════════════════ */}
       <section id="notebooks" className="border-t py-16" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)', scrollMarginTop: 100 }}>
         <div className="container-site">
           <div className="text-center mb-10">
             <p className="text-xs uppercase tracking-widest font-semibold mb-2" style={{ color: 'var(--gold)', letterSpacing: '0.12em' }}>The Library</p>
             <h2 className="font-display text-display-sm" style={{ color: 'var(--text-primary)' }}>Featured Notebooks</h2>
+            <Link href="/notebooks/general" className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold" style={{ color: 'var(--gold)' }}>
+              Browse all General Notebooks <ArrowRight size={14} />
+            </Link>
           </div>
 
           {notebooks.length === 0 ? (
@@ -327,7 +377,7 @@ export default function NotebooksClient({ notebooks, faqs }: { notebooks: Notebo
           </div>
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {[
-              { icon: Notebook, title: 'Choose Your Notebook', body: 'Pick a ready-made design or request a custom one built around your needs.' },
+              { icon: Notebook, title: 'Choose Your Notebook', body: 'Pick a design from the library or request a custom one built around your needs.' },
               { icon: Download, title: 'Download Instantly', body: 'Files arrive by email and in your account the moment payment clears.' },
               { icon: Tablet, title: 'Import & Begin', body: 'Open in GoodNotes or print at home and start filling the pages.' },
             ].map(({ icon: Icon, title, body }, i) => (
