@@ -1,7 +1,28 @@
 import { ImageResponse } from '@vercel/og'
 import { NextRequest } from 'next/server'
+import sharp from 'sharp'
 
-export const runtime = 'edge'
+// Node runtime required: sharp is used to transcode the source image below.
+export const runtime = 'nodejs'
+
+// Satori (inside @vercel/og) can only decode PNG/JPEG/GIF — not WebP, which is
+// what our product images are stored as. Fetch the image and normalise it to a
+// PNG data URL so any source format renders. Returns null on any failure so the
+// image is simply omitted and the OG endpoint never throws.
+async function toPngDataUrl(url: string): Promise<string | null> {
+  try {
+    const res = await fetch(url)
+    if (!res.ok) return null
+    const input = Buffer.from(await res.arrayBuffer())
+    const png = await sharp(input)
+      .resize(800, 800, { fit: 'inside', withoutEnlargement: true })
+      .png()
+      .toBuffer()
+    return `data:image/png;base64,${png.toString('base64')}`
+  } catch {
+    return null
+  }
+}
 
 // Generates OG (1200×630) and Pinterest (1000×1500) images on demand.
 // Usage: /api/og?title=...&subtitle=...&image=...&variant=og|pin
@@ -15,6 +36,9 @@ export async function GET(req: NextRequest) {
 
   const width  = variant === 'pin' ? 1000 : 1200
   const height = variant === 'pin' ? 1500 : 630
+
+  // Transcode the product image to a PNG data URL (WebP/JPEG/… all handled).
+  const imageSrc = imageUrl ? await toPngDataUrl(imageUrl) : null
 
   return new ImageResponse(
     (
@@ -43,7 +67,7 @@ export async function GET(req: NextRequest) {
           }}
         >
           {/* Product image */}
-          {imageUrl && (
+          {imageSrc && (
             <div
               style={{
                 width:  variant === 'pin' ? 700 : 320,
@@ -56,7 +80,7 @@ export async function GET(req: NextRequest) {
               }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={imageUrl} width={variant === 'pin' ? 700 : 320} height={variant === 'pin' ? 700 : 320}
+              <img src={imageSrc} width={variant === 'pin' ? 700 : 320} height={variant === 'pin' ? 700 : 320}
                 style={{ objectFit: 'cover' }} alt="" />
             </div>
           )}
