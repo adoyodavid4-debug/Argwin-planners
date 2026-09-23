@@ -246,8 +246,8 @@ export default function ShopClient({ products, categories, featured }: Props) {
             <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
               {featured.map((p) => (
                 <Link key={p.id} href={`/shop/${p.slug}`} className="flex-shrink-0 w-36 group">
-                  <div className="relative rounded-xl overflow-hidden mb-2" style={{ aspectRatio: '3/4', background: '#000', border: '1px solid var(--border)' }}>
-                    <Image src={p.thumbnail || FALLBACK_IMG} alt={p.title} fill loading="lazy" sizes="144px" className="object-contain transition-transform duration-300 group-hover:scale-105" />
+                  <div className="relative rounded-xl overflow-hidden mb-2" style={{ aspectRatio: '3/4', background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>
+                    <Image src={p.thumbnail || FALLBACK_IMG} alt={p.title} fill loading="lazy" sizes="144px" className="object-cover transition-transform duration-300 group-hover:scale-105" />
                     <span className="absolute top-2 left-2 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-white text-[9px] font-black" style={{ background: 'linear-gradient(135deg, var(--gold), var(--gold-light))' }}><Crown size={8} /> BEST</span>
                   </div>
                   <p className="text-xs font-semibold line-clamp-2 group-hover:text-gold transition-colors" style={{ color: 'var(--text-primary)' }}>{p.title}</p>
@@ -382,8 +382,8 @@ export default function ShopClient({ products, categories, featured }: Props) {
             <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
               {recent.map((p) => (
                 <Link key={p.id} href={`/shop/${p.slug}`} className="flex-shrink-0 w-36 group">
-                  <div className="relative rounded-xl overflow-hidden mb-2" style={{ aspectRatio: '3/4', background: '#000', border: '1px solid var(--border)' }}>
-                    <Image src={p.thumbnail || FALLBACK_IMG} alt={p.title} fill loading="lazy" sizes="144px" className="object-contain transition-transform duration-300 group-hover:scale-105" />
+                  <div className="relative rounded-xl overflow-hidden mb-2" style={{ aspectRatio: '3/4', background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>
+                    <Image src={p.thumbnail || FALLBACK_IMG} alt={p.title} fill loading="lazy" sizes="144px" className="object-cover transition-transform duration-300 group-hover:scale-105" />
                   </div>
                   <p className="text-xs font-semibold line-clamp-2 group-hover:text-gold transition-colors" style={{ color: 'var(--text-primary)' }}>{p.title}</p>
                   <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{money(p.price, p.currency)}</p>
@@ -551,10 +551,10 @@ function ShopCard({ p, index, onQuickView }: { p: Product; index: number; onQuic
   return (
     <motion.div layout initial={reduce ? false : { opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reduce ? 0 : 0.4, delay: reduce ? 0 : Math.min(index * 0.03, 0.25) }} className="group">
       <div className="rounded-xl overflow-hidden tile-hover h-full flex flex-col" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-        <div className="relative overflow-hidden" style={{ aspectRatio: '3/4', background: '#000' }}>
+        <div className="relative overflow-hidden" style={{ aspectRatio: '3/4', background: 'var(--bg-secondary)' }}>
           {!loaded && <div className="absolute inset-0 skeleton" />}
           <Badges p={p} />
-          <Link href={`/shop/${p.slug}`} aria-label={p.title}><Image src={p.thumbnail || FALLBACK_IMG} alt={`${p.title} cover`} fill sizes="(max-width:640px) 50vw, 25vw" priority={index < 4} onLoad={() => setLoaded(true)} className={`object-contain transition-all duration-500 ${loaded ? 'opacity-100' : 'opacity-0'} group-hover:scale-[1.05]`} /></Link>
+          <Link href={`/shop/${p.slug}`} aria-label={p.title}><Image src={p.thumbnail || FALLBACK_IMG} alt={`${p.title} cover`} fill sizes="(max-width:640px) 50vw, 25vw" priority={index < 4} onLoad={() => setLoaded(true)} className={`object-cover transition-all duration-500 ${loaded ? 'opacity-100' : 'opacity-0'} group-hover:scale-[1.05]`} /></Link>
           <button onClick={wish} aria-label="Toggle wishlist" className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full flex items-center justify-center transition-transform hover:scale-110" style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(6px)' }}><Heart size={14} style={{ fill: isWished ? 'var(--blush)' : 'transparent', stroke: isWished ? '#C9847C' : '#888' }} /></button>
           <div className="absolute inset-x-0 bottom-0 p-3 flex gap-2 translate-y-full group-hover:translate-y-0 transition-transform duration-300" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.55), transparent)' }}>
             <button onClick={(e) => { e.preventDefault(); onQuickView() }} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-full text-xs font-semibold" style={{ background: 'rgba(255,255,255,0.92)', color: 'var(--charcoal)' }}><Eye size={13} /> Quick view</button>
@@ -579,9 +579,9 @@ function ShopRow({ p, index, onQuickView }: { p: Product; index: number; onQuick
   const sale = p.compare_price && p.compare_price > p.price
   return (
     <motion.div layout initial={reduce ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reduce ? 0 : 0.35, delay: reduce ? 0 : Math.min(index * 0.03, 0.2) }} className="flex gap-4 p-3 rounded-2xl border tile-hover" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-      <Link href={`/shop/${p.slug}`} className="relative flex-shrink-0 rounded-xl overflow-hidden" style={{ width: 128, aspectRatio: '3/4', background: '#000' }}>
+      <Link href={`/shop/${p.slug}`} className="relative flex-shrink-0 rounded-xl overflow-hidden" style={{ width: 128, aspectRatio: '3/4', background: 'var(--bg-secondary)' }}>
         <Badges p={p} />
-        <Image src={p.thumbnail || FALLBACK_IMG} alt={p.title} fill loading="lazy" sizes="128px" className="object-contain" />
+        <Image src={p.thumbnail || FALLBACK_IMG} alt={p.title} fill loading="lazy" sizes="128px" className="object-cover" />
       </Link>
       <div className="flex-1 min-w-0 flex flex-col">
         <div className="flex items-start gap-2">
