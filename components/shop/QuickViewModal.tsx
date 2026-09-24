@@ -133,7 +133,7 @@ export default function QuickViewModal({ product, onClose }: Props) {
 
             {/* Preview thumbnails */}
             {product.preview_pages?.length > 0 && (
-              <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+              <div className="flex flex-wrap gap-2">
                 {product.preview_pages.slice(0, 4).map((url, i) => (
                   <div
                     key={i}

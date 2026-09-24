@@ -173,12 +173,12 @@ export default function BookingClient({ page }: { page: PublicPage }) {
                     </div>
                   </div>
 
-                  {/* Day strip */}
-                  <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2 mb-5">
+                  {/* Day strip — wraps so all days stay visible on phones */}
+                  <div className="grid grid-cols-5 sm:grid-cols-7 gap-2 pb-2 mb-5">
                     {days.map((d) => {
                       const l = dayLabel(d); const active = d === date
                       return (
-                        <button key={d} onClick={() => setDate(d)} className="flex-shrink-0 w-16 rounded-2xl border py-2.5 text-center transition-all"
+                        <button key={d} onClick={() => setDate(d)} className="min-w-0 rounded-2xl border py-2.5 text-center transition-all"
                           style={{ borderColor: active ? accent : 'var(--border)', background: active ? 'rgba(var(--gold-rgb),0.12)' : 'var(--bg-secondary)' }}>
                           <span className="block text-[11px] uppercase" style={{ color: 'var(--text-muted)' }}>{l.weekday}</span>
                           <span className="block text-lg font-semibold tabular-nums" style={{ color: 'var(--text-primary)' }}>{l.day}</span>

@@ -238,8 +238,8 @@ export default function PersonalizedClient() {
           <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>A glimpse of the interior spreads and tab navigation you can tailor.</p>
         </motion.div>
         <motion.div {...reveal(0.05)} className="grid lg:grid-cols-5 gap-8 items-start">
-          <div className="lg:col-span-3"><InteriorCarousel spreads={SPREADS} /></div>
-          <div className="lg:col-span-2 flex flex-col gap-3">
+          <div className="lg:col-span-3 min-w-0"><InteriorCarousel spreads={SPREADS} /></div>
+          <div className="lg:col-span-2 min-w-0 flex flex-col gap-3">
             {FEATURES.slice(0, 4).map((f) => { const Icon = FEAT_ICON[f.icon] ?? Sparkles; return (
               <div key={f.title} className="flex items-start gap-3 p-4 rounded-2xl border" style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}>
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(var(--gold-rgb),0.12)' }}><Icon size={18} style={{ color: 'var(--gold)' }} /></div>

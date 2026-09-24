@@ -644,9 +644,9 @@ export default function CategoryClient({ category, products, relatedCategories }
               <Clock size={16} style={{ color: 'var(--gold)' }} />
               <h2 className="font-display text-2xl" style={{ color: 'var(--text-primary)' }}>Recently Viewed</h2>
             </div>
-            <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
+            <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:flex md:gap-4 md:overflow-x-auto md:scrollbar-hide md:pb-2">
               {recentlyViewed.map((p) => (
-                <Link key={p.id} href={`/shop/${p.slug}`} className="flex-shrink-0 w-40 group">
+                <Link key={p.id} href={`/shop/${p.slug}`} className="min-w-0 md:flex-shrink-0 md:w-40 group">
                   <div className="relative rounded-xl overflow-hidden mb-2" style={{ aspectRatio: '3/4', background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
                     <Image src={p.thumbnail || FALLBACK_IMG} alt={p.title} fill sizes="160px" className="object-cover transition-transform duration-300 group-hover:scale-105" />
                   </div>

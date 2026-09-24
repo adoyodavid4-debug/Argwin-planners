@@ -104,6 +104,10 @@ html {
   -webkit-text-size-adjust: 100%;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  /* body-level overflow-x:hidden alone is ignored by iOS Safari when content
+     overhangs — the page can still be panned sideways. Clipping here too locks
+     the viewport horizontally on every page. */
+  overflow-x: hidden;
 }
 
 /* Smooth anchor scrolling only for users who haven't asked for reduced motion. */

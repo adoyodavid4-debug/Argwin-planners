@@ -41,8 +41,8 @@ export default function InteriorCarousel({ spreads }: { spreads: Spread[] }) {
         <span className="sr-only" aria-live="polite">Spread {i + 1} of {n}: {spreads[i].caption}</span>
       </div>
 
-      {/* thumbnails */}
-      <div className="flex gap-2.5 mt-4 overflow-x-auto scrollbar-hide pb-1">
+      {/* thumbnails — wrap so every spread stays reachable within the viewport */}
+      <div className="flex flex-wrap gap-2.5 mt-4 pb-1">
         {spreads.map((s, idx) => (
           <button key={idx} onClick={() => setI(idx)} aria-label={`View ${s.caption}`} aria-current={idx === i}
             className="relative flex-shrink-0 rounded-xl overflow-hidden transition-all"

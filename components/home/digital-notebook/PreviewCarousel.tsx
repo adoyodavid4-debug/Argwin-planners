@@ -121,7 +121,7 @@ export default function PreviewCarousel({ accent, accentLabel }: Props) {
       {/* Thumbnail strip */}
       <div
         ref={thumbsRef}
-        className="flex gap-2 overflow-x-auto scrollbar-hide pb-1"
+        className="flex flex-wrap gap-2 pb-1"
         role="group"
         aria-label="Choose a spread to preview"
       >

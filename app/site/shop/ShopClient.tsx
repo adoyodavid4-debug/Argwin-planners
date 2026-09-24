@@ -217,7 +217,7 @@ export default function ShopClient({ products, categories, featured }: Props) {
       {/* ══ CATEGORY BAR — click to filter to the right planners ══ */}
       {catList.length > 0 && (
         <div className="border-b" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
-          <div className="container-site py-3 flex gap-2 overflow-x-auto scrollbar-hide" role="tablist" aria-label="Shop by category">
+          <div className="container-site py-3 flex flex-wrap gap-2" role="tablist" aria-label="Shop by category">
             <button role="tab" aria-selected={!category} onClick={() => setCategory(null)}
               className="flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium border transition-all"
               style={{ borderColor: !category ? 'var(--gold)' : 'var(--border)', background: !category ? 'var(--gold)' : 'var(--bg-card)', color: !category ? '#fff' : 'var(--text-primary)' }}>
@@ -243,9 +243,9 @@ export default function ShopClient({ products, categories, featured }: Props) {
         <section className="border-b py-8" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
           <div className="container-site">
             <div className="flex items-center gap-2 mb-4"><Crown size={15} style={{ color: 'var(--gold)' }} /><h2 className="font-display text-xl" style={{ color: 'var(--text-primary)' }}>Bestsellers</h2></div>
-            <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
+            <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:flex md:gap-4 md:overflow-x-auto md:scrollbar-hide md:pb-2">
               {featured.map((p) => (
-                <Link key={p.id} href={`/shop/${p.slug}`} className="flex-shrink-0 w-36 group">
+                <Link key={p.id} href={`/shop/${p.slug}`} className="min-w-0 md:flex-shrink-0 md:w-36 group">
                   <div className="relative rounded-xl overflow-hidden mb-2" style={{ aspectRatio: '3/4', background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>
                     <Image src={p.thumbnail || FALLBACK_IMG} alt={p.title} fill loading="lazy" sizes="144px" className="object-cover transition-transform duration-300 group-hover:scale-105" />
                     <span className="absolute top-2 left-2 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-white text-[9px] font-black" style={{ background: 'linear-gradient(135deg, var(--gold), var(--gold-light))' }}><Crown size={8} /> BEST</span>
@@ -379,9 +379,9 @@ export default function ShopClient({ products, categories, featured }: Props) {
         <section className="border-t py-12" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
           <div className="container-site">
             <div className="flex items-center gap-2 mb-6"><Clock size={16} style={{ color: 'var(--gold)' }} /><h2 className="font-display text-2xl" style={{ color: 'var(--text-primary)' }}>Recently viewed</h2></div>
-            <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
+            <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:flex md:gap-4 md:overflow-x-auto md:scrollbar-hide md:pb-2">
               {recent.map((p) => (
-                <Link key={p.id} href={`/shop/${p.slug}`} className="flex-shrink-0 w-36 group">
+                <Link key={p.id} href={`/shop/${p.slug}`} className="min-w-0 md:flex-shrink-0 md:w-36 group">
                   <div className="relative rounded-xl overflow-hidden mb-2" style={{ aspectRatio: '3/4', background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>
                     <Image src={p.thumbnail || FALLBACK_IMG} alt={p.title} fill loading="lazy" sizes="144px" className="object-cover transition-transform duration-300 group-hover:scale-105" />
                   </div>

@@ -63,6 +63,7 @@ export default function Navbar({
 
   const [scrolled,      setScrolled]      = useState(false)
   const [dropdownOpen,  setDropdownOpen]  = useState<string | null>(null)
+  const [mobileSection, setMobileSection] = useState<string | null>(null)
   const [mounted,       setMounted]       = useState(false)
   const { theme, setTheme }              = useTheme()
   const pathname                         = usePathname()
@@ -75,6 +76,8 @@ export default function Navbar({
     window.addEventListener('scroll', handler, { passive: true })
     return () => window.removeEventListener('scroll', handler)
   }, [])
+  // Drawer reopens with every section collapsed again.
+  useEffect(() => { if (!mobileNavOpen) setMobileSection(null) }, [mobileNavOpen])
 
   return (
     <>
@@ -279,34 +282,66 @@ export default function Navbar({
             <div className="p-6 pt-20">
               <nav>
                 <ul className="space-y-1">
-                  {items.map((link) => (
-                    <li key={`${link.label}-${link.href}`}>
-                      <Link
-                        href={link.href}
-                        className="block px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 hover:bg-black/5 dark:hover:bg-white/5"
-                        style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-jost)' }}
-                        onClick={() => setMobileNavOpen(false)}
-                      >
-                        {link.label}
-                      </Link>
-                      {link.children && link.children.length > 0 && (
-                        <ul className="ml-4 mt-1 space-y-1">
-                          {link.children.map((child) => (
-                            <li key={`${child.label}-${child.href}`}>
-                              <Link
-                                href={child.href}
-                                className="block px-4 py-2 rounded-lg text-sm transition-all hover:bg-black/5 dark:hover:bg-white/5"
-                                style={{ color: 'var(--text-secondary)' }}
-                                onClick={() => setMobileNavOpen(false)}
-                              >
-                                {child.label}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </li>
-                  ))}
+                  {items.map((link) => {
+                    const hasChildren = !!link.children && link.children.length > 0
+                    const open = mobileSection === link.label
+                    return (
+                      <li key={`${link.label}-${link.href}`}>
+                        {hasChildren ? (
+                          <>
+                            {/* Collapsed dropdown — children only show once tapped open */}
+                            <button
+                              type="button"
+                              onClick={() => setMobileSection(open ? null : link.label)}
+                              aria-expanded={open}
+                              className="flex w-full items-center justify-between px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 hover:bg-black/5 dark:hover:bg-white/5"
+                              style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-jost)' }}
+                            >
+                              {link.label}
+                              <ChevronDown
+                                size={16}
+                                className={`transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+                                style={{ color: open ? 'var(--gold)' : 'var(--text-muted)' }}
+                              />
+                            </button>
+                            <AnimatePresence initial={false}>
+                              {open && (
+                                <motion.ul
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: 'auto', opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+                                  className="ml-4 overflow-hidden"
+                                >
+                                  {link.children!.map((child) => (
+                                    <li key={`${child.label}-${child.href}`}>
+                                      <Link
+                                        href={child.href}
+                                        className="block px-4 py-2 rounded-lg text-sm transition-all hover:bg-black/5 dark:hover:bg-white/5"
+                                        style={{ color: 'var(--text-secondary)' }}
+                                        onClick={() => setMobileNavOpen(false)}
+                                      >
+                                        {child.label}
+                                      </Link>
+                                    </li>
+                                  ))}
+                                </motion.ul>
+                              )}
+                            </AnimatePresence>
+                          </>
+                        ) : (
+                          <Link
+                            href={link.href}
+                            className="block px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 hover:bg-black/5 dark:hover:bg-white/5"
+                            style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-jost)' }}
+                            onClick={() => setMobileNavOpen(false)}
+                          >
+                            {link.label}
+                          </Link>
+                        )}
+                      </li>
+                    )
+                  })}
                 </ul>
               </nav>
 

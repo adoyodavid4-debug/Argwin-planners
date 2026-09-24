@@ -291,7 +291,7 @@ export default function NewArrivalsCarousel({ products }: { products: Product[] 
         ref={trackRef}
         role="list"
         aria-label="New arrivals"
-        className="scrollbar-hide -mx-1 flex snap-x snap-mandatory gap-5 overflow-x-auto px-1 pb-2"
+        className="grid grid-cols-2 gap-4 md:scrollbar-hide md:-mx-1 md:flex md:snap-x md:snap-mandatory md:gap-5 md:overflow-x-auto md:px-1 md:pb-2"
         style={{ scrollPadding: '0 4px' }}
       >
         {products.map((product, i) => (

@@ -54,7 +54,7 @@ export default function InteriorPreview() {
             <button onClick={() => go(1)} aria-label="Next spread" className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-transform hover:scale-110" style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(6px)' }}><ChevronRight size={18} style={{ color: 'var(--charcoal)' }} /></button>
             <span className="sr-only" aria-live="polite">Spread {i + 1} of {n}: {SPREADS[i].caption}</span>
           </div>
-          <div className="flex gap-2.5 mt-4 overflow-x-auto scrollbar-hide pb-1">
+          <div className="flex flex-wrap gap-2.5 mt-4 pb-1">
             {SPREADS.map((s, idx) => (
               <button key={idx} onClick={() => setI(idx)} aria-label={`View ${s.caption}`} aria-current={idx === i} className="relative flex-shrink-0 rounded-xl overflow-hidden transition-all" style={{ width: 84, height: 56, outline: idx === i ? '2px solid var(--gold)' : 'none', outlineOffset: 2, opacity: idx === i ? 1 : 0.6 }}>
                 <Image src={s.src} alt="" fill loading="lazy" sizes="84px" className="object-cover" />

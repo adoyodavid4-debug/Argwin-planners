@@ -99,7 +99,7 @@ export function NewArrivalsSkeleton() {
     <section className="section w-full" aria-hidden="true">
       <div className="container-site">
         <SectionHeader />
-        <div className="-mx-1 flex gap-5 overflow-hidden px-1">
+        <div className="grid grid-cols-2 gap-4 md:-mx-1 md:flex md:gap-5 md:overflow-hidden md:px-1">
           {Array.from({ length: 5 }).map((_, i) => (
             <div
               key={i}
