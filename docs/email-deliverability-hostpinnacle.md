@@ -15,19 +15,27 @@ landing in spam.
 ## 1. Add the domain in Resend
 
 1. Resend dashboard → **Domains → Add Domain** → enter `arwignplanners.com`.
-2. Pick the region closest to you (e.g. `us-east-1`). This decides the exact
-   hostnames in the records below — **always copy the values Resend shows you**,
-   don't hand-type the examples here.
-3. Resend now lists 3–4 DNS records. Keep that tab open for the next step.
+2. Open the domain's **Records** tab. **Always copy the values Resend shows
+   you** — don't hand-type the examples here.
 
-The records Resend generates look like this (yours will differ slightly):
+Resend's current infrastructure (**Forge**, hostnames under `rmta.net` — that
+domain belongs to Resend) uses **three records**:
 
-| Purpose | Type | Host / Name              | Value (copy from Resend)                        | Priority |
-|---------|------|--------------------------|-------------------------------------------------|----------|
-| DKIM    | TXT  | `resend._domainkey`      | `p=MIGfMA0GCSq…` (long key)                      | —        |
-| SPF     | TXT  | `send`                   | `v=spf1 include:amazonses.com ~all`             | —        |
-| Return-path (bounces) | MX | `send`      | `feedback-smtp.us-east-1.amazonses.com`         | 10       |
-| DMARC (recommended)   | TXT | `_dmarc`   | `v=DMARC1; p=none;`                              | —        |
+| Purpose | Type  | Host / Name         | Value (copy from Resend) |
+|---------|-------|---------------------|--------------------------|
+| Sending + SPF + bounces | CNAME | `send`  | `send.forge.rmta.net`    |
+| Return-path             | CNAME | `rsend` | `rsend.forge.rmta.net`   |
+| DKIM                    | TXT   | `resend._domainkey` | `p=MIGfMA0GCSq…` (long key, nothing else) |
+
+> **Where did the SPF TXT and `feedback-smtp…amazonses.com` MX go?** Older
+> Resend domains (Amazon SES-backed) needed a `v=spf1 include:amazonses.com`
+> TXT and a `feedback-smtp` MX on `send`. Forge replaces both with the CNAMEs
+> above: the SPF policy and the bounce ("feedback") mail exchanger now live on
+> `send.forge.rmta.net`, on Resend's side of the CNAME. If your dashboard shows
+> the CNAME values, do **not** add the old SPF/MX records.
+
+Also recommended (after verification): TXT `_dmarc` → `v=DMARC1; p=none;` —
+only if a `_dmarc` record doesn't already exist.
 
 ---
 
@@ -35,33 +43,37 @@ The records Resend generates look like this (yours will differ slightly):
 
 1. Log into HostPinnacle → **cPanel** → **Domains → Zone Editor** →
    **Manage** next to `arwignplanners.com`.
-2. For each Resend record click **+ Add Record** and fill it in.
+2. **First remove any old attempt:** if `send` already has a TXT (`v=spf1 …`)
+   or an MX (`feedback-smtp…`) record from earlier instructions, delete them.
+   DNS forbids a CNAME from coexisting with any other record on the same name —
+   the CNAME can't be added (or won't resolve) until they're gone.
+3. For each Resend record click **+ Add Record**:
 
 HostPinnacle appends the domain automatically, so enter the **Name** as just the
 host part:
 
-- DKIM → Name `resend._domainkey`, Type `TXT`, Value = the `p=…` key from Resend.
-- SPF (subdomain) → Name `send`, Type `TXT`, Value `v=spf1 include:amazonses.com ~all`.
-- Return-path → Name `send`, Type `MX`, Priority `10`,
-  Value `feedback-smtp.us-east-1.amazonses.com` (use YOUR region's value).
-- DMARC → Name `_dmarc`, Type `TXT`, Value `v=DMARC1; p=none;`
-  *(only add if you don't already have a `_dmarc` record — see below).*
+- Name `send`,  Type `CNAME`, Value `send.forge.rmta.net`
+- Name `rsend`, Type `CNAME`, Value `rsend.forge.rmta.net`
+- Name `resend._domainkey`, Type `TXT`, Value = the `p=…` key from Resend —
+  **the value must contain ONLY the key** (starts `p=MIG…`, ends `…IDAQAB`).
+  Pasting any surrounding text from instructions corrupts the record and DKIM
+  fails verification.
 
 > **TXT quoting:** paste the value without surrounding quotes; cPanel adds them.
 > If the DKIM key is very long, paste it as one line — don't split it.
 
 ### Do **not** touch these (they keep your inbox working)
 
-- **Root `MX`** (`@` → HostPinnacle mail server) — leave exactly as is.
+- **Root `MX`** (`@` → HostPinnacle mail server) — leave exactly as is, and it
+  must be the **only** root MX. A second root MX pointing anywhere else (e.g.
+  `inbound-smtp.us-east-1.amazonaws.com`) splits your incoming mail between two
+  servers and silently loses the half that goes to the wrong one — delete any
+  such extra record.
 - **Root `SPF`** (`@` TXT `v=spf1 …hostpinnacle… ~all`) — leave as is. Resend's
-  SPF lives on the `send` subdomain and aligns via DKIM, so the root SPF does not
-  need Resend added.
-  - *Optional hardening:* if you also send marketing mail straight from the root
-    domain and want belt-and-braces, you may add `include:amazonses.com` **into
-    the existing root SPF string** — never create a second root SPF record (only
-    one `v=spf1` TXT is allowed at the root).
-- **Existing `_dmarc`** — if HostPinnacle already created one, edit it instead of
-  adding a second. Only one `_dmarc` record may exist.
+  SPF lives behind the `send` CNAME and aligns via DKIM, so the root SPF does
+  not need Resend added. Only one `v=spf1` TXT is allowed at the root.
+- **Existing `_dmarc`** — if one already exists, edit it instead of adding a
+  second. Only one `_dmarc` record may exist.
 
 ---
 
@@ -71,10 +83,10 @@ host part:
 2. Back in Resend → **Domains** → click **Verify**. All records should go green.
 3. Sanity-check from your machine:
    ```bash
-   nslookup -type=TXT resend._domainkey.arwignplanners.com
-   nslookup -type=TXT send.arwignplanners.com
-   nslookup -type=MX  send.arwignplanners.com
-   nslookup -type=MX  arwignplanners.com   # should still be HostPinnacle
+   nslookup -type=CNAME send.arwignplanners.com    # → send.forge.rmta.net
+   nslookup -type=CNAME rsend.arwignplanners.com   # → rsend.forge.rmta.net
+   nslookup -type=TXT resend._domainkey.arwignplanners.com  # → p=MIG… only
+   nslookup -type=MX  arwignplanners.com   # → HostPinnacle only, nothing else
    ```
 
 ---
