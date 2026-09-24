@@ -41,9 +41,15 @@ export async function POST(req: NextRequest) {
   }
 
   const supabase = createServiceRoleClient()
+  // onConflict on email: without it the upsert conflicts on the fresh PK (never),
+  // raises 23505 for existing addresses, and a previously unsubscribed
+  // (is_active=false) address could never re-activate.
   const { error } = await supabase
     .from('newsletter_subscribers')
-    .upsert({ email: parsed.data.email, source: parsed.data.source, locale: parsed.data.locale, is_active: true })
+    .upsert(
+      { email: parsed.data.email, source: parsed.data.source, locale: parsed.data.locale, is_active: true },
+      { onConflict: 'email' }
+    )
 
   if (error && error.code !== '23505') {  // ignore duplicate
     console.error('[newsletter]', error)

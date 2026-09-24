@@ -79,13 +79,21 @@ export async function POST(req: NextRequest) {
       const productIds = session.metadata?.product_ids?.split(',').filter(Boolean) ?? []
       const email      = session.customer_email ?? session.customer_details?.email ?? ''
 
-      // Fetch products for order items
-      const { data: products } = await supabase
+      // No product_ids metadata → not a store checkout session; nothing to record.
+      if (productIds.length === 0) break
+
+      // Fetch products for order items. A paid session whose lookup fails must
+      // NOT be acknowledged — return 500 so Stripe redelivers and the order
+      // (and the buyer's email) is not silently lost.
+      const { data: products, error: productsErr } = await supabase
         .from('products')
         .select('id, title, price')
         .in('id', productIds)
 
-      if (!products?.length) break
+      if (productsErr || !products?.length) {
+        console.error('[stripe-webhook] products lookup failed for paid session', session.id, productsErr)
+        return NextResponse.json({ error: 'products lookup failed' }, { status: 500 })
+      }
 
       const subtotal = products.reduce((sum, p) => sum + p.price, 0)
       const total    = session.amount_total != null ? session.amount_total / 100 : subtotal
@@ -113,8 +121,10 @@ export async function POST(req: NextRequest) {
         .single()
 
       if (orderErr || !order) {
+        // Payment succeeded but the order (and buyer email) was not stored —
+        // fail the webhook so Stripe retries instead of losing the record.
         console.error('[stripe-webhook] Order creation failed:', orderErr)
-        break
+        return NextResponse.json({ error: 'order insert failed' }, { status: 500 })
       }
 
       // Insert order items
@@ -198,8 +208,10 @@ export async function POST(req: NextRequest) {
         .single()
 
       if (orderErr || !order) {
+        // Same rationale as the digital branch: never acknowledge a paid event
+        // whose order row (and buyer email) failed to persist.
         console.error('[stripe-webhook] Physical order creation failed:', orderErr)
-        break
+        return NextResponse.json({ error: 'order insert failed' }, { status: 500 })
       }
 
       if (pp?.product_id) {

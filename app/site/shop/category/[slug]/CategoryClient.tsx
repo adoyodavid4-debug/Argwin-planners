@@ -1119,7 +1119,11 @@ function NewsletterCTA({ categoryName }: { categoryName: string }) {
     if (!email || loading) return
     setLoading(true)
     try {
-      await fetch('/api/newsletter', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, source: `category:${categoryName}` }) })
+      const res = await fetch('/api/newsletter', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, source: `category:${categoryName}` }) })
+      if (!res.ok) {
+        toast.error(res.status === 429 ? 'Too many attempts — please try again in a few minutes.' : 'Something went wrong — try again.')
+        return
+      }
       setDone(true); toast.success('You\'re in! Check your inbox ✦')
     } catch { toast.error('Something went wrong — try again.') }
     finally { setLoading(false) }

@@ -60,14 +60,22 @@ export async function POST(req: NextRequest) {
   const token = randomBytes(32).toString('hex')
   const tokenExpires = new Date(Date.now() + 24 * 60 * 60_000).toISOString()
 
-  // Upsert subscriber (pending; idempotent on email)
+  // Never downgrade an already-confirmed subscriber back to 'pending' — a
+  // resubmission (e.g. grabbing a second freebie) keeps their confirmed status;
+  // the token still refreshes so the new download link works. Unsubscribed
+  // addresses DO go back through pending: re-opt-in needs fresh confirmation.
+  const { data: existing } = await supabase
+    .from('subscribers').select('status').eq('email', email).maybeSingle()
+  const nextStatus = existing?.status === 'confirmed' ? 'confirmed' : 'pending'
+
+  // Upsert subscriber (idempotent on email)
   const { data: sub, error } = await supabase
     .from('subscribers')
     .upsert(
       {
         email,
         locale,
-        status: 'pending',
+        status: nextStatus,
         source_lead_magnet_id: lead_magnet_id ?? null,
         utm: utm ?? {},
         consent_at: new Date().toISOString(),

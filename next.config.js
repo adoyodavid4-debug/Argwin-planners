@@ -100,6 +100,9 @@ const nextConfig = {
         { source: '/calendar',        destination: '/site/calendar' },
         { source: '/calendar/:path*', destination: '/site/calendar/:path*' },
         { source: '/order/:id',       destination: '/site/order/:id' },
+        // Unsubscribe confirmation — /api/optin/unsubscribe redirects here;
+        // without this rewrite every unsubscribe click landed on a 404.
+        { source: '/unsubscribed',    destination: '/site/unsubscribed' },
       ],
     }
   },
@@ -110,6 +113,9 @@ const nextConfig = {
       { source: '/planners',  destination: '/shop', permanent: true },
       { source: '/products',  destination: '/shop', permanent: true },
       { source: '/shop/all',  destination: '/shop', permanent: true },
+      // app/auth/register/ is an empty directory — signup lives on the login
+      // page's signup tab; send any register links there instead of a 404.
+      { source: '/auth/register', destination: '/auth/login?mode=signup', permanent: false },
     ]
   },
 }

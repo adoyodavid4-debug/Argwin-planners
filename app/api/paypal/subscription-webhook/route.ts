@@ -9,9 +9,41 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { verifyWebhookSignature, getSubscription } from '@/lib/paypal'
+import { PLAN_PRICE } from '@/lib/calendar/plan'
 
 const monthFromNow = () => new Date(Date.now() + 31 * 864e5).toISOString()
 const planFromId = (id?: string) => (id && id === process.env.NEXT_PUBLIC_PAYPAL_PLAN_TEAMS_ID ? 'teams' : 'plus')
+
+// Durable record of a subscription money event in orders — previously these
+// charges left no row (and no buyer email) in our database at all. Keyed on the
+// PayPal event id so webhook redeliveries don't duplicate. Best-effort: a
+// bookkeeping failure is logged, never breaks plan-state handling.
+async function recordSubscriptionPayment(
+  service: ReturnType<typeof createServiceRoleClient>,
+  args: { eventId: string; userId: string; email: string; plan: 'plus' | 'teams'; amount: number; subscriptionId: string; kind: string }
+) {
+  try {
+    const { data: dup } = await service
+      .from('orders').select('id')
+      .filter('metadata->>paypal_event_id', 'eq', args.eventId)
+      .limit(1)
+    if (dup?.length) return
+    const { error } = await service.from('orders').insert({
+      user_id:         args.userId,
+      email:           args.email,
+      status:          'completed',
+      payment_method:  'paypal',
+      amount_subtotal: args.amount,
+      amount_discount: 0,
+      amount_total:    args.amount,
+      currency:        'USD',
+      metadata:        { type: 'calendar_subscription', kind: args.kind, plan: args.plan, paypal_subscription_id: args.subscriptionId, paypal_event_id: args.eventId },
+    })
+    if (error) console.error('[paypal-webhook] payment record insert failed', args.kind, error)
+  } catch (err) {
+    console.error('[paypal-webhook] payment record failed', args.kind, err)
+  }
+}
 
 export async function POST(req: NextRequest) {
   const raw = await req.text()
@@ -40,6 +72,17 @@ export async function POST(req: NextRequest) {
         await service.from('profiles').update({
           calendar_plan: planFromId(r.plan_id), paypal_subscription_id: r.id, plan_expires_at: expires,
         }).eq('id', r.custom_id)
+        const plan = planFromId(r.plan_id)
+        const { data: prof } = await service.from('profiles').select('email').eq('id', r.custom_id).maybeSingle()
+        const paid = Number(r.billing_info?.last_payment?.amount?.value ?? PLAN_PRICE[plan])
+        await recordSubscriptionPayment(service, {
+          eventId: event.id ?? `${type}:${r.id}`, userId: r.custom_id, email: prof?.email ?? '',
+          plan, amount: paid, subscriptionId: r.id, kind: 'activation',
+        })
+      } else {
+        // A paid subscription we cannot link to a user — surface it loudly
+        // instead of dropping it silently.
+        console.error('[paypal-webhook] BILLING.SUBSCRIPTION.ACTIVATED without custom_id — unlinked paid subscription', r.id)
       }
     } else if (type === 'PAYMENT.SALE.COMPLETED') {
       const subId = r.billing_agreement_id
@@ -47,6 +90,15 @@ export async function POST(req: NextRequest) {
         let expires = monthFromNow()
         try { const sub: any = await getSubscription(subId); if (sub.billing_info?.next_billing_time) expires = new Date(sub.billing_info.next_billing_time).toISOString() } catch {}
         await service.from('profiles').update({ plan_expires_at: expires }).eq('paypal_subscription_id', subId)
+        const { data: prof } = await service.from('profiles')
+          .select('id, email, calendar_plan').eq('paypal_subscription_id', subId).maybeSingle()
+        if (prof) {
+          const plan = prof.calendar_plan === 'teams' ? 'teams' as const : 'plus' as const
+          await recordSubscriptionPayment(service, {
+            eventId: event.id ?? `${type}:${r.id}`, userId: prof.id, email: prof.email ?? '',
+            plan, amount: Number(r.amount?.total ?? PLAN_PRICE[plan]), subscriptionId: subId, kind: 'renewal',
+          })
+        }
       }
     } else if (type === 'BILLING.SUBSCRIPTION.EXPIRED') {
       if (r.id) await service.from('profiles').update({ calendar_plan: 'free', paypal_subscription_id: null }).eq('paypal_subscription_id', r.id)

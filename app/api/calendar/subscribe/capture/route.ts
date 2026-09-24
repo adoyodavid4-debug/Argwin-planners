@@ -37,6 +37,29 @@ export async function POST(req: NextRequest) {
 
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
     const service = createServiceRoleClient()
+
+    // Durable payment record FIRST — plan purchases previously wrote no orders
+    // row at all, so the buyer's email/payment existed only in PayPal. Recorded
+    // before activation so even an activation failure leaves a trace. Insert is
+    // best-effort: bookkeeping must never block the plan the user just paid for.
+    const { data: already } = await service
+      .from('orders').select('id').eq('paypal_order_id', orderID).limit(1)
+    if (!already?.length) {
+      const { error: recErr } = await service.from('orders').insert({
+        user_id:         user.id,
+        email:           user.email ?? '',
+        status:          'completed',
+        paypal_order_id: orderID,
+        payment_method:  'paypal',
+        amount_subtotal: PLAN_PRICE[plan],
+        amount_discount: 0,
+        amount_total:    amount,
+        currency:        'USD',
+        metadata:        { type: 'calendar_plan', plan, expires_at: expiresAt },
+      })
+      if (recErr) console.error('[subscribe/capture] payment record insert failed', recErr)
+    }
+
     const { error } = await service
       .from('profiles')
       .update({ calendar_plan: plan, plan_expires_at: expiresAt })
