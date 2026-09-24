@@ -249,7 +249,10 @@ export default function Navbar({
               aria-label={mobileNavOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={mobileNavOpen}
             >
-              <AnimatePresence mode="wait">
+              {/* initial={false}: without it the menu icon's rotate-90 entry
+                  state is server-rendered, so the hamburger shows as three
+                  vertical lines until hydration finishes. */}
+              <AnimatePresence mode="wait" initial={false}>
                 {mobileNavOpen ? (
                   <motion.div key="x" initial={{ rotate: -90 }} animate={{ rotate: 0 }} exit={{ rotate: 90 }} transition={{ duration: 0.15 }}>
                     <X size={20} />
