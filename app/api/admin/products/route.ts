@@ -57,6 +57,13 @@ export async function POST(req: NextRequest) {
     const isFeatured   = form.get('is_featured') === 'true'
     const isBestseller = form.get('is_bestseller') === 'true'
     const isNew        = form.get('is_new') !== 'false'
+    const isBundle     = form.get('is_bundle') === 'true' || deliveryType === 'bundle'
+    // bundle_items arrives as a JSON array of product UUIDs
+    let bundleItems: string[] | null = null
+    if (isBundle) {
+      const raw = form.get('bundle_items')
+      if (raw) { try { const p = JSON.parse(String(raw)); if (Array.isArray(p)) bundleItems = p.map(String).filter(Boolean) } catch { /* ignore */ } }
+    }
     const tagsRaw      = (form.get('tags') as string) ?? ''
     const tags         = tagsRaw ? tagsRaw.split(',').map((t) => t.trim()).filter(Boolean) : []
     const metaTitle    = (form.get('meta_title') as string) || title
@@ -165,6 +172,8 @@ export async function POST(req: NextRequest) {
         is_featured:      isFeatured,
         is_bestseller:    isBestseller,
         is_new:           isNew,
+        is_bundle:        isBundle,
+        bundle_items:     bundleItems,
         display_order:    displayOrder,
         tags,
         meta_title:       metaTitle,

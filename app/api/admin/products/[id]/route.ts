@@ -31,7 +31,7 @@ const JSON_ALLOWED = [
   'title', 'slug', 'status', 'price', 'compare_price', 'is_featured', 'is_bestseller',
   'is_new', 'description', 'tags', 'product_type', 'fulfillment_options', 'delivery_type',
   'category_id', 'file_formats', 'page_count', 'display_order', 'meta_title',
-  'meta_description', 'images', 'thumbnail',
+  'meta_description', 'images', 'thumbnail', 'is_bundle', 'bundle_items',
 ]
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
@@ -87,6 +87,14 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       if (form.has('is_featured'))    patch.is_featured   = form.get('is_featured') === 'true'
       if (form.has('is_bestseller'))  patch.is_bestseller = form.get('is_bestseller') === 'true'
       if (form.has('is_new'))         patch.is_new        = form.get('is_new') === 'true'
+      if (form.has('is_bundle'))      patch.is_bundle     = form.get('is_bundle') === 'true'
+      if (form.has('bundle_items')) {
+        const raw = form.get('bundle_items')
+        try {
+          const p = raw ? JSON.parse(String(raw)) : []
+          patch.bundle_items = Array.isArray(p) && p.length ? p.map(String).filter(Boolean) : null
+        } catch { patch.bundle_items = null }
+      }
       if (form.has('tags')) {
         const tagsRaw = String(form.get('tags'))
         patch.tags = tagsRaw ? tagsRaw.split(',').map((t) => t.trim()).filter(Boolean) : []

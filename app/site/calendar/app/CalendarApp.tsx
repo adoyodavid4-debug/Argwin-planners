@@ -488,7 +488,7 @@ export default function CalendarApp({ userEmail }: { userEmail: string }) {
   const openOcc = (o: Occ) => setDraft(draftFromOcc(o))
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
+    <div className="min-h-screen overflow-x-clip" style={{ background: 'var(--bg-primary)' }}>
       <div className="flex">
         {/* ── Sidebar ── */}
         <aside className="hidden lg:flex w-64 flex-shrink-0 flex-col gap-5 border-r p-4 min-h-screen" style={{ borderColor: 'var(--border)' }}>
@@ -539,25 +539,25 @@ export default function CalendarApp({ userEmail }: { userEmail: string }) {
         <div className="flex-1 min-w-0">
           <div className="container-site py-5">
             {/* Toolbar */}
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-              <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-4 min-w-0">
+              <div className="flex flex-wrap items-center gap-2 min-w-0">
                 <button onClick={() => step(-1)} className="btn-ghost" aria-label="Previous"><ChevronLeft size={18} /></button>
                 <button onClick={goToday} className="btn-outline px-3 py-1.5 text-sm">Today</button>
                 <button onClick={() => step(1)} className="btn-ghost" aria-label="Next"><ChevronRight size={18} /></button>
-                <span className="ml-1 min-w-[160px] font-medium" style={{ color: 'var(--text-primary)' }}>{title}</span>
+                <span className="ml-1 min-w-0 truncate sm:min-w-[160px] font-medium" style={{ color: 'var(--text-primary)' }}>{title}</span>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2 min-w-0 max-w-full">
                 <div className="relative hidden md:block">
                   <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
                   <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search"
                     className="w-40 rounded-lg border pl-8 pr-2 py-1.5 text-sm outline-none focus:ring-2"
                     style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-primary)' }} />
                 </div>
-                <div className="inline-flex rounded-xl border p-0.5" style={{ borderColor: 'var(--border)' }}>
+                <div className="inline-flex max-w-full overflow-x-auto scrollbar-hide rounded-xl border p-0.5" style={{ borderColor: 'var(--border)' }}>
                   {(['day', 'week', 'month', 'agenda', 'year'] as View[]).map((v) => (
                     <button key={v} onClick={() => setView(v)}
-                      className="px-2.5 py-1.5 text-xs font-medium rounded-lg capitalize"
+                      className="flex-shrink-0 px-2.5 py-1.5 text-xs font-medium rounded-lg capitalize"
                       style={view === v ? { background: 'var(--gold)', color: 'white' } : { color: 'var(--text-secondary)' }}>{v}</button>
                   ))}
                 </div>
@@ -579,7 +579,7 @@ export default function CalendarApp({ userEmail }: { userEmail: string }) {
               <Plus size={15} style={{ color: 'var(--gold)' }} />
               <input value={quick} onChange={(e) => setQuick(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') submitQuick() }}
                 placeholder='Quick add — "Lunch with Sara tomorrow 1pm at Java for 45m", "Standup every weekday 9am"'
-                className="flex-1 bg-transparent text-sm outline-none" style={{ color: 'var(--text-primary)' }} />
+                className="flex-1 min-w-0 truncate bg-transparent text-sm outline-none" style={{ color: 'var(--text-primary)' }} />
               <span className="hidden lg:block text-[11px]" style={{ color: 'var(--text-muted)' }}>⌘K · N new · T today</span>
             </div>
 

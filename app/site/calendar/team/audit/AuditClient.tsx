@@ -92,10 +92,10 @@ export default function AuditClient({ ws }: { ws: TeamWorkspace }) {
                   <div key={d.id} className="rounded-xl border p-3.5" style={{ borderColor: 'var(--border)' }}>
                     <div className="flex items-center gap-2">
                       {grantee && <Avatar name={grantee.name} hue={grantee.hue} size={26} />}
-                      <p className="text-sm" style={{ color: 'var(--text-primary)' }}>
+                      <p className="min-w-0 flex-1 text-sm" style={{ color: 'var(--text-primary)' }}>
                         <strong>{grantee?.name}</strong> acts for <strong>{grantor?.name}</strong>
                       </p>
-                      <button onClick={() => revoke(d.id)} className="ml-auto text-xs font-medium" style={{ color: 'var(--text-muted)' }}>Revoke</button>
+                      <button onClick={() => revoke(d.id)} className="ml-auto flex-shrink-0 text-xs font-medium" style={{ color: 'var(--text-muted)' }}>Revoke</button>
                     </div>
                     <p className="mt-1.5 text-xs" style={{ color: 'var(--text-muted)' }}>{d.scope} · since {fmtDateTz(d.since, ws.team.timezone)}</p>
                   </div>

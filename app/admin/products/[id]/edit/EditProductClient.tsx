@@ -9,6 +9,9 @@ import {
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import RichTextEditor from '@/components/admin/RichTextEditor'
+import BundleContentsCard, { type PlannerOption } from '@/components/admin/BundleContentsCard'
+
+const BUNDLE_CATEGORY_SLUG = 'planner-bundles'
 
 interface DbCategory { id: string; name: string; slug: string; icon: string | null }
 
@@ -36,6 +39,8 @@ interface ProductRow {
   is_featured: boolean
   is_bestseller: boolean
   is_new: boolean
+  is_bundle?: boolean
+  bundle_items?: string[] | null
   tags: string[]
   display_order: number | null
   categories?: { id: string; name: string; slug: string } | null
@@ -191,10 +196,11 @@ function PlannerFileSlot({
 }
 
 export default function EditProductClient({
-  product, categories,
+  product, categories, plannerOptions = [],
 }: {
   product: ProductRow
   categories: DbCategory[]
+  plannerOptions?: PlannerOption[]
 }) {
   const router = useRouter()
   const imageInputRef = useRef<HTMLInputElement>(null)
@@ -220,6 +226,16 @@ export default function EditProductClient({
   const [isFeatured,    setIsFeatured]    = useState(!!product.is_featured)
   const [isBestseller,  setIsBestseller]  = useState(!!product.is_bestseller)
   const [isNew,         setIsNew]         = useState(!!product.is_new)
+  const [bundleItems,   setBundleItems]   = useState<string[]>(product.bundle_items ?? [])
+
+  // A product is a bundle when the Bundle delivery type or Planner Bundles
+  // category is chosen. Picking the bundle category auto-selects Bundle delivery.
+  const isBundle = deliveryType === 'bundle' || categorySlug === BUNDLE_CATEGORY_SLUG
+
+  const selectCategory = (slug: string) => {
+    setCategorySlug(slug)
+    if (slug === BUNDLE_CATEGORY_SLUG && deliveryType !== 'bundle') setDeliveryType('bundle')
+  }
 
   // ── image state ────────────────────────────────────────────────────────
   const [existingImages, setExistingImages] = useState<string[]>(product.images ?? [])
@@ -273,6 +289,7 @@ export default function EditProductClient({
     if (!title.trim())                      { toast.error('Title is required');        return }
     if (!price || isNaN(parseFloat(price))) { toast.error('Valid price is required');  return }
     if (!categorySlug)                      { toast.error('Please select a category'); return }
+    if (isBundle && bundleItems.length < 2) { toast.error('Select at least 2 planners for the bundle'); return }
 
     setSubmitting(true)
     const fd = new FormData()
@@ -291,6 +308,8 @@ export default function EditProductClient({
     fd.append('is_featured',      String(isFeatured))
     fd.append('is_bestseller',    String(isBestseller))
     fd.append('is_new',           String(isNew))
+    fd.append('is_bundle',        String(isBundle))
+    fd.append('bundle_items',     JSON.stringify(isBundle ? bundleItems : []))
     fd.append('tags',             tags)
     fd.append('meta_title',       metaTitle)
     fd.append('meta_description', metaDesc)
@@ -433,7 +452,7 @@ export default function EditProductClient({
                   <button
                     key={cat.slug}
                     type="button"
-                    onClick={() => setCategorySlug(active ? '' : cat.slug)}
+                    onClick={() => selectCategory(active ? '' : cat.slug)}
                     className="flex items-center gap-2.5 p-3 rounded-xl border text-left transition-all duration-200"
                     style={{
                       borderColor: active ? 'var(--gold)' : 'var(--border)',
@@ -492,6 +511,17 @@ export default function EditProductClient({
               </div>
             </div>
           </Card>
+
+          {/* Bundle Contents — only for bundles */}
+          {isBundle && (
+            <BundleContentsCard
+              options={plannerOptions}
+              selectedIds={bundleItems}
+              onChange={setBundleItems}
+              bundlePrice={parseFloat(price) || 0}
+              onApplyCompare={(total) => setComparePrice(total.toFixed(2))}
+            />
+          )}
 
           {/* SEO */}
           <Card title="SEO & Tags">
@@ -626,27 +656,30 @@ export default function EditProductClient({
               onChange={(e) => { addImages(e.target.files); e.target.value = '' }} />
           </Card>
 
-          {/* Planner Files — one per paper size */}
-          <Card title="Planner Files">
-            <p className="text-xs mb-4" style={{ color: 'var(--text-secondary)' }}>
-              Current files are shown below. Upload a new file to replace a size, or remove one entirely.
-            </p>
-            <div className="space-y-4">
-              {PLANNER_SIZES.map(({ key, label }) => (
-                <PlannerFileSlot
-                  key={key}
-                  label={label}
-                  current={currentFiles[key] ?? null}
-                  file={newPlannerFiles[key]}
-                  removed={removedFiles[key]}
-                  onSelect={(f) => setNewPlannerFiles((p) => ({ ...p, [key]: f }))}
-                  onClearNew={() => setNewPlannerFiles((p) => ({ ...p, [key]: null }))}
-                  onRemoveCurrent={() => setRemovedFiles((p) => ({ ...p, [key]: true }))}
-                  onRestore={() => setRemovedFiles((p) => ({ ...p, [key]: false }))}
-                />
-              ))}
-            </div>
-          </Card>
+          {/* Planner Files — one per paper size.
+              Bundles deliver their component planners' own files, so no upload here. */}
+          {!isBundle && (
+            <Card title="Planner Files">
+              <p className="text-xs mb-4" style={{ color: 'var(--text-secondary)' }}>
+                Current files are shown below. Upload a new file to replace a size, or remove one entirely.
+              </p>
+              <div className="space-y-4">
+                {PLANNER_SIZES.map(({ key, label }) => (
+                  <PlannerFileSlot
+                    key={key}
+                    label={label}
+                    current={currentFiles[key] ?? null}
+                    file={newPlannerFiles[key]}
+                    removed={removedFiles[key]}
+                    onSelect={(f) => setNewPlannerFiles((p) => ({ ...p, [key]: f }))}
+                    onClearNew={() => setNewPlannerFiles((p) => ({ ...p, [key]: null }))}
+                    onRemoveCurrent={() => setRemovedFiles((p) => ({ ...p, [key]: true }))}
+                    onRestore={() => setRemovedFiles((p) => ({ ...p, [key]: false }))}
+                  />
+                ))}
+              </div>
+            </Card>
+          )}
 
           {/* File Details */}
           <Card title="File Details">

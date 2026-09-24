@@ -133,6 +133,44 @@ export default async function CheckoutSuccessPage({
     day: 'numeric', month: 'long', year: 'numeric',
   })
 
+  // Bundles are one order line but deliver several planners — expand them so the
+  // customer gets a download link per included planner (tokens are keyed per
+  // component product id by fulfilDigitalOrder).
+  const { data: itemProducts } = await supabase
+    .from('products')
+    .select('id, is_bundle, bundle_items')
+    .in('id', (items ?? []).map((i) => i.product_id))
+
+  const bundleMap = new Map<string, string[]>()
+  const componentIds = new Set<string>()
+  ;(itemProducts ?? []).forEach((p) => {
+    const comps = (p.bundle_items as string[] | null) ?? []
+    if (p.is_bundle && comps.length) {
+      bundleMap.set(p.id, comps)
+      comps.forEach((c) => componentIds.add(c))
+    }
+  })
+
+  const componentTitles = new Map<string, string>()
+  if (componentIds.size) {
+    const { data: comps } = await supabase.from('products').select('id, title').in('id', Array.from(componentIds))
+    ;(comps ?? []).forEach((c) => componentTitles.set(c.id, c.title))
+  }
+
+  const downloadsFor = (productId: string, fallbackTitle: string) => {
+    const comps = bundleMap.get(productId)
+    if (comps) {
+      const compDownloads = comps
+        .map((pid) => ({ pid, title: componentTitles.get(pid) ?? fallbackTitle, token: tokens[pid] }))
+        .filter((d) => d.token)
+      if (compDownloads.length) return compDownloads
+      // Legacy bundle orders (fulfilled before bundle expansion) hold a single
+      // token keyed by the bundle product itself — fall through so it renders.
+    }
+    const token = tokens[productId]
+    return token ? [{ pid: productId, title: fallbackTitle, token }] : []
+  }
+
   return (
     <div className="container-site py-12 md:py-16">
       <ClearCart />
@@ -177,25 +215,53 @@ export default async function CheckoutSuccessPage({
           <div className="p-6">
             <div className="space-y-4">
               {(items ?? []).map((item) => {
-                const token = tokens[item.product_id]
+                const downloads = downloadsFor(item.product_id, item.title)
+                // Show the per-planner box only when tokens actually expanded to
+                // components; legacy bundle orders fall back to a single
+                // bundle-keyed token and render the plain button instead.
+                const isBundleLine =
+                  bundleMap.has(item.product_id) &&
+                  downloads.length > 0 &&
+                  downloads[0].pid !== item.product_id
                 return (
-                  <div key={item.product_id} className="flex items-center gap-4">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-jost)' }}>
-                        {item.title}{item.quantity > 1 ? ` × ${item.quantity}` : ''}
-                      </p>
-                      <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
-                        {money(item.price * item.quantity)}
-                      </p>
+                  <div key={item.product_id} className="flex flex-col gap-3">
+                    <div className="flex items-center gap-4">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-jost)' }}>
+                          {item.title}{item.quantity > 1 ? ` × ${item.quantity}` : ''}
+                        </p>
+                        <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                          {money(item.price * item.quantity)}
+                        </p>
+                      </div>
+                      {!isBundleLine && downloads[0] && (
+                        <a
+                          href={`/api/download/${downloads[0].token}`}
+                          className="btn-primary text-xs flex-shrink-0"
+                          style={{ padding: '0.55rem 1rem' }}
+                        >
+                          <Download size={13} /> Download
+                        </a>
+                      )}
                     </div>
-                    {token && (
-                      <a
-                        href={`/api/download/${token}`}
-                        className="btn-primary text-xs flex-shrink-0"
-                        style={{ padding: '0.55rem 1rem' }}
-                      >
-                        <Download size={13} /> Download
-                      </a>
+                    {isBundleLine && downloads.length > 0 && (
+                      <div className="rounded-xl border p-3 space-y-2" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
+                        <p className="text-xs font-semibold uppercase" style={{ color: 'var(--text-muted)', letterSpacing: '0.08em' }}>
+                          {downloads.length} planners included
+                        </p>
+                        {downloads.map((d) => (
+                          <div key={d.pid} className="flex items-center gap-3">
+                            <span className="flex-1 min-w-0 text-sm truncate" style={{ color: 'var(--text-primary)' }}>{d.title}</span>
+                            <a
+                              href={`/api/download/${d.token}`}
+                              className="btn-primary text-xs flex-shrink-0"
+                              style={{ padding: '0.45rem 0.9rem' }}
+                            >
+                              <Download size={13} /> Download
+                            </a>
+                          </div>
+                        ))}
+                      </div>
                     )}
                   </div>
                 )

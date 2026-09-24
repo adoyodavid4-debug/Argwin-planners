@@ -98,7 +98,7 @@ export default function FocusClient({ ws }: { ws: PlusWorkspace }) {
                 })}
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <Field label="Protect evenings after">
                 <select value={bnd.protectAfterHour ?? ''} onChange={(e) => saveBnd({ protectAfterHour: e.target.value === '' ? null : Number(e.target.value) })} className={inp} style={inpStyle}>
                   <option value="">Off</option>

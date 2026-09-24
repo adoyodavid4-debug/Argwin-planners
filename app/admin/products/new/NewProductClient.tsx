@@ -11,6 +11,9 @@ import {
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import RichTextEditor from '@/components/admin/RichTextEditor'
+import BundleContentsCard, { type PlannerOption } from '@/components/admin/BundleContentsCard'
+
+const BUNDLE_CATEGORY_SLUG = 'planner-bundles'
 
 // Fallback list used only when the categories table is empty/unreachable.
 const FALLBACK_CATEGORIES = [
@@ -151,7 +154,13 @@ function PlannerFileSlot({
   )
 }
 
-export default function NewProductClient({ dbCategories = [] }: { dbCategories?: DbCategory[] }) {
+export default function NewProductClient({
+  dbCategories = [],
+  plannerOptions = [],
+}: {
+  dbCategories?: DbCategory[]
+  plannerOptions?: PlannerOption[]
+}) {
   const router = useRouter()
   const imageInputRef = useRef<HTMLInputElement>(null)
 
@@ -181,6 +190,16 @@ export default function NewProductClient({ dbCategories = [] }: { dbCategories?:
   const [isFeatured,    setIsFeatured]    = useState(false)
   const [isBestseller,  setIsBestseller]  = useState(false)
   const [isNew,         setIsNew]         = useState(true)
+  const [bundleItems,   setBundleItems]   = useState<string[]>([])
+
+  // A product is a bundle when the Bundle delivery type or Planner Bundles
+  // category is chosen. Picking the bundle category auto-selects Bundle delivery.
+  const isBundle = deliveryType === 'bundle' || categorySlug === BUNDLE_CATEGORY_SLUG
+
+  const selectCategory = (slug: string) => {
+    setCategorySlug(slug)
+    if (slug === BUNDLE_CATEGORY_SLUG && deliveryType !== 'bundle') setDeliveryType('bundle')
+  }
 
   // ── file state ────────────────────────────────────────────────────────────
   const [imageFiles,  setImageFiles]  = useState<File[]>([])
@@ -223,6 +242,7 @@ export default function NewProductClient({ dbCategories = [] }: { dbCategories?:
     if (!title.trim())                      { toast.error('Title is required');        return }
     if (!price || isNaN(parseFloat(price))) { toast.error('Valid price is required');  return }
     if (!categorySlug)                      { toast.error('Please select a category'); return }
+    if (isBundle && bundleItems.length < 2) { toast.error('Select at least 2 planners for the bundle'); return }
 
     setSubmitting(true)
     const fd = new FormData()
@@ -240,6 +260,8 @@ export default function NewProductClient({ dbCategories = [] }: { dbCategories?:
     fd.append('is_featured',      String(isFeatured))
     fd.append('is_bestseller',    String(isBestseller))
     fd.append('is_new',           String(isNew))
+    fd.append('is_bundle',        String(isBundle))
+    fd.append('bundle_items',     JSON.stringify(isBundle ? bundleItems : []))
     if (displayOrder) fd.append('display_order', displayOrder)
     fd.append('tags',             tags)
     fd.append('meta_title',       metaTitle)
@@ -380,7 +402,7 @@ export default function NewProductClient({ dbCategories = [] }: { dbCategories?:
                   <button
                     key={cat.slug}
                     type="button"
-                    onClick={() => setCategorySlug(active ? '' : cat.slug)}
+                    onClick={() => selectCategory(active ? '' : cat.slug)}
                     className="flex items-center gap-2.5 p-3 rounded-xl border text-left transition-all duration-200"
                     style={{
                       borderColor: active ? 'var(--gold)' : 'var(--border)',
@@ -439,6 +461,17 @@ export default function NewProductClient({ dbCategories = [] }: { dbCategories?:
               </div>
             </div>
           </Card>
+
+          {/* Bundle Contents — only for bundles */}
+          {isBundle && (
+            <BundleContentsCard
+              options={plannerOptions}
+              selectedIds={bundleItems}
+              onChange={setBundleItems}
+              bundlePrice={parseFloat(price) || 0}
+              onApplyCompare={(total) => setComparePrice(total.toFixed(2))}
+            />
+          )}
 
           {/* SEO */}
           <Card title="SEO & Tags">
@@ -558,24 +591,27 @@ export default function NewProductClient({ dbCategories = [] }: { dbCategories?:
               onChange={(e) => { addImages(e.target.files); e.target.value = '' }} />
           </Card>
 
-          {/* Planner Files — one per paper size, uploaded together */}
-          <Card title="Planner Files">
-            <p className="text-xs mb-4" style={{ color: 'var(--text-secondary)' }}>
-              Upload a file for each paper size. All provided sizes are saved together
-              when you publish.
-            </p>
-            <div className="space-y-4">
-              {PLANNER_SIZES.map(({ key, label }) => (
-                <PlannerFileSlot
-                  key={key}
-                  label={label}
-                  file={plannerFiles[key]}
-                  onSelect={(f) => setPlannerFiles((p) => ({ ...p, [key]: f }))}
-                  onClear={() => setPlannerFiles((p) => ({ ...p, [key]: null }))}
-                />
-              ))}
-            </div>
-          </Card>
+          {/* Planner Files — one per paper size, uploaded together.
+              Bundles deliver their component planners' own files, so no upload here. */}
+          {!isBundle && (
+            <Card title="Planner Files">
+              <p className="text-xs mb-4" style={{ color: 'var(--text-secondary)' }}>
+                Upload a file for each paper size. All provided sizes are saved together
+                when you publish.
+              </p>
+              <div className="space-y-4">
+                {PLANNER_SIZES.map(({ key, label }) => (
+                  <PlannerFileSlot
+                    key={key}
+                    label={label}
+                    file={plannerFiles[key]}
+                    onSelect={(f) => setPlannerFiles((p) => ({ ...p, [key]: f }))}
+                    onClear={() => setPlannerFiles((p) => ({ ...p, [key]: null }))}
+                  />
+                ))}
+              </div>
+            </Card>
+          )}
 
           {/* File Details */}
           <Card title="File Details">
