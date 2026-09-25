@@ -1,14 +1,20 @@
 # Email deliverability — Resend + HostPinnacle
 
+> **⚠️ Sept 2026 update — DNS moved to Vercel.** `arwignplanners.com` now
+> delegates to `ns1/ns2.vercel-dns.com`. All DNS edits happen in
+> **Vercel → Team → Domains → arwignplanners.com**, NOT at HostPinnacle.
+> (HostPinnacle's zone-sync pipeline was broken — edits in DirectAdmin/client
+> area never reached the public nameservers.) HostPinnacle still hosts the
+> **mailboxes** (`mail.arwignplanners.com` → `23.106.59.129`) and the domain
+> registration. The full zone — site records (automatic), MX/mail hosts, SPF,
+> both DKIM keys, DMARC, Google verification, and the Resend Forge records —
+> was recreated on Vercel DNS and verified 2026-09-25. The HostPinnacle
+> sections below are kept for reference only.
+
 Goal: send transactional email (order confirmations, opt-in, receipts) from
 `@arwignplanners.com` through **Resend**, while **HostPinnacle keeps hosting your
 mailboxes** (info@, hello@, etc.). Getting this right stops mail from bouncing or
 landing in spam.
-
-> HostPinnacle manages your **DNS zone** *and* your **inbox (MX)**. The rule that
-> makes both work together: **leave the root `MX` and root `SPF` pointing at
-> HostPinnacle** (so you keep receiving mail) and **add Resend's records on a
-> `send` subdomain + a DKIM selector** (so you can send). They never collide.
 
 ---
 
