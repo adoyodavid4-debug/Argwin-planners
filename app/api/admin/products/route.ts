@@ -31,6 +31,11 @@ export async function GET(req: NextRequest) {
   return NextResponse.json(data)
 }
 
+// Files (images + planner PDFs) are uploaded straight to Supabase Storage from
+// the browser via signed upload URLs (see /api/admin/uploads + lib/admin/
+// uploadFiles.ts). This handler therefore receives JSON — public image URLs and
+// a planner_files map of storage paths — never the binaries, so it can never hit
+// Vercel's 4.5 MB request-body limit.
 export async function POST(req: NextRequest) {
   const denied = await requireAdmin()
   if (denied) return denied
@@ -40,36 +45,48 @@ export async function POST(req: NextRequest) {
   )
 
   try {
-    const form = await req.formData()
+    const body = await req.json().catch(() => null)
+    if (!body) return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
 
-    const title        = (form.get('title') as string)?.trim()
-    const slug         = (form.get('slug') as string)?.trim() || slugify(title)
-    const description  = (form.get('description') as string) ?? ''
-    const categorySlug = (form.get('category_slug') as string) || null
-    const price        = parseFloat(form.get('price') as string)
-    const comparePrice = form.get('compare_price') ? parseFloat(form.get('compare_price') as string) : null
-    const status       = (form.get('status') as string) || 'draft'
-    const deliveryType        = (form.get('delivery_type') as string) || 'digital'
-    const productType         = (form.get('product_type') as string) || 'planner'
-    const fulfillmentOptions  = (form.get('fulfillment_options') as string) || 'digital'
-    const fileFormats  = form.getAll('file_formats') as string[]
-    const pageCount    = form.get('page_count') ? parseInt(form.get('page_count') as string) : null
-    const isFeatured   = form.get('is_featured') === 'true'
-    const isBestseller = form.get('is_bestseller') === 'true'
-    const isNew        = form.get('is_new') !== 'false'
-    const isBundle     = form.get('is_bundle') === 'true' || deliveryType === 'bundle'
-    // bundle_items arrives as a JSON array of product UUIDs
+    const title        = String(body.title ?? '').trim()
+    const slug         = String(body.slug ?? '').trim() || slugify(title)
+    const description  = String(body.description ?? '')
+    const categorySlug = body.category_slug ? String(body.category_slug) : null
+    const price        = parseFloat(String(body.price))
+    const comparePrice = body.compare_price != null && String(body.compare_price) !== ''
+      ? parseFloat(String(body.compare_price)) : null
+    const status              = String(body.status ?? 'draft')
+    const deliveryType        = String(body.delivery_type ?? 'digital')
+    const productType         = String(body.product_type ?? 'planner')
+    const fulfillmentOptions  = String(body.fulfillment_options ?? 'digital')
+    const fileFormats  = Array.isArray(body.file_formats) ? body.file_formats.map(String).filter(Boolean) : []
+    const pageCount    = body.page_count ? parseInt(String(body.page_count)) : null
+    const isFeatured   = body.is_featured === true || body.is_featured === 'true'
+    const isBestseller = body.is_bestseller === true || body.is_bestseller === 'true'
+    const isNew        = !(body.is_new === false || body.is_new === 'false')
+    const isBundle     = body.is_bundle === true || body.is_bundle === 'true' || deliveryType === 'bundle'
+
     let bundleItems: string[] | null = null
-    if (isBundle) {
-      const raw = form.get('bundle_items')
-      if (raw) { try { const p = JSON.parse(String(raw)); if (Array.isArray(p)) bundleItems = p.map(String).filter(Boolean) } catch { /* ignore */ } }
+    if (isBundle && Array.isArray(body.bundle_items)) {
+      const arr = body.bundle_items.map(String).filter(Boolean)
+      bundleItems = arr.length ? arr : null
     }
-    const tagsRaw      = (form.get('tags') as string) ?? ''
-    const tags         = tagsRaw ? tagsRaw.split(',').map((t) => t.trim()).filter(Boolean) : []
-    const metaTitle    = (form.get('meta_title') as string) || title
-    const metaDesc     = (form.get('meta_description') as string) || description.slice(0, 160)
-    const displayOrderRaw = form.get('display_order')
-    const displayOrderInput = displayOrderRaw ? parseInt(displayOrderRaw as string) : null
+
+    const tags = Array.isArray(body.tags)
+      ? body.tags.map(String).map((t: string) => t.trim()).filter(Boolean)
+      : (typeof body.tags === 'string' ? body.tags.split(',').map((t) => t.trim()).filter(Boolean) : [])
+
+    const metaTitle    = body.meta_title ? String(body.meta_title) : title
+    const metaDesc     = body.meta_description ? String(body.meta_description) : description.slice(0, 160)
+    const displayOrderInput = body.display_order ? parseInt(String(body.display_order)) : null
+
+    // Media — already uploaded to Storage by the client
+    const images    = Array.isArray(body.images) ? body.images.map(String).filter(Boolean) : []
+    const thumbnail = body.thumbnail ? String(body.thumbnail) : (images[0] ?? null)
+    const plannerFiles = (body.planner_files && typeof body.planner_files === 'object') ? body.planner_files : {}
+    const primary   = plannerFiles.a4 ?? plannerFiles.a5 ?? plannerFiles.us_letter ?? null
+    const fileUrl    = primary?.url ?? null
+    const fileSizeMb = primary?.size_mb ?? null
 
     if (!title || isNaN(price)) {
       return NextResponse.json({ error: 'Title and price are required' }, { status: 400 })
@@ -100,55 +117,6 @@ export async function POST(req: NextRequest) {
       displayOrder = maxRow?.display_order != null ? (maxRow.display_order as number) + 1 : 1
     }
 
-    // Upload product images to `product-images` bucket
-    let thumbnail: string | null = null
-    const imageUrls: string[] = []
-    const imageFiles = form.getAll('images') as File[]
-
-    for (let i = 0; i < imageFiles.length; i++) {
-      const file = imageFiles[i]
-      if (!file || file.size === 0) continue
-      const ext  = file.name.split('.').pop() ?? 'jpg'
-      const path = `${slug}/${i === 0 ? 'thumbnail' : `image-${i}`}.${ext}`
-      const buffer = Buffer.from(await file.arrayBuffer())
-      const { error } = await supabase.storage
-        .from('product-images')
-        .upload(path, buffer, { contentType: file.type, upsert: true })
-      if (!error) {
-        const { data: { publicUrl } } = supabase.storage.from('product-images').getPublicUrl(path)
-        imageUrls.push(publicUrl)
-        if (i === 0) thumbnail = publicUrl
-      }
-    }
-
-    // Upload per-size planner files (A4 / A5 / US Letter) to the private
-    // `product-files` bucket. The three files are submitted together under the
-    // form keys `file_a4`, `file_a5`, `file_us_letter`.
-    const PLANNER_SIZES: { key: string; slugSuffix: string }[] = [
-      { key: 'a4',        slugSuffix: 'a4' },
-      { key: 'a5',        slugSuffix: 'a5' },
-      { key: 'us_letter', slugSuffix: 'us-letter' },
-    ]
-    const plannerFiles: Record<string, { url: string; size_mb: number; name: string }> = {}
-    for (const { key, slugSuffix } of PLANNER_SIZES) {
-      const file = form.get(`file_${key}`) as File | null
-      if (!file || file.size === 0) continue
-      const ext    = file.name.split('.').pop() ?? 'pdf'
-      const path   = `${slug}/planner-${slugSuffix}.${ext}`
-      const sizeMb = parseFloat((file.size / (1024 * 1024)).toFixed(2))
-      const buffer = Buffer.from(await file.arrayBuffer())
-      const { error } = await supabase.storage
-        .from('product-files')
-        .upload(path, buffer, { contentType: file.type, upsert: true })
-      if (!error) plannerFiles[key] = { url: path, size_mb: sizeMb, name: file.name }
-    }
-
-    // Keep the legacy single-file columns populated for backward compatibility,
-    // preferring A4 and falling back to the first size that was uploaded.
-    const primary = plannerFiles.a4 ?? plannerFiles.a5 ?? plannerFiles.us_letter ?? null
-    const fileUrl    = primary?.url ?? null
-    const fileSizeMb = primary?.size_mb ?? null
-
     const { data: product, error } = await supabase
       .from('products')
       .insert({
@@ -163,7 +131,7 @@ export async function POST(req: NextRequest) {
         product_type:        productType,
         fulfillment_options: fulfillmentOptions,
         thumbnail,
-        images:           imageUrls,
+        images,
         file_url:         fileUrl,
         file_size_mb:     fileSizeMb,
         planner_files:    plannerFiles,

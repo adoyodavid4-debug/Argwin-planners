@@ -12,6 +12,7 @@ import {
 import toast from 'react-hot-toast'
 import RichTextEditor from '@/components/admin/RichTextEditor'
 import BundleContentsCard, { type PlannerOption } from '@/components/admin/BundleContentsCard'
+import { uploadProductImages, uploadPlannerFiles } from '@/lib/admin/uploadFiles'
 
 const BUNDLE_CATEGORY_SLUG = 'planner-bundles'
 
@@ -245,43 +246,53 @@ export default function NewProductClient({
     if (isBundle && bundleItems.length < 2) { toast.error('Select at least 2 planners for the bundle'); return }
 
     setSubmitting(true)
-    const fd = new FormData()
-    fd.append('title',            title.trim())
-    fd.append('slug',             slug || slugify(title))
-    fd.append('description',      description)
-    fd.append('category_slug',    categorySlug)
-    fd.append('delivery_type',      deliveryType)
-    fd.append('product_type',       productType)
-    fd.append('fulfillment_options',fulfillmentOptions)
-    fd.append('status',             publish ? 'active' : status)
-    fd.append('price',            price)
-    fd.append('compare_price',    comparePrice)
-    fd.append('page_count',       pageCount)
-    fd.append('is_featured',      String(isFeatured))
-    fd.append('is_bestseller',    String(isBestseller))
-    fd.append('is_new',           String(isNew))
-    fd.append('is_bundle',        String(isBundle))
-    fd.append('bundle_items',     JSON.stringify(isBundle ? bundleItems : []))
-    if (displayOrder) fd.append('display_order', displayOrder)
-    fd.append('tags',             tags)
-    fd.append('meta_title',       metaTitle)
-    fd.append('meta_description', metaDesc)
-    formats.forEach((f) => fd.append('file_formats', f))
-    imageFiles.forEach((f) => fd.append('images', f))
-    PLANNER_SIZES.forEach(({ key }) => {
-      const f = plannerFiles[key]
-      if (f) fd.append(`file_${key}`, f)
-    })
+    const finalSlug = slug || slugify(title)
 
     try {
-      const res  = await fetch('/api/admin/products', { method: 'POST', body: fd })
+      // Upload media straight to Supabase Storage (bypasses Vercel's 4.5 MB body
+      // cap), then send only the resulting URLs/paths to the API as JSON.
+      const images        = await uploadProductImages(finalSlug, imageFiles)
+      const uploadedFiles = isBundle ? {} : await uploadPlannerFiles(finalSlug, plannerFiles)
+
+      const payload = {
+        title:            title.trim(),
+        slug:             finalSlug,
+        description,
+        category_slug:    categorySlug,
+        delivery_type:       deliveryType,
+        product_type:        productType,
+        fulfillment_options: fulfillmentOptions,
+        status:           publish ? 'active' : status,
+        price,
+        compare_price:    comparePrice,
+        page_count:       pageCount,
+        display_order:    displayOrder || undefined,
+        is_featured:      isFeatured,
+        is_bestseller:    isBestseller,
+        is_new:           isNew,
+        is_bundle:        isBundle,
+        bundle_items:     isBundle ? bundleItems : [],
+        tags:             tags.split(',').map((t) => t.trim()).filter(Boolean),
+        meta_title:       metaTitle,
+        meta_description: metaDesc,
+        file_formats:     formats,
+        images,
+        thumbnail:        images[0] ?? null,
+        planner_files:    uploadedFiles,
+      }
+
+      const res  = await fetch('/api/admin/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to save')
       const label = CATEGORIES.find((c) => c.slug === categorySlug)?.name ?? categorySlug
       toast.success(publish ? `Planner published in "${label}"!` : 'Saved as draft')
       router.push('/admin/dashboard')
     } catch (e: any) {
-      toast.error(e.message)
+      toast.error(e.message || 'Something went wrong')
     } finally {
       setSubmitting(false)
     }

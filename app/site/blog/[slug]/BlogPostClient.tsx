@@ -734,12 +734,12 @@ const SIDEBAR_PRODUCTS: Record<string, BlogProduct[]> = {
     { name: 'The Whole Picture Budget Planner', price: '$12.99', href: '/shop/the-whole-picture-budget-planner' },
   ],
   'hobby-to-income-plan-solo-creatives': [
-    { name: 'GROUNDWORK.', price: '$18.99', href: '/shop/groundwork', blurb: 'The foundations of the MADE TO LAST. set — your offer, your customer, your pricing and your why.' },
-    { name: 'THE LONG YEAR.', price: '$18.99', href: '/shop/the-long-year' },
-    { name: 'THE COUNT.', price: '$18.99', href: '/shop/the-count' },
+    { name: 'GROUNDWORK.', price: '$18.00', href: '/shop/groundwork', blurb: 'The foundations of the MADE TO LAST. set — your offer, your customer, your pricing and your why.' },
+    { name: 'THE LONG YEAR.', price: '$24.00', href: '/shop/the-long-year' },
+    { name: 'THE COUNT.', price: '$20.00', href: '/shop/the-count' },
   ],
   'how-much-set-aside-tax-freelancer': [
-    { name: 'THE COUNT.', price: '$18.99', href: '/shop/the-count', blurb: 'The money book from MADE TO LAST. — ledgers, profit and loss, pricing and tax set-asides in one hyperlinked place.' },
+    { name: 'THE COUNT.', price: '$20.00', href: '/shop/the-count', blurb: 'The money book from MADE TO LAST. — ledgers, profit and loss, pricing and tax set-asides in one hyperlinked place.' },
     { name: 'The Financial Freedom Budget Planner', price: '$12.99', href: '/shop/the-financial-freedom-budget-planner' },
     { name: 'Your Personal Finances in One Planner', price: '$12.99', href: '/shop/your-personal-finances-in-one-journal-planner' },
   ],
