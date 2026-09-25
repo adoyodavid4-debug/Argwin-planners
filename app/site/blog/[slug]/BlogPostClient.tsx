@@ -713,6 +713,56 @@ const SIDEBAR_PRODUCTS: Record<string, BlogProduct[]> = {
     { name: 'Neurodivergent Set — ADHD-Friendly Planner', price: '$13.99', href: '/shop/neurodivergent-set-adhd-friendly-planner' },
     { name: 'Arwign Notebook — Everyday', price: '$14.99', href: '/shop/arwign-notebook-everyday' },
   ],
+  'how-to-set-up-digital-planner-goodnotes': [
+    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'Fully hyperlinked and GoodNotes-ready — set it up with the steps in this guide and land on today in a tap.' },
+    { name: 'Neurodivergent Set — ADHD-Friendly Planner', price: '$13.99', href: '/shop/neurodivergent-set-adhd-friendly-planner' },
+    { name: 'Arwign Notebook — Studio', price: '$14.99', href: '/shop/arwign-notebook-studio' },
+  ],
+  'adhd-friendly-planning-what-works': [
+    { name: 'Neurodivergent Set — ADHD-Friendly Planner', price: '$13.99', href: '/shop/neurodivergent-set-adhd-friendly-planner', blurb: 'Built for the moments planning falls apart — capture-first, low-scroll, and designed for restarts.' },
+    { name: 'Open Tabs — ADHD Mental Load Planner', price: '$13.99', href: '/shop/open_tabs_adhd_mental_load_planner' },
+    { name: 'Running on Empty', price: '$13.99', href: '/shop/running-on-empty' },
+  ],
+  'spoon-theory-planning-low-energy-week': [
+    { name: 'The Spoon Ledger', price: '$13.99', href: '/shop/the-spoon-ledger', blurb: 'Check in on your energy, weigh what each day asks, and spot what drains and restores you — spoon-aware planning made simple.' },
+    { name: 'Running on Empty', price: '$13.99', href: '/shop/running-on-empty' },
+    { name: 'One Spoon at a Time — Spoonie Wellness Planner', price: '$13.99', href: '/shop/one-spoon-at-a-time-a-chronic-illness-spoonie-wellness-planner' },
+  ],
+  'simple-budget-system-ipad': [
+    { name: 'Penny by Penny Savings & Budget Planner', price: '$12.99', href: '/shop/penny-by-penny-savings-budget-planner', blurb: 'Monthly budgets, spending trackers, sinking funds and savings goals — the four-part system in this article, all in one place.' },
+    { name: 'Ultimate Budget Planner', price: '$12.99', href: '/shop/ultimate-budget-planner' },
+    { name: 'The Whole Picture Budget Planner', price: '$12.99', href: '/shop/the-whole-picture-budget-planner' },
+  ],
+  'hobby-to-income-plan-solo-creatives': [
+    { name: 'SHOW UP.', price: '$18.99', href: '/shop/show-up', blurb: 'For building the consistent weekly rhythm of making, listing and posting that a creative business runs on.' },
+    { name: 'PAID.', price: '$18.99', href: '/shop/paid' },
+    { name: 'WHAT WORKS.', price: '$18.99', href: '/shop/what-works' },
+  ],
+  'how-much-set-aside-tax-freelancer': [
+    { name: 'The Financial Freedom Budget Planner', price: '$12.99', href: '/shop/the-financial-freedom-budget-planner', blurb: 'Income and expense tracking, savings and a tax set-aside in one calm place — so you always know what is really yours.' },
+    { name: 'Your Personal Finances in One Planner', price: '$12.99', href: '/shop/your-personal-finances-in-one-journal-planner' },
+    { name: 'PAID.', price: '$18.99', href: '/shop/paid' },
+  ],
+  'brand-deals-track-pitches-rates-payments-ugc': [
+    { name: 'PAID.', price: '$18.99', href: '/shop/paid', blurb: 'A 180-page brand-deal & UGC planner — every pitch, brief, deliverable and payment in one professional home.' },
+    { name: 'WHAT WORKS.', price: '$18.99', href: '/shop/what-works' },
+    { name: 'SHOW UP.', price: '$18.99', href: '/shop/show-up' },
+  ],
+  'social-media-metrics-that-matter': [
+    { name: 'WHAT WORKS.', price: '$18.99', href: '/shop/what-works', blurb: 'A 180-page analytics planner — weekly logs, post reviews and experiments for the five metrics in this article.' },
+    { name: 'PAID.', price: '$18.99', href: '/shop/paid' },
+    { name: 'SHOW UP.', price: '$18.99', href: '/shop/show-up' },
+  ],
+  'digital-vs-paper-planners-honest-comparison': [
+    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'The warmth of paper with the flexibility of digital — hyperlinked, reusable, in A4, A5 and US Letter.' },
+    { name: 'Arwign Notebook — Everyday', price: '$14.99', href: '/shop/arwign-notebook-everyday' },
+    { name: 'Neurodivergent Set — ADHD-Friendly Planner', price: '$13.99', href: '/shop/neurodivergent-set-adhd-friendly-planner' },
+  ],
+  'digital-planner-size-a5-a4-us-letter': [
+    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'Comes in A4, A5 and US Letter — each laid out and hyperlinked individually, so every size works properly.' },
+    { name: 'The Balanced Student', price: '$12.99', href: '/shop/the-balanced-student' },
+    { name: 'Arwign Notebook — Everyday', price: '$14.99', href: '/shop/arwign-notebook-everyday' },
+  ],
 }
 
 const DEFAULT_PRODUCTS: BlogProduct[] = [
