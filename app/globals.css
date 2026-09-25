@@ -386,8 +386,8 @@ h4, h5, h6 { font-family: var(--font-jost); font-weight: 600; }
 }
 .badge-gold    { background: rgba(var(--gold-rgb),0.15); color: var(--gold-dark); }
 .badge-new     { background: rgba(205,199,190,0.2); color: #7B6FAE; }
-.badge-sale    { background: rgba(232,197,192,0.3); color: #C9847C; }
-.badge-popular { background: rgba(168,181,160,0.2); color: #6E7E66; }
+.badge-sale    { background: #B04A42; color: #ffffff; }
+.badge-popular { background: #5B6E52; color: #ffffff; }
 
 /* ─── Star Rating ───────────────────────────────────────────── */
 .star-filled  { color: var(--gold); }
