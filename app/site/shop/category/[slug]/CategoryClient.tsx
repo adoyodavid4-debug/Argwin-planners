@@ -488,9 +488,6 @@ export default function CategoryClient({ category, products, relatedCategories }
         </div>
       </section>
 
-      {/* ══ COLLECTION SPOTLIGHT ══════════════════════════════ */}
-      <Spotlight category={category} products={products} meta={meta} accent={accent} />
-
       {/* ══ STICKY TOOLBAR ════════════════════════════════════ */}
       <div className="sticky top-[var(--nav-height,88px)] z-30 border-b py-3 backdrop-blur"
         style={{ background: 'color-mix(in srgb, var(--bg-primary) 88%, transparent)', borderColor: 'var(--border)' }}>
@@ -1201,73 +1198,6 @@ function CompareModal({ products, onClose }: { products: Product[]; onClose: () 
         </div>
       </div>
     </div>
-  )
-}
-
-// ── Collection spotlight banner ───────────────────────────────
-function Spotlight({ category, products, meta, accent }: { category: Category; products: Product[]; meta: any; accent: string }) {
-  const covers = products.slice(0, 3)
-  const top = [...products].sort((a, b) => Number(b.is_bestseller) - Number(a.is_bestseller) || (b.download_count ?? 0) - (a.download_count ?? 0))[0]
-  const scrollToGrid = () => document.getElementById('shop-grid')?.scrollIntoView({ behavior: 'smooth' })
-
-  return (
-    <section className="relative border-b overflow-hidden" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-      <div className="container-site py-12 lg:py-16 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-        {/* Copy */}
-        <motion.div initial={{ opacity: 0, x: -24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
-          <p className="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-semibold mb-4 px-3 py-1.5 rounded-full"
-            style={{ color: 'var(--gold-dark)', background: 'rgba(160,131,14,0.12)', letterSpacing: '0.12em' }}>
-            <Sparkles size={12} /> The Collection
-          </p>
-          <h2 className="font-display mb-4" style={{ fontSize: 'clamp(1.9rem,3.5vw,2.8rem)', lineHeight: 1.1, color: 'var(--text-primary)' }}>
-            Planning, beautifully reimagined
-          </h2>
-          <p className="text-sm leading-relaxed mb-6 max-w-md" style={{ color: 'var(--text-secondary)' }}>
-            {meta.description} Every design is crafted in-house, tested by real planners, and delivered the second you check out.
-          </p>
-          <div className="flex flex-wrap gap-2 mb-8">
-            {['Designed layouts', 'Instant delivery', 'Lifetime access', 'Loved worldwide'].map((c) => (
-              <span key={c} className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border"
-                style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)', background: 'var(--bg-primary)' }}>
-                <Check size={11} style={{ color: 'var(--gold)' }} /> {c}
-              </span>
-            ))}
-          </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <button onClick={scrollToGrid} className="btn-primary">Browse the Collection <ArrowRight size={15} /></button>
-            {top && <Link href={`/shop/${top.slug}`} className="btn-outline">View the Bestseller</Link>}
-          </div>
-        </motion.div>
-
-        {/* Cover collage */}
-        <motion.div initial={{ opacity: 0, scale: 0.94 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.55, delay: 0.1 }}
-          className="relative h-[320px] sm:h-[400px] flex items-center justify-center">
-          <div aria-hidden className="absolute rounded-full blur-3xl opacity-50" style={{ width: 360, height: 360, background: accent }} />
-          {covers.length > 0 ? covers.map((p, i) => {
-            const pos = [
-              { rotate: '-8deg', x: '-32%', z: 1, scale: 0.86 },
-              { rotate: '0deg',  x: '0%',   z: 3, scale: 1 },
-              { rotate: '8deg',  x: '32%',  z: 1, scale: 0.86 },
-            ][i] ?? { rotate: '0deg', x: '0%', z: 1, scale: 1 }
-            return (
-              <motion.div key={p.id} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.15 + i * 0.1 }}
-                className="absolute rounded-2xl overflow-hidden shadow-2xl"
-                style={{ width: 200, aspectRatio: '3/4', transform: `translateX(${pos.x}) rotate(${pos.rotate}) scale(${pos.scale})`, zIndex: pos.z, border: '3px solid var(--bg-card)' }}>
-                <Image src={p.thumbnail || FALLBACK_IMG} alt={p.title} fill sizes="200px" className="object-cover" />
-              </motion.div>
-            )
-          }) : (
-            <div className="relative rounded-2xl shadow-2xl" style={{ width: 220, aspectRatio: '3/4', background: meta.bgGradient }} />
-          )}
-          {/* Floating rating badge */}
-          <motion.div initial={{ opacity: 0, scale: 0.6 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.5 }}
-            className="absolute bottom-4 right-2 sm:right-8 z-10 flex items-center gap-2.5 px-4 py-3 rounded-2xl shadow-xl" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-            <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(160,131,14,0.14)' }}><Star size={16} style={{ fill: 'var(--gold)', stroke: 'var(--gold)' }} /></div>
-            <div><p className="text-sm font-bold leading-none" style={{ color: 'var(--text-primary)' }}>Hyperlinked</p><p className="text-[10px] mt-1" style={{ color: 'var(--text-muted)' }}>GoodNotes ready</p></div>
-          </motion.div>
-        </motion.div>
-      </div>
-    </section>
   )
 }
 

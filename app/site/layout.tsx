@@ -1,6 +1,7 @@
 import Navbar, { type NavItem } from '@/components/layout/Navbar'
 import Footer, { type FooterLink } from '@/components/layout/Footer'
 import CartDrawer from '@/components/layout/CartDrawer'
+import SearchOverlay from '@/components/layout/SearchOverlay'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 interface NavRow {
@@ -106,6 +107,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
     <>
       <Navbar links={data.headerLinks} announcement={data.announcement} />
       <CartDrawer />
+      <SearchOverlay />
       <main className="w-full min-h-screen">{children}</main>
       <Footer
         shopLinks={data.footerShop}
