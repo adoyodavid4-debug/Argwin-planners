@@ -646,52 +646,83 @@ const CONTENT: Record<string, React.FC<{ post: BlogPost }>> = {
   'goodnotes-vs-notability-planner': () => <GoodNotesVsNotabilityArticle />,
 }
 
-// ── Per-post sidebar product ──────────────────────────────────
-const SIDEBAR_PRODUCTS: Record<string, { name: string; blurb: string; price: string; href: string }> = {
-  'science-66-day-habit-loop': {
-    name:  'Tiny Anchors — Habit & Routine Builder',
-    blurb: 'The tracker built around the research in this article. Track up to 5 habits, log your triggers, and visualise your 66-day arc.',
-    price: '$13.99',
-    href:  '/shop/tiny-anchors-a-habit-routine-builder',
-  },
-  'goodnotes-vs-notability-planner': {
-    name:  'Neurodivergent Set — ADHD-Friendly Planner',
-    blurb: 'Fully hyperlinked, tested in both GoodNotes 6 and Notability. Works on iPad, iPhone, and Mac — start planning in under 60 seconds.',
-    price: '$13.99',
-    href:  '/shop/neurodivergent-set-adhd-friendly-planner',
-  },
-  'digital-planner-morning-routine': {
-    name:  'Undated Digital Monthly Planner',
-    blurb: 'Clean daily and weekly spreads designed for intentional mornings. Start any day of the year.',
-    price: '$9.99',
-    href:  '/shop/undated-monthly-planner-digital-connect',
-  },
-  'budget-planning-monthly-tracker-guide': {
-    name:  'Penny by Penny Savings & Budget Planner',
-    blurb: 'Step-by-step budget spreads built around the method described in this guide. Income, bills, savings, and debt — all in one place.',
-    price: '$12.99',
-    href:  '/shop/penny-by-penny-savings-budget-planner',
-  },
-  'student-planner-guide-academic-year': {
-    name:  'The Balanced Student',
-    blurb: 'Semester overviews, weekly study plans, assignment trackers, and exam countdowns. Runs August 2025 – July 2026.',
-    price: '$12.99',
-    href:  '/shop/the-balanced-student',
-  },
-  'self-care-wellness-routine-that-sticks': {
-    name:  'Small Good Things — A Gratitude Journal',
-    blurb: 'Daily mood check-ins, gratitude prompts, water tracker, and weekly reflection spreads. For the wellness routine that actually sticks.',
-    price: '$13.99',
-    href:  '/shop/small-good-things-a-gratitude-journal',
-  },
+// ── Per-post product picks ────────────────────────────────────
+// 2–3 planners relevant to each article. The first is the "featured"
+// pick (shown at the top); all of them appear in the "Planners for this
+// article" grid after the body. Slugs are validated against the live catalogue.
+type BlogProduct = { name: string; price: string; href: string; blurb?: string }
+
+const SIDEBAR_PRODUCTS: Record<string, BlogProduct[]> = {
+  'the-stale-week-workload-reset': [
+    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'Weekly spreads with a capacity check, a waiting-on page and a done column — the exact reset in this article.' },
+    { name: 'Off the Clock — A Work–Life Balance Planner', price: '$13.99', href: '/shop/off-the-clock-a-worklife-balance-planner' },
+    { name: 'The Nine to Five Brain — ADHD Work Planner', price: '$13.99', href: '/shop/the-nine-to-five-brain-adhd-work-planner' },
+  ],
+  'monday-morning-after-a-big-weekend-reset-your-week': [
+    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'Weekly spreads with the Big Three and a 3-2-1 list — set your week up on Friday, land it on Monday.' },
+    { name: "Morning's Light, Evening's Calm — Ritual Planner", price: '$13.99', href: '/shop/mornings-light-evenings-calm-a-morning-evening-ritual-planner' },
+    { name: 'Tiny Anchors — A Habit & Routine Builder', price: '$13.99', href: '/shop/tiny-anchors-a-habit-routine-builder' },
+  ],
+  'postgraduate-studies-and-full-time-work': [
+    { name: 'The Balanced Student', price: '$12.99', href: '/shop/the-balanced-student', blurb: 'Term maps, weekly study plans, assignment trackers and exam countdowns — built for studying alongside a job.' },
+    { name: 'The Long Game', price: '$12.99', href: '/shop/the-long-game' },
+    { name: 'Off the Clock — A Work–Life Balance Planner', price: '$13.99', href: '/shop/off-the-clock-a-worklife-balance-planner' },
+  ],
+  'the-boring-one-task-at-work-occurring-every-week': [
+    { name: 'Tiny Anchors — A Habit & Routine Builder', price: '$13.99', href: '/shop/tiny-anchors-a-habit-routine-builder', blurb: 'Give the dull weekly task a fixed slot and a tracker row so it stops looming over your week.' },
+    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect' },
+    { name: 'Arwign 66-Day Habit Tracker', price: '$14.99', href: '/shop/arwign-66-day-habit-tracker' },
+  ],
+  'digital-planner-morning-routine': [
+    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'Clean daily and weekly spreads designed for intentional mornings. Start any day of the year.' },
+    { name: "Morning's Light, Evening's Calm — Ritual Planner", price: '$13.99', href: '/shop/mornings-light-evenings-calm-a-morning-evening-ritual-planner' },
+    { name: 'Tiny Anchors — A Habit & Routine Builder', price: '$13.99', href: '/shop/tiny-anchors-a-habit-routine-builder' },
+  ],
+  'goodnotes-vs-notability-planner': [
+    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'Fully hyperlinked and tested in both GoodNotes 6 and Notability — start planning in under 60 seconds.' },
+    { name: 'Neurodivergent Set — ADHD-Friendly Planner', price: '$13.99', href: '/shop/neurodivergent-set-adhd-friendly-planner' },
+    { name: 'Arwign Notebook — Studio', price: '$14.99', href: '/shop/arwign-notebook-studio' },
+  ],
+  'science-66-day-habit-loop': [
+    { name: 'Arwign 66-Day Habit Tracker', price: '$14.99', href: '/shop/arwign-66-day-habit-tracker', blurb: 'The tracker built around the 66-day research in this article — log triggers and watch the streak build.' },
+    { name: 'Tiny Anchors — A Habit & Routine Builder', price: '$13.99', href: '/shop/tiny-anchors-a-habit-routine-builder' },
+    { name: 'One Small Step — A Gentle Goals & Habits Planner', price: '$13.99', href: '/shop/one-small-step-a-gentle-goals-habits-planner' },
+  ],
+  'budget-planning-monthly-tracker-guide': [
+    { name: 'Penny by Penny Savings & Budget Planner', price: '$12.99', href: '/shop/penny-by-penny-savings-budget-planner', blurb: 'Step-by-step budget spreads built around the method in this guide — income, bills, savings and debt in one place.' },
+    { name: 'Ultimate Budget Planner', price: '$12.99', href: '/shop/ultimate-budget-planner' },
+    { name: 'The Financial Freedom Budget Planner', price: '$12.99', href: '/shop/the-financial-freedom-budget-planner' },
+  ],
+  'why-undated-planners-are-better': [
+    { name: 'Undated Digital Monthly Planner — Digital Connect', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'Undated by design — start any day, reuse it year after year, never waste a page.' },
+    { name: 'Undated Digital Monthly Planner — Golden Hour', price: '$9.99', href: '/shop/undated-monthly-planner-golden-hour' },
+    { name: 'Undated Digital Monthly Planner — Navy Gold', price: '$9.99', href: '/shop/undated-monthly-planner-navy-gold' },
+  ],
+  'student-planner-guide-academic-year': [
+    { name: 'The Balanced Student', price: '$12.99', href: '/shop/the-balanced-student', blurb: 'Semester overviews, weekly study plans, assignment trackers and exam countdowns.' },
+    { name: 'Exam Season — Calm', price: '$12.99', href: '/shop/exam-season-calm' },
+    { name: 'The Deep Dive', price: '$12.99', href: '/shop/the-deep-dive' },
+  ],
+  'self-care-wellness-routine-that-sticks': [
+    { name: 'Small Good Things — A Gratitude Journal', price: '$13.99', href: '/shop/small-good-things-a-gratitude-journal', blurb: 'Daily mood check-ins, gratitude prompts and weekly reflection — for the routine that actually sticks.' },
+    { name: 'The Reset — A Fresh-Start Wellness Planner', price: '$13.99', href: '/shop/the-reset-a-fresh-start-wellness-planner' },
+    { name: "Morning's Light, Evening's Calm — Ritual Planner", price: '$13.99', href: '/shop/mornings-light-evenings-calm-a-morning-evening-ritual-planner' },
+  ],
+  'digital-planning-tips-ipad-beginners': [
+    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'Hyperlinked and beginner-friendly — the easiest first digital planner for iPad, GoodNotes or Notability.' },
+    { name: 'Neurodivergent Set — ADHD-Friendly Planner', price: '$13.99', href: '/shop/neurodivergent-set-adhd-friendly-planner' },
+    { name: 'Arwign Notebook — Everyday', price: '$14.99', href: '/shop/arwign-notebook-everyday' },
+  ],
 }
 
-const DEFAULT_PRODUCT = {
-  name:  'Browse the Full Collection',
-  blurb: 'Explore the full Arwign collection — digital and printable planners for every part of your life.',
-  price: 'from $9.99',
-  href:  '/shop',
-}
+const DEFAULT_PRODUCTS: BlogProduct[] = [
+  {
+    name:  'Browse the Full Collection',
+    blurb: 'Explore the full Arwign collection — digital and printable planners for every part of your life.',
+    price: 'from $9.99',
+    href:  '/shop',
+  },
+]
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -724,7 +755,43 @@ function Toc({ items, onJump, reduce }: { items: { id: string; text: string }[];
   )
 }
 
-function InlineProduct({ sp, compact }: { sp: { name: string; blurb: string; price: string; href: string }; compact?: boolean }) {
+// Arwign Calendar plans — the companion app, relevant to every planning article.
+const CALENDAR_PLANS: BlogProduct[] = [
+  { name: 'Arwign Calendar Plus', price: '$19.99/mo', href: '/calendar/subscribe/plus', blurb: 'AI scheduling, unlimited connected calendars, a daily briefing, booking pages and reminders.' },
+  { name: 'Arwign Calendar Teams', price: '$49.99/mo', href: '/calendar/subscribe/teams', blurb: 'Shared team calendars, round-robin booking, a cross-timezone availability finder and an admin console.' },
+]
+
+// A titled grid of product picks — the planners for the article plus the
+// Arwign Calendar plans that pair with them.
+function RelatedPlanners({ items }: { items: BlogProduct[] }) {
+  const Card = ({ p }: { p: BlogProduct }) => (
+    <Link href={p.href} className="group flex flex-col gap-1.5 p-4 rounded-2xl border transition-all duration-300 hover:-translate-y-0.5 hover:shadow-product h-full"
+      style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}>
+      <div className="flex items-start justify-between gap-3">
+        <span className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(201,168,76,0.16)' }}><BookOpen size={16} style={{ color: 'var(--gold)' }} /></span>
+        <span className="text-sm font-bold whitespace-nowrap" style={{ color: 'var(--gold)' }}>{p.price}</span>
+      </div>
+      <p className="font-semibold text-sm leading-snug mt-1 transition-colors group-hover:text-gold" style={{ color: 'var(--text-primary)' }}>{p.name}</p>
+      {p.blurb && <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{p.blurb}</p>}
+      <span className="inline-flex items-center gap-1 text-xs font-semibold mt-auto pt-1.5" style={{ color: 'var(--gold)' }}>View <ArrowUpRight size={12} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" /></span>
+    </Link>
+  )
+  return (
+    <section className="my-10">
+      <p className="text-[11px] font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--gold)', letterSpacing: '0.1em' }}>Planners for this article</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {items.map((p) => <Card key={p.href} p={p} />)}
+      </div>
+
+      <p className="text-[11px] font-bold uppercase tracking-widest mb-4 mt-9" style={{ color: 'var(--gold)', letterSpacing: '0.1em' }}>Plan it in Arwign Calendar</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {CALENDAR_PLANS.map((p) => <Card key={p.href} p={p} />)}
+      </div>
+    </section>
+  )
+}
+
+function InlineProduct({ sp, compact }: { sp: BlogProduct; compact?: boolean }) {
   if (compact) {
     return (
       <Link href={sp.href} className="group flex items-center gap-4 my-8 p-4 rounded-2xl border transition-all duration-300 hover:-translate-y-0.5 hover:shadow-product"
@@ -834,7 +901,7 @@ export default function BlogPostClient({ post, related }: Props) {
   const ArticleBody = post.body?.trim()
     ? MarkdownArticle
     : (CONTENT[post.slug] ?? ComingSoonBody)
-  const sp = SIDEBAR_PRODUCTS[post.slug] ?? DEFAULT_PRODUCT
+  const products = SIDEBAR_PRODUCTS[post.slug] ?? DEFAULT_PRODUCTS
   const reduce = !!useReducedMotion()
   const articleRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: articleRef, offset: ['start start', 'end end'] })
@@ -909,8 +976,8 @@ export default function BlogPostClient({ post, related }: Props) {
             {/* Mobile TOC */}
             {toc.length >= 3 && <div className="lg:hidden"><Toc items={toc} onJump={jump} reduce={reduce} /></div>}
 
-            {/* Inline product (within) */}
-            <InlineProduct sp={sp} compact />
+            {/* Inline product (within) — the featured pick */}
+            <InlineProduct sp={products[0]} compact />
 
             {/* Article body */}
             <motion.div ref={articleRef} initial={reduce ? false : { opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-80px' }} transition={{ duration: 0.5 }}>
@@ -927,8 +994,8 @@ export default function BlogPostClient({ post, related }: Props) {
               </div>
             )}
 
-            {/* Inline product (after) */}
-            <InlineProduct sp={sp} />
+            {/* Related planners + Arwign Calendar plans (after the body) */}
+            <RelatedPlanners items={products} />
 
             {/* Author bio */}
             <div className="mt-12 flex items-start gap-4 p-6 rounded-2xl border" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
