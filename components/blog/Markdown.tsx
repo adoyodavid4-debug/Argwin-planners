@@ -1,7 +1,8 @@
 // components/blog/Markdown.tsx
 // Tiny dependency-free markdown renderer for blog post bodies.
 // Supports: #/##/### headings, paragraphs, - and 1. lists, > blockquotes,
-// standalone ![alt](src) images, **bold**, *italic*, `code` and [text](url) links.
+// standalone ![alt](src) images, GFM pipe tables, --- dividers,
+// **bold**, *italic*, `code` and [text](url) links.
 // Pure component — safe to use from both server and client components.
 
 import React from 'react'
@@ -47,6 +48,15 @@ type Block =
   | { type: 'ul'; items: string[] }
   | { type: 'ol'; items: string[] }
   | { type: 'image'; alt: string; src: string }
+  | { type: 'table'; header: string[]; rows: string[][] }
+  | { type: 'hr' }
+
+const splitRow = (line: string): string[] =>
+  line.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map((c) => c.trim())
+
+// A GFM separator row: | --- | :--: | ---: | (dashes, optional colons, pipes)
+const isTableSeparator = (line: string): boolean =>
+  /^\|?\s*:?-{1,}:?\s*(\|\s*:?-{1,}:?\s*)*\|?$/.test(line.trim()) && line.includes('-')
 
 function parseBlocks(content: string): Block[] {
   const lines = content.replace(/\r\n/g, '\n').split('\n')
@@ -65,6 +75,28 @@ function parseBlocks(content: string): Block[] {
     const trimmed = line.trim()
 
     if (!trimmed) { flushPara(); continue }
+
+    // Horizontal rule: a line of --- / *** / ___
+    if (/^(-{3,}|\*{3,}|_{3,})$/.test(trimmed)) {
+      flushPara()
+      blocks.push({ type: 'hr' })
+      continue
+    }
+
+    // GFM pipe table: a `| … |` header immediately followed by a separator row.
+    if (trimmed.startsWith('|') && i + 1 < lines.length && isTableSeparator(lines[i + 1])) {
+      flushPara()
+      const header = splitRow(trimmed)
+      const rows: string[][] = []
+      let j = i + 2
+      while (j < lines.length && lines[j].trim().startsWith('|')) {
+        rows.push(splitRow(lines[j]))
+        j++
+      }
+      blocks.push({ type: 'table', header, rows })
+      i = j - 1
+      continue
+    }
 
     const heading = trimmed.match(/^(#{1,4})\s+(.*)$/)
     if (heading) {
@@ -144,6 +176,39 @@ export default function Markdown({ content }: { content: string }) {
               <img key={i} src={block.src} alt={block.alt} loading="lazy" decoding="async"
                 className="w-full rounded-2xl border my-8"
                 style={{ borderColor: 'var(--border)' }} />
+            )
+          case 'hr':
+            return <hr key={i} className="my-10 border-0 h-px" style={{ background: 'var(--border)' }} />
+          case 'table':
+            return (
+              // Scroll is contained to this box — the page never pans sideways,
+              // even for wide tables on a phone.
+              <div key={i} className="my-8 rounded-2xl border overflow-x-auto" style={{ borderColor: 'var(--border)' }}>
+                <table className="w-full text-sm border-collapse" style={{ color: 'var(--text-secondary)' }}>
+                  <thead>
+                    <tr>
+                      {block.header.map((cell, c) => (
+                        <th key={c} className="px-3 py-2.5 text-left font-semibold whitespace-nowrap border-b"
+                          style={{ color: 'var(--text-primary)', background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
+                          {renderInline(cell)}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {block.rows.map((row, r) => (
+                      <tr key={r}>
+                        {block.header.map((_, c) => (
+                          <td key={c} className="px-3 py-2.5 align-top border-b last:border-b-0"
+                            style={{ borderColor: 'var(--border)' }}>
+                            {renderInline(row[c] ?? '')}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )
           case 'quote':
             return (
