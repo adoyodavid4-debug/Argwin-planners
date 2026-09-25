@@ -734,14 +734,14 @@ const SIDEBAR_PRODUCTS: Record<string, BlogProduct[]> = {
     { name: 'The Whole Picture Budget Planner', price: '$12.99', href: '/shop/the-whole-picture-budget-planner' },
   ],
   'hobby-to-income-plan-solo-creatives': [
-    { name: 'SHOW UP.', price: '$18.99', href: '/shop/show-up', blurb: 'For building the consistent weekly rhythm of making, listing and posting that a creative business runs on.' },
-    { name: 'PAID.', price: '$18.99', href: '/shop/paid' },
-    { name: 'WHAT WORKS.', price: '$18.99', href: '/shop/what-works' },
+    { name: 'GROUNDWORK.', price: '$18.99', href: '/shop/groundwork', blurb: 'The foundations of the MADE TO LAST. set — your offer, your customer, your pricing and your why.' },
+    { name: 'THE LONG YEAR.', price: '$18.99', href: '/shop/the-long-year' },
+    { name: 'THE COUNT.', price: '$18.99', href: '/shop/the-count' },
   ],
   'how-much-set-aside-tax-freelancer': [
-    { name: 'The Financial Freedom Budget Planner', price: '$12.99', href: '/shop/the-financial-freedom-budget-planner', blurb: 'Income and expense tracking, savings and a tax set-aside in one calm place — so you always know what is really yours.' },
+    { name: 'THE COUNT.', price: '$18.99', href: '/shop/the-count', blurb: 'The money book from MADE TO LAST. — ledgers, profit and loss, pricing and tax set-asides in one hyperlinked place.' },
+    { name: 'The Financial Freedom Budget Planner', price: '$12.99', href: '/shop/the-financial-freedom-budget-planner' },
     { name: 'Your Personal Finances in One Planner', price: '$12.99', href: '/shop/your-personal-finances-in-one-journal-planner' },
-    { name: 'PAID.', price: '$18.99', href: '/shop/paid' },
   ],
   'brand-deals-track-pitches-rates-payments-ugc': [
     { name: 'PAID.', price: '$18.99', href: '/shop/paid', blurb: 'A 180-page brand-deal & UGC planner — every pitch, brief, deliverable and payment in one professional home.' },
@@ -903,16 +903,52 @@ function ShareRow({ title }: { title: string }) {
 }
 
 // Default editorial author (no per-post author field exists in the data source).
-const AUTHOR = {
-  name: 'The Arwign Team',
-  role: 'Planner designers & writers',
-  bio: 'We craft premium digital and printable planners — and write about the systems, science and small habits behind a calmer, more intentional life.',
+// Rotating bylines — each post is written by one of the Arwign writers.
+type AuthorKey = 'David' | 'Jewel' | 'Frank'
+const AUTHORS: Record<AuthorKey, { first: string; bio: string }> = {
+  David: { first: 'David', bio: 'Writes for Arwign Planners about the systems, science and small habits behind a calmer, more intentional life.' },
+  Jewel: { first: 'Jewel', bio: 'Writes for Arwign Planners on planning, wellbeing and the gentle routines that make a week feel lighter.' },
+  Frank: { first: 'Frank', bio: 'Writes for Arwign Planners about focus, money and building things that last, one calm step at a time.' },
+}
+const POST_AUTHOR: Record<string, AuthorKey> = {
+  'the-stale-week-workload-reset': 'David',
+  'monday-morning-after-a-big-weekend-reset-your-week': 'Jewel',
+  'postgraduate-studies-and-full-time-work': 'Frank',
+  'the-boring-one-task-at-work-occurring-every-week': 'David',
+  'digital-planner-morning-routine': 'Jewel',
+  'goodnotes-vs-notability-planner': 'Frank',
+  'science-66-day-habit-loop': 'David',
+  'budget-planning-monthly-tracker-guide': 'Jewel',
+  'why-undated-planners-are-better': 'Frank',
+  'student-planner-guide-academic-year': 'David',
+  'self-care-wellness-routine-that-sticks': 'Jewel',
+  'digital-planning-tips-ipad-beginners': 'Frank',
+  'how-to-set-up-digital-planner-goodnotes': 'David',
+  'adhd-friendly-planning-what-works': 'Jewel',
+  'spoon-theory-planning-low-energy-week': 'Frank',
+  'simple-budget-system-ipad': 'David',
+  'hobby-to-income-plan-solo-creatives': 'Jewel',
+  'how-much-set-aside-tax-freelancer': 'Frank',
+  'brand-deals-track-pitches-rates-payments-ugc': 'David',
+  'social-media-metrics-that-matter': 'Jewel',
+  'digital-vs-paper-planners-honest-comparison': 'Frank',
+  'digital-planner-size-a5-a4-us-letter': 'David',
+}
+const KEYS: AuthorKey[] = ['David', 'Jewel', 'Frank']
+function authorFor(slug: string) {
+  const key = POST_AUTHOR[slug] ?? KEYS[slug.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 3]
+  return AUTHORS[key]
 }
 
-function Avatar({ size = 36 }: { size?: number }) {
+// First name bold + italic; " @Arwign" stays plain.
+function AuthorName({ first }: { first: string }) {
+  return <span><span style={{ fontWeight: 700, fontStyle: 'italic' }}>{first}</span> @Arwign</span>
+}
+
+function Avatar({ size = 36, initial = 'A' }: { size?: number; initial?: string }) {
   return (
     <span className="rounded-full flex items-center justify-center font-bold text-white flex-shrink-0"
-      style={{ width: size, height: size, background: 'linear-gradient(135deg, var(--gold), var(--gold-light))', fontSize: size * 0.42, fontFamily: 'var(--font-cormorant)' }} aria-hidden>A</span>
+      style={{ width: size, height: size, background: 'linear-gradient(135deg, var(--gold), var(--gold-light))', fontSize: size * 0.42, fontFamily: 'var(--font-cormorant)' }} aria-hidden>{initial}</span>
   )
 }
 
@@ -952,6 +988,7 @@ export default function BlogPostClient({ post, related }: Props) {
     ? MarkdownArticle
     : (CONTENT[post.slug] ?? ComingSoonBody)
   const products = SIDEBAR_PRODUCTS[post.slug] ?? DEFAULT_PRODUCTS
+  const author = authorFor(post.slug)
   const reduce = !!useReducedMotion()
   const articleRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: articleRef, offset: ['start start', 'end end'] })
@@ -994,7 +1031,7 @@ export default function BlogPostClient({ post, related }: Props) {
               {post.title}
             </motion.h1>
             <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/75">
-              <span className="flex items-center gap-2"><Avatar size={28} /> <span className="text-white/90 font-medium">{AUTHOR.name}</span></span>
+              <span className="flex items-center gap-2"><Avatar size={28} initial={author.first[0]} /> <span className="text-white/90"><AuthorName first={author.first} /></span></span>
               <span className="flex items-center gap-1.5"><Clock size={13} /> {post.readMins} min read</span>
               <span>{formatDate(post.publishedAt)}</span>
             </div>
@@ -1049,11 +1086,11 @@ export default function BlogPostClient({ post, related }: Props) {
 
             {/* Author bio */}
             <div className="mt-12 flex items-start gap-4 p-6 rounded-2xl border" style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
-              <Avatar size={52} />
+              <Avatar size={52} initial={author.first[0]} />
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: 'var(--gold)', letterSpacing: '0.1em' }}>Written by</p>
-                <p className="font-display text-lg" style={{ color: 'var(--text-primary)' }}>{AUTHOR.name}</p>
-                <p className="text-sm leading-relaxed mt-1" style={{ color: 'var(--text-secondary)' }}>{AUTHOR.bio}</p>
+                <p className="font-display text-lg" style={{ color: 'var(--text-primary)' }}><AuthorName first={author.first} /></p>
+                <p className="text-sm leading-relaxed mt-1" style={{ color: 'var(--text-secondary)' }}>{author.bio}</p>
                 <Link href="/shop" className="inline-flex items-center gap-1 text-xs font-semibold mt-2.5 hover:gap-2 transition-all" style={{ color: 'var(--gold)' }}>Explore our planners <ArrowRight size={12} /></Link>
               </div>
             </div>
