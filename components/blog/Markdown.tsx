@@ -1,8 +1,8 @@
 // components/blog/Markdown.tsx
 // Tiny dependency-free markdown renderer for blog post bodies.
-// Supports: #/##/### headings, paragraphs, - and 1. lists, > blockquotes,
-// standalone ![alt](src) images, GFM pipe tables, --- dividers,
-// **bold**, *italic*, `code` and [text](url) links.
+// Supports: #/##/### headings, paragraphs, - and 1. lists, - [ ]/- [x] task
+// lists, > blockquotes, standalone ![alt](src) images, GFM pipe tables,
+// --- dividers, **bold**, *italic*, `code` and [text](url) links.
 // Pure component — safe to use from both server and client components.
 
 import React from 'react'
@@ -49,6 +49,7 @@ type Block =
   | { type: 'ol'; items: string[] }
   | { type: 'image'; alt: string; src: string }
   | { type: 'table'; header: string[]; rows: string[][] }
+  | { type: 'checklist'; items: { checked: boolean; text: string }[] }
   | { type: 'hr' }
 
 const splitRow = (line: string): string[] =>
@@ -122,6 +123,17 @@ function parseBlocks(content: string): Block[] {
       continue
     }
 
+    // Task-list item: - [ ] text / - [x] text (checked before plain bullets)
+    const taskItem = trimmed.match(/^[-*]\s+\[([ xX])\]\s+(.*)$/)
+    if (taskItem) {
+      flushPara()
+      const item = { checked: taskItem[1].toLowerCase() === 'x', text: taskItem[2] }
+      const last = blocks[blocks.length - 1]
+      if (last && last.type === 'checklist') last.items.push(item)
+      else blocks.push({ type: 'checklist', items: [item] })
+      continue
+    }
+
     const ulItem = trimmed.match(/^[-*]\s+(.*)$/)
     if (ulItem) {
       flushPara()
@@ -176,6 +188,22 @@ export default function Markdown({ content }: { content: string }) {
               <img key={i} src={block.src} alt={block.alt} loading="lazy" decoding="async"
                 className="w-full rounded-2xl border my-8"
                 style={{ borderColor: 'var(--border)' }} />
+            )
+          case 'checklist':
+            return (
+              <ul key={i} className="ml-1 mb-5 space-y-2.5 list-none">
+                {block.items.map((item, j) => (
+                  <li key={j} className="flex items-start gap-2.5 text-[0.96rem] leading-[1.7] break-words" style={{ color: 'var(--text-secondary)' }}>
+                    <span aria-hidden className="mt-0.5 flex-shrink-0 w-4 h-4 rounded flex items-center justify-center text-[10px] font-bold"
+                      style={item.checked
+                        ? { background: 'var(--gold)', color: '#fff', border: '1px solid var(--gold)' }
+                        : { background: 'transparent', color: 'transparent', border: '1.5px solid var(--border)' }}>
+                      {item.checked ? '✓' : ''}
+                    </span>
+                    <span>{renderInline(item.text)}</span>
+                  </li>
+                ))}
+              </ul>
             )
           case 'hr':
             return <hr key={i} className="my-10 border-0 h-px" style={{ background: 'var(--border)' }} />
