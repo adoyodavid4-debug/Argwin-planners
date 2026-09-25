@@ -1,7 +1,7 @@
 // components/blog/Markdown.tsx
 // Tiny dependency-free markdown renderer for blog post bodies.
 // Supports: #/##/### headings, paragraphs, - and 1. lists, > blockquotes,
-// **bold**, *italic*, `code` and [text](url) links.
+// standalone ![alt](src) images, **bold**, *italic*, `code` and [text](url) links.
 // Pure component — safe to use from both server and client components.
 
 import React from 'react'
@@ -46,6 +46,7 @@ type Block =
   | { type: 'quote'; lines: string[] }
   | { type: 'ul'; items: string[] }
   | { type: 'ol'; items: string[] }
+  | { type: 'image'; alt: string; src: string }
 
 function parseBlocks(content: string): Block[] {
   const lines = content.replace(/\r\n/g, '\n').split('\n')
@@ -69,6 +70,14 @@ function parseBlocks(content: string): Block[] {
     if (heading) {
       flushPara()
       blocks.push({ type: 'heading', level: heading[1].length, text: heading[2] })
+      continue
+    }
+
+    // Standalone image line: ![alt](src)
+    const image = trimmed.match(/^!\[([^\]]*)\]\(([^)\s]+)\)$/)
+    if (image) {
+      flushPara()
+      blocks.push({ type: 'image', alt: image[1], src: image[2] })
       continue
     }
 
@@ -129,6 +138,13 @@ export default function Markdown({ content }: { content: string }) {
               </h3>
             )
           }
+          case 'image':
+            return (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img key={i} src={block.src} alt={block.alt} loading="lazy" decoding="async"
+                className="w-full rounded-2xl border my-8"
+                style={{ borderColor: 'var(--border)' }} />
+            )
           case 'quote':
             return (
               <blockquote key={i} className="border-l-4 pl-6 my-8 py-2" style={{ borderColor: 'var(--gold)' }}>
