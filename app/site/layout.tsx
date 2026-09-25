@@ -53,6 +53,17 @@ async function getLayoutData() {
           : { label: parent.label, href: parent.href }
       })
 
+    // Blog is pinned into the header even when the DB-driven nav has no row
+    // for it (slotted before About, else appended). An empty result set still
+    // falls through to the Navbar fallback list, which also carries Blog.
+    const hasBlog = headerLinks.some((l) => l.href === '/blog' || l.children?.some((c) => c.href === '/blog'))
+    if (headerLinks.length > 0 && !hasBlog) {
+      const blogItem: NavItem = { label: 'Blog', href: '/blog' }
+      const aboutIdx = headerLinks.findIndex((l) => l.href === '/about')
+      if (aboutIdx >= 0) headerLinks.splice(aboutIdx, 0, blogItem)
+      else headerLinks.push(blogItem)
+    }
+
     const footerColumn = (location: string): FooterLink[] =>
       rows
         .filter((r) => r.location === location && !r.parent_id)
