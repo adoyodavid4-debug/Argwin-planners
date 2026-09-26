@@ -27,7 +27,7 @@ export default function TermsPage() {
       <LSection title="3. Orders, pricing & payment">
         <ul>
           <li>Prices are shown in US dollars (USD) unless stated otherwise and may change at any time before purchase.</li>
-          <li>Payment is taken at checkout through our providers (Stripe, PayPal, Pesapal, or Paystack). Your order is confirmed once payment clears.</li>
+          <li>Payment is taken at checkout through our providers (PayPal or Paystack). Your order is confirmed once payment clears.</li>
           <li>You are responsible for any taxes or fees that apply in your country.</li>
         </ul>
       </LSection>

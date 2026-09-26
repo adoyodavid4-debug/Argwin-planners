@@ -1,7 +1,7 @@
 // app/api/paystack/initialize/route.ts
 // Validates cart prices server-side (like /api/checkout), creates a pending
 // `orders` row, then initializes a Paystack transaction for the DB-validated
-// total. Mirrors app/api/pesapal/submit-order/route.ts.
+// total.
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient, createServiceRoleClient } from '@/lib/supabase/server'
 import { initializePaystackTransaction } from '@/lib/paystack'

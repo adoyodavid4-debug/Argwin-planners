@@ -2,7 +2,6 @@
 // Paystack calls this server-to-server when a transaction's status changes.
 // We verify the signature, then verify+fulfil on charge.success. This is the
 // reliable source of truth (the browser return page is just a fast-path).
-// Mirrors app/api/pesapal/callback/route.ts.
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { verifyPaystackSignature, verifyAndFulfilPaystackOrder } from '@/lib/paystack'

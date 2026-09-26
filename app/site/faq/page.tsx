@@ -33,7 +33,7 @@ const GROUPS: { title: string; qa: { q: string; a: string }[] }[] = [
     qa: [
       { q: 'What payment methods do you accept?', a: 'You can pay securely by card, PayPal, and our other supported providers at checkout. Your card details are handled directly by the payment processor — we never see or store them.' },
       { q: 'What is your refund policy?', a: 'Because these are instant digital downloads, sales are generally final — but we offer a 30-day happiness guarantee: if anything is wrong with your file, we’ll fix it or refund you. See our Refund Policy for details.' },
-      { q: 'Is checkout secure?', a: 'Yes. The whole site runs over encrypted HTTPS, and payments are processed by trusted providers (Stripe, PayPal, Pesapal, and Paystack).' },
+      { q: 'Is checkout secure?', a: 'Yes. The whole site runs over encrypted HTTPS, and payments are processed by trusted providers (PayPal and Paystack).' },
     ],
   },
   {

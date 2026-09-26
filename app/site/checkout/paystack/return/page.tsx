@@ -3,7 +3,6 @@
 // paying on the hosted Paystack page. We actively verify the transaction here
 // as a fast-path safety net in case the async webhook hasn't landed yet, then
 // hand off to the existing generic success page.
-// Mirrors app/site/checkout/pesapal/return/page.tsx.
 import { redirect } from 'next/navigation'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { verifyAndFulfilPaystackOrder } from '@/lib/paystack'

@@ -6,10 +6,9 @@ import Image from 'next/image'
 import { Loader2, Lock, Mail, ShoppingBag, Trash2, Zap } from 'lucide-react'
 import { useCartStore, type CartItem } from '@/lib/store'
 import { trackInitiateCheckout, trackPurchase, newEventId, getFbIds, hasMarketingConsent } from '@/lib/analytics'
-import PesapalCheckout from '@/components/checkout/PesapalCheckout'
 import PaystackCheckout from '@/components/checkout/PaystackCheckout'
 
-type Method = 'pesapal' | 'paypal' | 'paystack'
+type Method = 'paypal' | 'paystack'
 
 declare global {
   interface Window { paypal?: any }
@@ -22,7 +21,9 @@ export default function CheckoutClient() {
   const { items, removeItem, total, clearCart } = useCartStore()
 
   const [mounted,     setMounted]     = useState(false)
-  const [method,      setMethod]      = useState<Method>('pesapal')
+  // Default to PayPal — it's always configured, so the default tab is never a
+  // not-yet-live gateway. Card (Paystack) is a second option once enabled.
+  const [method,      setMethod]      = useState<Method>('paypal')
   const [email,       setEmail]       = useState('')
   const [emailError,  setEmailError]  = useState('')
   const [paypalReady, setPaypalReady] = useState(false)
@@ -191,14 +192,16 @@ export default function CheckoutClient() {
     )
   }
 
-  // Paystack is only offered when its keys are configured (set
-  // NEXT_PUBLIC_PAYSTACK_ENABLED=true once PAYSTACK_* are added to the env),
-  // otherwise selecting it would fail at the hosted-page step.
+  // Card payments run through Paystack (Visa/Mastercard + mobile money). It's
+  // only shown once its key is live: set NEXT_PUBLIC_PAYSTACK_ENABLED=true AFTER
+  // adding PAYSTACK_SECRET_KEY, otherwise the hosted-page step would fail. PayPal
+  // (balance or a linked card) is always available.
   const paystackEnabled = process.env.NEXT_PUBLIC_PAYSTACK_ENABLED === 'true'
   const methods: { key: Method; label: string; icon?: string; iconAlt: string }[] = [
-    { key: 'pesapal',  label: 'Card',     icon: '/images/payments/visa-mastercard.jpg', iconAlt: 'Visa and Mastercard' },
     { key: 'paypal',   label: 'PayPal',   icon: '/images/payments/paypal.jpg',          iconAlt: 'PayPal' },
-    ...(paystackEnabled ? [{ key: 'paystack' as Method, label: 'Paystack', iconAlt: 'Paystack' }] : []),
+    ...(paystackEnabled
+      ? [{ key: 'paystack' as Method, label: 'Card', icon: '/images/payments/visa-mastercard.jpg', iconAlt: 'Visa and Mastercard' }]
+      : []),
   ]
 
   return (
@@ -268,16 +271,6 @@ export default function CheckoutClient() {
                 </button>
               ))}
             </div>
-
-            {/* Card (PesaPal — Visa / Mastercard) */}
-            {method === 'pesapal' && (
-              <PesapalCheckout
-                items={items}
-                total={total()}
-                email={email}
-                onEmailInvalid={() => validateEmail(email)}
-              />
-            )}
 
             {/* PayPal */}
             {method === 'paypal' && (

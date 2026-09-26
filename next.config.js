@@ -60,11 +60,22 @@ const nextConfig = {
           },
         ],
       },
-      // Cache static assets aggressively
+      // Content-hashed build assets never change at a given URL — cache forever.
       {
-        source: '/(.*)\\.(ico|png|jpg|jpeg|svg|webp|avif|woff2|woff)',
+        source: '/_next/static/:path*',
         headers: [
           { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+      // Public assets live at STABLE, unhashed URLs (e.g. /products/*.png,
+      // /logo.png). They must NOT be `immutable`: re-uploading a file keeps the
+      // same URL, so an immutable cache pins the old/broken copy for a year and
+      // never picks up the fix. Long CDN cache (Vercel invalidates it each deploy)
+      // + short browser freshness with background revalidation instead.
+      {
+        source: '/((?!_next/).*)\\.(ico|png|jpg|jpeg|svg|webp|avif|woff2|woff)',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=3600, s-maxage=31536000, stale-while-revalidate=86400' },
         ],
       },
     ]

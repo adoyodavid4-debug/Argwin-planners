@@ -49,7 +49,7 @@ export default function PrivacyPage() {
       <LSection title="5. Who we share it with">
         <p>We do <strong>not</strong> sell your personal information. We share it only with the service providers who help us run the store, and only as needed:</p>
         <ul>
-          <li><strong>Payment processors</strong> — Stripe, PayPal, Pesapal, and Paystack process your payment securely.</li>
+          <li><strong>Payment processors</strong> — PayPal and Paystack process your payment securely.</li>
           <li><strong>Email</strong> — we send transactional and (opt-in) marketing email through our email provider.</li>
           <li><strong>Hosting & database</strong> — our site and data are hosted with Vercel and Supabase.</li>
           <li><strong>Analytics</strong> — Google and Meta, as described above.</li>

@@ -44,7 +44,7 @@ export default function RefundPage() {
       </LSection>
 
       <LSection title="5. How refunds are processed">
-        <p>Approved refunds are returned to your original payment method (card, PayPal, Pesapal, or Paystack). It can take a few business days for your bank or provider to post the refund. If you believe you were charged in error, please contact us before opening a chargeback so we can resolve it quickly.</p>
+        <p>Approved refunds are returned to your original payment method (card, PayPal, or Paystack). It can take a few business days for your bank or provider to post the refund. If you believe you were charged in error, please contact us before opening a chargeback so we can resolve it quickly.</p>
       </LSection>
     </LegalShell>
   )
