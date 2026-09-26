@@ -669,9 +669,9 @@ const SIDEBAR_PRODUCTS: Record<string, BlogProduct[]> = {
     { name: 'The Nine to Five Brain — ADHD Work Planner', price: '$13.99', href: '/shop/the-nine-to-five-brain-adhd-work-planner' },
   ],
   'monday-morning-after-a-big-weekend-reset-your-week': [
-    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'Weekly spreads with the Big Three and a 3-2-1 list — set your week up on Friday, land it on Monday.' },
+    { name: 'Tiny Anchors — A Habit & Routine Builder', price: '$13.99', href: '/shop/tiny-anchors-a-habit-routine-builder', blurb: 'Rebuild the week around a few small anchors — gentle routines and habit tracking to steady Monday and get your momentum back.' },
+    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect' },
     { name: "Morning's Light, Evening's Calm — Ritual Planner", price: '$13.99', href: '/shop/mornings-light-evenings-calm-a-morning-evening-ritual-planner' },
-    { name: 'Tiny Anchors — A Habit & Routine Builder', price: '$13.99', href: '/shop/tiny-anchors-a-habit-routine-builder' },
   ],
   'postgraduate-studies-and-full-time-work': [
     { name: 'The Balanced Student', price: '$12.99', href: '/shop/the-balanced-student', blurb: 'Term maps, weekly study plans, assignment trackers and exam countdowns — built for studying alongside a job.' },
