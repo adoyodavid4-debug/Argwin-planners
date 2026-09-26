@@ -89,7 +89,7 @@ That''s a conversation with a doctor, or a therapist, or whatever support you ha
 
 ---
 
-*Our weekly and habit spreads keep the rollover count, the done column and the free evenings visible — so the audit takes ten minutes.* [See Off the Clock, our work–life balance planner →](/shop/off-the-clock-a-worklife-balance-planner)',
+*Our weekly and habit spreads keep the rollover count, the done column and the free evenings visible — so the audit takes ten minutes.* [See Living through the Burnout →](/shop/living-through-the-burnout)',
   '/blog-content/burnout-warning-signs-in-your-planner.webp',
   'Wellness',
   ARRAY['burnout', 'wellness', 'weekly review', 'overwhelm', 'self care', 'work life balance']::text[],
@@ -100,18 +100,11 @@ That''s a conversation with a doctor, or a therapist, or whatever support you ha
   '2026-09-27T09:00:00Z'
 )
 on conflict (slug) do update set
-  title            = excluded.title,
-  excerpt          = excluded.excerpt,
-  body             = excluded.body,
-  cover_image      = excluded.cover_image,
-  category         = excluded.category,
-  tags             = excluded.tags,
-  status           = excluded.status,
-  read_time_mins   = excluded.read_time_mins,
-  meta_title       = excluded.meta_title,
-  meta_description = excluded.meta_description,
-  published_at     = excluded.published_at,
-  updated_at       = now();
+  title = excluded.title, excerpt = excluded.excerpt, body = excluded.body,
+  cover_image = excluded.cover_image, category = excluded.category, tags = excluded.tags,
+  status = excluded.status, read_time_mins = excluded.read_time_mins,
+  meta_title = excluded.meta_title, meta_description = excluded.meta_description,
+  published_at = excluded.published_at, updated_at = now();
 
 insert into blog_posts
   (title, slug, excerpt, body, cover_image, category, tags, status, read_time_mins, meta_title, meta_description, published_at)
@@ -224,7 +217,7 @@ Give it four weeks before you judge it. The first week feels like a downgrade. T
 
 ---
 
-*Our weekly spreads are built for exactly this — one page, hard edges, room for the week you''ll actually have.* [See the Undated Digital Monthly Planner →](/shop/undated-monthly-planner-digital-connect)',
+*Our weekly spreads are built for exactly this — one page, hard edges, room for the week you''ll actually have.* [See the Arwign Notebook — Everyday →](/shop/arwign-notebook-everyday)',
   '/blog-content/notion-to-paper-why-i-went-back.webp',
   'Digital tools',
   ARRAY['notion', 'paper planner', 'digital vs paper', 'productivity systems', 'second brain']::text[],
@@ -235,18 +228,11 @@ Give it four weeks before you judge it. The first week feels like a downgrade. T
   '2026-09-27T09:00:00Z'
 )
 on conflict (slug) do update set
-  title            = excluded.title,
-  excerpt          = excluded.excerpt,
-  body             = excluded.body,
-  cover_image      = excluded.cover_image,
-  category         = excluded.category,
-  tags             = excluded.tags,
-  status           = excluded.status,
-  read_time_mins   = excluded.read_time_mins,
-  meta_title       = excluded.meta_title,
-  meta_description = excluded.meta_description,
-  published_at     = excluded.published_at,
-  updated_at       = now();
+  title = excluded.title, excerpt = excluded.excerpt, body = excluded.body,
+  cover_image = excluded.cover_image, category = excluded.category, tags = excluded.tags,
+  status = excluded.status, read_time_mins = excluded.read_time_mins,
+  meta_title = excluded.meta_title, meta_description = excluded.meta_description,
+  published_at = excluded.published_at, updated_at = now();
 
 insert into blog_posts
   (title, slug, excerpt, body, cover_image, category, tags, status, read_time_mins, meta_title, meta_description, published_at)
@@ -340,7 +326,7 @@ Then leave it alone for a month. No tweaking, no new apps. The system isn''t the
 
 ---
 
-*Our weekly spreads are designed for exactly this split — calendar blocks at the top, the decided week underneath, habits down the side.* [See the Undated Digital Monthly Planner →](/shop/undated-monthly-planner-digital-connect)',
+*Our weekly spreads are designed for exactly this split — calendar blocks at the top, the decided week underneath, habits down the side.* [See A Place for Everything →](/shop/a-place-for-everything)',
   '/blog-content/paper-or-app-what-goes-where.webp',
   'Digital tools',
   ARRAY['hybrid planning', 'digital vs paper', 'productivity systems', 'calendar', 'setup']::text[],
@@ -351,18 +337,11 @@ Then leave it alone for a month. No tweaking, no new apps. The system isn''t the
   '2026-09-27T09:00:00Z'
 )
 on conflict (slug) do update set
-  title            = excluded.title,
-  excerpt          = excluded.excerpt,
-  body             = excluded.body,
-  cover_image      = excluded.cover_image,
-  category         = excluded.category,
-  tags             = excluded.tags,
-  status           = excluded.status,
-  read_time_mins   = excluded.read_time_mins,
-  meta_title       = excluded.meta_title,
-  meta_description = excluded.meta_description,
-  published_at     = excluded.published_at,
-  updated_at       = now();
+  title = excluded.title, excerpt = excluded.excerpt, body = excluded.body,
+  cover_image = excluded.cover_image, category = excluded.category, tags = excluded.tags,
+  status = excluded.status, read_time_mins = excluded.read_time_mins,
+  meta_title = excluded.meta_title, meta_description = excluded.meta_description,
+  published_at = excluded.published_at, updated_at = now();
 
 insert into blog_posts
   (title, slug, excerpt, body, cover_image, category, tags, status, read_time_mins, meta_title, meta_description, published_at)
@@ -457,7 +436,7 @@ You won''t become accurate. Nobody does — the bias is stubborn. But you''ll be
 
 ---
 
-*Our weekly and daily spreads have estimate-versus-actual columns built in — the fastest way to find your correction factor.* [See the Undated Digital Monthly Planner →](/shop/undated-monthly-planner-digital-connect)',
+*Our weekly and daily spreads have estimate-versus-actual columns built in — the fastest way to find your correction factor.* [See Pace, Don''t Race →](/shop/pace-dont-race)',
   '/blog-content/planning-fallacy-why-your-todo-list-lies.webp',
   'Productivity',
   ARRAY['planning fallacy', 'time blocking', 'time management', 'productivity', 'weekly planning']::text[],
@@ -468,18 +447,11 @@ You won''t become accurate. Nobody does — the bias is stubborn. But you''ll be
   '2026-09-27T09:00:00Z'
 )
 on conflict (slug) do update set
-  title            = excluded.title,
-  excerpt          = excluded.excerpt,
-  body             = excluded.body,
-  cover_image      = excluded.cover_image,
-  category         = excluded.category,
-  tags             = excluded.tags,
-  status           = excluded.status,
-  read_time_mins   = excluded.read_time_mins,
-  meta_title       = excluded.meta_title,
-  meta_description = excluded.meta_description,
-  published_at     = excluded.published_at,
-  updated_at       = now();
+  title = excluded.title, excerpt = excluded.excerpt, body = excluded.body,
+  cover_image = excluded.cover_image, category = excluded.category, tags = excluded.tags,
+  status = excluded.status, read_time_mins = excluded.read_time_mins,
+  meta_title = excluded.meta_title, meta_description = excluded.meta_description,
+  published_at = excluded.published_at, updated_at = now();
 
 insert into blog_posts
   (title, slug, excerpt, body, cover_image, category, tags, status, read_time_mins, meta_title, meta_description, published_at)
@@ -573,7 +545,7 @@ Somewhere in there, the half-second pause at the card machine quietly disappears
 
 ---
 
-*Our budget and expense trackers are built around the three numbers and a weekly page — no seventeen categories, no spreadsheet.* [See Penny by Penny, our budget planner →](/shop/penny-by-penny-savings-budget-planner)',
+*Our budget and expense trackers are built around the three numbers and a weekly page — no seventeen categories, no spreadsheet.* [See Your Personal Finances in One Planner →](/shop/your-personal-finances-in-one-journal-planner)',
   '/blog-content/weekly-money-hour-end-money-anxiety.webp',
   'Money',
   ARRAY['money anxiety', 'budgeting', 'expense tracker', 'weekly routine', 'personal finance', 'adulting']::text[],
@@ -584,15 +556,8 @@ Somewhere in there, the half-second pause at the card machine quietly disappears
   '2026-09-27T09:00:00Z'
 )
 on conflict (slug) do update set
-  title            = excluded.title,
-  excerpt          = excluded.excerpt,
-  body             = excluded.body,
-  cover_image      = excluded.cover_image,
-  category         = excluded.category,
-  tags             = excluded.tags,
-  status           = excluded.status,
-  read_time_mins   = excluded.read_time_mins,
-  meta_title       = excluded.meta_title,
-  meta_description = excluded.meta_description,
-  published_at     = excluded.published_at,
-  updated_at       = now();
+  title = excluded.title, excerpt = excluded.excerpt, body = excluded.body,
+  cover_image = excluded.cover_image, category = excluded.category, tags = excluded.tags,
+  status = excluded.status, read_time_mins = excluded.read_time_mins,
+  meta_title = excluded.meta_title, meta_description = excluded.meta_description,
+  published_at = excluded.published_at, updated_at = now();

@@ -775,29 +775,29 @@ const SIDEBAR_PRODUCTS: Record<string, BlogProduct[]> = {
   ],
   // ── Made to Last. blog additions ──
   'burnout-warning-signs-in-your-planner': [
-    { name: 'Off the Clock — A Work–Life Balance Planner', price: '$13.99', href: '/shop/off-the-clock-a-worklife-balance-planner', blurb: 'Protect an evening, subtract a commitment and keep your weekly review honest — the monthly burnout audit in this article, built into the spreads.' },
-    { name: 'Running on Empty', price: '$13.99', href: '/shop/running-on-empty' },
-    { name: 'Tiny Anchors — A Habit & Routine Builder', price: '$13.99', href: '/shop/tiny-anchors-a-habit-routine-builder' },
+    { name: 'Living through the Burnout', price: '$12.99', href: '/shop/living-through-the-burnout', blurb: 'A planner made for this exact stretch — ease the load, protect recovery and steady the week while you find your feet again.' },
+    { name: 'Off the Clock — A Work–Life Balance Planner', price: '$13.99', href: '/shop/off-the-clock-a-worklife-balance-planner' },
+    { name: 'The Overwhelm Reset', price: '$12.99', href: '/shop/the-overwhelm-reset' },
   ],
   'notion-to-paper-why-i-went-back': [
-    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'One page with hard edges — a weekly spread that makes you choose what fits, then leaves you alone. The paper-plus-app split, done properly.' },
-    { name: 'Arwign Notebook — Everyday', price: '$14.99', href: '/shop/arwign-notebook-everyday' },
+    { name: 'Arwign Notebook — Everyday', price: '$14.99', href: '/shop/arwign-notebook-everyday', blurb: 'The case for going back to paper, in one notebook — a single page with hard edges that makes you choose what fits, then leaves you alone.' },
+    { name: 'Clear Mind, Clear Desk', price: '$12.99', href: '/shop/clear-mind-clear-desk' },
     { name: 'Tiny Anchors — A Habit & Routine Builder', price: '$13.99', href: '/shop/tiny-anchors-a-habit-routine-builder' },
   ],
   'paper-or-app-what-goes-where': [
-    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'Calendar blocks at the top, the decided week underneath, habits down the side — the exact paper-and-app split from this article, in one weekly spread.' },
+    { name: 'A Place for Everything', price: '$12.99', href: '/shop/a-place-for-everything', blurb: 'One clear rule for what belongs on paper and what belongs in an app — so everything has a home and you stop re-deciding every week.' },
     { name: 'Tiny Anchors — A Habit & Routine Builder', price: '$13.99', href: '/shop/tiny-anchors-a-habit-routine-builder' },
-    { name: 'Arwign Notebook — Everyday', price: '$14.99', href: '/shop/arwign-notebook-everyday' },
+    { name: 'The Anchored Day', price: '$13.99', href: '/shop/the-anchored-day' },
   ],
   'planning-fallacy-why-your-todo-list-lies': [
-    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'Weekly and daily spreads with estimate-versus-actual columns and a capacity check — find your correction factor and plan the week that actually fits.' },
-    { name: 'The Nine to Five Brain — ADHD Work Planner', price: '$13.99', href: '/shop/the-nine-to-five-brain-adhd-work-planner' },
-    { name: 'Off the Clock — A Work–Life Balance Planner', price: '$13.99', href: '/shop/off-the-clock-a-worklife-balance-planner' },
+    { name: "Pace, Don't Race", price: '$12.99', href: '/shop/pace-dont-race', blurb: 'For the plan that fits real life instead of the optimistic film in your head — realistic pacing over an over-packed day.' },
+    { name: 'The Deep Dive', price: '$12.99', href: '/shop/the-deep-dive' },
+    { name: 'The Long Game', price: '$12.99', href: '/shop/the-long-game' },
   ],
   'weekly-money-hour-end-money-anxiety': [
-    { name: 'Penny by Penny Savings & Budget Planner', price: '$12.99', href: '/shop/penny-by-penny-savings-budget-planner', blurb: 'The weekly money hour on one page — in, out, left, plus a spot for what is coming. No seventeen categories, no spreadsheet.' },
+    { name: 'Your Personal Finances in One Planner', price: '$12.99', href: '/shop/your-personal-finances-in-one-journal-planner', blurb: 'Your whole money picture in one place — the weekly look that turns dread into a boring, five-minute habit.' },
+    { name: 'The Whole Picture Budget Planner', price: '$12.99', href: '/shop/the-whole-picture-budget-planner' },
     { name: 'Ultimate Budget Planner', price: '$12.99', href: '/shop/ultimate-budget-planner' },
-    { name: 'Your Personal Finances in One Planner', price: '$12.99', href: '/shop/your-personal-finances-in-one-journal-planner' },
   ],
 }
 
