@@ -20,23 +20,31 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
-  const svc = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
-    process.env.SUPABASE_SERVICE_ROLE_KEY ?? '',
-  )
-  // HEAD count → returns no rows and no data; we only look at whether it errored.
-  const probe = async (table: string) => {
-    const { error } = await svc.from(table).select('id', { count: 'exact', head: true })
-    return { ok: !error, error: error ? error.message : null }
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
+
+  // Raw REST HEAD/GET so we can read the exact rejection reason Supabase returns
+  // (e.g. "Legacy API keys are disabled" / "Invalid API key"). No rows requested.
+  const raw = async (table: string) => {
+    try {
+      const r = await fetch(`${url}/rest/v1/${table}?select=id&limit=1`, {
+        headers: { apikey: key, Authorization: `Bearer ${key}` },
+      })
+      const body = await r.text()
+      return { status: r.status, message: body.slice(0, 240) }
+    } catch (e) {
+      return { status: 0, message: String(e).slice(0, 240) }
+    }
   }
 
-  const [orders, profiles] = await Promise.all([probe('orders'), probe('profiles')])
-  const keyPresent = (process.env.SUPABASE_SERVICE_ROLE_KEY ?? '').length > 0
+  const [orders, profiles] = await Promise.all([raw('orders'), raw('profiles')])
+  const serviceRoleWorks = orders.status >= 200 && orders.status < 300
 
   return NextResponse.json({
     ok: true,
-    keyPresent,
-    serviceRoleWorks: orders.ok && profiles.ok,
-    reads: { orders: { ok: orders.ok, error: orders.error }, profiles: { ok: profiles.ok, error: profiles.error } },
+    keyPresent: key.length > 0,
+    keyFormat: key.startsWith('sb_secret_') ? 'new-secret' : key.startsWith('eyJ') ? 'legacy-jwt' : key ? 'other' : 'empty',
+    serviceRoleWorks,
+    reads: { orders, profiles },
   })
 }
