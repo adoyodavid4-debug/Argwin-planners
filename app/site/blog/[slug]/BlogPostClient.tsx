@@ -773,6 +773,32 @@ const SIDEBAR_PRODUCTS: Record<string, BlogProduct[]> = {
     { name: 'The Balanced Student', price: '$12.99', href: '/shop/the-balanced-student' },
     { name: 'Arwign Notebook — Everyday', price: '$14.99', href: '/shop/arwign-notebook-everyday' },
   ],
+  // ── Made to Last. blog additions ──
+  'burnout-warning-signs-in-your-planner': [
+    { name: 'Off the Clock — A Work–Life Balance Planner', price: '$13.99', href: '/shop/off-the-clock-a-worklife-balance-planner', blurb: 'Protect an evening, subtract a commitment and keep your weekly review honest — the monthly burnout audit in this article, built into the spreads.' },
+    { name: 'Running on Empty', price: '$13.99', href: '/shop/running-on-empty' },
+    { name: 'Tiny Anchors — A Habit & Routine Builder', price: '$13.99', href: '/shop/tiny-anchors-a-habit-routine-builder' },
+  ],
+  'notion-to-paper-why-i-went-back': [
+    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'One page with hard edges — a weekly spread that makes you choose what fits, then leaves you alone. The paper-plus-app split, done properly.' },
+    { name: 'Arwign Notebook — Everyday', price: '$14.99', href: '/shop/arwign-notebook-everyday' },
+    { name: 'Tiny Anchors — A Habit & Routine Builder', price: '$13.99', href: '/shop/tiny-anchors-a-habit-routine-builder' },
+  ],
+  'paper-or-app-what-goes-where': [
+    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'Calendar blocks at the top, the decided week underneath, habits down the side — the exact paper-and-app split from this article, in one weekly spread.' },
+    { name: 'Tiny Anchors — A Habit & Routine Builder', price: '$13.99', href: '/shop/tiny-anchors-a-habit-routine-builder' },
+    { name: 'Arwign Notebook — Everyday', price: '$14.99', href: '/shop/arwign-notebook-everyday' },
+  ],
+  'planning-fallacy-why-your-todo-list-lies': [
+    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'Weekly and daily spreads with estimate-versus-actual columns and a capacity check — find your correction factor and plan the week that actually fits.' },
+    { name: 'The Nine to Five Brain — ADHD Work Planner', price: '$13.99', href: '/shop/the-nine-to-five-brain-adhd-work-planner' },
+    { name: 'Off the Clock — A Work–Life Balance Planner', price: '$13.99', href: '/shop/off-the-clock-a-worklife-balance-planner' },
+  ],
+  'weekly-money-hour-end-money-anxiety': [
+    { name: 'Penny by Penny Savings & Budget Planner', price: '$12.99', href: '/shop/penny-by-penny-savings-budget-planner', blurb: 'The weekly money hour on one page — in, out, left, plus a spot for what is coming. No seventeen categories, no spreadsheet.' },
+    { name: 'Ultimate Budget Planner', price: '$12.99', href: '/shop/ultimate-budget-planner' },
+    { name: 'Your Personal Finances in One Planner', price: '$12.99', href: '/shop/your-personal-finances-in-one-journal-planner' },
+  ],
 }
 
 const DEFAULT_PRODUCTS: BlogProduct[] = [
