@@ -5,6 +5,7 @@ import { createServiceRoleClient } from '@/lib/supabase/server'
 import { fulfilDigitalOrder, incrementDownloadCount } from '@/lib/orders'
 import { getEmailProvider } from '@/lib/email'
 import { createBookingEvent, sendBookingEmails } from '@/lib/calendar/booking'
+import { sendMetaEvent } from '@/lib/meta-capi'
 import Stripe from 'stripe'
 import { format } from 'date-fns'
 
@@ -143,6 +144,20 @@ export async function POST(req: NextRequest) {
 
       // Generate download tokens + send the confirmation email (idempotent)
       await fulfilDigitalOrder(supabase, order.id)
+
+      // Server-side Meta Purchase (Conversions API). No-op unless Meta is
+      // configured; only for buyers who granted marketing consent (flag threaded
+      // via the Stripe session metadata). Deterministic eventId dedupes retries.
+      if (session.metadata?.fb_consent === 'true') {
+        await sendMetaEvent({
+          eventName:  'Purchase',
+          eventId:    `purchase_${order.id}`,
+          user:       { email, fbp: session.metadata?.fbp || null, fbc: session.metadata?.fbc || null },
+          value:      total,
+          currency:   'USD',
+          contentIds: productIds,
+        })
+      }
 
       console.log(`[stripe-webhook] Order ${order.id} completed for ${email}`)
       break

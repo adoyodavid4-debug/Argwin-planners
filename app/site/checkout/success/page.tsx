@@ -7,6 +7,7 @@ import { CheckCircle2, Download } from 'lucide-react'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import SuccessPoller from './SuccessPoller'
 import ClearCart from './ClearCart'
+import PurchaseTracking from './PurchaseTracking'
 
 export const dynamic = 'force-dynamic'
 
@@ -174,6 +175,17 @@ export default async function CheckoutSuccessPage({
   return (
     <div className="container-site py-12 md:py-16">
       <ClearCart />
+      {/* GA4 `purchase` conversion. PayPal already fires it client-side in its
+          onApprove handler, so skip it here for PayPal to avoid double-counting;
+          this covers Paystack (and any other redirect-based method). */}
+      {order.payment_method !== 'paypal' && (
+        <PurchaseTracking
+          id={order.id}
+          value={order.amount_total}
+          currency={currency}
+          items={(items ?? []).map((i) => ({ product_id: i.product_id, title: i.title, price: i.price, quantity: i.quantity }))}
+        />
+      )}
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-10">

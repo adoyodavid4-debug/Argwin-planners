@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { Loader2, Zap } from 'lucide-react'
+import { getFbIds, hasMarketingConsent } from '@/lib/analytics'
 
 interface CartItem {
   id:        string
@@ -29,12 +30,16 @@ export default function PaystackCheckout({ items, total, email, onEmailInvalid }
     setLoading(true)
     setError('')
     try {
+      // Meta attribution for the server-side Purchase (Conversions API), stored
+      // on the pending order and only used when marketing consent was granted.
+      const { fbp, fbc } = getFbIds()
       const res = await fetch('/api/paystack/initialize', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           items: items.map(({ id, slug, title, price }) => ({ id, slug, title, price })),
           email: email.trim(),
+          analytics: { fbp, fbc, consent: hasMarketingConsent() },
         }),
       })
       const data = await res.json()

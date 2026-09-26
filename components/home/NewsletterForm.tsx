@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { ArrowRight, CheckCircle, Loader2, AlertCircle } from 'lucide-react'
+import { trackLead } from '@/lib/analytics'
 
 const schema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -31,6 +32,8 @@ export default function NewsletterForm({ source = 'footer', className = '' }: Pr
         body: JSON.stringify({ email, source }),
       })
       if (!res.ok) throw new Error()
+      // Lead conversion (GA4 generate_lead + Meta Lead) — fires once on success.
+      trackLead(`newsletter: ${source}`)
       setSubmitted(true)
     } catch {
       setServerError('Something went wrong. Please try again.')

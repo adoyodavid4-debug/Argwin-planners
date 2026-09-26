@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { trackLead } from '@/lib/analytics'
 
 type Variant = 'inline' | 'footer' | 'exit-intent'
 type Locale = 'en' | 'fr'
@@ -82,6 +83,8 @@ export function OptInForm({ locale = 'en', variant = 'inline', leadMagnetId, mag
     })
 
     if (res.ok) {
+      // Lead conversion (GA4 generate_lead + Meta Lead) — fires once on success.
+      trackLead(magnetTitle ? `opt-in: ${magnetTitle}` : 'opt-in')
       setSubmitted(true)
     } else {
       const data = await res.json().catch(() => ({}))

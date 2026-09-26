@@ -5,6 +5,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { verifyPaystackSignature, verifyAndFulfilPaystackOrder } from '@/lib/paystack'
+import { sendMetaEvent } from '@/lib/meta-capi'
 
 export async function POST(req: NextRequest) {
   // Must read the RAW body to validate the signature
@@ -30,6 +31,28 @@ export async function POST(req: NextRequest) {
     try {
       const supabase = createServiceRoleClient()
       await verifyAndFulfilPaystackOrder(supabase, reference)
+
+      // Server-side Meta Purchase (Conversions API). No-op unless Meta is
+      // configured; only for buyers who granted marketing consent at checkout
+      // (flag stored on the order at initialize time). eventId is deterministic
+      // so Paystack webhook retries dedupe to a single Purchase.
+      const { data: order } = await supabase
+        .from('orders')
+        .select('id, email, amount_total, currency, status, metadata')
+        .eq('id', reference)
+        .maybeSingle()
+      const meta = (order?.metadata ?? {}) as Record<string, any>
+      if (order && order.status === 'completed' && meta.fb_consent === true) {
+        const { data: lines } = await supabase.from('order_items').select('product_id').eq('order_id', order.id)
+        await sendMetaEvent({
+          eventName:  'Purchase',
+          eventId:    `purchase_${order.id}`,
+          user:       { email: order.email, fbp: meta.fbp ?? null, fbc: meta.fbc ?? null },
+          value:      order.amount_total,
+          currency:   (order.currency ?? 'usd').toUpperCase(),
+          contentIds: (lines ?? []).map((l: any) => l.product_id).filter(Boolean),
+        })
+      }
     } catch (err) {
       console.error('[paystack/webhook]', err)
       // Still 200 below so Paystack doesn't hammer retries on a transient error;

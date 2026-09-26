@@ -15,6 +15,13 @@ const schema = z.object({
     price: z.number().positive(),
   })).min(1),
   email: z.string().email(),
+  // Optional Meta attribution — stored on the order so the webhook can send a
+  // consented server-side Purchase (Conversions API) after payment succeeds.
+  analytics: z.object({
+    fbp:     z.string().max(128).nullable().optional(),
+    fbc:     z.string().max(256).nullable().optional(),
+    consent: z.boolean(),
+  }).optional(),
 })
 
 export async function POST(req: NextRequest) {
@@ -24,7 +31,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
   }
 
-  const { items, email } = parsed.data
+  const { items, email, analytics } = parsed.data
   const supabase = createServerSupabaseClient()
 
   // Verify products exist and prices match — never trust client prices
@@ -61,6 +68,11 @@ export async function POST(req: NextRequest) {
       amount_discount: 0,
       amount_total:    total,
       currency:        'usd',
+      // Only persist Meta identifiers when the buyer granted marketing consent;
+      // the webhook keys the Conversions-API Purchase off this flag.
+      metadata: analytics?.consent
+        ? { fb_consent: true, fbp: analytics.fbp ?? null, fbc: analytics.fbc ?? null }
+        : {},
     })
     .select('id')
     .single()

@@ -14,6 +14,13 @@ const schema = z.object({
   })).min(1),
   coupon_code: z.string().optional(),
   email:       z.string().email().optional(),
+  // Optional Meta attribution — mirrored into the Stripe session metadata so the
+  // webhook can send a consented server-side Purchase (Conversions API).
+  analytics: z.object({
+    fbp:     z.string().max(128).nullable().optional(),
+    fbc:     z.string().max(256).nullable().optional(),
+    consent: z.boolean(),
+  }).optional(),
 })
 
 // Cap checkout-session creation per IP (10 / minute) so the endpoint — and the
@@ -31,7 +38,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
   }
 
-  const { items, coupon_code, email } = parsed.data
+  const { items, coupon_code, email, analytics } = parsed.data
   const supabase = createServerSupabaseClient()
 
   // Verify products exist and prices match (server-side validation — never trust client prices)
@@ -96,6 +103,8 @@ export async function POST(req: NextRequest) {
     metadata: {
       product_ids: items.map((i) => i.id).join(','),
       coupon_code: coupon_code || '',
+      // Stripe metadata values must be strings; only set when consent was granted.
+      ...(analytics?.consent ? { fb_consent: 'true', fbp: analytics.fbp ?? '', fbc: analytics.fbc ?? '' } : {}),
     },
   })
 
