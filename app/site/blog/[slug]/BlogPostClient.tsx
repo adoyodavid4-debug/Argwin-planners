@@ -654,7 +654,7 @@ type BlogProduct = { name: string; price: string; href: string; blurb?: string }
 
 const SIDEBAR_PRODUCTS: Record<string, BlogProduct[]> = {
   'wedding-planning-checklist-overwhelm': [
-    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'Run the weekly wedding hour and give every task its latest safe date — monthly and weekly spreads with next-action pages and a backwards countdown.' },
+    { name: 'Yes, I Do — Wedding Planner', price: '$18.99', href: '/shop/yes-i-do-wedding-planner', blurb: 'A complete wedding planner with decision logs, supplier trackers and a backwards-countdown — everything in this article, in one hyperlinked place.' },
     { name: 'Off the Clock — A Work–Life Balance Planner', price: '$13.99', href: '/shop/off-the-clock-a-worklife-balance-planner' },
     { name: 'Tiny Anchors — A Habit & Routine Builder', price: '$13.99', href: '/shop/tiny-anchors-a-habit-routine-builder' },
   ],
