@@ -653,6 +653,11 @@ const CONTENT: Record<string, React.FC<{ post: BlogPost }>> = {
 type BlogProduct = { name: string; price: string; href: string; blurb?: string }
 
 const SIDEBAR_PRODUCTS: Record<string, BlogProduct[]> = {
+  'wedding-planning-checklist-overwhelm': [
+    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'Run the weekly wedding hour and give every task its latest safe date — monthly and weekly spreads with next-action pages and a backwards countdown.' },
+    { name: 'Off the Clock — A Work–Life Balance Planner', price: '$13.99', href: '/shop/off-the-clock-a-worklife-balance-planner' },
+    { name: 'Tiny Anchors — A Habit & Routine Builder', price: '$13.99', href: '/shop/tiny-anchors-a-habit-routine-builder' },
+  ],
   'finding-space-to-work-in-a-busy-home': [
     { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'Map your week, claim one reliable pocket and write it in as a fixed commitment — with next-action pages and a weekly progress log.' },
     { name: 'Off the Clock — A Work–Life Balance Planner', price: '$13.99', href: '/shop/off-the-clock-a-worklife-balance-planner' },
@@ -916,6 +921,7 @@ const AUTHORS: Record<AuthorKey, { first: string; bio: string }> = {
   Frank: { first: 'Frank', bio: 'Writes for Arwign Planners about focus, money and building things that last, one calm step at a time.' },
 }
 const POST_AUTHOR: Record<string, AuthorKey> = {
+  'wedding-planning-checklist-overwhelm': 'David',
   'finding-space-to-work-in-a-busy-home': 'Frank',
   'the-stale-week-workload-reset': 'David',
   'monday-morning-after-a-big-weekend-reset-your-week': 'Jewel',
