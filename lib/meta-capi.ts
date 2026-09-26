@@ -16,6 +16,10 @@ import { createHash } from 'crypto'
 
 const PIXEL_ID = process.env.NEXT_PUBLIC_FB_PIXEL_ID
 const TOKEN = process.env.META_CAPI_ACCESS_TOKEN
+// Optional: a code from Events Manager → Test Events. When set, every server
+// event is routed to the Test Events tab for live verification. Leave UNSET in
+// normal production, or real conversions won't be recorded against your dataset.
+const TEST_EVENT_CODE = process.env.META_CAPI_TEST_EVENT_CODE
 const API = 'https://graph.facebook.com/v21.0'
 
 export function metaCapiConfigured(): boolean {
@@ -68,6 +72,8 @@ export async function sendMetaEvent(ev: CapiEvent): Promise<void> {
           },
         } : {}),
       }],
+      // Routes to Events Manager → Test Events when a test code is configured.
+      ...(TEST_EVENT_CODE ? { test_event_code: TEST_EVENT_CODE } : {}),
     }
 
     const res = await fetch(`${API}/${PIXEL_ID}/events?access_token=${TOKEN}`, {
