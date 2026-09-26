@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { createServiceRoleClient } from '@/lib/supabase/server'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import BestSellersClient from './BestSellersClient'
 
 export const revalidate = 300
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 }
 
 export default async function BestSellersPage() {
-  const supabase = createServiceRoleClient()
+  const supabase = createServerSupabaseClient()
 
   const { data: products } = await supabase
     .from('products')

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { createServiceRoleClient } from '@/lib/supabase/server'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { ItemListSchema, BreadcrumbSchema } from '@/components/seo/JsonLd'
 import BundlesClient from './BundlesClient'
 import type { Product } from '@/types/database'
@@ -22,7 +22,7 @@ const SECTIONS: { title: string; subtitle: string; slugs: string[] }[] = [
 const FEATURED_SLUG = 'complete-planner-bundle'
 
 async function getBundles() {
-  const supabase = createServiceRoleClient()
+  const supabase = createServerSupabaseClient()
   const { data, error } = await supabase
     .from('products')
     .select('*, category:categories(name, slug)')

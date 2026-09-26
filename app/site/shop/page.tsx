@@ -1,7 +1,7 @@
 // app/site/shop/page.tsx
 import type { Metadata } from 'next'
 import ShopClient from './ShopClient'
-import { createServiceRoleClient } from '@/lib/supabase/server'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { BreadcrumbSchema } from '@/components/seo/JsonLd'
 
 const BASE = 'https://www.arwignplanners.com'
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 }
 
 export default async function ShopPage() {
-  const supabase = createServiceRoleClient()
+  const supabase = createServerSupabaseClient()
 
   const [{ data: products }, { data: categories }] = await Promise.all([
     supabase

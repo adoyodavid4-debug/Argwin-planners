@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { createServiceRoleClient } from '@/lib/supabase/server'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { ItemListSchema, FaqSchema } from '@/components/seo/JsonLd'
 import GeneralClient, { type CatalogItem } from './GeneralClient'
 import { FAQS } from './data'
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 }
 
 export default async function GeneralNotebooksPage() {
-  const supabase = createServiceRoleClient()
+  const supabase = createServerSupabaseClient()
 
   const { data: notebooks } = await supabase
     .from('products')

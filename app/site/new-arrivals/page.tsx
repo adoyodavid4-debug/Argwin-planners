@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { createServiceRoleClient } from '@/lib/supabase/server'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import NewArrivalsClient, { type RelItem } from './NewArrivalsClient'
 
 export const revalidate = 300
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 }
 
 export default async function NewArrivalsPage() {
-  const supabase = createServiceRoleClient()
+  const supabase = createServerSupabaseClient()
 
   const [{ data: categories }, { data: products }, { data: related }] = await Promise.all([
     supabase.from('categories').select('*').order('sort_order').then((r) => ({ data: r.error ? [] : r.data })),

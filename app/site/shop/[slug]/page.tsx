@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import { createServiceRoleClient } from '@/lib/supabase/server'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import {
   ProductSchema,
   BreadcrumbSchema,
@@ -16,7 +16,7 @@ const BASE = 'https://www.arwignplanners.com'
 interface Props { params: { slug: string } }
 
 async function getProduct(slug: string) {
-  const supabase = createServiceRoleClient()
+  const supabase = createServerSupabaseClient()
   const { data } = await supabase
     .from('products')
     .select(`
@@ -36,14 +36,14 @@ async function getProduct(slug: string) {
 
 async function getBundleItems(ids: string[]) {
   if (!ids.length) return []
-  const supabase = createServiceRoleClient()
+  const supabase = createServerSupabaseClient()
   const { data } = await supabase.from('products').select('id, title, slug, thumbnail, price, currency').in('id', ids)
   return data ?? []
 }
 
 async function getRelated(categoryId: string | null, excludeId: string) {
   if (!categoryId) return []
-  const supabase = createServiceRoleClient()
+  const supabase = createServerSupabaseClient()
   const { data } = await supabase
     .from('products')
     .select('id, title, slug, thumbnail, price, currency, rating_avg, rating_count, is_bestseller, is_new')
@@ -54,7 +54,7 @@ async function getRelated(categoryId: string | null, excludeId: string) {
 }
 
 async function getReviews(productId: string) {
-  const supabase = createServiceRoleClient()
+  const supabase = createServerSupabaseClient()
   const { data } = await supabase
     .from('reviews')
     .select('id, reviewer_name, rating, title, body, verified, created_at')

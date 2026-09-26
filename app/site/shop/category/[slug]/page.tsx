@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { createServiceRoleClient } from '@/lib/supabase/server'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { BreadcrumbSchema } from '@/components/seo/JsonLd'
 import CategoryClient from './CategoryClient'
 
@@ -13,7 +13,7 @@ interface Props {
 export const revalidate = 300
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const supabase = createServiceRoleClient()
+  const supabase = createServerSupabaseClient()
   const { data: cat } = await supabase
     .from('categories')
     .select('name, description')
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function CategoryPage({ params }: Props) {
-  const supabase = createServiceRoleClient()
+  const supabase = createServerSupabaseClient()
 
   // ── Fetch category ────────────────────────────────────────
   const { data: category } = await supabase
