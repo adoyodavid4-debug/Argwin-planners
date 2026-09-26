@@ -653,6 +653,11 @@ const CONTENT: Record<string, React.FC<{ post: BlogPost }>> = {
 type BlogProduct = { name: string; price: string; href: string; blurb?: string }
 
 const SIDEBAR_PRODUCTS: Record<string, BlogProduct[]> = {
+  'finding-space-to-work-in-a-busy-home': [
+    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'Map your week, claim one reliable pocket and write it in as a fixed commitment — with next-action pages and a weekly progress log.' },
+    { name: 'Off the Clock — A Work–Life Balance Planner', price: '$13.99', href: '/shop/off-the-clock-a-worklife-balance-planner' },
+    { name: 'GROUNDWORK.', price: '$18.00', href: '/shop/groundwork' },
+  ],
   'the-stale-week-workload-reset': [
     { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'Weekly spreads with a capacity check, a waiting-on page and a done column — the exact reset in this article.' },
     { name: 'Off the Clock — A Work–Life Balance Planner', price: '$13.99', href: '/shop/off-the-clock-a-worklife-balance-planner' },
@@ -911,6 +916,7 @@ const AUTHORS: Record<AuthorKey, { first: string; bio: string }> = {
   Frank: { first: 'Frank', bio: 'Writes for Arwign Planners about focus, money and building things that last, one calm step at a time.' },
 }
 const POST_AUTHOR: Record<string, AuthorKey> = {
+  'finding-space-to-work-in-a-busy-home': 'Frank',
   'the-stale-week-workload-reset': 'David',
   'monday-morning-after-a-big-weekend-reset-your-week': 'Jewel',
   'postgraduate-studies-and-full-time-work': 'Frank',
