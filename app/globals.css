@@ -106,8 +106,13 @@ html {
   -webkit-font-smoothing: antialiased;
   /* body-level overflow-x:hidden alone is ignored by iOS Safari when content
      overhangs — the page can still be panned sideways. Clipping here too locks
-     the viewport horizontally on every page. */
+     the viewport horizontally on every page.
+     Use `clip`, not `hidden`: `hidden` promotes overflow-y to `auto`, turning
+     <html> into a scroll container, which breaks `position: sticky` (the header
+     + homepage calendar). `clip` locks the axis without a scroll container, so
+     sticky keeps pinning. `hidden` stays first as the Safari < 16 fallback. */
   overflow-x: hidden;
+  overflow-x: clip;
 }
 
 /* Smooth anchor scrolling only for users who haven't asked for reduced motion. */
@@ -129,7 +134,10 @@ body {
   font-family: var(--font-jost);
   font-size: 1rem;
   line-height: 1.7;
+  /* clip (not hidden) so <body> never becomes a scroll container that would
+     break position: sticky; hidden kept first as the Safari < 16 fallback. */
   overflow-x: hidden;
+  overflow-x: clip;
   transition: background-color 0.4s var(--ease-smooth), color 0.4s var(--ease-smooth);
 }
 
