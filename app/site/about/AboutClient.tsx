@@ -100,7 +100,7 @@ export default function AboutClient() {
             <motion.div {...heroIn(0.15)} className="relative hidden lg:block">
               <motion.div style={reduce ? undefined : { y: parallax }} className="relative rounded-3xl overflow-hidden shadow-2xl" >
                 <div className="relative" style={{ aspectRatio: '4/5' }}>
-                  <Image src="https://images.unsplash.com/photo-1517842645767-c639042777db?w=900&q=85" alt="A calm planning workspace with an open Arwign planner" fill priority sizes="45vw" className="object-cover" />
+                  <Image src="/images/about-hero.webp" alt="A calm, plant-filled desk with an open Arwign planner, pens and notebooks in warm morning light" fill priority sizes="45vw" className="object-cover" />
                 </div>
                 <div className="absolute bottom-5 left-5 right-5 p-4 rounded-2xl backdrop-blur-md" style={{ background: 'rgba(255,255,255,0.82)', border: '1px solid rgba(255,255,255,0.6)' }}>
                   <p className="font-display text-lg font-semibold mb-0.5" style={{ color: 'var(--text-primary)' }}>Designed to be used</p>
@@ -166,7 +166,7 @@ export default function AboutClient() {
         <div className="container-site grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <motion.div {...reveal()} className="order-last lg:order-first">
             <div className="relative rounded-3xl overflow-hidden shadow-xl" style={{ aspectRatio: '4/3' }}>
-              <Image src="https://images.unsplash.com/photo-1531346878377-a5be20888e57?w=900&q=85" alt="Close-up of an Arwign planner interior spread" fill loading="lazy" sizes="(max-width:1024px) 100vw, 45vw" className="object-cover" />
+              <Image src="/images/about-craft.webp" alt="Close-up of an Arwign planner interior spread, showing the care in every page" fill loading="lazy" sizes="(max-width:1024px) 100vw, 45vw" className="object-cover" />
             </div>
           </motion.div>
           <motion.div {...reveal(0.05)}>
