@@ -34,6 +34,13 @@ const CRAFT = [
   { icon: Leaf,   title: 'Undated & reusable',      body: 'Start any day; reuse year after year.' },
 ]
 
+const MAKER_STEPS = [
+  { icon: PenTool, title: 'Drawn with intention', body: 'Every layout starts with one question: what will you actually use?' },
+  { icon: Check,   title: 'Tested in real life',  body: 'Pages are used, scribbled on and reworked before they’re released.' },
+  { icon: Link2,   title: 'Linked with care',     body: 'Tabs, contents and links are designed so you’re never more than a tap away from where you need to be.' },
+  { icon: Leaf,    title: 'Made to last',         body: 'Undated, so you can begin whenever you’re ready and come back year after year.' },
+]
+
 // TODO(reviews): swap for real verified reviews when available.
 const TESTIMONIALS = [
   { quote: 'Arwign is the first planner that actually stayed on my iPad for more than a week.', name: 'Amara N.', role: 'Teacher, Chicago', grad: 'linear-gradient(135deg,#B8A9D4,#7B6FAE)' },
@@ -188,25 +195,54 @@ export default function AboutClient() {
       {/* ══ 5. THE MAKER ═══════════════════════════════════════ */}
       <section className="py-20 border-b" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
         <div className="container-site max-w-4xl mx-auto">
-          <motion.div {...reveal()} className="rounded-3xl border overflow-hidden grid md:grid-cols-[auto_1fr]" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-            {/* Brand mark (forest green) — TODO: replace with a real founder portrait */}
-            <div className="flex items-center justify-center p-10 md:p-12" style={{ background: BRAND_GREEN }}>
-              <div className="w-28 h-28 rounded-full flex items-center justify-center" style={{ border: '2px solid rgba(255,255,255,0.35)' }}>
-                <span style={{ fontFamily: 'var(--font-cormorant)', fontSize: 52, fontWeight: 600, color: '#fff' }}>A</span>
+          <motion.div {...reveal()} className="text-center mb-12">
+            <p className="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-semibold mb-3" style={{ color: 'var(--gold)', letterSpacing: '0.1em' }}><Award size={13} /> The maker</p>
+            <h2 className="font-display text-4xl" style={{ color: 'var(--text-primary)', lineHeight: 1.1 }}>Beautiful and useful. <em style={{ color: 'var(--gold)', fontStyle: 'italic' }}>Finally, both.</em></h2>
+          </motion.div>
+
+          {/* Founder card */}
+          <motion.div {...reveal(0.05)} className="rounded-3xl border overflow-hidden grid md:grid-cols-[220px_1fr]" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+            <div className="flex flex-col items-center justify-center gap-4 p-10" style={{ background: BRAND_GREEN }}>
+              <div className="w-24 h-24 rounded-full flex items-center justify-center" style={{ border: '2px solid rgba(255,255,255,0.35)' }}>
+                <span style={{ fontFamily: 'var(--font-cormorant)', fontSize: 46, fontWeight: 600, color: '#fff' }}>A</span>
+              </div>
+              <div className="text-center">
+                <p className="font-display text-xl" style={{ color: '#fff' }}>David</p>
+                <p className="text-[11px] uppercase tracking-widest mt-0.5" style={{ color: 'rgba(255,255,255,0.7)', letterSpacing: '0.1em' }}>Founder &amp; Maker</p>
               </div>
             </div>
             <div className="p-8 md:p-10">
-              <p className="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-semibold mb-3" style={{ color: 'var(--gold)', letterSpacing: '0.1em' }}><Award size={13} /> The maker</p>
-              <h2 className="font-display text-3xl mb-4" style={{ color: 'var(--text-primary)' }}>The person behind Arwign</h2>
-              <p className="text-sm leading-relaxed mb-3" style={{ color: 'var(--text-secondary)' }}>
-                Arwign is a small, independent studio led by a designer who spent years frustrated by planners that were either beautiful or useful, but never both. Combining a background in graphic design with a genuine obsession for calm, intentional productivity, every product is drawn, tested and refined by hand.
-              </p>
-              <p className="text-xs italic" style={{ color: 'var(--text-muted)' }}>
-                {/* TODO(bio): replace with the real founder name, photo and personal bio when available. */}
-                Founder bio &amp; portrait — placeholder, to be replaced with real details.
-              </p>
+              <h3 className="font-display text-2xl mb-4" style={{ color: 'var(--text-primary)' }}>The person behind Arwign</h3>
+              <div className="flex flex-col gap-4 text-[0.95rem] leading-7" style={{ color: 'var(--text-secondary)' }}>
+                <p>Hello, I&rsquo;m David, a designer and the maker behind every Arwign planner.</p>
+                <p>For nearly 13 years I&rsquo;ve designed screens, systems and experiences, and I&rsquo;ve spent just as long frustrated by planners. Some were lovely to look at but fell apart by March. Others worked hard but felt like filling in a tax form. I kept wondering why a planner couldn&rsquo;t be both.</p>
+                <p style={{ color: 'var(--gold-dark)', fontStyle: 'italic' }}>So I started drawing my own.</p>
+                <p>Arwign is a small, independent studio built on one idea: planning should feel calm, not crowded. Every page is sketched, tested in real weeks and refined by hand until it earns its place. If a page doesn&rsquo;t make your day a little lighter, it doesn&rsquo;t make it into the book.</p>
+              </div>
             </div>
           </motion.div>
+
+          {/* How every planner is made */}
+          <motion.div {...reveal(0.1)} className="mt-10">
+            <h3 className="font-display text-2xl mb-6 text-center" style={{ color: 'var(--text-primary)' }}>How every planner is made</h3>
+            <div className="grid sm:grid-cols-2 gap-x-6 gap-y-5 max-w-3xl mx-auto">
+              {MAKER_STEPS.map(({ icon: Icon, title, body }) => (
+                <div key={title} className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(var(--gold-rgb),0.12)' }}><Icon size={17} style={{ color: 'var(--gold)' }} /></div>
+                  <div><p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{title}</p><p className="text-xs leading-relaxed mt-0.5" style={{ color: 'var(--text-secondary)' }}>{body}</p></div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Founder quote */}
+          <motion.figure {...reveal(0.15)} className="mt-12 text-center max-w-2xl mx-auto">
+            <Quote size={26} style={{ color: 'var(--gold)', opacity: 0.4 }} className="mx-auto mb-3" />
+            <blockquote className="font-display text-2xl leading-snug" style={{ color: 'var(--text-primary)', fontStyle: 'italic' }}>
+              &ldquo;I don&rsquo;t make planners to fill your days. I make them to give you back a little room in them.&rdquo;
+            </blockquote>
+            <figcaption className="text-sm mt-4" style={{ color: 'var(--text-muted)' }}>&mdash; David, founder of Arwign Planners</figcaption>
+          </motion.figure>
         </div>
       </section>
 
