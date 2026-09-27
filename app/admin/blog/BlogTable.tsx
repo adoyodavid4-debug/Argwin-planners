@@ -52,7 +52,7 @@ export default function BlogTable({ initialPosts }: { initialPosts: AdminBlogPos
             <th className="px-4 py-3 font-medium" style={{ color: 'var(--text-primary)' }}>Title</th>
             <th className="px-4 py-3 font-medium" style={{ color: 'var(--text-primary)' }}>Category</th>
             <th className="px-4 py-3 font-medium" style={{ color: 'var(--text-primary)' }}>Status</th>
-            <th className="px-4 py-3 font-medium" style={{ color: 'var(--text-primary)' }}>Views</th>
+            <th className="px-4 py-3 font-medium" style={{ color: 'var(--text-primary)' }}>Clicks</th>
             <th className="px-4 py-3 font-medium" style={{ color: 'var(--text-primary)' }}>Date</th>
             <th className="px-4 py-3 font-medium" style={{ color: 'var(--text-primary)' }}>Actions</th>
           </tr>

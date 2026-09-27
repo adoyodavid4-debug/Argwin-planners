@@ -12,7 +12,7 @@ import { type BlogPost, STATIC_POSTS } from './blog-data'
 export type { BlogPost }
 export { STATIC_POSTS }
 
-const CATEGORIES = ['All', 'Planning', 'Productivity', 'Digital Tools', 'Lifestyle', 'Finance', 'Wellness', 'Student Life']
+const CATEGORIES = ['All', 'Planning', 'Productivity', 'Digital Tools', 'Lifestyle', 'Finance', 'Wellness', 'Student Life', 'Work stress', 'Ambition', 'Family', 'Study', 'Home & sleep']
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })

@@ -6,11 +6,23 @@ import { motion, useScroll, useSpring, useReducedMotion } from 'framer-motion'
 import {
   Clock, Tag, ChevronRight, ArrowRight,
   ArrowLeft, BookOpen, Lightbulb, Check, Trophy,
-  List, ArrowUpRight, Twitter, Facebook, Linkedin, Link as LinkIcon,
+  List, ArrowUpRight, Twitter, Facebook, Linkedin, Link as LinkIcon, MessageCircle,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import Markdown from '@/components/blog/Markdown'
 import type { BlogPost } from '../blog-data'
+import { useBlogLike, BlogActionBar, HeartBurst } from '@/components/blog/BlogActions'
+import BlogComments, { type Comment as BlogCommentT } from '@/components/blog/BlogComments'
+
+export interface BlogEngagement {
+  postId:        string
+  likeCount:     number
+  commentCount:  number
+  comments:      BlogCommentT[]
+  saved:         boolean
+  isLoggedIn:    boolean
+  currentUserId: string | null
+}
 
 const slugifyHeading = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 
@@ -734,7 +746,8 @@ const SIDEBAR_PRODUCTS: Record<string, BlogProduct[]> = {
     { name: 'Running on Empty', price: '$13.99', href: '/shop/running-on-empty' },
   ],
   'spoon-theory-planning-low-energy-week': [
-    { name: 'The Spoon Ledger', price: '$13.99', href: '/shop/the-spoon-ledger', blurb: 'Check in on your energy, weigh what each day asks, and spot what drains and restores you — spoon-aware planning made simple.' },
+    { name: 'Your Own Soft Place — A Self-Love & Self-Care Planner', price: '$13.99', href: '/shop/your-own-soft-place-a-self-love-self-care-planner', blurb: 'Gentle, low-pressure self-care spreads for empty-spoon days — rest planning, kind check-ins and soft prompts to tend yourself through your lowest-energy weeks.' },
+    { name: 'The Spoon Ledger', price: '$13.99', href: '/shop/the-spoon-ledger' },
     { name: 'Running on Empty', price: '$13.99', href: '/shop/running-on-empty' },
     { name: 'One Spoon at a Time — Spoonie Wellness Planner', price: '$13.99', href: '/shop/one-spoon-at-a-time-a-chronic-illness-spoonie-wellness-planner' },
   ],
@@ -798,6 +811,62 @@ const SIDEBAR_PRODUCTS: Record<string, BlogProduct[]> = {
     { name: 'Your Personal Finances in One Planner', price: '$12.99', href: '/shop/your-personal-finances-in-one-journal-planner', blurb: 'Your whole money picture in one place — the weekly look that turns dread into a boring, five-minute habit.' },
     { name: 'The Whole Picture Budget Planner', price: '$12.99', href: '/shop/the-whole-picture-budget-planner' },
     { name: 'Ultimate Budget Planner', price: '$12.99', href: '/shop/ultimate-budget-planner' },
+  ],
+  // ── Life-admin & stress cluster ──
+  'after-hours-work-messages-boundaries': [
+    { name: 'Off the Clock — A Work–Life Balance Planner', price: '$13.99', href: '/shop/off-the-clock-a-worklife-balance-planner', blurb: 'Build the five-minute shutdown from this article into an end-of-day routine that actually closes the day.' },
+    { name: 'The Anchored Day', price: '$13.99', href: '/shop/the-anchored-day' },
+    { name: 'The Reset — A Fresh-Start Wellness Planner', price: '$13.99', href: '/shop/the-reset-a-fresh-start-wellness-planner' },
+  ],
+  'big-goals-small-time-side-projects': [
+    { name: 'The Long Game', price: '$12.99', href: '/shop/the-long-game', blurb: 'For goals measured in seasons, not sprints — steady progress on the thing you\'re building in the small hours.' },
+    { name: "Pace, Don't Race", price: '$12.99', href: '/shop/pace-dont-race' },
+    { name: 'GROUNDWORK.', price: '$18.00', href: '/shop/groundwork' },
+  ],
+  'caring-for-parents-while-working': [
+    { name: 'Running on Empty', price: '$13.99', href: '/shop/running-on-empty', blurb: 'For the season when everyone needs you — track your energy budget and spot what drains and restores you.' },
+    { name: 'The Spoon Ledger', price: '$13.99', href: '/shop/the-spoon-ledger' },
+    { name: 'Off the Clock — A Work–Life Balance Planner', price: '$13.99', href: '/shop/off-the-clock-a-worklife-balance-planner' },
+  ],
+  'comparison-milestone-anxiety': [
+    { name: 'Small Good Things — A Gratitude Journal', price: '$13.99', href: '/shop/small-good-things-a-gratitude-journal', blurb: 'The antidote to the comparison spiral — a daily record of your own life going well, in your own words.' },
+    { name: 'The Long Game', price: '$12.99', href: '/shop/the-long-game' },
+    { name: 'The Reset — A Fresh-Start Wellness Planner', price: '$13.99', href: '/shop/the-reset-a-fresh-start-wellness-planner' },
+  ],
+  'family-expectations-exam-pressure': [
+    { name: 'Exam Season — Calm', price: '$12.99', href: '/shop/exam-season-calm', blurb: 'Revision calendars, exam countdowns and steady daily plans — pressure managed on paper, not in your head.' },
+    { name: 'The Balanced Student', price: '$12.99', href: '/shop/the-balanced-student' },
+    { name: 'The Deep Dive', price: '$12.99', href: '/shop/the-deep-dive' },
+  ],
+  'mental-load-household-cognitive-labour': [
+    { name: 'Open Tabs — ADHD Mental Load Planner', price: '$13.99', href: '/shop/open_tabs_adhd_mental_load_planner', blurb: 'Built for exactly this — get every open tab out of your head and into one shared, visible place.' },
+    { name: 'A Place for Everything', price: '$12.99', href: '/shop/a-place-for-everything' },
+    { name: 'Clear Mind, Clear Desk', price: '$12.99', href: '/shop/clear-mind-clear-desk' },
+  ],
+  'overcommitment-how-to-say-no': [
+    { name: "Pace, Don't Race", price: '$12.99', href: '/shop/pace-dont-race', blurb: 'See your real capacity before you say yes — realistic pacing for people whose default answer is "sure".' },
+    { name: 'Running on Empty', price: '$13.99', href: '/shop/running-on-empty' },
+    { name: 'Off the Clock — A Work–Life Balance Planner', price: '$13.99', href: '/shop/off-the-clock-a-worklife-balance-planner' },
+  ],
+  'partners-alarm-ruining-your-sleep': [
+    { name: "Morning's Light, Evening's Calm — Ritual Planner", price: '$13.99', href: '/shop/mornings-light-evenings-calm-a-morning-evening-ritual-planner', blurb: 'Design mornings and evenings that work for two different body clocks — wind-down, wake-up and the space between.' },
+    { name: 'The Anchored Day', price: '$13.99', href: '/shop/the-anchored-day' },
+    { name: 'The Reset — A Fresh-Start Wellness Planner', price: '$13.99', href: '/shop/the-reset-a-fresh-start-wellness-planner' },
+  ],
+  'recovering-from-a-bad-week-at-work': [
+    { name: 'The Overwhelm Reset', price: '$12.99', href: '/shop/the-overwhelm-reset', blurb: 'A structured fresh start for the Monday after a rough week — close it out, learn the one lesson, begin again.' },
+    { name: 'Small Good Things — A Gratitude Journal', price: '$13.99', href: '/shop/small-good-things-a-gratitude-journal' },
+    { name: 'Off the Clock — A Work–Life Balance Planner', price: '$13.99', href: '/shop/off-the-clock-a-worklife-balance-planner' },
+  ],
+  'school-admin-term-planning-for-parents': [
+    { name: 'Undated Digital Monthly Planner — Digital Connect', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'One calendar for the whole term — mufti days, trips, clubs and deadlines captured the moment the newsletter lands.' },
+    { name: 'A Place for Everything', price: '$12.99', href: '/shop/a-place-for-everything' },
+    { name: 'Arwign Notebook — Everyday', price: '$14.99', href: '/shop/arwign-notebook-everyday' },
+  ],
+  'why-revision-timetables-fail': [
+    { name: 'The Deep Dive', price: '$12.99', href: '/shop/the-deep-dive', blurb: 'Session-based study planning — what you\'ll actually do in each block, not just a colour-coded grid.' },
+    { name: 'Exam Season — Calm', price: '$12.99', href: '/shop/exam-season-calm' },
+    { name: 'The Balanced Student', price: '$12.99', href: '/shop/the-balanced-student' },
   ],
 }
 
@@ -916,6 +985,7 @@ function ShareRow({ title }: { title: string }) {
     { icon: Twitter,  label: 'Share on X',        href: `https://twitter.com/intent/tweet?url=${enc(url)}&text=${enc(title)}` },
     { icon: Facebook, label: 'Share on Facebook', href: `https://www.facebook.com/sharer/sharer.php?u=${enc(url)}` },
     { icon: Linkedin, label: 'Share on LinkedIn', href: `https://www.linkedin.com/sharing/share-offsite/?url=${enc(url)}` },
+    { icon: MessageCircle, label: 'Share on WhatsApp', href: `https://wa.me/?text=${enc(`${title} ${url}`)}` },
   ]
   return (
     <div className="flex items-center gap-3 mt-10 pt-6 border-t" style={{ borderColor: 'var(--border)' }}>
@@ -998,6 +1068,7 @@ function ShareRail({ title }: { title: string }) {
     { icon: Twitter,  label: 'Share on X',        href: `https://twitter.com/intent/tweet?url=${enc(url)}&text=${enc(title)}` },
     { icon: Facebook, label: 'Share on Facebook', href: `https://www.facebook.com/sharer/sharer.php?u=${enc(url)}` },
     { icon: Linkedin, label: 'Share on LinkedIn', href: `https://www.linkedin.com/sharing/share-offsite/?url=${enc(url)}` },
+    { icon: MessageCircle, label: 'Share on WhatsApp', href: `https://wa.me/?text=${enc(`${title} ${url}`)}` },
   ]
   return (
     <div className="sticky top-28 flex flex-col items-center gap-2.5">
@@ -1018,9 +1089,10 @@ function ShareRail({ title }: { title: string }) {
 interface Props {
   post:    BlogPost
   related: BlogPost[]
+  engagement?: BlogEngagement | null
 }
 
-export default function BlogPostClient({ post, related }: Props) {
+export default function BlogPostClient({ post, related, engagement }: Props) {
   // Priority: markdown body from the CMS → hand-crafted article component → coming-soon stub
   const ArticleBody = post.body?.trim()
     ? MarkdownArticle
@@ -1029,6 +1101,33 @@ export default function BlogPostClient({ post, related }: Props) {
   const author = authorFor(post.slug)
   const reduce = !!useReducedMotion()
   const articleRef = useRef<HTMLDivElement>(null)
+
+  // ── Engagement (likes + double-tap burst) — only for DB-backed posts ──
+  const eng = engagement ?? null
+  const { count: likeCount, liked, like, toggle } = useBlogLike(eng?.postId ?? '', eng?.likeCount ?? 0)
+  const [burst, setBurst] = useState<{ id: number; x: number; y: number } | null>(null)
+  const burstIdRef = useRef(0)
+  const lastTapRef = useRef(0)
+
+  const popHeart = (clientX: number, clientY: number, container: HTMLElement) => {
+    if (!eng) return
+    like()
+    const rect = container.getBoundingClientRect()
+    const id = ++burstIdRef.current
+    setBurst({ id, x: clientX - rect.left, y: clientY - rect.top })
+    window.setTimeout(() => setBurst((b) => (b && b.id === id ? null : b)), 900)
+  }
+  const onArticleDoubleClick = (e: React.MouseEvent<HTMLDivElement>) => popHeart(e.clientX, e.clientY, e.currentTarget)
+  const onArticleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    const now = Date.now()
+    if (now - lastTapRef.current < 300 && e.changedTouches[0]) {
+      popHeart(e.changedTouches[0].clientX, e.changedTouches[0].clientY, e.currentTarget)
+      lastTapRef.current = 0
+    } else {
+      lastTapRef.current = now
+    }
+  }
+  const jumpToComments = () => document.getElementById('comments')?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })
   const { scrollYProgress } = useScroll({ target: articleRef, offset: ['start start', 'end end'] })
   const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.2 })
   const [toc, setToc] = useState<{ id: string; text: string }[]>([])
@@ -1104,10 +1203,23 @@ export default function BlogPostClient({ post, related }: Props) {
             {/* Inline product (within) — the featured pick */}
             <InlineProduct sp={products[0]} compact />
 
-            {/* Article body */}
-            <motion.div ref={articleRef} initial={reduce ? false : { opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-80px' }} transition={{ duration: 0.5 }}>
+            {/* Article body — double-tap / double-click anywhere to like */}
+            <motion.div ref={articleRef} onDoubleClick={eng ? onArticleDoubleClick : undefined} onTouchEnd={eng ? onArticleTouchEnd : undefined}
+              style={{ position: 'relative' }}
+              initial={reduce ? false : { opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-80px' }} transition={{ duration: 0.5 }}>
               <ArticleBody post={post} />
+              {eng && <HeartBurst burst={burst} />}
             </motion.div>
+
+            {/* Like · comments · save · share */}
+            {eng && (
+              <BlogActionBar
+                postId={eng.postId} slug={post.slug} title={post.title}
+                likeCount={likeCount} liked={liked} onToggleLike={toggle}
+                initialSaved={eng.saved} isLoggedIn={eng.isLoggedIn}
+                commentCount={eng.commentCount} onJumpToComments={jumpToComments}
+              />
+            )}
 
             {/* Tags */}
             {post.tags.length > 0 && (
@@ -1132,6 +1244,14 @@ export default function BlogPostClient({ post, related }: Props) {
                 <Link href="/shop" className="inline-flex items-center gap-1 text-xs font-semibold mt-2.5 hover:gap-2 transition-all" style={{ color: 'var(--gold)' }}>Explore our planners <ArrowRight size={12} /></Link>
               </div>
             </div>
+
+            {/* Comments */}
+            {eng && (
+              <BlogComments
+                postId={eng.postId} slug={post.slug}
+                initialComments={eng.comments} isLoggedIn={eng.isLoggedIn} currentUserId={eng.currentUserId}
+              />
+            )}
 
             {/* Share row (mobile only) */}
             <div className="lg:hidden"><ShareRow title={post.title} /></div>

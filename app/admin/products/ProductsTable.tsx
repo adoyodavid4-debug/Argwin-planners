@@ -186,11 +186,10 @@ export default function ProductsTable({ initialProducts, categories }: Props) {
                   <td className="px-4 py-3 max-w-xs">
                     <p className="font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{product.title}</p>
                     <p className="text-xs mt-0.5 truncate font-mono" style={{ color: 'var(--text-muted)' }}>/shop/{product.slug}</p>
-                    {product.rating_count > 0 && (
-                      <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
-                        ★ {product.rating_avg?.toFixed(1)} ({product.rating_count}) · {product.download_count} downloads
-                      </p>
-                    )}
+                    <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                      <span style={{ color: 'var(--gold)', fontWeight: 600 }}>{(product.view_count ?? 0).toLocaleString()} clicks</span> · {product.download_count} downloads
+                      {product.rating_count > 0 && <> · ★ {product.rating_avg?.toFixed(1)} ({product.rating_count})</>}
+                    </p>
                   </td>
 
                   {/* Status — inline toggle */}

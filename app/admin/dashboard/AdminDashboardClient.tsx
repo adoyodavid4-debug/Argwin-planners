@@ -2,9 +2,10 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
-import { DollarSign, ShoppingBag, Package, Users, Plus } from 'lucide-react'
+import { DollarSign, ShoppingBag, Package, Users, Plus, MousePointerClick, Tablet, Notebook, FileText } from 'lucide-react'
 import { fmtDate } from '@/lib/calendar/fmt'
 
+interface ClickItem { title: string; slug: string; view_count: number | null }
 interface Stats {
   totalOrders:      number
   thisMonthOrders:  number
@@ -13,6 +14,48 @@ interface Stats {
   totalSubscribers: number
   recentOrders:     any[]
   topProducts:      any[]
+  clicks: {
+    plannerTotal:  number
+    notebookTotal: number
+    blogTotal:     number
+    topPlanners:   ClickItem[]
+    topNotebooks:  ClickItem[]
+    topBlogs:      ClickItem[]
+  }
+}
+
+// One "Clicks" panel — a total plus a ranked list of the most-clicked items.
+function ClicksPanel({
+  icon: Icon, label, total, items, accent,
+}: {
+  icon: typeof Tablet; label: string; total: number; items: ClickItem[]; accent: string
+}) {
+  return (
+    <div className="p-6 rounded-2xl border" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Icon size={16} style={{ color: accent }} />
+          <h3 className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{label}</h3>
+        </div>
+        <span className="text-lg font-display font-semibold" style={{ color: accent }}>{total.toLocaleString()}</span>
+      </div>
+      <div className="space-y-2.5">
+        {items.length === 0 ? (
+          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>No clicks recorded yet</p>
+        ) : (
+          items.map((it, i) => (
+            <div key={it.slug || i} className="flex items-center gap-3">
+              <span className="text-xs font-bold w-4 flex-shrink-0" style={{ color: 'var(--text-muted)' }}>{i + 1}</span>
+              <p className="text-xs flex-1 min-w-0 truncate" style={{ color: 'var(--text-secondary)' }}>{it.title}</p>
+              <span className="text-xs font-semibold flex-shrink-0" style={{ color: 'var(--text-primary)' }}>
+                {(it.view_count ?? 0).toLocaleString()}
+              </span>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  )
 }
 
 // The admin sidebar nav now lives in app/admin/AdminSidebar.tsx, rendered by
@@ -113,6 +156,20 @@ export default function AdminDashboardClient({ stats }: { stats: Stats }) {
                   ))
                 )}
               </div>
+            </div>
+          </div>
+
+          {/* Clicks — engagement per planner, notebook and blog */}
+          <div className="mt-8">
+            <div className="flex items-center gap-2 mb-4">
+              <MousePointerClick size={18} style={{ color: 'var(--gold)' }} />
+              <h2 className="font-display text-lg" style={{ color: 'var(--text-primary)' }}>Clicks</h2>
+              <span className="text-xs" style={{ color: 'var(--text-muted)' }}>— times each item was opened</span>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <ClicksPanel icon={Tablet}   label="Planners"    total={stats.clicks.plannerTotal}  items={stats.clicks.topPlanners}  accent="var(--gold)" />
+              <ClicksPanel icon={Notebook} label="Notebooks"   total={stats.clicks.notebookTotal} items={stats.clicks.topNotebooks} accent="#7B6FAE" />
+              <ClicksPanel icon={FileText} label="Blog reads"  total={stats.clicks.blogTotal}     items={stats.clicks.topBlogs}     accent="#6E7E66" />
             </div>
           </div>
 

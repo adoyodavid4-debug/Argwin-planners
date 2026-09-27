@@ -13,7 +13,7 @@ export default async function AdminProductsPage() {
 
   const { data: products, error } = await supabase
     .from('products')
-    .select('id, title, slug, status, price, currency, thumbnail, is_featured, is_bestseller, is_new, delivery_type, product_type, fulfillment_options, tags, rating_avg, rating_count, download_count, created_at, updated_at, categories(name, slug)')
+    .select('id, title, slug, status, price, currency, thumbnail, is_featured, is_bestseller, is_new, delivery_type, product_type, fulfillment_options, tags, rating_avg, rating_count, download_count, view_count, created_at, updated_at, categories(name, slug)')
     .order('created_at', { ascending: false })
     .limit(2000)
 
@@ -82,6 +82,7 @@ export interface Product {
   rating_avg: number
   rating_count: number
   download_count: number
+  view_count: number | null
   created_at: string
   updated_at: string
   categories: { name: string; slug: string } | null

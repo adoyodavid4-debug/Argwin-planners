@@ -128,6 +128,7 @@ export interface Profile {
   role: UserRole
   locale: string
   wishlist: string[]
+  saved_posts: string[]
   created_at: string
   updated_at: string
 }
@@ -148,7 +149,19 @@ export interface BlogPost {
   meta_description: string | null
   read_time_mins: number | null
   view_count: number
+  like_count: number
+  comment_count: number
   published_at: string | null
+  created_at: string
+}
+
+export interface BlogComment {
+  id: string
+  post_id: string
+  user_id: string
+  author_name: string
+  body: string
+  status: 'approved' | 'hidden'
   created_at: string
 }
 
@@ -268,7 +281,8 @@ export interface Database {
       orders:                 { Row: Order;      Insert: Partial<Order>;      Update: Partial<Order>      } & R
       order_items:            { Row: OrderItem;  Insert: Partial<OrderItem>;  Update: Partial<OrderItem>  } & R
       coupons:                { Row: Coupon;     Insert: Partial<Coupon>;     Update: Partial<Coupon>     } & R
-      blog_posts:             { Row: BlogPost;   Insert: Partial<BlogPost>;   Update: Partial<BlogPost>   } & R
+      blog_posts:             { Row: BlogPost;    Insert: Partial<BlogPost>;    Update: Partial<BlogPost>    } & R
+      blog_comments:          { Row: BlogComment; Insert: Partial<BlogComment>; Update: Partial<BlogComment> } & R
       newsletter_subscribers: { Row: { id: string; email: string; locale: string; source: string | null; is_active: boolean; created_at: string }; Insert: { email: string; locale?: string; source?: string }; Update: { email?: string; locale?: string; source?: string; is_active?: boolean } } & R
       testimonials:           { Row: Testimonial;      Insert: Partial<Testimonial>;      Update: Partial<Testimonial>      } & R
       nav_links:              { Row: NavLink;          Insert: Partial<NavLink>;          Update: Partial<NavLink>          } & R

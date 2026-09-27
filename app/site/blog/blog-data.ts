@@ -11,6 +11,8 @@ export interface BlogPost {
   readMins:    number
   publishedAt: string
   viewCount:   number
+  likeCount?:   number
+  commentCount?: number
   /** Markdown body — present for DB-managed posts, absent for static ones. */
   body?:       string | null
 }

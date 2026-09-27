@@ -9,6 +9,7 @@ import {
   ItemListSchema,
 } from '@/components/seo/JsonLd'
 import ProductDetailClient from './ProductDetailClient'
+import TrackView from '@/components/analytics/TrackView'
 import { descriptionExcerpt } from '@/lib/richtext'
 
 const BASE = 'https://www.arwignplanners.com'
@@ -142,6 +143,8 @@ export default async function ProductPage({ params }: Props) {
         <ItemListSchema name={`What's included in ${p.title}`} url={productUrl}
           items={bundleItems.map((item, i) => ({ name: item.title, url: `${BASE}/shop/${item.slug}`, position: i + 1 }))} />
       )}
+
+      <TrackView type="product" id={p.id} />
 
       <ProductDetailClient
         product={product as any}
