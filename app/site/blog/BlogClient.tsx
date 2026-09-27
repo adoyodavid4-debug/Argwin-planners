@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion, AnimatePresence, useScroll, useTransform, useReducedMotion } from 'framer-motion'
 import {
-  BookOpen, Clock, Search, X, ChevronRight, ArrowRight, Plus,
+  BookOpen, Clock, Search, X, ChevronRight, ChevronDown, ArrowRight, Plus,
   TrendingUp, Heart, Wallet, Tablet, Sparkles,
 } from 'lucide-react'
 import { type BlogPost, STATIC_POSTS } from './blog-data'
@@ -205,9 +205,9 @@ export default function BlogClient({ posts, searchParams }: Props) {
         style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)' }}
       >
         <div className="container-site">
-          <div className="flex flex-wrap items-center gap-3">
-            {/* Category pills */}
-            <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-3">
+            {/* Category pills — desktop */}
+            <div className="hidden lg:flex items-center gap-2 flex-wrap">
               {CATEGORIES.map((cat) => (
                 <button
                   key={cat}
@@ -219,23 +219,42 @@ export default function BlogClient({ posts, searchParams }: Props) {
               ))}
             </div>
 
-            <div className="flex-1" />
+            {/* Category dropdown — mobile (keeps the sticky bar to one row) */}
+            <div className="relative lg:hidden flex-shrink-0">
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                aria-label="Filter articles by category"
+                className="input-field text-sm"
+                style={{ width: 'auto', minWidth: 130, WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none', paddingTop: 8, paddingBottom: 8, paddingLeft: 14, paddingRight: 30 }}
+              >
+                {CATEGORIES.map((cat) => (
+                  <option key={cat} value={cat}>{cat === 'All' ? 'All topics' : cat}</option>
+                ))}
+              </select>
+              <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--text-muted)' }} />
+            </div>
 
-            {/* Search */}
-            <div className="relative">
-              <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
+            {/* Desktop spacer */}
+            <div className="hidden lg:block flex-1" />
+
+            {/* Search — icon on the right so it never overlaps the placeholder */}
+            <div className="relative flex-1 lg:flex-none lg:w-[200px]">
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search articles…"
-                className="input-field pl-8 pr-8 py-2 text-sm"
-                style={{ width: 200 }}
+                aria-label="Search articles"
+                className="input-field text-sm"
+                style={{ width: '100%', paddingTop: 8, paddingBottom: 8, paddingLeft: 14, paddingRight: 34 }}
               />
-              {search && (
-                <button onClick={clearSearch} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }}>
-                  <X size={12} />
+              {search ? (
+                <button onClick={clearSearch} aria-label="Clear search" className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }}>
+                  <X size={13} />
                 </button>
+              ) : (
+                <Search size={14} className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--text-muted)' }} />
               )}
             </div>
           </div>
