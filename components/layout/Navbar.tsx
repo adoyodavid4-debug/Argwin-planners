@@ -46,7 +46,6 @@ const navLinks: NavItem[] = [
   },
   { label: 'Arwign Calendar', href: '/calendar' },
   { label: 'Blog',         href: '/blog' },
-  { label: 'About',        href: '/about' },
   { label: 'Contact',      href: '/site/contact' },
 ]
 
