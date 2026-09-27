@@ -671,18 +671,18 @@ const SIDEBAR_PRODUCTS: Record<string, BlogProduct[]> = {
     { name: 'Tiny Anchors — A Habit & Routine Builder', price: '$13.99', href: '/shop/tiny-anchors-a-habit-routine-builder' },
   ],
   'finding-space-to-work-in-a-busy-home': [
-    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'Map your week, claim one reliable pocket and write it in as a fixed commitment — with next-action pages and a weekly progress log.' },
+    { name: 'A Place for Everything', price: '$12.99', href: '/shop/a-place-for-everything', blurb: 'Map your week, claim one reliable pocket and write it in as a fixed commitment — one clear home for every task and time slot.' },
     { name: 'Off the Clock — A Work–Life Balance Planner', price: '$13.99', href: '/shop/off-the-clock-a-worklife-balance-planner' },
     { name: 'GROUNDWORK.', price: '$18.00', href: '/shop/groundwork' },
   ],
   'the-stale-week-workload-reset': [
-    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'Weekly spreads with a capacity check, a waiting-on page and a done column — the exact reset in this article.' },
+    { name: 'The Overwhelm Reset', price: '$12.99', href: '/shop/the-overwhelm-reset', blurb: 'A capacity check, a waiting-on page and a done column — the exact workload reset in this article, in one planner.' },
     { name: 'Off the Clock — A Work–Life Balance Planner', price: '$13.99', href: '/shop/off-the-clock-a-worklife-balance-planner' },
     { name: 'The Nine to Five Brain — ADHD Work Planner', price: '$13.99', href: '/shop/the-nine-to-five-brain-adhd-work-planner' },
   ],
   'monday-morning-after-a-big-weekend-reset-your-week': [
     { name: 'Tiny Anchors — A Habit & Routine Builder', price: '$13.99', href: '/shop/tiny-anchors-a-habit-routine-builder', blurb: 'Rebuild the week around a few small anchors — gentle routines and habit tracking to steady Monday and get your momentum back.' },
-    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect' },
+    { name: 'The Reset — A Fresh-Start Wellness Planner', price: '$13.99', href: '/shop/the-reset-a-fresh-start-wellness-planner' },
     { name: "Morning's Light, Evening's Calm — Ritual Planner", price: '$13.99', href: '/shop/mornings-light-evenings-calm-a-morning-evening-ritual-planner' },
   ],
   'postgraduate-studies-and-full-time-work': [
@@ -692,16 +692,16 @@ const SIDEBAR_PRODUCTS: Record<string, BlogProduct[]> = {
   ],
   'the-boring-one-task-at-work-occurring-every-week': [
     { name: 'Tiny Anchors — A Habit & Routine Builder', price: '$13.99', href: '/shop/tiny-anchors-a-habit-routine-builder', blurb: 'Give the dull weekly task a fixed slot and a tracker row so it stops looming over your week.' },
-    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect' },
+    { name: 'The Nine to Five Brain — ADHD Work Planner', price: '$13.99', href: '/shop/the-nine-to-five-brain-adhd-work-planner' },
     { name: 'Arwign 66-Day Habit Tracker', price: '$14.99', href: '/shop/arwign-66-day-habit-tracker' },
   ],
   'digital-planner-morning-routine': [
-    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'Clean daily and weekly spreads designed for intentional mornings. Start any day of the year.' },
-    { name: "Morning's Light, Evening's Calm — Ritual Planner", price: '$13.99', href: '/shop/mornings-light-evenings-calm-a-morning-evening-ritual-planner' },
+    { name: "Morning's Light, Evening's Calm — Ritual Planner", price: '$13.99', href: '/shop/mornings-light-evenings-calm-a-morning-evening-ritual-planner', blurb: 'Purpose-built for intentional mornings — wake-up rituals, calm evening wind-downs and the routine that holds them together.' },
+    { name: 'The Anchored Day', price: '$13.99', href: '/shop/the-anchored-day' },
     { name: 'Tiny Anchors — A Habit & Routine Builder', price: '$13.99', href: '/shop/tiny-anchors-a-habit-routine-builder' },
   ],
   'goodnotes-vs-notability-planner': [
-    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'Fully hyperlinked and tested in both GoodNotes 6 and Notability — start planning in under 60 seconds.' },
+    { name: 'The Anchored Day', price: '$13.99', href: '/shop/the-anchored-day', blurb: 'Fully hyperlinked and tested in both GoodNotes 6 and Notability — start planning in under 60 seconds.' },
     { name: 'Neurodivergent Set — ADHD-Friendly Planner', price: '$13.99', href: '/shop/neurodivergent-set-adhd-friendly-planner' },
     { name: 'Arwign Notebook — Studio', price: '$14.99', href: '/shop/arwign-notebook-studio' },
   ],
@@ -716,9 +716,9 @@ const SIDEBAR_PRODUCTS: Record<string, BlogProduct[]> = {
     { name: 'The Financial Freedom Budget Planner', price: '$12.99', href: '/shop/the-financial-freedom-budget-planner' },
   ],
   'why-undated-planners-are-better': [
-    { name: 'Undated Digital Monthly Planner — Digital Connect', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'Undated by design — start any day, reuse it year after year, never waste a page.' },
-    { name: 'Undated Digital Monthly Planner — Golden Hour', price: '$9.99', href: '/shop/undated-monthly-planner-golden-hour' },
-    { name: 'Undated Digital Monthly Planner — Navy Gold', price: '$9.99', href: '/shop/undated-monthly-planner-navy-gold' },
+    { name: 'The Anchored Day', price: '$13.99', href: '/shop/the-anchored-day', blurb: 'Undated by design — start any day, reuse it year after year, never waste a page.' },
+    { name: 'The Long Game', price: '$12.99', href: '/shop/the-long-game' },
+    { name: 'Tiny Anchors — A Habit & Routine Builder', price: '$13.99', href: '/shop/tiny-anchors-a-habit-routine-builder' },
   ],
   'student-planner-guide-academic-year': [
     { name: 'The Balanced Student', price: '$12.99', href: '/shop/the-balanced-student', blurb: 'Semester overviews, weekly study plans, assignment trackers and exam countdowns.' },
@@ -731,14 +731,14 @@ const SIDEBAR_PRODUCTS: Record<string, BlogProduct[]> = {
     { name: "Morning's Light, Evening's Calm — Ritual Planner", price: '$13.99', href: '/shop/mornings-light-evenings-calm-a-morning-evening-ritual-planner' },
   ],
   'digital-planning-tips-ipad-beginners': [
-    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'Hyperlinked and beginner-friendly — the easiest first digital planner for iPad, GoodNotes or Notability.' },
+    { name: 'One Small Step — A Gentle Goals & Habits Planner', price: '$13.99', href: '/shop/one-small-step-a-gentle-goals-habits-planner', blurb: 'Gentle structure and simple hyperlinked pages — the friendliest first digital planner for iPad, GoodNotes or Notability.' },
     { name: 'Neurodivergent Set — ADHD-Friendly Planner', price: '$13.99', href: '/shop/neurodivergent-set-adhd-friendly-planner' },
     { name: 'Arwign Notebook — Everyday', price: '$14.99', href: '/shop/arwign-notebook-everyday' },
   ],
   'how-to-set-up-digital-planner-goodnotes': [
-    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'Fully hyperlinked and GoodNotes-ready — set it up with the steps in this guide and land on today in a tap.' },
+    { name: 'Arwign Notebook — Studio', price: '$14.99', href: '/shop/arwign-notebook-studio', blurb: 'Fully hyperlinked and GoodNotes-ready — import it with the steps in this guide and land on today in a tap.' },
+    { name: 'The Anchored Day', price: '$13.99', href: '/shop/the-anchored-day' },
     { name: 'Neurodivergent Set — ADHD-Friendly Planner', price: '$13.99', href: '/shop/neurodivergent-set-adhd-friendly-planner' },
-    { name: 'Arwign Notebook — Studio', price: '$14.99', href: '/shop/arwign-notebook-studio' },
   ],
   'adhd-friendly-planning-what-works': [
     { name: 'Neurodivergent Set — ADHD-Friendly Planner', price: '$13.99', href: '/shop/neurodivergent-set-adhd-friendly-planner', blurb: 'Built for the moments planning falls apart — capture-first, low-scroll, and designed for restarts.' },
@@ -777,13 +777,13 @@ const SIDEBAR_PRODUCTS: Record<string, BlogProduct[]> = {
     { name: 'SHOW UP.', price: '$18.99', href: '/shop/show-up' },
   ],
   'digital-vs-paper-planners-honest-comparison': [
-    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'The warmth of paper with the flexibility of digital — hyperlinked, reusable, in A4, A5 and US Letter.' },
-    { name: 'Arwign Notebook — Everyday', price: '$14.99', href: '/shop/arwign-notebook-everyday' },
+    { name: 'Arwign Notebook — Everyday', price: '$14.99', href: '/shop/arwign-notebook-everyday', blurb: 'The warmth of paper with the flexibility of digital — hyperlinked, reusable and made to write in every day.' },
+    { name: 'A Place for Everything', price: '$12.99', href: '/shop/a-place-for-everything' },
     { name: 'Neurodivergent Set — ADHD-Friendly Planner', price: '$13.99', href: '/shop/neurodivergent-set-adhd-friendly-planner' },
   ],
   'digital-planner-size-a5-a4-us-letter': [
-    { name: 'Undated Digital Monthly Planner', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'Comes in A4, A5 and US Letter — each laid out and hyperlinked individually, so every size works properly.' },
-    { name: 'The Balanced Student', price: '$12.99', href: '/shop/the-balanced-student' },
+    { name: 'The Balanced Student', price: '$12.99', href: '/shop/the-balanced-student', blurb: 'Comes in A4, A5 and US Letter — each laid out and hyperlinked individually, so every size works properly.' },
+    { name: 'The Anchored Day', price: '$13.99', href: '/shop/the-anchored-day' },
     { name: 'Arwign Notebook — Everyday', price: '$14.99', href: '/shop/arwign-notebook-everyday' },
   ],
   // ── Made to Last. blog additions ──
@@ -859,8 +859,8 @@ const SIDEBAR_PRODUCTS: Record<string, BlogProduct[]> = {
     { name: 'Off the Clock — A Work–Life Balance Planner', price: '$13.99', href: '/shop/off-the-clock-a-worklife-balance-planner' },
   ],
   'school-admin-term-planning-for-parents': [
-    { name: 'Undated Digital Monthly Planner — Digital Connect', price: '$9.99', href: '/shop/undated-monthly-planner-digital-connect', blurb: 'One calendar for the whole term — mufti days, trips, clubs and deadlines captured the moment the newsletter lands.' },
-    { name: 'A Place for Everything', price: '$12.99', href: '/shop/a-place-for-everything' },
+    { name: 'A Place for Everything', price: '$12.99', href: '/shop/a-place-for-everything', blurb: 'One home for the whole term — mufti days, trips, clubs and deadlines captured the moment the newsletter lands.' },
+    { name: 'Tiny Anchors — A Habit & Routine Builder', price: '$13.99', href: '/shop/tiny-anchors-a-habit-routine-builder' },
     { name: 'Arwign Notebook — Everyday', price: '$14.99', href: '/shop/arwign-notebook-everyday' },
   ],
   'why-revision-timetables-fail': [
@@ -870,13 +870,12 @@ const SIDEBAR_PRODUCTS: Record<string, BlogProduct[]> = {
   ],
 }
 
+// Fallback for any post without an explicit entry above — real planners, never
+// a generic "browse the shop" card.
 const DEFAULT_PRODUCTS: BlogProduct[] = [
-  {
-    name:  'Browse the Full Collection',
-    blurb: 'Explore the full Arwign collection — digital and printable planners for every part of your life.',
-    price: 'from $9.99',
-    href:  '/shop',
-  },
+  { name: 'The Anchored Day', price: '$13.99', href: '/shop/the-anchored-day', blurb: 'A calm, hyperlinked daily planner — anchor the day around what matters and let the rest fit in around it.' },
+  { name: 'A Place for Everything', price: '$12.99', href: '/shop/a-place-for-everything' },
+  { name: 'The Reset — A Fresh-Start Wellness Planner', price: '$13.99', href: '/shop/the-reset-a-fresh-start-wellness-planner' },
 ]
 
 function formatDate(iso: string) {
