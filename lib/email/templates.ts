@@ -481,6 +481,41 @@ const templates: Record<string, (locale: Locale, data: Record<string, unknown>) 
 
     return { subject, html, text }
   },
+
+  // Team role changed — transactional (no unsubscribe footer).
+  'team.role_changed': (locale, data) => {
+    const teamName  = String(data.team_name ?? 'your team')
+    const roleLabel = String(data.role_label ?? 'Member')
+    const changedBy = String(data.changed_by ?? 'A team manager')
+    const teamUrl   = `${BASE_URL}/calendar/team`
+
+    const subject = `Your role in ${teamName} is now ${roleLabel}`
+    const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#FAF8F4;color:#1A1820;margin:0;padding:0}a{color:#C9A84C}.wrapper{padding:32px 16px}.container{max-width:560px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;border:1px solid #E8E4DB}.content{padding:36px 40px}</style></head><body><div class="wrapper"><div class="container"><div style="height:4px;background:#C9A84C"></div>${brandHeader()}<div class="content">
+      <h2 style="color:#1A1820;margin:0 0 20px">Your role has changed</h2>
+      <p style="margin:0 0 16px"><strong>${changedBy}</strong> updated your role in <strong>${teamName}</strong> — you are now a <strong>${roleLabel}</strong>.</p>
+      <p style="text-align:center;margin:28px 0"><a href="${teamUrl}" style="background:#C9A84C;color:#fff;padding:13px 28px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block">Open the workspace →</a></p>
+      <p style="font-size:13px;color:#888;margin:0">The Members page in the workspace lists exactly what each role can do.</p>
+    </div><div style="padding:20px 40px;border-top:1px solid #E8E4DB;background:#FAF8F4"><p style="font-size:12px;color:#aaa;margin:0"><a href="${BASE_URL}" style="color:#C9A84C;text-decoration:none">arwignplanners.com</a> · © ${new Date().getFullYear()} Arwign Planners</p></div></div></div></body></html>`
+
+    const text = `${changedBy} updated your role in ${teamName} — you are now a ${roleLabel}.\n\nOpen the workspace: ${teamUrl}`
+    return { subject, html, text }
+  },
+
+  // Removed from team — transactional (no unsubscribe footer).
+  'team.removed': (locale, data) => {
+    const teamName  = String(data.team_name ?? 'the team')
+
+    const subject = `You've been removed from ${teamName} on Arwign Calendar`
+    const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#FAF8F4;color:#1A1820;margin:0;padding:0}a{color:#C9A84C}.wrapper{padding:32px 16px}.container{max-width:560px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;border:1px solid #E8E4DB}.content{padding:36px 40px}</style></head><body><div class="wrapper"><div class="container"><div style="height:4px;background:#C9A84C"></div>${brandHeader()}<div class="content">
+      <h2 style="color:#1A1820;margin:0 0 20px">You've left ${teamName}</h2>
+      <p style="margin:0 0 16px">Your membership of <strong>${teamName}</strong> on Arwign Calendar has been removed by a team manager. You no longer have access to its shared calendars, resources or booking pages.</p>
+      <p style="margin:0 0 16px">Your personal Arwign Calendar and account are unaffected.</p>
+      <p style="font-size:13px;color:#888;margin:0">Think this was a mistake? Reply to this email or contact the team's owner.</p>
+    </div><div style="padding:20px 40px;border-top:1px solid #E8E4DB;background:#FAF8F4"><p style="font-size:12px;color:#aaa;margin:0"><a href="${BASE_URL}" style="color:#C9A84C;text-decoration:none">arwignplanners.com</a> · © ${new Date().getFullYear()} Arwign Planners</p></div></div></div></body></html>`
+
+    const text = `Your membership of ${teamName} on Arwign Calendar has been removed by a team manager. Your personal calendar and account are unaffected.`
+    return { subject, html, text }
+  },
 }
 
 export function resolveTemplate(

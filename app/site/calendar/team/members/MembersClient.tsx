@@ -1,10 +1,9 @@
 'use client'
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { UserPlus, Check, Mail, X, Clock } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
 import TeamShell, { SectionCard, Avatar } from '../TeamShell'
-import { type TeamWorkspace, type Member, type Role, ROLES, ROLE_ORDER, fmtOffset, byId, logTeamAction } from '@/lib/calendar/team'
+import { type TeamWorkspace, type Member, type Role, ROLES, ROLE_ORDER, fmtOffset, byId } from '@/lib/calendar/team'
 
 export default function MembersClient({ ws }: { ws: TeamWorkspace }) {
   const [members, setMembers] = useState<Member[]>(ws.members)
@@ -12,36 +11,43 @@ export default function MembersClient({ ws }: { ws: TeamWorkspace }) {
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteRole, setInviteRole] = useState<Role>('propose')
 
-  const supabase = useMemo(() => createClient() as any, [])
-
   const setRole = async (id: string, role: Role) => {
     const target = byId(members, id)
-    const prevName = target?.name ?? 'Member'
     const prevRole = target?.role
     setMembers((ms) => ms.map((m) => (m.id === id ? { ...m, role } : m)))
     if (!ws.live) return
-    // .select() so an RLS-blocked write (which returns no error but zero rows)
-    // is detected — otherwise the change silently reverts on the server while the
-    // UI (and a false audit entry) claim success.
-    const { data, error } = await supabase.from('team_members').update({ role }).eq('id', id).select('id')
-    if (error || !data?.length) {
+    // Server route performs the update (RLS re-checked), writes the audit entry
+    // and emails the member about their new role.
+    const res = await fetch('/api/calendar/team/members', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ memberId: id, role }),
+    })
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) {
       setMembers((ms) => ms.map((m) => (m.id === id ? { ...m, role: (prevRole ?? m.role) as Role } : m)))
-      toast.error(error?.message ?? 'You don’t have permission to change roles.')
+      toast.error(data.error ?? 'You don’t have permission to change roles.')
       return
     }
-    logTeamAction(supabase, ws.team.id, ws.currentMemberId, 'changed role', `${prevName} → ${ROLES[role].label}`, 'member')
+    if (data.emailed) toast.success(`${target?.name ?? 'Member'} notified of their new role`)
   }
   const remove = async (id: string) => {
     const snapshot = members
+    const target = byId(members, id)
     setMembers((ms) => ms.filter((m) => m.id !== id))
     if (!ws.live) return
-    const { data, error } = await supabase.from('team_members').delete().eq('id', id).select('id')
-    if (error || !data?.length) {
+    const res = await fetch('/api/calendar/team/members', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ memberId: id }),
+    })
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) {
       setMembers(snapshot)
-      toast.error(error?.message ?? 'You don’t have permission to remove members.')
+      toast.error(data.error ?? 'You don’t have permission to remove members.')
       return
     }
-    logTeamAction(supabase, ws.team.id, ws.currentMemberId, 'removed member', byId(snapshot, id)?.email ?? '', 'member')
+    if (data.emailed) toast.success(`${target?.name ?? 'Member'} has been notified`)
   }
 
   const sendInvite = async () => {

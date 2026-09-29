@@ -10,7 +10,10 @@ export const metadata: Metadata = {
   title: 'Planning Tips, Guides & Inspiration — Arwign Blog',
   description:
     'Discover planning tips, productivity guides, digital planner tutorials, and lifestyle inspiration from the Arwign Planners team.',
-  alternates: { canonical: 'https://www.arwignplanners.com/blog' },
+  alternates: {
+    canonical: 'https://www.arwignplanners.com/blog',
+    types: { 'application/rss+xml': 'https://www.arwignplanners.com/rss.xml' },
+  },
   openGraph: {
     title: 'The Arwign Blog — Planning Tips & Inspiration',
     description: 'Productivity guides, digital planner tutorials, and planning inspiration.',
