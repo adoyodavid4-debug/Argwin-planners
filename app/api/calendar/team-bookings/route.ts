@@ -304,6 +304,23 @@ export async function POST(req: NextRequest) {
     )
   }
 
+  // Group seats aren't bounded by the unique index (null assignee), so two
+  // simultaneous requests can both pass the pre-insert capacity check. Recount
+  // AFTER inserting and, if the slot is now oversold, the newest surplus rows
+  // (ours included, by created-order) delete themselves and return 409.
+  if (ctx.page.type === 'group') {
+    const { data: slotRows } = await supabase
+      .from('team_bookings').select('id')
+      .eq('page_id', ctx.page.id).eq('status', 'confirmed')
+      .eq('start_at', start.toISOString())
+      .order('created_at', { ascending: true }).order('id', { ascending: true })
+    const kept = new Set((slotRows ?? []).slice(0, ctx.page.capacity).map((r) => r.id))
+    if (slotRows && slotRows.length > ctx.page.capacity && !kept.has(booking.id)) {
+      await supabase.from('team_bookings').delete().eq('id', booking.id)
+      return NextResponse.json({ error: 'Sorry — this session just filled up. Please pick another time.' }, { status: 409 })
+    }
+  }
+
   // Put the meeting on each relevant host's calendar (or reuse the group session's event).
   let firstEventId: string | null = reuseEventId
   for (const h of eventHosts) {

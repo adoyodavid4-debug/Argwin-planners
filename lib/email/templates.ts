@@ -451,6 +451,36 @@ const templates: Record<string, (locale: Locale, data: Record<string, unknown>) 
     </div></body></html>`
     return { subject, html, text: subject }
   },
+
+  // Team invite — transactional (no unsubscribe footer). Sent by
+  // /api/calendar/team/invite; the button lands on /calendar/team/join.
+  'team.invite': (locale, data) => {
+    const inviter  = String(data.inviter_name ?? 'A teammate')
+    const teamName = String(data.team_name ?? 'their team')
+    const roleLabel = String(data.role_label ?? 'Member')
+    const acceptUrl = String(data.accept_url ?? `${BASE_URL}/calendar/team`)
+    const invitedEmail = String(data.invited_email ?? '')
+
+    const subject = `${inviter} invited you to ${teamName} on Arwign Calendar`
+    const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#FAF8F4;color:#1A1820;margin:0;padding:0}a{color:#C9A84C}.wrapper{padding:32px 16px}.container{max-width:560px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;border:1px solid #E8E4DB}.content{padding:36px 40px}</style></head><body><div class="wrapper"><div class="container"><div style="height:4px;background:#C9A84C"></div>${brandHeader()}<div class="content">
+      <h2 style="color:#1A1820;margin:0 0 20px">You're invited to join ${teamName}</h2>
+      <p style="margin:0 0 16px"><strong>${inviter}</strong> has invited you to join <strong>${teamName}</strong> on Arwign Calendar as a <strong>${roleLabel}</strong>.</p>
+      <p style="margin:0 0 28px">Shared calendars, team availability, rooms &amp; resources and booking pages — all in one place.</p>
+      <p style="text-align:center;margin:0 0 28px"><a href="${acceptUrl}" style="background:#C9A84C;color:#fff;padding:14px 30px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block">Accept invitation →</a></p>
+      <p style="font-size:13px;color:#888;margin:0 0 6px">This invite was sent to <strong>${invitedEmail}</strong> — sign in (or create your account) with that email to join.</p>
+      <p style="font-size:13px;color:#888;margin:0">Didn't expect this? You can safely ignore this email.</p>
+    </div><div style="padding:20px 40px;border-top:1px solid #E8E4DB;background:#FAF8F4"><p style="font-size:12px;color:#aaa;margin:0"><a href="${BASE_URL}" style="color:#C9A84C;text-decoration:none">arwignplanners.com</a> · © ${new Date().getFullYear()} Arwign Planners</p></div></div></div></body></html>`
+
+    const text = [
+      `${inviter} invited you to ${teamName} on Arwign Calendar as ${roleLabel}.`,
+      '',
+      `Accept the invitation: ${acceptUrl}`,
+      '',
+      `This invite was sent to ${invitedEmail} — sign in with that email to join.`,
+    ].join('\n')
+
+    return { subject, html, text }
+  },
 }
 
 export function resolveTemplate(

@@ -49,13 +49,22 @@ export default function MembersClient({ ws }: { ws: TeamWorkspace }) {
     if (!email) return
     const name = email.split('@')[0]
     if (ws.live) {
-      const { data, error } = await supabase.from('team_members')
-        .insert({ team_id: ws.team.id, email, name, role: inviteRole, status: 'invited', timezone: ws.team.timezone, tz_offset: -5, hue: (members.length * 47) % 360 })
-        .select('id').single()
-      if (error || !data) { toast.error(error?.message ?? 'Could not send invite'); return }
-      setMembers((ms) => [...ms, { id: data.id, name, email, role: inviteRole, title: 'Invited', timezone: ws.team.timezone, tz_offset: -5, hue: (ms.length * 47) % 360, status: 'invited', last_active: 'pending', meetings_week: 0, focus_hours: 0 }])
-      logTeamAction(supabase, ws.team.id, ws.currentMemberId, 'invited member', email, 'member')
-      toast.success('Invite sent')
+      // Server route creates the row AND sends the invite email (the old
+      // client-side insert silently sent nothing).
+      const res = await fetch('/api/calendar/team/invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, role: inviteRole }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok || !data.member) { toast.error(data.error ?? 'Could not send invite'); return }
+      const m = data.member
+      setMembers((ms) => [...ms, {
+        id: m.id, name: m.name ?? name, email: m.email ?? email, role: (m.role ?? inviteRole) as Role,
+        title: 'Invited', timezone: m.timezone ?? ws.team.timezone, tz_offset: m.tz_offset ?? -5,
+        hue: m.hue ?? (ms.length * 47) % 360, status: 'invited', last_active: 'pending', meetings_week: 0, focus_hours: 0,
+      }])
+      toast.success(data.emailed ? `Invite email sent to ${email}` : 'Invite created, but the email could not be sent — share the link from your team settings.')
     } else {
       setMembers((ms) => [...ms, { id: `inv-${Date.now()}`, name, email, role: inviteRole, title: 'Invited', timezone: ws.team.timezone, tz_offset: -5, hue: (ms.length * 47) % 360, status: 'invited', last_active: 'pending', meetings_week: 0, focus_hours: 0 }])
     }
