@@ -29,7 +29,7 @@ export async function GET(req: NextRequest, { params }: { params: { provider: st
   const accountEmail = emailFromIdToken(tokens.id_token)
   const meta = { expires_at: new Date(Date.now() + (tokens.expires_in ?? 3600) * 1000).toISOString() }
 
-  await supabase.from('calendar_integrations').upsert({
+  const { error: storeErr } = await supabase.from('calendar_integrations').upsert({
     user_id: user.id,
     provider,
     status: 'connected',
@@ -40,6 +40,13 @@ export async function GET(req: NextRequest, { params }: { params: { provider: st
     sync_token: null, // reset — next sync does a full pull
     meta,
   }, { onConflict: 'user_id,provider' })
+
+  // Don't show a false "connected" banner if the tokens never persisted (missing
+  // column / RLS) — that produced a fake-connected state that synced nothing.
+  if (storeErr) {
+    console.error('[oauth callback] failed to store integration', provider, storeErr)
+    return NextResponse.redirect(`${base}?error=store_failed`)
+  }
 
   const res = NextResponse.redirect(`${base}?connected=${provider}`)
   res.cookies.delete(`cal_oauth_state_${provider}`)

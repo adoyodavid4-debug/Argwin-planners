@@ -27,7 +27,12 @@ export default function IntegrationsClient({ configured, rows: initialRows }: Pr
     if (p.get('connected')) setBanner({ tone: 'ok', text: `${p.get('connected')} connected. Run a sync to pull your events in.` })
     else if (p.get('error')) {
       const e = p.get('error')
-      setBanner({ tone: 'err', text: e === 'not_configured' ? 'That provider isn’t configured yet — its OAuth credentials need to be added.' : `Couldn’t connect (${e}).` })
+      const msg = e === 'not_configured'
+        ? 'That provider isn’t configured yet — its OAuth credentials need to be added.'
+        : e === 'store_failed'
+          ? 'Connected with the provider, but saving the account failed on our side — please try again or contact support.'
+          : `Couldn’t connect (${e}).`
+      setBanner({ tone: 'err', text: msg })
     }
   }, [])
 
