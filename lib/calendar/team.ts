@@ -14,6 +14,7 @@
 
 import { wallTimeToUtc } from './slots'
 import { expandRange, type CalEventRow } from './plus'
+import { TEAMS_MAX_SEATS } from './plan'
 
 // ── Roles ─────────────────────────────────────────────────────
 // Ordered least → most privileged. `rank` gates who can change whom.
@@ -270,7 +271,7 @@ export function sampleWorkspace(): TeamWorkspace {
 
   const team: Team = {
     id: 'team-sample', name: 'Arwign', plan: 'teams',
-    seats_used: members.filter((m) => m.status === 'active').length, seats_total: 10,
+    seats_used: members.filter((m) => m.status === 'active').length, seats_total: TEAMS_MAX_SEATS,
     timezone: 'America/New_York', billing_email: 'billing@arwign.com',
     renews_on: '2026-10-05', created_at: '2026-06-01',
   }
@@ -399,7 +400,7 @@ export async function loadTeamWorkspace(supabase: any): Promise<TeamWorkspace> {
 
     const team: Team = {
       id: t.id, name: t.name, plan: t.plan ?? 'teams',
-      seats_used: activeCount, seats_total: t.seats_total ?? 5,
+      seats_used: activeCount, seats_total: t.seats_total ?? TEAMS_MAX_SEATS,
       timezone: t.timezone ?? 'America/New_York', billing_email: t.billing_email ?? '',
       renews_on: t.renews_on ?? '', created_at: t.created_at ?? '',
     }
@@ -458,7 +459,7 @@ export async function provisionTeam(
     const teamName = opts.teamName || `${ownerName}'s Team`
 
     const teamIns = await supabase.from('teams')
-      .insert({ name: teamName, owner_id: uid, seats_total: 5, timezone: tz, billing_email: opts.ownerEmail })
+      .insert({ name: teamName, owner_id: uid, seats_total: TEAMS_MAX_SEATS, timezone: tz, billing_email: opts.ownerEmail })
       .select('id').single()
     if (teamIns.error || !teamIns.data) return { ok: false, error: teamIns.error?.message || 'Could not create team' }
     const teamId = teamIns.data.id

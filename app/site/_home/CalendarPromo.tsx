@@ -27,8 +27,8 @@ const TIERS: Tier[] = [
     cta: 'Subscribe to Arwign Plus', href: '/calendar/subscribe/plus',
   },
   {
-    name: 'Arwign Teams', price: '$49.99', unit: '/mo', icon: Users,
-    blurb: 'Shared team calendars, meeting polls, roles & admin controls.',
+    name: 'Arwign Teams', price: '$79.99', unit: '/mo', icon: Users,
+    blurb: 'Up to 10 members, one flat price. Shared calendars, polls, roles & admin.',
     cta: 'Subscribe to Arwign Teams', href: '/calendar/subscribe/teams',
   },
 ]

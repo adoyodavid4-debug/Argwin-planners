@@ -221,13 +221,14 @@ const TIERS = [
   {
     name: 'Arwign Teams',
     tagline: 'For teams',
-    price: '$49.99',
+    price: '$79.99',
     period: '/month',
     cta: 'Subscribe to Arwign Teams',
     href: '/calendar/subscribe/teams',
     highlight: false,
     features: [
       'Everything in Plus, plus:',
+      'One flat price — up to 10 members, no per-seat fees',
       'Shared team calendars with roles',
       'Resource / room booking with approvals',
       'Team availability finder across zones',

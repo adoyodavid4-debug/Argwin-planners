@@ -4,6 +4,7 @@ import toast from 'react-hot-toast'
 import { Building2, CreditCard, ShieldCheck, KeyRound, Minus, Plus, AlertTriangle, Check, X } from 'lucide-react'
 import TeamShell, { SectionCard } from '../TeamShell'
 import { type TeamWorkspace, byId, logTeamAction } from '@/lib/calendar/team'
+import { PLAN_PRICE, TEAMS_MAX_SEATS } from '@/lib/calendar/plan'
 import { fmtDateLong } from '@/lib/calendar/fmt'
 import { createClient } from '@/lib/supabase/client'
 
@@ -26,7 +27,7 @@ export default function AdminClient({ ws }: { ws: TeamWorkspace }) {
       // .select() so an RLS-blocked update (no error, zero rows) doesn't report
       // a false success to a non-owner.
       const { data, error } = await supabase.from('teams')
-        .update({ name: name.trim() || ws.team.name, timezone, billing_email: billingEmail.trim(), seats_total: seats })
+        .update({ name: name.trim() || ws.team.name, timezone, billing_email: billingEmail.trim(), seats_total: Math.min(TEAMS_MAX_SEATS, seats) })
         .eq('id', ws.team.id)
         .select('id')
       if (error) { toast.error(error.message); return }
@@ -94,17 +95,17 @@ export default function AdminClient({ ws }: { ws: TeamWorkspace }) {
           <div className="mb-4 flex items-center justify-between rounded-xl border p-3.5" style={{ borderColor: 'rgba(var(--gold-rgb),0.35)', background: 'rgba(var(--gold-rgb),0.06)' }}>
             <div>
               <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Arwign Teams</p>
-              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>$49.99 / month{ws.team.renews_on ? ` · renews ${fmtDateLong(ws.team.renews_on, ws.team.timezone)}` : ''}</p>
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>${PLAN_PRICE.teams.toFixed(2)} / month · up to {TEAMS_MAX_SEATS} members included{ws.team.renews_on ? ` · renews ${fmtDateLong(ws.team.renews_on, ws.team.timezone)}` : ''}</p>
             </div>
             <CreditCard size={20} style={{ color: 'var(--gold)' }} />
           </div>
 
           <div className="mb-4">
-            <label className="mb-1.5 block text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>Seats</label>
+            <label className="mb-1.5 block text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>Seats <span style={{ color: 'var(--text-muted)' }}>· up to {TEAMS_MAX_SEATS} included in your plan</span></label>
             <div className="flex items-center gap-3">
               <button onClick={() => setSeats((s) => Math.max(ws.team.seats_used, s - 1))} className="btn-ghost" aria-label="Fewer seats"><Minus size={15} /></button>
               <span className="min-w-[3rem] text-center font-display text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>{seats}</span>
-              <button onClick={() => setSeats((s) => s + 1)} className="btn-ghost" aria-label="More seats"><Plus size={15} /></button>
+              <button onClick={() => setSeats((s) => Math.min(TEAMS_MAX_SEATS, s + 1))} className="btn-ghost disabled:opacity-40" disabled={seats >= TEAMS_MAX_SEATS} aria-label="More seats"><Plus size={15} /></button>
               <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{ws.team.seats_used} in use · {seats - ws.team.seats_used} available</span>
             </div>
           </div>

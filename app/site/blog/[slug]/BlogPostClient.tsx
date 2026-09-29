@@ -912,7 +912,7 @@ function Toc({ items, onJump, reduce }: { items: { id: string; text: string }[];
 // Arwign Calendar plans — the companion app, relevant to every planning article.
 const CALENDAR_PLANS: BlogProduct[] = [
   { name: 'Arwign Calendar Plus', price: '$19.99/mo', href: '/calendar/subscribe/plus', blurb: 'AI scheduling, unlimited connected calendars, a daily briefing, booking pages and reminders.' },
-  { name: 'Arwign Calendar Teams', price: '$49.99/mo', href: '/calendar/subscribe/teams', blurb: 'Shared team calendars, round-robin booking, a cross-timezone availability finder and an admin console.' },
+  { name: 'Arwign Calendar Teams', price: '$79.99/mo', href: '/calendar/subscribe/teams', blurb: 'Up to 10 members, one flat price — shared team calendars, round-robin booking, a cross-timezone availability finder and an admin console.' },
 ]
 
 // A titled grid of product picks — the planners for the article plus the

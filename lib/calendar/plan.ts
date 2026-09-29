@@ -7,7 +7,12 @@ export type CalendarPlan = 'free' | 'plus' | 'teams'
 export const PLAN_RANK: Record<CalendarPlan, number> = { free: 0, plus: 1, teams: 2 }
 export const PLAN_LABEL: Record<CalendarPlan, string> = { free: 'Arwign Free', plus: 'Arwign Plus', teams: 'Arwign Teams' }
 // Monthly price in USD (the source of truth for the payment amount).
-export const PLAN_PRICE: Record<Exclude<CalendarPlan, 'free'>, number> = { plus: 19.99, teams: 49.99 }
+export const PLAN_PRICE: Record<Exclude<CalendarPlan, 'free'>, number> = { plus: 19.99, teams: 79.99 }
+
+// Arwign Teams is a flat plan: one monthly payment (PLAN_PRICE.teams) covers the
+// owner plus up to this many active members — no per-seat billing. This is the
+// single source of truth for team capacity (seat cap, invite limit, provisioning).
+export const TEAMS_MAX_SEATS = 10
 
 export interface PlanInfo {
   plan: CalendarPlan

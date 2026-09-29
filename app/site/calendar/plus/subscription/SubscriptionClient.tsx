@@ -6,7 +6,7 @@ import toast from 'react-hot-toast'
 import { Sparkles, Check, CreditCard, Users, ArrowRight, Loader2, ExternalLink } from 'lucide-react'
 import PlusShell, { SectionCard } from '../PlusShell'
 import { type PlusWorkspace } from '@/lib/calendar/plus'
-import { type PlanInfo, PLAN_LABEL, PLAN_PRICE } from '@/lib/calendar/plan'
+import { type PlanInfo, PLAN_LABEL, PLAN_PRICE, TEAMS_MAX_SEATS } from '@/lib/calendar/plan'
 import { fmtDateLong } from '@/lib/calendar/fmt'
 
 const INCLUDED = [
@@ -111,7 +111,7 @@ export default function SubscriptionClient({ ws, plan }: { ws: PlusWorkspace; pl
             <div className="rounded-2xl border p-5" style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}>
               <Users size={18} style={{ color: 'var(--gold)' }} />
               <p className="mt-2 text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Working with a team?</p>
-              <p className="mt-1 text-xs" style={{ color: 'var(--text-muted)' }}>Arwign Teams adds shared calendars, roles, resource booking and an admin console — $49.99/mo.</p>
+              <p className="mt-1 text-xs" style={{ color: 'var(--text-muted)' }}>Arwign Teams adds shared calendars, roles, resource booking and an admin console — one flat ${PLAN_PRICE.teams.toFixed(2)}/mo for up to {TEAMS_MAX_SEATS} members.</p>
               <Link href="/calendar/subscribe/teams" className="btn-outline mt-3 w-full justify-center py-2 text-sm">Explore Teams <ArrowRight size={14} /></Link>
             </div>
           )}

@@ -7,6 +7,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createServerSupabaseClient, createServiceRoleClient } from '@/lib/supabase/server'
+import { TEAMS_MAX_SEATS } from '@/lib/calendar/plan'
 
 export const metadata: Metadata = { title: 'Join your team — Arwign Calendar', robots: { index: false, follow: false } }
 export const dynamic = 'force-dynamic'
@@ -74,7 +75,7 @@ export default async function JoinTeamPage({ searchParams }: { searchParams: { m
   if (!team) {
     return <Card title="Team not found" body="The team behind this invitation no longer exists." />
   }
-  if ((activeCount ?? 0) >= (team.seats_total ?? 5)) {
+  if ((activeCount ?? 0) >= (team.seats_total ?? TEAMS_MAX_SEATS)) {
     return <Card title="This team is full" body={`${team.name} has used all its seats. Ask the team owner to add seats, then try the link again.`} />
   }
 

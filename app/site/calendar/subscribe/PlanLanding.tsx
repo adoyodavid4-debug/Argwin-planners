@@ -141,13 +141,14 @@ const CONTENT: Record<Plan, TierContent> = {
   teams: {
     plan: 'teams',
     name: 'Arwign Teams',
-    price: '$49.99',
+    price: '$79.99',
     period: 'per month',
     tagline: 'For teams',
     intro:
-      'Everything in Plus for your whole team — shared calendars with roles, resource booking, cross-timezone scheduling and centralised admin, so a distributed team can find time and manage it together.',
+      'Everything in Plus for your whole team — shared calendars with roles, resource booking, cross-timezone scheduling and centralised admin, so a distributed team can find time and manage it together. One flat price covers up to 10 members — no per-seat fees.',
     builtOn: 'Everything in Arwign Plus, for your team',
     heroBenefits: [
+      'One flat price — up to 10 team members included, no per-seat billing',
       'Shared team calendars with granular roles (view / propose / edit / manage)',
       'Conference room & resource booking with approval workflows',
       'Team availability finder across time zones',
