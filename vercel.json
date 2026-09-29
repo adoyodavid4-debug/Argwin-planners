@@ -15,6 +15,14 @@
     {
       "path": "/api/cron/daily-briefing?slot=evening",
       "schedule": "0 23 * * *"
+    },
+    {
+      "path": "/api/cron/calendar-reminders",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/calendar-sync",
+      "schedule": "0 * * * *"
     }
   ]
 }
