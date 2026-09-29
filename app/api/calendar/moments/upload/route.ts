@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { randomUUID } from 'crypto'
 import { createClient } from '@supabase/supabase-js'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { requirePlan } from '@/lib/calendar/guard'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,6 +16,7 @@ export async function POST(req: NextRequest) {
   const supabase = createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Not signed in' }, { status: 401 })
+  const denied = await requirePlan('plus', supabase); if (denied) return denied
 
   let form: FormData
   try { form = await req.formData() } catch { return NextResponse.json({ error: 'Invalid upload.' }, { status: 400 }) }

@@ -85,7 +85,9 @@ export async function exchangeCode(provider: Provider, code: string): Promise<To
   return res.json()
 }
 
-export async function refreshToken(provider: Provider, refresh_token: string): Promise<TokenSet | null> {
+// 'invalid_grant' means the refresh token is permanently dead (user revoked
+// access, password change, or long inactivity) — retrying will never succeed.
+export async function refreshToken(provider: Provider, refresh_token: string): Promise<TokenSet | 'invalid_grant' | null> {
   const c = cfg(provider)
   if (!c) return null
   const body = new URLSearchParams({
@@ -95,7 +97,11 @@ export async function refreshToken(provider: Provider, refresh_token: string): P
     grant_type: 'refresh_token',
   })
   const res = await fetch(c.tokenUrl, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body })
-  if (!res.ok) { console.error('[oauth] refresh failed', provider, await res.text().catch(() => '')); return null }
+  if (!res.ok) {
+    const errText = await res.text().catch(() => '')
+    console.error('[oauth] refresh failed', provider, errText)
+    return errText.includes('invalid_grant') ? 'invalid_grant' : null
+  }
   return res.json()
 }
 
@@ -119,6 +125,15 @@ export async function validAccessToken(supabase: any, integration: any): Promise
   if (!integration.refresh_token) return integration.access_token ?? null
 
   const t = await refreshToken(provider, integration.refresh_token)
+  if (t === 'invalid_grant') {
+    // Permanently revoked — flip to 'error' so the hourly sync stops retrying
+    // (it only picks up status='connected') and the Integrations page shows
+    // the "Needs attention" badge. Reconnecting resets status to 'connected'.
+    await supabase.from('calendar_integrations')
+      .update({ status: 'error', meta: { ...(integration.meta ?? {}), error: 'reauth_required', errored_at: new Date().toISOString() } })
+      .eq('id', integration.id)
+    return null
+  }
   if (!t) return null
   const meta = { ...(integration.meta ?? {}), expires_at: new Date(Date.now() + (t.expires_in ?? 3600) * 1000).toISOString() }
   await supabase.from('calendar_integrations').update({

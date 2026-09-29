@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { requirePlan } from '@/lib/calendar/guard'
 import { getEmailProvider } from '@/lib/email'
 import { ROLES, type Role } from '@/lib/calendar/team'
 
@@ -31,6 +32,7 @@ export async function POST(req: NextRequest) {
   const supabase = createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Not signed in' }, { status: 401 })
+  const denied = await requirePlan('teams', supabase); if (denied) return denied
 
   const parsed = schema.safeParse(await req.json().catch(() => null))
   if (!parsed.success) return NextResponse.json({ error: 'Enter a valid email address' }, { status: 400 })
@@ -100,7 +102,7 @@ export async function POST(req: NextRequest) {
         team_name: team.name,
         role_label: ROLES[role]?.label ?? role,
         invited_email: email,
-        accept_url: `${APP_URL}/calendar/team/join?m=${member.id}`,
+        accept_url: `${APP_URL}/calendar/join?m=${member.id}`,
       },
     })
   } catch (err) {

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { requirePlan } from '@/lib/calendar/guard'
 import { getEmailProvider } from '@/lib/email'
 import { fmtDateLong } from '@/lib/calendar/fmt'
 import {
@@ -31,6 +32,7 @@ export async function POST(req: NextRequest) {
   const supabase = createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Not signed in' }, { status: 401 })
+  const denied = await requirePlan('plus', supabase); if (denied) return denied
 
   let body: any
   try { body = await req.json() } catch { return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 }) }

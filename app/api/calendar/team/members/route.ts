@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { requirePlan } from '@/lib/calendar/guard'
 import { getEmailProvider } from '@/lib/email'
 import { ROLES, type Role } from '@/lib/calendar/team'
 
@@ -13,6 +14,8 @@ async function requireManager() {
   const supabase = createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: NextResponse.json({ error: 'Not signed in' }, { status: 401 }) }
+  const denied = await requirePlan('teams', supabase)
+  if (denied) return { error: denied }
 
   const { data: mine } = await supabase
     .from('team_members')

@@ -1,4 +1,4 @@
-// app/site/calendar/team/join/page.tsx
+// app/site/calendar/join/page.tsx
 // Invite acceptance: the link in the team.invite email lands here.
 // Requires login, verifies the signed-in email matches the invited row
 // (service role — the invitee has no RLS access to the team yet), then
@@ -34,7 +34,7 @@ export default async function JoinTeamPage({ searchParams }: { searchParams: { m
   const supabase = createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
-    redirect(`/auth/login?redirect=${encodeURIComponent(`/calendar/team/join?m=${memberId}`)}`)
+    redirect(`/auth/login?redirect=${encodeURIComponent(`/calendar/join?m=${memberId}`)}`)
   }
 
   const service = createServiceRoleClient()
@@ -61,7 +61,7 @@ export default async function JoinTeamPage({ searchParams }: { searchParams: { m
       <Card
         title="This invite was sent to a different email"
         body={`The invitation is for ${row.email}, but you're signed in as ${user!.email}. Sign in with the invited email to join.`}
-        cta={{ href: `/auth/login?redirect=${encodeURIComponent(`/calendar/team/join?m=${memberId}`)}`, label: 'Switch account' }}
+        cta={{ href: `/auth/login?redirect=${encodeURIComponent(`/calendar/join?m=${memberId}`)}`, label: 'Switch account' }}
       />
     )
   }
