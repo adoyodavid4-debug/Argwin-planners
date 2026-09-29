@@ -6,7 +6,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { createServerSupabaseClient, createServiceRoleClient } from '@/lib/supabase/server'
+import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase/server'
 import { TEAMS_MAX_SEATS } from '@/lib/calendar/plan'
 
 export const metadata: Metadata = { title: 'Join your team — Arwign Calendar', robots: { index: false, follow: false } }
@@ -38,7 +38,10 @@ export default async function JoinTeamPage({ searchParams }: { searchParams: { m
     redirect(`/auth/login?redirect=${encodeURIComponent(`/calendar/join?m=${memberId}`)}`)
   }
 
-  const service = createServiceRoleClient()
+  // Must bypass RLS: the invitee is signed in but not a member yet, so a
+  // cookie-scoped client would run as them and RLS would hide the invited row
+  // (which showed as "invite not found"). createAdminClient ignores the cookie.
+  const service = createAdminClient()
   const { data: row } = await service
     .from('team_members')
     .select('id, team_id, email, status, user_id, name')
