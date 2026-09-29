@@ -6,7 +6,9 @@ import { createClient } from '@/lib/supabase/client'
 import TeamShell, { SectionCard, Avatar } from '../TeamShell'
 import { type TeamWorkspace, type SharedCalendar, TEAM_COLOURS, byId, logTeamAction } from '@/lib/calendar/team'
 
-export default function CalendarsClient({ ws }: { ws: TeamWorkspace }) {
+export interface BusyBlock { memberId: string; startISO: string; endISO: string }
+
+export default function CalendarsClient({ ws, busy = [] }: { ws: TeamWorkspace; busy?: BusyBlock[] }) {
   const supabase = useMemo(() => createClient() as any, [])
   const [cals, setCals] = useState<SharedCalendar[]>(ws.calendars)
   const [selected, setSelected] = useState<string>(ws.calendars[0]?.id ?? '')
@@ -119,6 +121,8 @@ export default function CalendarsClient({ ws }: { ws: TeamWorkspace }) {
         </div>
       </div>
 
+      <TeamAvailability ws={ws} busy={busy} />
+
       {/* Create dialog */}
       {form && (
         <div className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-6" style={{ background: 'rgba(0,0,0,0.45)' }} onClick={() => setForm(null)}>
@@ -177,6 +181,73 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     <div>
       <label className="mb-1.5 block text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>{label}</label>
       {children}
+    </div>
+  )
+}
+
+// Anonymous "busy only" team availability for the next 7 days. Times come from
+// every member's synced + native calendar (server-loaded with the service role);
+// only start/end are shown — never titles — preserving the content-free model.
+function TeamAvailability({ ws, busy }: { ws: TeamWorkspace; busy: BusyBlock[] }) {
+  const tz = ws.team.timezone || 'UTC'
+  const activeMembers = ws.members.filter((m) => m.status === 'active')
+
+  const byMember = useMemo(() => {
+    const dayFmt = new Intl.DateTimeFormat('en-US', { weekday: 'short', day: 'numeric', timeZone: tz })
+    const timeFmt = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', timeZone: tz })
+    const m = new Map<string, Map<string, string[]>>()
+    const sorted = [...busy].sort((a, b) => a.startISO.localeCompare(b.startISO))
+    for (const b of sorted) {
+      const s = new Date(b.startISO), e = new Date(b.endISO)
+      if (isNaN(s.getTime()) || isNaN(e.getTime())) continue
+      const day = dayFmt.format(s)
+      const label = `${timeFmt.format(s)}–${timeFmt.format(e)}`
+      let days = m.get(b.memberId); if (!days) { days = new Map(); m.set(b.memberId, days) }
+      const arr = days.get(day) ?? []; arr.push(label); days.set(day, arr)
+    }
+    return m
+  }, [busy, tz])
+
+  if (!ws.live) return null
+
+  return (
+    <div className="mt-6">
+      <SectionCard title="Team availability · next 7 days"
+        action={<span className="inline-flex items-center gap-1.5 text-[11px]" style={{ color: 'var(--text-muted)' }}><EyeOff size={13} /> Busy only · {tz}</span>}>
+        {busy.length === 0 ? (
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+            No busy blocks yet. Once members connect a calendar under Integrations, their events show here as anonymous busy times.
+          </p>
+        ) : (
+          <div className="space-y-2.5">
+            {activeMembers.map((m) => {
+              const days = byMember.get(m.id)
+              return (
+                <div key={m.id} className="flex items-start gap-3 rounded-xl border p-3" style={{ borderColor: 'var(--border)' }}>
+                  <Avatar name={m.name} hue={m.hue} size={26} />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{m.name}</p>
+                    {!days || days.size === 0 ? (
+                      <p className="mt-0.5 text-xs" style={{ color: 'var(--text-muted)' }}>Free all week</p>
+                    ) : (
+                      <div className="mt-1 space-y-1">
+                        {Array.from(days.entries()).map(([day, slots]) => (
+                          <div key={day} className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                            <span className="text-[11px] font-semibold" style={{ color: 'var(--text-secondary)', minWidth: 56 }}>{day}</span>
+                            {slots.map((s, i) => (
+                              <span key={i} className="rounded-md px-1.5 py-0.5 text-[11px]" style={{ background: 'rgba(var(--gold-rgb),0.10)', color: 'var(--text-secondary)' }}>{s}</span>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </SectionCard>
     </div>
   )
 }
