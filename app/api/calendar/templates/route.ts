@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
-import { requirePlan } from '@/lib/calendar/guard'
+import { requirePlan, isActiveTeamMember } from '@/lib/calendar/guard'
 import { fmtDateTime } from '@/lib/calendar/fmt'
 import { TEMPLATE_COLOURS } from '@/lib/calendar/templates'
 
@@ -38,7 +38,9 @@ export async function POST(req: NextRequest) {
   const supabase = createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Not signed in' }, { status: 401 })
-  const denied = await requirePlan('plus', supabase); if (denied) return denied
+  // Plus feature, also served to active team members via /calendar/team/templates.
+  const denied = await requirePlan('plus', supabase)
+  if (denied && !(await isActiveTeamMember(supabase))) return denied
 
   let body: any
   try { body = await req.json() } catch { return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 }) }
