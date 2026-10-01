@@ -22,6 +22,7 @@ export default function LoginClient() {
   const [fullName,   setFullName]   = useState('')
   const [email,      setEmail]      = useState('')
   const [password,   setPassword]   = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [showPass,   setShowPass]   = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [errorMsg,   setErrorMsg]   = useState<string | null>(null)
@@ -34,6 +35,7 @@ export default function LoginClient() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email.trim() || !password) { setErrorMsg('Email and password are required.'); return }
+    if (mode === 'signup' && password !== confirmPassword) { setErrorMsg('Passwords do not match.'); return }
 
     setSubmitting(true)
     setErrorMsg(null)
@@ -224,6 +226,37 @@ export default function LoginClient() {
                   </button>
                 </div>
               </div>
+
+              {mode === 'signup' && (
+                <div>
+                  {label('Confirm Password')}
+                  <div className="relative">
+                    <input
+                      type={showPass ? 'text' : 'password'}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Re-enter your password"
+                      className="input-field"
+                      style={{ paddingRight: '2.75rem' }}
+                      autoComplete="new-password"
+                      minLength={6}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPass((v) => !v)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2"
+                      style={{ color: 'var(--text-muted)' }}
+                      aria-label={showPass ? 'Hide password' : 'Show password'}
+                    >
+                      {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
+                    </button>
+                  </div>
+                  {confirmPassword && confirmPassword !== password && (
+                    <p className="mt-1.5 text-xs" style={{ color: '#9C4A2E' }}>Passwords do not match.</p>
+                  )}
+                </div>
+              )}
 
               {errorMsg && (
                 <p role="alert" className="rounded-lg px-3.5 py-2.5 text-sm"

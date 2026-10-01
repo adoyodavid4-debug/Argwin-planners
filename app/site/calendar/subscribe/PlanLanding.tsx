@@ -532,6 +532,7 @@ function SubscribeCard({ plan, name, price, period }: { plan: Plan; name: string
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [checkEmail, setCheckEmail] = useState(false)
@@ -554,6 +555,7 @@ function SubscribeCard({ plan, name, price, period }: { plan: Plan; name: string
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email.trim() || !password) { setError('Email and password are required.'); return }
+    if (mode === 'signup' && password !== confirmPassword) { setError('Passwords do not match.'); return }
     setSubmitting(true); setError(null)
     const supabase = createClient()
     try {
@@ -631,6 +633,10 @@ function SubscribeCard({ plan, name, price, period }: { plan: Plan; name: string
             )}
             <Field icon={<Mail size={15} />}><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" autoComplete="email" required className="w-full bg-transparent text-sm outline-none" style={{ color: 'var(--text-primary)' }} /></Field>
             <Field icon={<Lock size={15} />}><input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={mode === 'signup' ? 'Create a password' : 'Password'} autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} minLength={6} required className="w-full bg-transparent text-sm outline-none" style={{ color: 'var(--text-primary)' }} /></Field>
+            {mode === 'signup' && (
+              <Field icon={<Lock size={15} />}><input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirm password" autoComplete="new-password" minLength={6} required className="w-full bg-transparent text-sm outline-none" style={{ color: 'var(--text-primary)' }} /></Field>
+            )}
+            {mode === 'signup' && confirmPassword && confirmPassword !== password && <p className="text-xs text-red-500">Passwords do not match.</p>}
             {error && <p className="text-xs text-red-500">{error}</p>}
             <button type="submit" disabled={submitting} className="btn-primary w-full justify-center py-3 disabled:opacity-60">
               {submitting ? <Loader2 size={16} className="animate-spin" /> : (mode === 'signup' ? 'Create account & subscribe' : 'Log in & subscribe')}
