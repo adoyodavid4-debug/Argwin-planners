@@ -219,7 +219,7 @@ export default function CheckoutClient() {
               Email address
             </label>
             <div className="relative">
-              <Mail size={15} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
+              <Mail size={15} className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--text-muted)' }} />
               <input
                 type="email"
                 required
@@ -227,7 +227,7 @@ export default function CheckoutClient() {
                 onChange={(e) => { setEmail(e.target.value); if (emailError) validateEmail(e.target.value) }}
                 onBlur={(e) => { if (e.target.value) validateEmail(e.target.value) }}
                 placeholder="you@example.com"
-                className="input-field pl-9 text-sm w-full"
+                className="input-field pr-9 text-sm w-full"
                 autoComplete="email"
               />
             </div>

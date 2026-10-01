@@ -3,7 +3,7 @@
 // `orders` row, then initializes a Paystack transaction for the DB-validated
 // total.
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerSupabaseClient, createServiceRoleClient } from '@/lib/supabase/server'
+import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase/server'
 import { initializePaystackTransaction } from '@/lib/paystack'
 import { z } from 'zod'
 
@@ -56,8 +56,10 @@ export async function POST(req: NextRequest) {
   const total  = products.reduce((sum, p) => sum + p.price, 0)
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? req.headers.get('origin') ?? 'http://localhost:3000'
 
-  // Create the pending order (service role — bypasses RLS in API routes)
-  const service = createServiceRoleClient()
+  // Create the pending order with the admin client (TRUE RLS bypass).
+  // createServiceRoleClient keeps the signed-in user's RLS, so a logged-in
+  // buyer's insert gets blocked → "Could not create order".
+  const service = createAdminClient()
   const { data: order, error: orderErr } = await service
     .from('orders')
     .insert({
