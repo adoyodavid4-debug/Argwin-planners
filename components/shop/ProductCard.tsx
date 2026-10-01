@@ -19,11 +19,11 @@ export default function ProductCard({ product, priority = false, index = 0 }: Pr
   const [hovered,     setHovered]     = useState(false)
 
   const addItem       = useCartStore((s) => s.addItem)
-  const hasItem       = useCartStore((s) => s.hasItem)
+  // Reactive selectors: subscribe to the derived value (not the fn reference) so
+  // the card re-renders the moment this item enters the cart / wishlist.
+  const inCart        = useCartStore((s) => s.items.some((i) => i.id === product.id))
   const toggleWish    = useWishlistStore((s) => s.toggle)
-  const isWished      = useWishlistStore((s) => s.has(product.id))
-
-  const inCart       = hasItem(product.id)
+  const isWished      = useWishlistStore((s) => s.ids.includes(product.id))
   const hasDiscount  = product.compare_price && product.compare_price > product.price
   const discountPct  = hasDiscount
     ? Math.round(((product.compare_price! - product.price) / product.compare_price!) * 100)

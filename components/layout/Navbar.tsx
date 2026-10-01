@@ -67,7 +67,10 @@ export default function Navbar({
   const [mounted,       setMounted]       = useState(false)
   const { theme, setTheme }              = useTheme()
   const pathname                         = usePathname()
-  const itemCount                        = useCartStore((s) => s.itemCount)
+  // Subscribe to items.length (a value that changes), NOT the itemCount fn whose
+  // reference is stable — selecting the fn meant the badge never re-rendered on
+  // add/remove.
+  const itemCount                        = useCartStore((s) => s.items.length)
   const { setCartOpen, setSearchOpen, mobileNavOpen, setMobileNavOpen } = useUIStore()
 
   useEffect(() => { setMounted(true) }, [])
@@ -198,7 +201,7 @@ export default function Navbar({
             </button>
 
             {/* Wishlist */}
-            <Link href="/customer/notebooks" className="btn-icon hidden sm:inline-flex" aria-label="My notebooks">
+            <Link href="/wishlist" className="btn-icon hidden sm:inline-flex" aria-label="Wishlist">
               <Heart size={18} />
             </Link>
 
@@ -227,17 +230,20 @@ export default function Navbar({
             <button
               onClick={() => setCartOpen(true)}
               className="btn-icon relative"
-              aria-label={`Cart, ${itemCount()} items`}
+              aria-label={`Cart, ${mounted ? itemCount : 0} items`}
             >
               <ShoppingCart size={18} />
-              {itemCount() > 0 && (
+              {/* Gate on `mounted` so the server (no localStorage → 0) and the
+                  first client render agree; the count then appears post-hydration. */}
+              {mounted && itemCount > 0 && (
                 <motion.span
+                  key={itemCount}
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   className="absolute -top-1 -right-1 w-4.5 h-4.5 text-white text-[10px] font-bold rounded-full flex items-center justify-center"
                   style={{ background: 'var(--gold)', minWidth: '18px', minHeight: '18px', fontSize: '10px' }}
                 >
-                  {itemCount()}
+                  {itemCount}
                 </motion.span>
               )}
             </button>

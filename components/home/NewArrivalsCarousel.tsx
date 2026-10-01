@@ -49,8 +49,7 @@ function NewArrivalCard({
 }) {
   const [imageLoaded, setImageLoaded] = useState(false)
   const addItem = useCartStore((s) => s.addItem)
-  const hasItem = useCartStore((s) => s.hasItem)
-  const inCart = hasItem(product.id)
+  const inCart = useCartStore((s) => s.hasItem(product.id))
 
   const tags = formatTags(product)
   const showNew = isRecentlyAdded(product.created_at)

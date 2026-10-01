@@ -16,8 +16,9 @@ interface Props {
 
 export default function QuickViewModal({ product, onClose }: Props) {
   const addItem  = useCartStore((s) => s.addItem)
-  const hasItem  = useCartStore((s) => s.hasItem)
-  const inCart   = hasItem(product.id)
+  // Select the derived boolean (reactive) — not the fn reference, which never
+  // changes and so would leave the button stuck on "Add to Cart".
+  const inCart   = useCartStore((s) => s.hasItem(product.id))
 
   const closeRef   = useRef<HTMLButtonElement>(null)
   const overlayRef = useRef<HTMLDivElement>(null)

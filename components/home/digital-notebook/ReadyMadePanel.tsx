@@ -19,15 +19,16 @@ interface Props {
 
 export default function ReadyMadePanel({ size, colour, onSizeChange, onColourChange }: Props) {
   const addItem     = useCartStore((s) => s.addItem)
-  const hasItem     = useCartStore((s) => s.hasItem)
   const setCartOpen = useUIStore((s) => s.setCartOpen)
+  const cartItems   = useCartStore((s) => s.items)
 
   const [adding, setAdding] = useState(false)
   const [error,  setError]  = useState('')
 
   // One cart line per size + colourway combination.
   const variantId = `general-notebook-${size.id}-${colour.id}`
-  const inCart    = hasItem(variantId)
+  // Derive from the items array (reactive) so the button updates on add.
+  const inCart    = cartItems.some((i) => i.id === variantId)
   const coverSrc  = SPREADS.find((s) => s.cover)?.src ?? SPREADS[0].src
 
   const handleAddToCart = async () => {

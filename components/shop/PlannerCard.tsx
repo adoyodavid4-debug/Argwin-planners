@@ -25,10 +25,10 @@ export default function PlannerCard({ product, index = 0, priority = false }: Pr
   const menuRef = useRef<HTMLDivElement>(null)
 
   const addItem    = useCartStore((s) => s.addItem)
-  const hasItem    = useCartStore((s) => s.hasItem)
   const toggleWish = useWishlistStore((s) => s.toggle)
   const isWished   = useWishlistStore((s) => s.has(product.id))
-  const inCart     = hasItem(product.id)
+  // Derived boolean selector so the button reacts the instant this item is added.
+  const inCart     = useCartStore((s) => s.hasItem(product.id))
 
   // Close dropdown on outside click
   useEffect(() => {

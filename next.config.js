@@ -97,6 +97,7 @@ const nextConfig = {
         { source: '/checkout/:path*', destination: '/site/checkout/:path*' },
         { source: '/best-sellers',    destination: '/site/best-sellers' },
         { source: '/new-arrivals',    destination: '/site/new-arrivals' },
+        { source: '/wishlist',        destination: '/site/wishlist' },
         { source: '/about',           destination: '/site/about' },
         { source: '/contact',         destination: '/site/contact' },
         { source: '/blog',            destination: '/site/blog' },
