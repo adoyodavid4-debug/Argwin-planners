@@ -10,7 +10,7 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { type BlogPost, STATIC_POSTS } from '../blog/blog-data'
 
 const DEFAULT_COVER = 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=600&q=75'
-const ROTATE_DAYS = 4
+const ROTATE_DAYS = 1
 const TOP_N = 8
 
 async function getTopPosts(): Promise<BlogPost[]> {
@@ -63,7 +63,7 @@ export default async function FeaturedBlog() {
           <BookOpen size={12} /> Featured Blog
         </span>
         <p className="text-sm mt-3" style={{ color: 'var(--text-secondary)' }}>
-          A fresh read from the Arwign journal — a new pick every few days.
+          A fresh read from the Arwign journal — a new pick every day.
         </p>
       </div>
 
