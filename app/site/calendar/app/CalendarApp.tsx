@@ -8,7 +8,7 @@ import {
   ChevronLeft, ChevronRight, Plus, X, Trash2, MapPin, AlignLeft, Clock,
   CalendarDays, Loader2, ArrowLeft, Link2, Search, Repeat, Bell, Tag as TagIcon,
   Command, Upload, Download, Settings as SettingsIcon, Sun, Moon, Palette,
-  Globe2, BarChart3, Video, Check, Sparkles, Users,
+  Globe2, BarChart3, Video, Check, Sparkles, Users, Lock,
 } from 'lucide-react'
 import {
   parseRRule, buildRRule, expandOccurrences, describeRRule, type RRule, type Weekday, WEEKDAYS,
@@ -183,7 +183,7 @@ function buildOccurrences(
 }
 
 // ══════════════════════════════════════════════════════════════
-export default function CalendarApp({ userEmail }: { userEmail: string }) {
+export default function CalendarApp({ userEmail, canPlus = false, canTeams = false }: { userEmail: string; canPlus?: boolean; canTeams?: boolean }) {
   const supabase = useMemo(() => createClient() as any, [])
   const { setTheme } = useTheme()
   const [settings, setSettings] = useState<CalendarSettings>(() => defaultSettings())
@@ -526,11 +526,11 @@ export default function CalendarApp({ userEmail }: { userEmail: string }) {
               style={{ color: 'var(--gold-dark)' }}>
               <Sparkles size={15} /> Plans & upgrade
             </button>
-            <SideLink href="/calendar/plus" icon={<Sparkles size={15} />} label="Plus workspace" />
-            <SideLink href="/calendar/team" icon={<Users size={15} />} label="Team workspace" />
-            <SideLink href="/calendar/booking-pages" icon={<Link2 size={15} />} label="Booking pages" />
-            <SideLink href="/calendar/polls" icon={<CalendarDays size={15} />} label="Meeting polls" />
-            <SideLink href="/calendar/analytics" icon={<BarChart3 size={15} />} label="Analytics" />
+            <SideLink href="/calendar/plus" icon={<Sparkles size={15} />} label="Plus workspace" locked={!canPlus} lockHref="/calendar/subscribe/plus" />
+            <SideLink href="/calendar/team" icon={<Users size={15} />} label="Team workspace" locked={!canTeams} lockHref="/calendar/subscribe/teams" />
+            <SideLink href="/calendar/booking-pages" icon={<Link2 size={15} />} label="Booking pages" locked={!canPlus} lockHref="/calendar/subscribe/plus" />
+            <SideLink href="/calendar/polls" icon={<CalendarDays size={15} />} label="Meeting polls" locked={!canPlus} lockHref="/calendar/subscribe/plus" />
+            <SideLink href="/calendar/analytics" icon={<BarChart3 size={15} />} label="Analytics" locked={!canPlus} lockHref="/calendar/subscribe/plus" />
             <SideLink href="/calendar/settings" icon={<SettingsIcon size={15} />} label="Settings" />
           </nav>
         </aside>
@@ -844,7 +844,17 @@ function YearView({ cursor, weekStart, occs, onPickDay }: { cursor: Date; weekSt
 // ══════════════════════════════════════════════════════════════
 //  Sidebar pieces
 // ══════════════════════════════════════════════════════════════
-function SideLink({ href, icon, label }: { href: string; icon: React.ReactNode; label: string }) {
+function SideLink({ href, icon, label, locked = false, lockHref }: { href: string; icon: React.ReactNode; label: string; locked?: boolean; lockHref?: string }) {
+  // Locked (plan not met): route to the upgrade page and show a lock, so the
+  // paywall is visible in the panel rather than a silent redirect on click.
+  if (locked) {
+    return (
+      <Link href={lockHref ?? '/calendar/subscribe/plus'} title="Upgrade to unlock"
+        className="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-black/[0.04]" style={{ color: 'var(--text-muted)' }}>
+        {icon} <span className="flex-1">{label}</span> <Lock size={13} style={{ color: 'var(--text-muted)' }} />
+      </Link>
+    )
+  }
   return (
     <Link href={href} className="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-black/[0.04]" style={{ color: 'var(--text-secondary)' }}>
       {icon} {label}
