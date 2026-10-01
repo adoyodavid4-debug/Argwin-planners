@@ -110,10 +110,15 @@ export async function middleware(req: NextRequest) {
   }
 
   // ── Redirect logged-in users from auth pages ──────────────
-  // Send them home. (There is no /customer/dashboard page — pointing here
-  // previously produced a 404.)
+  // Honour ?redirect= so a signed-in visitor who lands on an auth page — e.g. a
+  // "Create your free calendar" CTA that first hits /calendar/app and bounces
+  // here — is sent where they were going, not dumped on the homepage. Falls
+  // back to home when absent. Same-origin relative paths only (open-redirect
+  // guard, mirrors LoginClient).
   if (isPublicAuth && session) {
-    return NextResponse.redirect(new URL('/', req.url))
+    const raw  = req.nextUrl.searchParams.get('redirect') || '/'
+    const dest = /^\/(?![/\\])/.test(raw) ? raw : '/'
+    return NextResponse.redirect(new URL(dest, req.url))
   }
 
   // ── Security headers added in next.config.js ─────────────

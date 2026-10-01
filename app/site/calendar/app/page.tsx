@@ -15,7 +15,9 @@ export const dynamic = 'force-dynamic'
 export default async function CalendarAppPage() {
   const supabase = createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/auth/login?redirect=/calendar/app')
+  // New visitors from the "Create your free calendar" CTA should land on the
+  // account-creation form (mode=signup), then return to the calendar once done.
+  if (!user) redirect('/auth/login?mode=signup&redirect=/calendar/app')
 
   // Plan capability — drives which left-panel workspaces are unlocked. The real
   // enforcement is the server gate on each route; this just mirrors it in the UI

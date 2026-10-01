@@ -38,7 +38,8 @@ const priceIdx = args.indexOf('--price')
 const NEW_PRICE = (priceIdx !== -1 && args[priceIdx + 1] ? args[priceIdx + 1] : '79.99')
 const CURRENCY = process.env.PAYPAL_CURRENCY || 'USD'
 
-const ENV = (process.env.PAYPAL_ENV || 'sandbox').toLowerCase()
+const envIdx = args.indexOf('--env')
+const ENV = ((envIdx !== -1 && args[envIdx + 1]) ? args[envIdx + 1] : (process.env.PAYPAL_ENV || 'sandbox')).toLowerCase()
 const BASE = ENV === 'live' || ENV === 'production'
   ? 'https://api-m.paypal.com'
   : 'https://api-m.sandbox.paypal.com'
