@@ -28,6 +28,8 @@ export default function LoginClient() {
   const [showPass,   setShowPass]   = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [errorMsg,   setErrorMsg]   = useState<string | null>(null)
+  const [needsConfirm, setNeedsConfirm] = useState(false)
+  const [resending,  setResending]  = useState(false)
 
   const switchMode = (next: 'signin' | 'signup') => {
     setMode(next)
@@ -42,6 +44,7 @@ export default function LoginClient() {
 
     setSubmitting(true)
     setErrorMsg(null)
+    setNeedsConfirm(false)
     const supabase = createClient()
 
     try {
@@ -70,13 +73,41 @@ export default function LoginClient() {
           router.refresh()
         } else {
           toast.success('Account created — check your email to confirm, then sign in.')
+          setNeedsConfirm(true)
           switchMode('signin')
         }
       }
     } catch (err: any) {
-      setErrorMsg(err?.message ?? 'Something went wrong. Please try again.')
+      const msg = err?.message ?? 'Something went wrong. Please try again.'
+      // Supabase returns "Email not confirmed" when signing in before confirming.
+      if (mode === 'signin' && (/not confirmed/i.test(msg) || err?.code === 'email_not_confirmed')) {
+        setNeedsConfirm(true)
+        setErrorMsg('Your email isn’t confirmed yet. Resend the confirmation link below.')
+      } else {
+        setErrorMsg(msg)
+      }
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  const resendConfirmation = async () => {
+    if (!email.trim()) { setErrorMsg('Enter your email above, then tap resend.'); return }
+    setResending(true)
+    setErrorMsg(null)
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email.trim(),
+        options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}` },
+      })
+      if (error) throw error
+      toast.success('Confirmation email sent — check your inbox and spam.')
+    } catch (err: any) {
+      setErrorMsg(err?.message ?? 'Could not resend right now. Please try again shortly.')
+    } finally {
+      setResending(false)
     }
   }
 
@@ -279,6 +310,18 @@ export default function LoginClient() {
                   ? <Loader2 size={16} className="animate-spin" />
                   : (<>{mode === 'signin' ? 'Sign In' : 'Create Account'} <ArrowRight size={15} /></>)}
               </button>
+
+              {mode === 'signin' && needsConfirm && (
+                <button
+                  type="button"
+                  onClick={resendConfirmation}
+                  disabled={resending}
+                  className="w-full inline-flex items-center justify-center gap-1.5 rounded-xl border py-2.5 text-sm font-semibold transition-colors disabled:opacity-60"
+                  style={{ borderColor: 'var(--border)', color: 'var(--gold-dark)', background: 'rgba(var(--gold-rgb),0.06)' }}
+                >
+                  {resending ? <Loader2 size={15} className="animate-spin" /> : 'Resend confirmation email'}
+                </button>
+              )}
             </form>
 
             {/* Trust row */}
