@@ -1,6 +1,6 @@
 // app/api/newsletter/route.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { createServiceRoleClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 import { headers } from 'next/headers'
 
@@ -40,7 +40,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid email' }, { status: 400 })
   }
 
-  const supabase = createServiceRoleClient()
+  // createAdminClient (NOT createServiceRoleClient): this is a public endpoint
+  // that must always write regardless of who's signed in. createServiceRoleClient
+  // wraps @supabase/ssr and, when an auth cookie is present (e.g. an admin testing
+  // the form), sends that user's JWT instead of the service_role key — so RLS
+  // applies and the upsert's ON CONFLICT UPDATE is blocked (no UPDATE policy).
+  const supabase = createAdminClient()
   // onConflict on email: without it the upsert conflicts on the fresh PK (never),
   // raises 23505 for existing addresses, and a previously unsubscribed
   // (is_active=false) address could never re-activate.

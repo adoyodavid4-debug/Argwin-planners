@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServiceRoleClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
 import { getEmailProvider } from '@/lib/email'
 import { z } from 'zod'
 import { headers } from 'next/headers'
@@ -43,7 +43,10 @@ export async function POST(req: NextRequest) {
   }
 
   const { email, locale, lead_magnet_id, utm, consent_text } = parsed.data
-  const supabase = createServiceRoleClient()
+  // createAdminClient: public opt-in endpoint — must bypass RLS so the
+  // subscriber upsert works even when someone is signed in (createServiceRoleClient
+  // would forward their JWT and RLS would block the ON CONFLICT UPDATE).
+  const supabase = createAdminClient()
 
   // Resolve lead magnet title for email
   let magnetTitle: string | undefined
