@@ -1,8 +1,15 @@
 // app/api/newsletter/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
+import { getEmailProvider } from '@/lib/email'
+import { signNewsletterEmail } from '@/lib/newsletter-unsub'
 import { z } from 'zod'
 import { headers } from 'next/headers'
+
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL
+  ?? process.env.NEXT_PUBLIC_SITE_URL
+  ?? 'https://www.arwignplanners.com'
 
 const schema = z.object({
   email:  z.string().email(),
@@ -40,25 +47,54 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid email' }, { status: 400 })
   }
 
-  // createAdminClient (NOT createServiceRoleClient): this is a public endpoint
-  // that must always write regardless of who's signed in. createServiceRoleClient
-  // wraps @supabase/ssr and, when an auth cookie is present (e.g. an admin testing
-  // the form), sends that user's JWT instead of the service_role key — so RLS
-  // applies and the upsert's ON CONFLICT UPDATE is blocked (no UPDATE policy).
+  const email  = parsed.data.email.toLowerCase().trim()
+  const locale: 'en' | 'fr' = parsed.data.locale === 'fr' ? 'fr' : 'en'
+
+  // createAdminClient (NOT createServiceRoleClient): public endpoint that must
+  // write regardless of who's signed in — the ssr client would forward a
+  // signed-in user's JWT and RLS would block the ON CONFLICT UPDATE.
   const supabase = createAdminClient()
+
+  // Only first-time or re-activating subscribers get the welcome email — a
+  // re-submit from an already-active address stays silent.
+  const { data: before } = await supabase
+    .from('newsletter_subscribers')
+    .select('is_active')
+    .eq('email', email)
+    .maybeSingle()
+  const shouldWelcome = !before || before.is_active === false
+
   // onConflict on email: without it the upsert conflicts on the fresh PK (never),
   // raises 23505 for existing addresses, and a previously unsubscribed
   // (is_active=false) address could never re-activate.
   const { error } = await supabase
     .from('newsletter_subscribers')
     .upsert(
-      { email: parsed.data.email, source: parsed.data.source, locale: parsed.data.locale, is_active: true },
+      { email, source: parsed.data.source, locale, is_active: true },
       { onConflict: 'email' }
     )
 
   if (error && error.code !== '23505') {  // ignore duplicate
     console.error('[newsletter]', error)
     return NextResponse.json({ error: 'Subscription failed' }, { status: 500 })
+  }
+
+  // Welcome email — best-effort; never fail the subscribe on an email hiccup.
+  if (shouldWelcome) {
+    try {
+      const unsubscribe_url =
+        `${APP_URL}/api/newsletter/unsubscribe?e=${encodeURIComponent(email)}&t=${signNewsletterEmail(email)}`
+      await getEmailProvider().sendTransactional({
+        to: email,
+        locale,
+        templateKey: 'newsletter.welcome',
+        idempotencyKey: `newsletter-welcome:${email}`,
+        category: 'info',
+        data: { unsubscribe_url },
+      })
+    } catch (err) {
+      console.error('[newsletter] welcome email failed:', err)
+    }
   }
 
   return NextResponse.json({ success: true })

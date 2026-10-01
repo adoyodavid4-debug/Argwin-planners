@@ -516,6 +516,39 @@ const templates: Record<string, (locale: Locale, data: Record<string, unknown>) 
     const text = `Your membership of ${teamName} on Arwign Calendar has been removed by a team manager. Your personal calendar and account are unaffected.`
     return { subject, html, text }
   },
+
+  // Newsletter welcome — sent by /api/newsletter on first (or re-)subscribe.
+  // Marketing email, so it keeps the standard footer: resolveTemplate fills the
+  // {{unsubscribe_url}} placeholder from the signed link the route passes in.
+  'newsletter.welcome': (locale) => {
+    if (locale === 'fr') {
+      return wrap(locale, 'Bienvenue chez Arwign Planners ✦', `
+        <h2 style="color:#1A1820;margin:0 0 16px">Vous êtes des nôtres ✦</h2>
+        <p style="margin:0 0 16px">Merci d'avoir rejoint la communauté Arwign Planners. Voici ce qui arrivera dans votre boîte de réception :</p>
+        <ul style="margin:0 0 20px;padding-left:20px;color:#555">
+          <li style="margin:0 0 6px"><strong>Imprimables gratuits</strong> — des pages à télécharger et utiliser dès aujourd'hui</li>
+          <li style="margin:0 0 6px"><strong>Astuces de productivité</strong> — des idées concrètes, sans blabla</li>
+          <li style="margin:0 0 6px"><strong>Réductions exclusives</strong> — des offres réservées aux abonnés</li>
+          <li style="margin:0 0 6px"><strong>Accès prioritaire</strong> — les nouveautés avant tout le monde</li>
+        </ul>
+        <p style="text-align:center;margin:28px 0"><a href="${BASE_URL}/shop" style="background:#C9A84C;color:#fff;padding:13px 28px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block">Découvrir la boutique →</a></p>
+        <p style="margin:0;color:#888;font-size:13px">À très vite,<br>L'équipe Arwign Planners</p>
+      `)
+    }
+    return wrap(locale, 'Welcome to Arwign Planners ✦', `
+      <h2 style="color:#1A1820;margin:0 0 16px">You're in ✦</h2>
+      <p style="margin:0 0 16px">Thanks for joining the Arwign Planners community. Here's what lands in your inbox:</p>
+      <ul style="margin:0 0 20px;padding-left:20px;color:#555">
+        <li style="margin:0 0 6px"><strong>Free printables</strong> — planning pages to download and use today</li>
+        <li style="margin:0 0 6px"><strong>Productivity tips</strong> — practical ideas, no fluff</li>
+        <li style="margin:0 0 6px"><strong>Exclusive discounts</strong> — subscriber-only offers</li>
+        <li style="margin:0 0 6px"><strong>First access</strong> — new launches before anyone else</li>
+      </ul>
+      <p style="margin:0 0 8px">Want somewhere to start? Have a browse — there's a planner for every corner of life.</p>
+      <p style="text-align:center;margin:28px 0"><a href="${BASE_URL}/shop" style="background:#C9A84C;color:#fff;padding:13px 28px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block">Browse the shop →</a></p>
+      <p style="margin:0;color:#888;font-size:13px">Happy planning,<br>The Arwign Planners Team</p>
+    `)
+  },
 }
 
 export function resolveTemplate(
