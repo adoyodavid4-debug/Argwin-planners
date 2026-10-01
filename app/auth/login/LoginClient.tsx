@@ -7,6 +7,8 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Loader2, Mail, User, Eye, EyeOff, ArrowRight, Shield, Sparkles, Star } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
+import { passwordError, PASSWORD_MIN } from '@/lib/password'
+import PasswordRequirements from '@/components/auth/PasswordRequirements'
 
 export default function LoginClient() {
   const router       = useRouter()
@@ -35,6 +37,7 @@ export default function LoginClient() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email.trim() || !password) { setErrorMsg('Email and password are required.'); return }
+    if (mode === 'signup') { const pwErr = passwordError(password); if (pwErr) { setErrorMsg(pwErr); return } }
     if (mode === 'signup' && password !== confirmPassword) { setErrorMsg('Passwords do not match.'); return }
 
     setSubmitting(true)
@@ -208,11 +211,11 @@ export default function LoginClient() {
                     type={showPass ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder={mode === 'signup' ? 'At least 6 characters' : '••••••••'}
+                    placeholder={mode === 'signup' ? `At least ${PASSWORD_MIN} characters` : '••••••••'}
                     className="input-field"
                     style={{ paddingRight: '2.75rem' }}
                     autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
-                    minLength={6}
+                    minLength={mode === 'signup' ? PASSWORD_MIN : 6}
                     required
                   />
                   <button
@@ -225,6 +228,7 @@ export default function LoginClient() {
                     {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
                   </button>
                 </div>
+                {mode === 'signup' && <PasswordRequirements password={password} />}
               </div>
 
               {mode === 'signup' && (

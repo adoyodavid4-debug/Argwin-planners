@@ -6,6 +6,8 @@ import { motion } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 import SubscribePayPal from './SubscribePayPal'
+import { passwordError, PASSWORD_MIN } from '@/lib/password'
+import PasswordRequirements from '@/components/auth/PasswordRequirements'
 import {
   Check, Loader2, ArrowLeft, ArrowRight, Mail, Lock, User, Sparkles, Users,
   PlugZap, Brain, Palette, Vote, Bell, MessageSquare, Clock, CalendarDays,
@@ -555,6 +557,7 @@ function SubscribeCard({ plan, name, price, period }: { plan: Plan; name: string
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email.trim() || !password) { setError('Email and password are required.'); return }
+    if (mode === 'signup') { const pwErr = passwordError(password); if (pwErr) { setError(pwErr); return } }
     if (mode === 'signup' && password !== confirmPassword) { setError('Passwords do not match.'); return }
     setSubmitting(true); setError(null)
     const supabase = createClient()
@@ -632,7 +635,8 @@ function SubscribeCard({ plan, name, price, period }: { plan: Plan; name: string
               <Field icon={<User size={15} />}><input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Full name" autoComplete="name" className="w-full bg-transparent text-sm outline-none" style={{ color: 'var(--text-primary)' }} /></Field>
             )}
             <Field icon={<Mail size={15} />}><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" autoComplete="email" required className="w-full bg-transparent text-sm outline-none" style={{ color: 'var(--text-primary)' }} /></Field>
-            <Field icon={<Lock size={15} />}><input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={mode === 'signup' ? 'Create a password' : 'Password'} autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} minLength={6} required className="w-full bg-transparent text-sm outline-none" style={{ color: 'var(--text-primary)' }} /></Field>
+            <Field icon={<Lock size={15} />}><input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={mode === 'signup' ? `At least ${PASSWORD_MIN} characters` : 'Password'} autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} minLength={mode === 'signup' ? PASSWORD_MIN : 6} required className="w-full bg-transparent text-sm outline-none" style={{ color: 'var(--text-primary)' }} /></Field>
+            {mode === 'signup' && <PasswordRequirements password={password} />}
             {mode === 'signup' && (
               <Field icon={<Lock size={15} />}><input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirm password" autoComplete="new-password" minLength={6} required className="w-full bg-transparent text-sm outline-none" style={{ color: 'var(--text-primary)' }} /></Field>
             )}

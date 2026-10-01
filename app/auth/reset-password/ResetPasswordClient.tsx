@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation'
 import { Loader2, Eye, EyeOff, ArrowRight } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
+import { passwordError, PASSWORD_MIN } from '@/lib/password'
+import PasswordRequirements from '@/components/auth/PasswordRequirements'
 
 export default function ResetPasswordClient() {
   const router = useRouter()
@@ -27,7 +29,8 @@ export default function ResetPasswordClient() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (password.length < 6) { setErrorMsg('Password must be at least 6 characters.'); return }
+    const pwErr = passwordError(password)
+    if (pwErr) { setErrorMsg(pwErr); return }
     if (password !== confirm) { setErrorMsg('Passwords do not match.'); return }
 
     setSubmitting(true)
@@ -62,7 +65,7 @@ export default function ResetPasswordClient() {
         className="input-field"
         style={{ paddingRight: '2.75rem' }}
         autoComplete={autoComplete}
-        minLength={6}
+        minLength={PASSWORD_MIN}
         required
       />
       <button
@@ -142,7 +145,8 @@ export default function ResetPasswordClient() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   {label('New Password')}
-                  {passwordInput(password, setPassword, 'At least 6 characters', 'new-password')}
+                  {passwordInput(password, setPassword, `At least ${PASSWORD_MIN} characters`, 'new-password')}
+                  <PasswordRequirements password={password} />
                 </div>
 
                 <div>
