@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { Loader2, Mail, User, Eye, EyeOff, ArrowRight, Shield, Sparkles, Star } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
@@ -11,7 +11,6 @@ import { passwordError, PASSWORD_MIN } from '@/lib/password'
 import PasswordRequirements from '@/components/auth/PasswordRequirements'
 
 export default function LoginClient() {
-  const router       = useRouter()
   const searchParams = useSearchParams()
   // Only allow same-origin relative paths. Reject absolute ("https://evil.com")
   // and protocol-relative ("//evil.com", "/\evil.com") targets so a crafted
@@ -55,8 +54,11 @@ export default function LoginClient() {
         })
         if (error) throw error
         toast.success('Welcome back!')
-        router.push(redirectTo)
-        router.refresh()
+        // Hard navigation (not router.push): a full load guarantees the server
+        // sees the freshly-set auth cookie and renders the destination, bypassing
+        // Next's router cache — which may hold a logged-out prefetch of the target
+        // (e.g. /calendar/app's redirect-to-login) and bounce you to the homepage.
+        window.location.assign(redirectTo)
       } else {
         const { data, error } = await supabase.auth.signUp({
           email: email.trim(),
@@ -69,8 +71,7 @@ export default function LoginClient() {
         if (error) throw error
         if (data.session) {
           toast.success('Account created!')
-          router.push(redirectTo)
-          router.refresh()
+          window.location.assign(redirectTo)
         } else {
           toast.success('Account created — check your email to confirm, then sign in.')
           setNeedsConfirm(true)
