@@ -39,10 +39,9 @@ const PILLARS = [
       'Two-way sync with Google Calendar & Microsoft 365 / Outlook',
       'Apple Calendar via CalDAV + ICS import / export',
       'Email connectivity for event detection — Gmail & Microsoft Graph (read-only)',
-      'Task managers: Todoist, Notion, Asana, ClickUp, Linear & Trello',
-      'CRM: HubSpot, Salesforce & Pipedrive — meetings logged to the record',
-      'Auto Google Meet / Zoom / Teams links on every event',
-      'One unified, conflict-aware view across every account',
+      'Add a Meet / Zoom / Teams link to any event — synced meetings keep theirs',
+      'One unified, conflict-aware view across your connected calendars',
+      'Coming soon: CRM & task-manager sync, and auto-generated video links',
     ],
   },
   {
@@ -54,8 +53,8 @@ const PILLARS = [
       'Auto time-blocks your tasks into real, defended slots',
       'Natural language: “coffee with Amara Thursday 3pm” → event',
       'Smart reschedule — proposes the least-disruptive shift on conflict',
-      'Meeting prep briefs from agenda, attendees & CRM context',
-      'Post-meeting action extraction into your connected task manager',
+      'Meeting prep briefs from the agenda, attendees & past meetings',
+      'Post-meeting action items extracted from your notes',
     ],
   },
   {
@@ -106,7 +105,7 @@ const DIFFERENTIATORS = [
   {
     icon: CalendarClock,
     pain: 'Tasks with deadlines never actually get time on the calendar.',
-    fix: 'Auto time-blocking slots tasks from your task manager into real, defended slots.',
+    fix: 'Auto time-blocking slots your tasks into real, defended slots.',
   },
   {
     icon: Repeat,
@@ -136,7 +135,7 @@ const DIFFERENTIATORS = [
   {
     icon: FileText,
     pain: 'You arrive at meetings cold, with no context.',
-    fix: 'AI prep briefs assembled from agenda, attendee/CRM history and last-meeting notes.',
+    fix: 'AI prep briefs assembled from the agenda, attendee history and last-meeting notes.',
   },
   {
     icon: Wand2,

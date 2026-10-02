@@ -39,6 +39,7 @@ interface TierContent {
   compareFrom: string
   compareTo: string
   compare: CompareRow[]
+  roadmap?: string[]
   enterprise: boolean
 }
 
@@ -73,9 +74,8 @@ const CONTENT: Record<Plan, TierContent> = {
           'Two-way sync with Google Calendar & Microsoft 365 / Outlook',
           'Apple Calendar via CalDAV + ICS import / export',
           'Email event detection — Gmail & Microsoft Graph (read-only)',
-          'Task managers: Todoist, Notion, Asana, ClickUp, Linear & Trello',
-          'Auto Google Meet / Zoom / Teams links on every event',
-          'One unified, conflict-aware view across every account',
+          'Add a Meet / Zoom / Teams link to any event — synced meetings keep theirs',
+          'One unified, conflict-aware view across your connected calendars',
         ],
       },
       {
@@ -87,7 +87,7 @@ const CONTENT: Record<Plan, TierContent> = {
           'Natural language: “coffee with Amara Thursday 3pm” → event',
           'Smart reschedule — the least-disruptive shift on conflict',
           'Meeting prep briefs from agenda & attendee history',
-          'Post-meeting action extraction into your task manager',
+          'Post-meeting action items extracted from your notes',
         ],
       },
       {
@@ -108,7 +108,7 @@ const CONTENT: Record<Plan, TierContent> = {
       { icon: MapPin, pain: 'Reminders are dumb — no travel, no prep, no context.', fix: 'Smart pre-event push with join link, prep note and live “leave now” travel timing.' },
       { icon: RefreshCcw, pain: 'One change cascades and you fix the fallout by hand.', fix: 'One-tap AI reflow proposes the least-disruptive shift for every knock-on conflict.' },
       { icon: ShieldCheck, pain: 'Deep work gets eaten alive by meetings.', fix: 'Focus time that defends itself — protected blocks auto-decline or propose alternates.' },
-      { icon: CalendarClock, pain: 'Tasks with deadlines never actually get time on the calendar.', fix: 'Auto time-blocking slots tasks from your task manager into real, defended slots.' },
+      { icon: CalendarClock, pain: 'Tasks with deadlines never actually get time on the calendar.', fix: 'Auto time-blocking slots your tasks into real, defended slots.' },
       { icon: Layers, pain: 'Double-booking across personal + work accounts.', fix: 'A unified, conflict-aware multi-account view that guards against overlaps.' },
       { icon: BarChart3, pain: 'No idea where your time actually goes.', fix: 'Calendar-health analytics — meeting load, focus ratio and biggest time sinks.' },
       { icon: Moon, pain: 'Evenings and weekends quietly get colonised.', fix: 'Boundary rules — “protect my evenings / no-meeting Fridays” enforced automatically.' },
@@ -136,6 +136,11 @@ const CONTENT: Record<Plan, TierContent> = {
       { label: 'Booking pages & meeting polls', from: '—', to: 'Personal booking + polls' },
       { label: 'Calendar-health analytics', from: '—', to: 'Included + weekly review' },
       { label: 'Focus protection, boundary rules & travel buffers', from: '—', to: 'Included' },
+    ],
+    roadmap: [
+      'CRM sync — HubSpot, Salesforce & Pipedrive (meetings logged to the record)',
+      'Task managers — Todoist, Notion, Asana, ClickUp, Linear & Trello',
+      'Auto-generated Meet / Zoom / Teams links on new events',
     ],
     enterprise: false,
   },
@@ -184,21 +189,20 @@ const CONTENT: Record<Plan, TierContent> = {
       },
       {
         icon: PlugZap,
-        title: 'Connected to the tools you sell & ship with',
+        title: 'Connected to your calendars',
         points: [
-          'CRM: HubSpot, Salesforce & Pipedrive — meetings logged to the record',
           'Two-way sync with Google Calendar & Microsoft 365 / Outlook',
-          'Task managers: Todoist, Notion, Asana, ClickUp, Linear & Trello',
-          'Auto Google Meet / Zoom / Teams links on every event',
-          'One unified, conflict-aware view across every account',
+          'Apple Calendar via CalDAV + ICS import / export',
+          'Add a Meet / Zoom / Teams link to any event — synced meetings keep theirs',
+          'One unified, conflict-aware view across your connected calendars',
         ],
       },
       {
         icon: Brain,
         title: 'Smart automation (AI)',
         points: [
-          'Meeting prep briefs from agenda, attendees & CRM context',
-          'Post-meeting action extraction into your team’s task manager',
+          'Meeting prep briefs from the agenda, attendees & past meetings',
+          'Post-meeting action items extracted from your notes',
           'Smart reschedule — least-disruptive reflow on conflict',
           'Rescue mode — proposes what to decline, move, shorten or delegate',
         ],
@@ -210,8 +214,8 @@ const CONTENT: Record<Plan, TierContent> = {
       { icon: Globe2, pain: 'Time zones cause wrong-time and missed meetings.', fix: 'A timezone-correct core, inline “this is 6am for them” warnings and a world-clock strip.' },
       { icon: Layers, pain: 'Double-booking across personal + work accounts.', fix: 'A unified, conflict-aware multi-account view that guards against overlaps.' },
       { icon: LifeBuoy, pain: 'Overbooked weeks with no way out.', fix: 'Rescue mode — AI proposes what to decline, move, shorten or delegate.' },
-      { icon: FileText, pain: 'You arrive at meetings cold, with no context.', fix: 'AI prep briefs assembled from agenda, attendee/CRM history and last-meeting notes.' },
-      { icon: Wand2, pain: 'Meetings end and nothing captures what was decided.', fix: 'Post-meeting action extraction turns notes into tasks in your connected tools.' },
+      { icon: FileText, pain: 'You arrive at meetings cold, with no context.', fix: 'AI prep briefs assembled from the agenda, attendee history and last-meeting notes.' },
+      { icon: Wand2, pain: 'Meetings end and nothing captures what was decided.', fix: 'Post-meeting action extraction turns your notes into a clear action list.' },
       { icon: Route, pain: 'Back-to-back days with no breathing room.', fix: 'Automatic buffers + travel blocks inserted around every meeting.' },
       { icon: BarChart3, pain: 'No idea where the team’s time actually goes.', fix: 'Team calendar-health analytics — meeting load, focus ratio and after-hours creep.' },
     ],
@@ -235,6 +239,11 @@ const CONTENT: Record<Plan, TierContent> = {
       { label: 'Booking page types', from: 'Personal (one-off)', to: 'Round-robin, collective & group' },
       { label: 'Delegation & audit trail', from: '—', to: 'Full audit trail' },
       { label: 'Admin & billing', from: 'Personal', to: 'Admin console + centralised billing' },
+    ],
+    roadmap: [
+      'CRM sync — HubSpot, Salesforce & Pipedrive (meetings logged to the record)',
+      'Task managers — Todoist, Notion, Asana, ClickUp, Linear & Trello',
+      'Auto-generated Meet / Zoom / Teams links on new events',
     ],
     enterprise: true,
   },
@@ -492,6 +501,22 @@ export default function PlanLanding({ plan }: { plan: Plan }) {
               </div>
             ))}
           </div>
+          {c.roadmap && c.roadmap.length > 0 && (
+            <div className="max-w-3xl mx-auto mt-10 rounded-2xl border p-6" style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)' }}>
+              <p className="mb-1.5 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
+                <Clock size={13} style={{ color: 'var(--gold)' }} /> On the roadmap
+              </p>
+              <p className="mb-4 text-sm" style={{ color: 'var(--text-secondary)' }}>Planned, not available yet — these are not included today:</p>
+              <ul className="grid sm:grid-cols-2 gap-x-8 gap-y-2.5">
+                {c.roadmap.map((r) => (
+                  <li key={r} className="flex items-start gap-2.5 text-sm" style={{ color: 'var(--text-muted)' }}>
+                    <Clock size={15} className="flex-shrink-0 mt-0.5" style={{ color: 'var(--text-muted)' }} />
+                    {r}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           {c.enterprise && (
             <div className="max-w-3xl mx-auto mt-10 rounded-2xl border p-5 flex items-start gap-3" style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)' }}>
               <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(var(--gold-rgb),0.12)' }}>
