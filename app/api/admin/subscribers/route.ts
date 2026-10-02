@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServiceRoleClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
 import { requireAdmin } from '@/lib/supabase/admin-guard'
 
 export async function GET(req: NextRequest) {
@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
   const from = (page - 1) * pageSize
   const to   = from + pageSize - 1
 
-  const supabase = createServiceRoleClient()
+  const supabase = createAdminClient()
   let query = supabase
     .from('subscribers')
     .select('id, email, status, locale, confirmed_at, created_at, tags, source_lead_magnet_id, lead_magnets(title_i18n)', { count: 'exact' })

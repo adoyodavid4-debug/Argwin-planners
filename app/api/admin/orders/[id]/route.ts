@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServiceRoleClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
 import { requireAdmin } from '@/lib/supabase/admin-guard'
 
 const VALID_STATUSES = ['pending', 'processing', 'completed', 'refunded', 'cancelled']
@@ -14,7 +14,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
   }
 
-  const supabase = createServiceRoleClient()
+  const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('orders')
     .update({ status })

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServiceRoleClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 import { requireAdmin } from '@/lib/supabase/admin-guard'
 
@@ -18,7 +18,7 @@ const schema = z.object({
 export async function GET() {
   const denied = await requireAdmin()
   if (denied) return denied
-  const supabase = createServiceRoleClient()
+  const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('lead_magnets')
     .select('*, email_sequences(slug, name)')
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
   const parsed = schema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
 
-  const supabase = createServiceRoleClient()
+  const supabase = createAdminClient()
   const { data, error } = await supabase.from('lead_magnets').insert(parsed.data).select().single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json(data, { status: 201 })

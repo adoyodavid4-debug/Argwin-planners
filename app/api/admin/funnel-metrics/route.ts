@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server'
-import { createServiceRoleClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
 import { requireAdmin } from '@/lib/supabase/admin-guard'
 
 export async function GET() {
   const denied = await requireAdmin()
   if (denied) return denied
-  const supabase = createServiceRoleClient()
+  const supabase = createAdminClient()
 
   const [
     { count: totalOptins },

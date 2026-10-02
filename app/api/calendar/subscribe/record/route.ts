@@ -3,7 +3,7 @@
 // plan, owner) before activating the plan. The webhook is the ongoing source
 // of truth; this gives instant activation.
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerSupabaseClient, createServiceRoleClient } from '@/lib/supabase/server'
+import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase/server'
 import { getSubscription, planIdFor } from '@/lib/paypal'
 import { z } from 'zod'
 
@@ -31,7 +31,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Subscription could not be verified.' }, { status: 402 })
     }
 
-    const service = createServiceRoleClient()
+    // Admin client (true RLS bypass): migration 021 blocks a user from setting
+    // their own calendar_plan, so createServiceRoleClient (which keeps the user's
+    // RLS) would fail the activation — the buyer would pay but not get the plan.
+    const service = createAdminClient()
 
     // A subscription id may only ever back one account. Reject if another
     // profile already holds it (defence-in-depth against id replay/cloning).

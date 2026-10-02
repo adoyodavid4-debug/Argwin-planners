@@ -3,7 +3,7 @@
  *   POST body { action: 'approve' | 'reject', reason?: string }
  */
 import { NextRequest, NextResponse } from 'next/server'
-import { createServiceRoleClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
 import { getFulfillmentProvider } from '@/lib/fulfillment'
 import type { Address } from '@/lib/fulfillment/types'
 import { z } from 'zod'
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   const parsed = schema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
 
-  const supabase = createServiceRoleClient()
+  const supabase = createAdminClient()
 
   const { data: po, error } = await supabase
     .from('physical_orders')

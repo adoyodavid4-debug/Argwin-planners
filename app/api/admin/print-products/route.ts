@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServiceRoleClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 import { requireAdmin } from '@/lib/supabase/admin-guard'
 
@@ -21,7 +21,7 @@ const schema = z.object({
 export async function GET() {
   const denied = await requireAdmin()
   if (denied) return denied
-  const supabase = createServiceRoleClient()
+  const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('print_products')
     .select('*, products(title, slug, status)')
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     }, { status: 422 })
   }
 
-  const supabase = createServiceRoleClient()
+  const supabase = createAdminClient()
   const { data, error } = await supabase.from('print_products').insert(d).select().single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json(data, { status: 201 })

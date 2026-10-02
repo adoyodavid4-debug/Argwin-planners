@@ -3,7 +3,7 @@
 // until the current period ends (plan_expires_at), after which getPlanInfo
 // lapses them to Free.
 import { NextResponse } from 'next/server'
-import { createServerSupabaseClient, createServiceRoleClient } from '@/lib/supabase/server'
+import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase/server'
 import { cancelSubscription } from '@/lib/paypal'
 
 export async function POST() {
@@ -11,7 +11,9 @@ export async function POST() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Please sign in first.' }, { status: 401 })
 
-  const service = createServiceRoleClient()
+  // Admin client (true RLS bypass) — createServiceRoleClient keeps the signed-in
+  // user's RLS, which can block clearing paypal_subscription_id on their profile.
+  const service = createAdminClient()
   const { data: prof } = await service
     .from('profiles')
     .select('paypal_subscription_id, plan_expires_at')

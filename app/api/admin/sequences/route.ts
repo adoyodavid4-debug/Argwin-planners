@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServiceRoleClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 import { requireAdmin } from '@/lib/supabase/admin-guard'
 
@@ -24,7 +24,7 @@ const seqSchema = z.object({
 export async function GET() {
   const denied = await requireAdmin()
   if (denied) return denied
-  const supabase = createServiceRoleClient()
+  const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('email_sequences')
     .select('*, email_sequence_steps(*)')
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
 
   const { steps, ...seqData } = parsed.data
-  const supabase = createServiceRoleClient()
+  const supabase = createAdminClient()
 
   const { data: seq, error } = await supabase.from('email_sequences').insert(seqData).select().single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

@@ -2,7 +2,7 @@
 // Captures the PayPal order, verifies it was paid for the right amount, then
 // activates the plan for 30 days. Activation only happens after a real capture.
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerSupabaseClient, createServiceRoleClient } from '@/lib/supabase/server'
+import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase/server'
 import { capturePayPalOrder } from '@/lib/paypal'
 import { PLAN_PRICE } from '@/lib/calendar/plan'
 import { z } from 'zod'
@@ -36,7 +36,10 @@ export async function POST(req: NextRequest) {
     }
 
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-    const service = createServiceRoleClient()
+    // Admin client (true RLS bypass): migration 021 blocks a user from setting
+    // their own calendar_plan, so createServiceRoleClient (which keeps the user's
+    // RLS) would fail the activation — the buyer would pay but not get the plan.
+    const service = createAdminClient()
 
     // Durable payment record FIRST — plan purchases previously wrote no orders
     // row at all, so the buyer's email/payment existed only in PayPal. Recorded
