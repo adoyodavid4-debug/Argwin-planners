@@ -2,9 +2,11 @@
 // Anonymous like counter for a blog post. Frictionless (no login) — the client
 // keeps a per-browser guard so a visitor can't inflate the count by repeat taps,
 // and this endpoint is rate-limited per IP as a second line of defence. Uses the
-// service role because blog_posts is admin-write under RLS.
+// admin client (TRUE RLS bypass) because blog_posts is admin-write — the plain
+// service-role client keeps a signed-in user's RLS, so the update wrote 0 rows
+// and the tally never moved off 0.
 import { NextRequest, NextResponse } from 'next/server'
-import { createServiceRoleClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
 import { makeRateLimiter, clientIp } from '@/lib/rate-limit'
 import { z } from 'zod'
 
@@ -18,7 +20,7 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
 
   const { post_id, op } = parsed.data
-  const supabase = createServiceRoleClient()
+  const supabase = createAdminClient()
   try {
     const { data } = await supabase.from('blog_posts').select('like_count').eq('id', post_id).single()
     if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 })

@@ -1,7 +1,7 @@
 // app/api/blog/comment/route.ts
 // Post or delete a blog comment. Login required to write (mirrors reviews).
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerSupabaseClient, createServiceRoleClient } from '@/lib/supabase/server'
+import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase/server'
 import { makeRateLimiter, clientIp } from '@/lib/rate-limit'
 import { z } from 'zod'
 
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Sign in to comment.' }, { status: 401 })
 
   // Display name snapshotted from the profile.
-  const service = createServiceRoleClient()
+  const service = createAdminClient()
   const { data: profile } = await service.from('profiles').select('full_name, email').eq('id', user.id).single()
   const author_name = profile?.full_name?.trim() || profile?.email?.split('@')[0] || 'Reader'
 
@@ -56,7 +56,7 @@ export async function DELETE(req: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
   if (!deleted) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-  const service = createServiceRoleClient()
+  const service = createAdminClient()
   try {
     const { data: p } = await service.from('blog_posts').select('comment_count').eq('id', post_id).single()
     if (p) await service.from('blog_posts').update({ comment_count: Math.max(0, (p.comment_count ?? 0) - 1) }).eq('id', post_id)
