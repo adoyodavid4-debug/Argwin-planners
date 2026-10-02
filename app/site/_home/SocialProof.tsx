@@ -23,7 +23,7 @@ export default function SocialProof() {
     { icon: Download, value: 'Instant', label: 'Download' },
     { icon: Link2, value: 'Hyperlinked', label: 'PDF navigation' },
     { icon: Tablet, value: 'GoodNotes', label: '& Notability ready' },
-    { icon: Printer, value: 'Print-ready', label: 'A4 & US Letter' },
+    { icon: Printer, value: 'Print-ready', label: 'A4 size' },
   ]
 
   return (

@@ -1298,7 +1298,7 @@ function DeviceShowcase({ categoryName }: { categoryName: string }) {
           className="grid grid-cols-2 gap-4">
           {[
             { n: 'PDF', l: 'Fully Hyperlinked' },
-            { n: 'A4·A5', l: 'Print Ready' },
+            { n: 'A4', l: 'Print Ready' },
             { n: '100%', l: 'Instant Access' },
             { n: '30-Day', l: 'Happiness Promise' },
           ].map((s) => (
