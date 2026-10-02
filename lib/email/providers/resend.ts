@@ -27,6 +27,11 @@ const FROM_ADDRESSES: Record<EmailCategory, string> = {
   support: envAddr('EMAIL_FROM_SUPPORT') ?? DEFAULT_FROM,
 }
 
+// Replies route to a real, monitored mailbox. The from-address sends from the
+// verified subdomain (send.arwignplanners.com), which has NO inbox — without a
+// Reply-To, customer replies would bounce. Overridable via EMAIL_REPLY_TO.
+const REPLY_TO = envAddr('EMAIL_REPLY_TO') ?? 'Arwign Planners <hello@arwignplanners.com>'
+
 export class ResendProvider implements EmailProvider {
   readonly id = 'resend'
   private client: Resend
@@ -51,6 +56,7 @@ export class ResendProvider implements EmailProvider {
     const { data, error } = await this.client.emails.send({
       from,
       to: input.to,
+      replyTo: REPLY_TO,
       subject,
       html,
       headers: { 'X-Idempotency-Key': input.idempotencyKey },
