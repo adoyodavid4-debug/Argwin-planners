@@ -50,6 +50,19 @@ export default function MembersClient({ ws }: { ws: TeamWorkspace }) {
     if (data.emailed) toast.success(`${target?.name ?? 'Member'} has been notified`)
   }
 
+  // Manual fallback for when the invite email can't be delivered (Resend
+  // misconfigured, recipient bouncing, spam): copy the accept link to share
+  // by hand. Mirrors accept_url in app/api/calendar/team/invite/route.ts.
+  const copyInviteLink = async (m: Member) => {
+    const url = `${window.location.origin}/calendar/join?m=${m.id}`
+    try {
+      await navigator.clipboard.writeText(url)
+      toast.success('Invite link copied — paste it to your teammate')
+    } catch {
+      toast(url, { duration: 10000 }) // clipboard blocked — show it to copy by hand
+    }
+  }
+
   const sendInvite = async () => {
     const email = inviteEmail.trim()
     if (!email) return
@@ -70,7 +83,7 @@ export default function MembersClient({ ws }: { ws: TeamWorkspace }) {
         title: 'Invited', timezone: m.timezone ?? ws.team.timezone, tz_offset: m.tz_offset ?? -5,
         hue: m.hue ?? (ms.length * 47) % 360, status: 'invited', last_active: 'pending', meetings_week: 0, focus_hours: 0,
       }])
-      toast.success(data.emailed ? `Invite email sent to ${email}` : 'Invite created, but the email could not be sent — share the link from your team settings.')
+      toast.success(data.emailed ? `Invite email sent to ${email}` : 'Invite created, but the email could not be sent — use “Copy link” below to share it.')
     } else {
       setMembers((ms) => [...ms, { id: `inv-${Date.now()}`, name, email, role: inviteRole, title: 'Invited', timezone: ws.team.timezone, tz_offset: -5, hue: (ms.length * 47) % 360, status: 'invited', last_active: 'pending', meetings_week: 0, focus_hours: 0 }])
     }
@@ -139,6 +152,9 @@ export default function MembersClient({ ws }: { ws: TeamWorkspace }) {
                       <p className="truncate text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{m.email}</p>
                       <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Invited as {ROLES[m.role].label} · awaiting acceptance</p>
                     </div>
+                    {ws.live && (
+                      <button onClick={() => copyInviteLink(m)} className="text-xs font-medium" style={{ color: 'var(--gold-dark)' }}>Copy link</button>
+                    )}
                     <button onClick={() => remove(m.id)} className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>Revoke</button>
                   </div>
                 ))}
