@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import {
   TrendingUp, ShoppingBag, Package, Wand2, FolderTree, FileText, Quote,
   Compass, PenSquare, Settings, BookOpen, Printer, NotebookPen, Lightbulb,
-  Magnet, Mail, Users, Filter, Plus, LogOut, Tags,
+  Magnet, Mail, Users, Filter, Plus, LogOut, Tags, Bot, CheckSquare,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
@@ -31,6 +31,11 @@ const adminNav = [
   { label: 'Sequences',         href: '/admin/sequences',         icon: Mail },
   { label: 'Subscribers',       href: '/admin/subscribers',       icon: Users },
   { label: 'Funnel',            href: '/admin/funnel',            icon: Filter },
+]
+
+const agentsNav = [
+  { label: 'Agent Centre',  href: '/admin/agents',             icon: Bot },
+  { label: 'Approvals',     href: '/admin/agents/approvals',   icon: CheckSquare },
 ]
 
 export default function AdminSidebar() {
@@ -67,7 +72,7 @@ export default function AdminSidebar() {
         </button>
       </div>
       <nav className="flex gap-1 overflow-x-auto px-3 pb-2 scrollbar-hide" aria-label="Admin navigation">
-        {adminNav.map((item) => {
+        {[...adminNav, ...agentsNav].map((item) => {
           const active = pathname === item.href || pathname.startsWith(`${item.href}/`)
           return (
             <Link
@@ -110,6 +115,30 @@ export default function AdminSidebar() {
 
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
         {adminNav.map((item) => {
+          const active = pathname === item.href || pathname.startsWith(`${item.href}/`)
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all hover:bg-black/5 dark:hover:bg-white/5"
+              style={{
+                color:      active ? 'var(--gold)' : 'var(--text-secondary)',
+                background: active ? 'rgba(201,168,76,0.08)' : 'transparent',
+              }}
+            >
+              <item.icon size={16} />
+              {item.label}
+            </Link>
+          )
+        })}
+
+        {/* Growth Agents section */}
+        <div className="pt-3 pb-1 px-4">
+          <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
+            Growth Agents
+          </p>
+        </div>
+        {agentsNav.map((item) => {
           const active = pathname === item.href || pathname.startsWith(`${item.href}/`)
           return (
             <Link
