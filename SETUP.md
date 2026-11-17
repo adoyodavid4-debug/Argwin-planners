@@ -79,18 +79,20 @@ Two agent crons are registered in `vercel.json`:
 
 **Important — Vercel Hobby plan only allows daily crons.** The tick route is
 designed to run **every minute** (the pacing engine sends ≤1 message per
-channel per tick). Until the project is on Vercel Pro (where you can change
-the tick schedule to `* * * * *`), either:
+channel per tick), so the daily `vercel.json` entry is only a fallback.
 
-1. Upgrade to Pro and set `"schedule": "* * * * *"` for `/api/agents/tick`, or
-2. Use a free external pinger (e.g. cron-job.org) calling
-   `https://www.arwignplanners.com/api/agents/tick` every minute with header
-   `Authorization: Bearer <CRON_SECRET>`.
+**To run the tick every minute, use Supabase pg_cron** (the same mechanism
+already driving the calendar routes — see `supabase/schedule_calendar_pings.sql`):
 
-This replaces the masterplan's pg_cron → Edge Functions design: the repo
-already standardises on Vercel crons + Next API routes (see
-`/api/cron/daily-briefing`), so the agents follow the same pattern rather
-than introducing a second scheduler stack.
+1. Open `supabase/schedule_agent_pings.sql`, replace `PASTE_CRON_SECRET_HERE`
+   with the current `CRON_SECRET` from Vercel, and run it in the Supabase SQL editor.
+2. Verify with `SELECT * FROM cron.job WHERE jobname LIKE 'arwign-agent%';`
+   and check runs via `SELECT * FROM cron.job_run_details ORDER BY start_time DESC`.
+
+The daily `/api/agents/cron` pass stays on the Vercel cron; only the
+minute-level tick needs pg_cron. This follows the repo's existing scheduler
+pattern (Vercel crons + Next API routes, pg_cron for sub-daily frequency)
+rather than the masterplan's pg_cron → Edge Functions design.
 
 ## 5. Go-live order (masterplan §18)
 
