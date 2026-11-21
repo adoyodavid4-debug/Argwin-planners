@@ -868,6 +868,107 @@ const SIDEBAR_PRODUCTS: Record<string, BlogProduct[]> = {
     { name: 'Exam Season — Calm', price: '$12.99', href: '/shop/exam-season-calm' },
     { name: 'The Balanced Student', price: '$12.99', href: '/shop/the-balanced-student' },
   ],
+  // ── New Planners / Articles batch (Nov 2026) — varied featured picks ──
+  'annual-costs-nobody-budgets-for': [
+    { name: 'The Whole Picture Budget Planner', price: '$12.99', href: '/shop/the-whole-picture-budget-planner', blurb: 'A yearly view of every cost — including the once-a-year ones that blow a budget — in one place to plan for before they land.' },
+    { name: 'Ultimate Budget Planner', price: '$12.99', href: '/shop/ultimate-budget-planner' },
+    { name: 'Your Personal Finances in One Planner', price: '$12.99', href: '/shop/your-personal-finances-in-one-journal-planner' },
+  ],
+  'annual-review-90-minutes': [
+    { name: 'The Long Game', price: '$12.99', href: '/shop/the-long-game', blurb: 'Built for the long view — the annual reflection, the themes for the year and the goals that outlast January.' },
+    { name: 'One Small Step — A Gentle Goals & Habits Planner', price: '$13.99', href: '/shop/one-small-step-a-gentle-goals-habits-planner' },
+    { name: 'Small Good Things — A Gratitude Journal', price: '$13.99', href: '/shop/small-good-things-a-gratitude-journal' },
+  ],
+  'audit-your-recurring-meetings': [
+    { name: 'A Place for Everything', price: '$12.99', href: '/shop/a-place-for-everything', blurb: 'One clear home for every commitment — so the meetings that earn their slot stay and the rest become a two-line note.' },
+    { name: 'Off the Clock — A Work–Life Balance Planner', price: '$13.99', href: '/shop/off-the-clock-a-worklife-balance-planner' },
+    { name: 'Clear Mind, Clear Desk', price: '$12.99', href: '/shop/clear-mind-clear-desk' },
+  ],
+  'birthday-year-planning': [
+    { name: 'One Small Step — A Gentle Goals & Habits Planner', price: '$13.99', href: '/shop/one-small-step-a-gentle-goals-habits-planner', blurb: 'Start your personal new year with a gentle goal or two — small steps that actually survive past the birthday week.' },
+    { name: 'Small Good Things — A Gratitude Journal', price: '$13.99', href: '/shop/small-good-things-a-gratitude-journal' },
+    { name: 'The Reset — A Fresh-Start Wellness Planner', price: '$13.99', href: '/shop/the-reset-a-fresh-start-wellness-planner' },
+  ],
+  'budgeting-with-irregular-income': [
+    { name: 'The Financial Freedom Budget Planner', price: '$12.99', href: '/shop/the-financial-freedom-budget-planner', blurb: 'A budget that bends with an unpredictable month — plan from what you actually have, not the month you hoped for.' },
+    { name: 'Penny by Penny Savings & Budget Planner', price: '$12.99', href: '/shop/penny-by-penny-savings-budget-planner' },
+    { name: 'THE COUNT.', price: '$20.00', href: '/shop/the-count' },
+  ],
+  'christmas-without-the-resentment': [
+    { name: 'Open Tabs — ADHD Mental Load Planner', price: '$13.99', href: '/shop/open_tabs_adhd_mental_load_planner', blurb: 'Get the invisible Christmas to-do list out of one person\'s head and into a shared, visible place everyone can see.' },
+    { name: 'A Place for Everything', price: '$12.99', href: '/shop/a-place-for-everything' },
+    { name: 'Off the Clock — A Work–Life Balance Planner', price: '$13.99', href: '/shop/off-the-clock-a-worklife-balance-planner' },
+  ],
+  'creative-block-is-usually-unclear': [
+    { name: 'Arwign Notebook — Studio', price: '$14.99', href: '/shop/arwign-notebook-studio', blurb: 'A roomy studio notebook for getting unclear thoughts onto the page — where most "blocks" quietly turn into a plan.' },
+    { name: 'The Deep Dive', price: '$12.99', href: '/shop/the-deep-dive' },
+    { name: 'Clear Mind, Clear Desk', price: '$12.99', href: '/shop/clear-mind-clear-desk' },
+  ],
+  'december-wind-down': [
+    { name: 'Off the Clock — A Work–Life Balance Planner', price: '$13.99', href: '/shop/off-the-clock-a-worklife-balance-planner', blurb: 'Close the working year properly — a clean shutdown so December\'s loose ends don\'t follow you into January.' },
+    { name: 'The Overwhelm Reset', price: '$12.99', href: '/shop/the-overwhelm-reset' },
+    { name: 'Small Good Things — A Gratitude Journal', price: '$13.99', href: '/shop/small-good-things-a-gratitude-journal' },
+  ],
+  'dissertation-you-keep-not-starting': [
+    { name: 'The Deep Dive', price: '$12.99', href: '/shop/the-deep-dive', blurb: 'Session-based planning for big, daunting writing — turn "the dissertation" into the next 90 minutes of actual work.' },
+    { name: 'The Balanced Student', price: '$12.99', href: '/shop/the-balanced-student' },
+    { name: "Pace, Don't Race", price: '$12.99', href: '/shop/pace-dont-race' },
+  ],
+  'first-90-days-new-job': [
+    { name: 'The Anchored Day', price: '$13.99', href: '/shop/the-anchored-day', blurb: 'Anchor the first uncertain weeks around a steady daily shape — so a new job feels learnable, not overwhelming.' },
+    { name: 'A Place for Everything', price: '$12.99', href: '/shop/a-place-for-everything' },
+    { name: 'Off the Clock — A Work–Life Balance Planner', price: '$13.99', href: '/shop/off-the-clock-a-worklife-balance-planner' },
+  ],
+  'keep-a-work-log-for-your-cv': [
+    { name: 'Arwign Notebook — Everyday', price: '$14.99', href: '/shop/arwign-notebook-everyday', blurb: 'A plain, reliable notebook for a running work log — the wins and numbers your future CV and appraisal will thank you for.' },
+    { name: 'Clear Mind, Clear Desk', price: '$12.99', href: '/shop/clear-mind-clear-desk' },
+    { name: 'The Long Game', price: '$12.99', href: '/shop/the-long-game' },
+  ],
+  'learning-something-new-as-an-adult': [
+    { name: 'Arwign 66-Day Habit Tracker', price: '$14.99', href: '/shop/arwign-66-day-habit-tracker', blurb: 'Learning sticks through repetition, not motivation — track the small daily reps that turn a new skill into a habit.' },
+    { name: 'Tiny Anchors — A Habit & Routine Builder', price: '$13.99', href: '/shop/tiny-anchors-a-habit-routine-builder' },
+    { name: 'One Small Step — A Gentle Goals & Habits Planner', price: '$13.99', href: '/shop/one-small-step-a-gentle-goals-habits-planner' },
+  ],
+  'moving-house-planning': [
+    { name: 'A Place for Everything', price: '$12.99', href: '/shop/a-place-for-everything', blurb: 'A move is a hundred small admin tasks — capture every one the moment it appears so nothing slips in the chaos.' },
+    { name: 'Tiny Anchors — A Habit & Routine Builder', price: '$13.99', href: '/shop/tiny-anchors-a-habit-routine-builder' },
+    { name: 'Off the Clock — A Work–Life Balance Planner', price: '$13.99', href: '/shop/off-the-clock-a-worklife-balance-planner' },
+  ],
+  'planning-for-variable-energy': [
+    { name: 'Running on Empty', price: '$13.99', href: '/shop/running-on-empty', blurb: 'Plan around a body that won\'t always cooperate — track your real energy and spot what drains and restores it.' },
+    { name: 'The Spoon Ledger', price: '$13.99', href: '/shop/the-spoon-ledger' },
+    { name: "Pace, Don't Race", price: '$12.99', href: '/shop/pace-dont-race' },
+  ],
+  'solo-business-week-planning': [
+    { name: 'GROUNDWORK.', price: '$18.00', href: '/shop/groundwork', blurb: 'The foundations of a solo business — your offer, your customer and your week, so "also the marketing department" feels doable.' },
+    { name: 'SHOW UP.', price: '$18.99', href: '/shop/show-up' },
+    { name: 'WHAT WORKS.', price: '$18.99', href: '/shop/what-works' },
+  ],
+  'the-appointment-nobody-books': [
+    { name: 'The Reset — A Fresh-Start Wellness Planner', price: '$13.99', href: '/shop/the-reset-a-fresh-start-wellness-planner', blurb: 'A gentle nudge to book the health admin you keep deferring — the check-ups and appointments that protect future-you.' },
+    { name: 'A Place for Everything', price: '$12.99', href: '/shop/a-place-for-everything' },
+    { name: 'Tiny Anchors — A Habit & Routine Builder', price: '$13.99', href: '/shop/tiny-anchors-a-habit-routine-builder' },
+  ],
+  'toddler-years-logistics': [
+    { name: 'Tiny Anchors — A Habit & Routine Builder', price: '$13.99', href: '/shop/tiny-anchors-a-habit-routine-builder', blurb: 'The toddler years run on routines — a few small anchors that hold the day together when everything else is improvised.' },
+    { name: 'A Place for Everything', price: '$12.99', href: '/shop/a-place-for-everything' },
+    { name: 'Running on Empty', price: '$13.99', href: '/shop/running-on-empty' },
+  ],
+  'visiting-family-for-a-week': [
+    { name: 'Small Good Things — A Gratitude Journal', price: '$13.99', href: '/shop/small-good-things-a-gratitude-journal', blurb: 'A week with the people you love is easier with a little daily grounding — small good things to notice amid the noise.' },
+    { name: 'Off the Clock — A Work–Life Balance Planner', price: '$13.99', href: '/shop/off-the-clock-a-worklife-balance-planner' },
+    { name: 'The Reset — A Fresh-Start Wellness Planner', price: '$13.99', href: '/shop/the-reset-a-fresh-start-wellness-planner' },
+  ],
+  'why-new-year-resolutions-fail': [
+    { name: 'One Small Step — A Gentle Goals & Habits Planner', price: '$13.99', href: '/shop/one-small-step-a-gentle-goals-habits-planner', blurb: 'Resolutions die as vague instructions — this turns one into a small, specific, repeatable step that survives February.' },
+    { name: 'Arwign 66-Day Habit Tracker', price: '$14.99', href: '/shop/arwign-66-day-habit-tracker' },
+    { name: 'Tiny Anchors — A Habit & Routine Builder', price: '$13.99', href: '/shop/tiny-anchors-a-habit-routine-builder' },
+  ],
+  'working-across-time-zones': [
+    { name: 'The Anchored Day', price: '$13.99', href: '/shop/the-anchored-day', blurb: 'Anchor your day around fixed, protected hours — so a calendar spread across time zones stops eating your evenings.' },
+    { name: 'Off the Clock — A Work–Life Balance Planner', price: '$13.99', href: '/shop/off-the-clock-a-worklife-balance-planner' },
+    { name: 'A Place for Everything', price: '$12.99', href: '/shop/a-place-for-everything' },
+  ],
 }
 
 // Fallback for any post without an explicit entry above — real planners, never
